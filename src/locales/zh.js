@@ -30,7 +30,8 @@ export default {
     delete: '删除',
     postFailed: '发布失败',
     deleteError: '删除失败',
-    placeholder: '在想什么？'
+    placeholder: '在想什么？',
+    updateFailed: '更新失败'
   },
   article: {
     title: '文章',
@@ -50,12 +51,13 @@ export default {
     cover: '封面',
     upload: '上传',
     content: '正文',
-    saving: '保存中...',
+    publishing: '发布中...',
     publish: '发布',
     titleRequired: '标题和内容不能为空',
     loadFailed: '加载文章失败',
     saveFailed: '保存失败',
-    deleteError: '删除失败'
+    deleteError: '删除失败',
+    toc: '目录'
   },
   user: {
     title: '成员',
@@ -66,7 +68,9 @@ export default {
     momentsEmpty: '暂无动态。',
     articlesEmpty: '暂无文章。',
     heHim: '(他)',
-    sheHer: '(她)'
+    sheHer: '(她)',
+    admin: '管理',
+    members: '用户'
   },
   comment: {
     title: '{count} 条评论',
@@ -95,6 +99,7 @@ export default {
     pwdUpdateFailed: '密码修改失败',
     deleteFailed: '注销账号失败',
     avatarHint: '点击上传头像',
+    username: '用户名',
     nickname: '昵称',
     gender: '性别',
     male: '男',
@@ -143,7 +148,30 @@ export default {
     subtitle: '站点配置与工具',
     siteConfig: '站点配置',
     loadFailed: '加载配置失败',
-    saveFailed: '保存失败'
+    saveFailed: '保存失败',
+    saved: '已保存: {key}'
+  },
+  errors: {
+    'Username already exists': '用户名已存在',
+    'Username already taken': '用户名已被占用',
+    'Username cannot be empty': '用户名不能为空',
+    'Invalid username or password': '用户名或密码错误',
+    'Account is disabled': '账号已被禁用',
+    'Old password is incorrect': '原密码错误',
+    'User not found': '用户不存在',
+    'Moment not found': '动态不存在',
+    'Article not found': '文章不存在',
+    'Comment not found': '评论不存在',
+    'You can only edit your own moments': '只能编辑自己的动态',
+    'You can only edit your own articles': '只能编辑自己的文章',
+    'You can only delete your own comments': '只能删除自己的评论',
+    'No permission to delete this moment': '无权删除此动态',
+    'No permission to delete this article': '无权删除此文章',
+    'Only founder can pin moments': '仅管理员可置顶动态',
+    'Only founder can unpin moments': '仅管理员可取消置顶动态',
+    'Only founder can pin articles': '仅管理员可置顶文章',
+    'Only founder can unpin articles': '仅管理员可取消置顶文章',
+    'Internal server error': '服务器内部错误'
   },
   notFound: {
     message: '页面不存在。',
@@ -156,6 +184,9 @@ export default {
   },
   common: {
     loading: '加载中...',
+    posting: '发布中...',
+    saving: '保存中...',
+    backToList: '返回列表',
     confirm: '确定',
     cancel: '取消',
     delete: '删除',
@@ -167,11 +198,11 @@ export default {
     next: '下一页',
     preview: '预览',
     uploading: '上传中...',
-    uploadImage: '上传图片',
+    addImage: '添加图片',
     mdPlaceholder: '用 Markdown 编写...',
     website: '网站',
     email: '邮箱',
-    twitter: '推特',
+    x: 'X',
     download: '下载',
     close: '关闭'
   }

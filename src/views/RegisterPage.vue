@@ -3,8 +3,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 const router = useRouter()
 const auth = useAuthStore()
 
@@ -27,7 +29,7 @@ async function handleSubmit() {
     await auth.register(form.value)
     router.push('/')
   } catch (err) {
-    error.value = err.response?.data?.message || t('auth.registerFailed')
+    error.value = getMessage(err, 'auth.registerFailed')
   } finally {
     loading.value = false
   }

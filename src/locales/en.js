@@ -30,7 +30,8 @@ export default {
     delete: 'Delete',
     postFailed: 'Failed to post',
     deleteError: 'Failed to delete',
-    placeholder: "What's on your mind?"
+    placeholder: "What's on your mind?",
+    updateFailed: 'Failed to update'
   },
   article: {
     title: 'Articles',
@@ -50,12 +51,13 @@ export default {
     cover: 'Cover',
     upload: 'Upload',
     content: 'Content',
-    saving: 'Saving...',
+    publishing: 'Publishing...',
     publish: 'Publish',
     titleRequired: 'Title and content are required',
     loadFailed: 'Failed to load article',
     saveFailed: 'Save failed',
-    deleteError: 'Failed to delete'
+    deleteError: 'Failed to delete',
+    toc: 'On this page'
   },
   user: {
     title: 'Members',
@@ -66,7 +68,9 @@ export default {
     momentsEmpty: 'No moments yet.',
     articlesEmpty: 'No articles yet.',
     heHim: 'he/him',
-    sheHer: 'she/her'
+    sheHer: 'she/her',
+    admin: 'Admin',
+    members: 'User'
   },
   comment: {
     title: '{count} Comments',
@@ -95,6 +99,7 @@ export default {
     pwdUpdateFailed: 'Failed to change password',
     deleteFailed: 'Failed to delete account',
     avatarHint: 'Click to upload avatar',
+    username: 'Username',
     nickname: 'Nickname',
     gender: 'Gender',
     male: 'Male',
@@ -143,7 +148,30 @@ export default {
     subtitle: 'Site configuration & tools',
     siteConfig: 'Site Configuration',
     loadFailed: 'Failed to load configs',
-    saveFailed: 'Save failed'
+    saveFailed: 'Save failed',
+    saved: 'Saved: {key}'
+  },
+  errors: {
+    'Username already exists': 'Username already exists',
+    'Username already taken': 'Username already taken',
+    'Username cannot be empty': 'Username cannot be empty',
+    'Invalid username or password': 'Invalid username or password',
+    'Account is disabled': 'Account is disabled',
+    'Old password is incorrect': 'Old password is incorrect',
+    'User not found': 'User not found',
+    'Moment not found': 'Moment not found',
+    'Article not found': 'Article not found',
+    'Comment not found': 'Comment not found',
+    'You can only edit your own moments': 'You can only edit your own moments',
+    'You can only edit your own articles': 'You can only edit your own articles',
+    'You can only delete your own comments': 'You can only delete your own comments',
+    'No permission to delete this moment': 'No permission to delete this moment',
+    'No permission to delete this article': 'No permission to delete this article',
+    'Only founder can pin moments': 'Only admin can pin moments',
+    'Only founder can unpin moments': 'Only admin can unpin moments',
+    'Only founder can pin articles': 'Only admin can pin articles',
+    'Only founder can unpin articles': 'Only admin can unpin articles',
+    'Internal server error': 'Internal server error'
   },
   notFound: {
     message: "The page you're looking for doesn't exist.",
@@ -156,6 +184,9 @@ export default {
   },
   common: {
     loading: 'Loading...',
+    posting: 'Posting...',
+    saving: 'Saving...',
+    backToList: 'Back to list',
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete: 'Delete',
@@ -167,11 +198,11 @@ export default {
     next: 'Next',
     preview: 'Preview',
     uploading: 'Uploading...',
-    uploadImage: 'Upload Image',
+    addImage: 'Add Image',
     mdPlaceholder: 'Write in Markdown...',
     website: 'Website',
     email: 'Email',
-    twitter: 'Twitter',
+    x: 'X',
     download: 'Download',
     close: 'Close'
   }

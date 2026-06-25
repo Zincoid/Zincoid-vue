@@ -2,11 +2,13 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 const auth = useAuthStore()
 
 const moments = ref([])
@@ -77,7 +79,7 @@ async function submitMoment() {
     page.value = 1
     await fetchMoments()
   } catch (err) {
-    alert(err.response?.data?.message || t('moment.postFailed'))
+    alert(getMessage(err, 'moment.postFailed'))
   } finally {
     posting.value = false
   }
@@ -139,7 +141,7 @@ async function submitMoment() {
           @click="submitMoment"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          {{ posting ? t('common.loading') : t('moment.post') }}
+          {{ posting ? t('common.posting') : t('moment.post') }}
         </button>
       </div>
     </div>
@@ -156,7 +158,7 @@ async function submitMoment() {
 
 <style scoped>
 .timeline { padding-bottom: var(--spacing-4xl); }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2xl); flex-wrap: wrap; gap: var(--spacing-lg); }
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-lg); }
 
 .editor { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
 .editor__input { width: 100%; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); line-height: var(--leading-normal); background: var(--color-bg); color: var(--color-text); resize: vertical; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }

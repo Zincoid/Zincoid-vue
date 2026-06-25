@@ -77,7 +77,7 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: () => import('@/views/AdminPage.vue'),
-    meta: { requiresAuth: true, requiresFounder: true, title: 'Manage' }
+    meta: { requiresAuth: true, requiresAdmin: true, title: 'Manage' }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -103,7 +103,7 @@ router.beforeEach((to, from, next) => {
     return next('/login')
   }
 
-  if (to.meta.requiresFounder && (!user || user.role !== 1)) {
+  if (to.meta.requiresAdmin && (!user || user.role !== 1)) {
     return next('/')
   }
 

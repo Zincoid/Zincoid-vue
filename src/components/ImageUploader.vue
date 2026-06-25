@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { fileAPI } from '@/api'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 
 const emit = defineEmits(['uploaded'])
 
@@ -18,7 +20,7 @@ async function handleUpload(e) {
     const { data } = await fileAPI.upload(file)
     emit('uploaded', data.data.url)
   } catch (err) {
-    alert(t('common.failed') + ': ' + (err.response?.data?.message || err.message))
+    alert(getMessage(err, 'common.failed'))
   } finally {
     uploading.value = false
     e.target.value = ''
@@ -36,7 +38,7 @@ async function handleUpload(e) {
       :disabled="uploading"
     />
     <span class="uploader__icon">+</span>
-    <span class="uploader__text">{{ uploading ? t('common.uploading') : t('common.uploadImage') }}</span>
+    <span class="uploader__text">{{ uploading ? t('common.uploading') : t('common.addImage') }}</span>
   </label>
 </template>
 

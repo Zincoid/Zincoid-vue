@@ -133,7 +133,7 @@ const visibleComments = computed(() => {
               <div class="comment__actions">
                 <button class="comment__reply-btn" @click="startReply(comment)">{{ t('comment.reply') }}</button>
                 <button
-                  v-if="auth.user?.id === comment.userId || auth.isFounder"
+                  v-if="auth.user?.id === comment.userId || auth.isAdmin"
                   class="comment__delete-btn"
                   @click="emit('delete', comment.id)"
                 >

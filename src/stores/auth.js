@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(JSON.parse(localStorage.getItem('user') || 'null'))
 
   const isLoggedIn = computed(() => !!token.value)
-  const isFounder = computed(() => user.value?.role === 1)
+  const isAdmin = computed(() => user.value?.role === 1)
 
   async function login(credentials) {
     const { data } = await authAPI.login(credentials)
@@ -54,5 +54,5 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/')
   }
 
-  return { token, user, isLoggedIn, isFounder, login, register, fetchMe, updateProfile, changePassword, logout }
+  return { token, user, isLoggedIn, isAdmin, login, register, fetchMe, updateProfile, changePassword, logout }
 })

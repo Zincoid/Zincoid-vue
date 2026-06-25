@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { adminAPI, siteConfigAPI } from '@/api'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 
 const configs = ref([])
 const message = ref('')
@@ -21,10 +23,10 @@ onMounted(async () => {
 async function saveConfig(config) {
   try {
     await adminAPI.updateConfig(config.configKey, config.configValue)
-    message.value = `Saved: ${config.configKey}`
+    message.value = t('admin.saved', { key: config.configKey })
     setTimeout(() => message.value = '', 2000)
   } catch (err) {
-    error.value = err.response?.data?.message || t('admin.saveFailed')
+    error.value = getMessage(err, 'admin.saveFailed')
   }
 }
 </script>

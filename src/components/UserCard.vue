@@ -47,7 +47,7 @@ const router = useRouter()
 .user-card:hover {
   border-color: #f9a8d4;
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: translateY(-5px);
 }
 
 .user-card__avatar {

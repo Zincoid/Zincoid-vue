@@ -2,10 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { articleAPI, fileAPI } from '@/api'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 
 const route = useRoute()
 const router = useRouter()
@@ -19,8 +21,9 @@ const form = ref({
   status: 1
 })
 
+const mdEditor = ref(null)
 const error = ref('')
-const saving = ref(false)
+const publishing = ref(false)
 const coverFile = ref(null)
 const coverPreview = ref('')
 
@@ -54,25 +57,27 @@ async function save() {
     error.value = t('article.titleRequired')
     return
   }
-  saving.value = true
+  publishing.value = true
   error.value = ''
   try {
+    const contentMd = await mdEditor.value.resolveImages(form.value.contentMd)
     if (coverFile.value) {
       const { data } = await fileAPI.upload(coverFile.value, 'ARTICLE', null)
       form.value.coverImage = data.data.url
     }
+    const payload = { ...form.value, contentMd }
     if (isEdit.value) {
-      await articleAPI.update(route.params.id, form.value)
+      await articleAPI.update(route.params.id, payload)
     } else {
-      const { data } = await articleAPI.create(form.value)
+      const { data } = await articleAPI.create(payload)
       router.push(`/articles/${data.data.id}`)
       return
     }
     router.push(`/articles/${route.params.id}`)
   } catch (err) {
-    error.value = err.response?.data?.message || t('article.saveFailed')
+    error.value = getMessage(err, 'article.saveFailed')
   } finally {
-    saving.value = false
+    publishing.value = false
   }
 }
 </script>
@@ -106,7 +111,7 @@ async function save() {
 
       <div class="field">
         <label>{{ t('article.content') }}</label>
-        <MarkdownEditor v-model="form.contentMd" />
+        <MarkdownEditor ref="mdEditor" v-model="form.contentMd" />
       </div>
     </div>
 
@@ -117,9 +122,9 @@ async function save() {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         {{ t('common.cancel') }}
       </router-link>
-      <button class="btn btn--primary" :disabled="saving" @click="save">
+      <button class="btn btn--primary" :disabled="publishing" @click="save">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        {{ saving ? t('article.saving') : (isEdit ? t('common.update') : t('article.publish')) }}
+        {{ publishing ? t('article.publishing') : (isEdit ? t('common.update') : t('article.publish')) }}
       </button>
     </div>
   </div>

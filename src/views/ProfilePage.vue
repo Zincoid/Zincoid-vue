@@ -1,15 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { fileAPI, authAPI } from '@/api'
 
 const { t } = useI18n()
-const router = useRouter()
+const { getMessage } = useError()
 const auth = useAuthStore()
 
 const profile = ref({
+  username: '',
   nickname: '',
   gender: null,
   title: '',
@@ -34,6 +35,7 @@ onMounted(async () => {
     await auth.fetchMe()
     const u = auth.user
     profile.value = {
+      username: u.username || '',
       nickname: u.nickname || '',
       gender: u.gender ?? null,
       title: u.title || '',
@@ -78,7 +80,7 @@ async function saveProfile() {
     await auth.updateProfile(payload)
     message.value = t('profile.saved')
   } catch (err) {
-    error.value = err.response?.data?.message || t('profile.saveFailed')
+    error.value = getMessage(err, 'profile.saveFailed')
   }
 }
 
@@ -90,7 +92,7 @@ async function changePassword() {
     pwdMessage.value = t('profile.passwordChanged')
     pwdForm.value = { oldPassword: '', newPassword: '' }
   } catch (err) {
-    pwdError.value = err.response?.data?.message || t('profile.pwdUpdateFailed')
+    pwdError.value = getMessage(err, 'profile.pwdUpdateFailed')
   }
 }
 
@@ -98,11 +100,9 @@ async function deleteAccount() {
   if (!confirm(t('profile.deleteAccountConfirm'))) return
   try {
     await authAPI.deleteMe()
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    router.push('/')
+    auth.logout()
   } catch (err) {
-    error.value = err.response?.data?.message || t('profile.deleteFailed')
+    error.value = getMessage(err, 'profile.deleteFailed')
   }
 }
 </script>
@@ -130,6 +130,10 @@ async function deleteAccount() {
         <div class="card">
           <h2 class="card__title">{{ t('profile.information') }}</h2>
           <div class="fields">
+            <div class="field">
+              <label class="field__label">{{ t('profile.username') }}</label>
+              <input v-model="profile.username" class="field__input" />
+            </div>
             <div class="field">
               <label class="field__label">{{ t('profile.nickname') }}</label>
               <input v-model="profile.nickname" class="field__input" />
@@ -168,7 +172,7 @@ async function deleteAccount() {
             </div>
             <div class="field">
               <label class="field__label">{{ t('profile.contacts') }}</label>
-              <textarea v-model="profile.contacts" class="field__input field__textarea" rows="2" placeholder='{"website":"...","email":"...","github":"...","bilibili":"...","twitter":"..."}'></textarea>
+              <textarea v-model="profile.contacts" class="field__input field__textarea" rows="2" placeholder='{"website":"...","email":"...","github":"...","bilibili":"...","x":"..."}'></textarea>
               <span class="field__hint">{{ t('profile.contactsHint') }}</span>
             </div>
           </div>

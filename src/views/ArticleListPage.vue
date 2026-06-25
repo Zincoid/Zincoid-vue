@@ -59,6 +59,6 @@ function onPageChange(p) {
 
 <style scoped>
 .article-list { padding-bottom: var(--spacing-4xl); }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-2xl); flex-wrap: wrap; gap: var(--spacing-lg); }
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-lg); }
 .articles-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 </style>

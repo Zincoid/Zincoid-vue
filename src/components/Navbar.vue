@@ -18,7 +18,7 @@ const navLinks = computed(() => {
     { to: '/articles', label: t('nav.articles'), icon: 'articles' },
     { to: '/users', label: t('nav.members'), icon: 'members' }
   ]
-  if (auth.isFounder) {
+  if (auth.isAdmin) {
     links.push({ to: '/admin', label: t('nav.manage'), icon: 'admin' })
   }
   return links
@@ -40,12 +40,12 @@ function closeMenu() {
 <template>
   <nav class="navbar">
     <div class="navbar__inner">
-      <router-link to="/" class="navbar__brand" @click="closeMenu">
+      <router-link to="/" class="navbar__brand">
         <span class="navbar__brand-text">Zincoid</span>
         <span class="navbar__brand-text navbar__brand-text--light">'s</span>
       </router-link>
 
-      <button class="navbar__burger" @click="toggleMenu" :aria-expanded="menuOpen">
+      <button class="navbar__burger" :class="{ 'navbar__burger--open': menuOpen }" @click="toggleMenu" :aria-expanded="menuOpen">
         <span></span>
         <span></span>
         <span></span>
@@ -57,8 +57,13 @@ function closeMenu() {
             <router-link
               :to="link.to"
               class="navbar__item"
-              :class="{ 'navbar__item--active': isActive(link.to) }"
-              @click="closeMenu"
+              :class="{
+                'navbar__item--active': isActive(link.to),
+                'navbar__item--moments': link.icon === 'moments',
+                'navbar__item--articles': link.icon === 'articles',
+                'navbar__item--members': link.icon === 'members',
+                'navbar__item--admin': link.icon === 'admin'
+              }"
             >
               <svg v-if="link.icon === 'moments'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               <svg v-else-if="link.icon === 'articles'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -71,7 +76,7 @@ function closeMenu() {
 
         <div class="navbar__actions">
           <template v-if="auth.isLoggedIn">
-            <router-link to="/profile" class="navbar__item" :class="{ 'navbar__item--active': isActive('/profile') }" @click="closeMenu">
+            <router-link to="/profile" class="navbar__item navbar__item--profile" :class="{ 'navbar__item--active': isActive('/profile') }">
               <img
                 v-if="auth.user?.avatar"
                 :src="auth.user.avatar"
@@ -86,7 +91,7 @@ function closeMenu() {
               {{ t('nav.logout') }}
             </button>
           </template>
-          <router-link v-else to="/login" class="navbar__item" :class="{ 'navbar__item--active': isActive('/login') }" @click="closeMenu">
+          <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') }">
             <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
             {{ t('nav.signIn') }}
           </router-link>
@@ -95,12 +100,12 @@ function closeMenu() {
             {{ t('nav.lang') }}
           </button>
         </div>
-        <div v-if="auth.isLoggedIn" class="navbar__footer">
+        <div class="navbar__footer">
           <button class="navbar__item" @click="locale.toggleLocale()">
             <svg class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             {{ t('nav.lang') }}
           </button>
-          <button class="navbar__item" @click="auth.logout(); closeMenu()">
+          <button v-if="auth.isLoggedIn" class="navbar__item navbar__item--logout-mobile" @click="auth.logout(); closeMenu()">
             <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             {{ t('nav.logout') }}
           </button>
@@ -130,20 +135,22 @@ function closeMenu() {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 var(--spacing-xl);
   max-width: 100%;
 }
 
 .navbar__brand {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
   color: var(--color-text-heading);
   letter-spacing: -0.3px;
   flex-shrink: 0;
   min-width: 140px;
-  margin-right: var(--spacing-lg);
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-3xl);
+  height: 100%;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.25);
 }
 .navbar__brand-text--light {
   font-weight: var(--weight-light);
@@ -156,6 +163,7 @@ function closeMenu() {
   gap: 5px;
   padding: var(--spacing-xs);
   margin-left: auto;
+  margin-right: var(--spacing-md);
   z-index: 101;
 }
 .navbar__burger span {
@@ -164,7 +172,17 @@ function closeMenu() {
   height: 2px;
   background: var(--color-text-heading);
   border-radius: var(--rounded-full);
-  transition: transform var(--transition-fast);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  transform-origin: center;
+}
+.navbar__burger--open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.navbar__burger--open span:nth-child(2) {
+  opacity: 0;
+}
+.navbar__burger--open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 .navbar__menu {
@@ -210,6 +228,36 @@ function closeMenu() {
   background: var(--color-primary-light);
   border-bottom-color: var(--color-primary);
 }
+.navbar__item--moments { border-bottom: 2px solid rgba(219, 39, 119, 0.25); }
+.navbar__item--articles { border-bottom: 2px solid rgba(22, 163, 74, 0.25); }
+.navbar__item--members { border-bottom: 2px solid rgba(37, 99, 235, 0.25); }
+.navbar__item--admin { border-bottom: 2px solid rgba(107, 33, 168, 0.25); }
+.navbar__item--moments.navbar__item--active {
+  color: #db2777;
+  background: #fce7f3;
+  border-bottom: 4px solid #db2777;
+}
+.navbar__item--articles.navbar__item--active {
+  color: #16a34a;
+  background: #dcfce7;
+  border-bottom: 4px solid #16a34a;
+}
+.navbar__item--members.navbar__item--active {
+  color: #2563eb;
+  background: #dbeafe;
+  border-bottom: 4px solid #2563eb;
+}
+.navbar__item--admin.navbar__item--active {
+  color: #6b21a8;
+  background: #f3e8ff;
+  border-bottom: 4px solid #6b21a8;
+}
+.navbar__item--profile.navbar__item--active,
+.navbar__item--signin.navbar__item--active {
+  color: #111827;
+  background: #f3f4f6;
+  border-bottom: 4px solid #111827;
+}
 
 .navbar__nav-icon {
   flex-shrink: 0;
@@ -253,7 +301,13 @@ function closeMenu() {
   font-weight: var(--weight-medium);
 }
 
+.navbar__item--logout:hover,
+.navbar__item--logout-mobile:hover {
+  color: var(--color-danger);
+}
+
 @media (max-width: 960px) {
+  .navbar__brand { border-bottom: none; }
   .navbar__burger {
     display: flex;
   }
@@ -324,6 +378,10 @@ function closeMenu() {
     border-bottom: none;
     width: 100%;
   }
+  .navbar__item--moments.navbar__item--active { border-bottom: none; border-left: 4px solid #db2777; }
+  .navbar__item--articles.navbar__item--active { border-bottom: none; border-left: 4px solid #16a34a; }
+  .navbar__item--members.navbar__item--active { border-bottom: none; border-left: 4px solid #2563eb; }
+  .navbar__item--admin.navbar__item--active { border-bottom: none; border-left: 4px solid #6b21a8; }
   .navbar__item--logout {
     display: none;
   }
@@ -342,11 +400,33 @@ function closeMenu() {
     border-top: 1px solid var(--color-border);
     margin-top: var(--spacing-xs);
     padding-top: var(--spacing-xs);
+    gap: 4px;
   }
   .navbar__footer .navbar__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-normal);
     color: var(--color-text);
+    background: none;
+    border: none;
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
   }
-  .navbar__footer .navbar__item:last-child {
+  .navbar__footer .navbar__item:hover {
+    color: var(--color-text-heading);
+    background: var(--color-bg-alt);
+  }
+  .navbar__footer .navbar__item--logout-mobile {
+    color: #e5534b;
+  }
+  .navbar__footer .navbar__item--logout-mobile:hover {
     color: var(--color-danger);
   }
 }

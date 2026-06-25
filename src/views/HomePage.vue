@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
-import { momentAPI, articleAPI } from '@/api'
+import { momentAPI, articleAPI, userAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 
@@ -17,26 +17,40 @@ const typed = ref('')
 const typingDone = ref(false)
 let typingTimer = null
 
-// Glowing red square — dynamic grid tracking
+// Colored squares on grid — dynamic tracking
 const GRID = 24
-const sqX = ref(0)
-const sqY = ref(0)
 const sqCols = ref(20)
 const sqRows = ref(12)
 let sqTimer = null
 const heroRef = ref(null)
+const squares = reactive([
+  { x: 0, y: 0, cls: 'hero-terminal__sq--red' },
+  { x: 0, y: 0, cls: 'hero-terminal__sq--green' },
+  { x: 0, y: 0, cls: 'hero-terminal__sq--blue' }
+])
 
-function moveSquare() {
+function moveSquares() {
   const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]]
-  const [dx, dy] = dirs[Math.floor(Math.random() * 4)]
-  sqX.value = (sqX.value + dx + sqCols.value) % sqCols.value
-  sqY.value = (sqY.value + dy + sqRows.value) % sqRows.value
+  for (const sq of squares) {
+    const [dx, dy] = dirs[Math.floor(Math.random() * 4)]
+    sq.x = (sq.x + dx + sqCols.value) % sqCols.value
+    sq.y = (sq.y + dy + sqRows.value) % sqRows.value
+  }
+}
+
+function clampSquares() {
+  for (const sq of squares) {
+    sq.x = Math.min(sq.x, sqCols.value - 1)
+    sq.y = Math.min(sq.y, sqRows.value - 1)
+  }
 }
 
 onMounted(() => {
-  sqX.value = Math.floor(Math.random() * sqCols.value)
-  sqY.value = Math.floor(Math.random() * sqRows.value)
-  sqTimer = setInterval(moveSquare, 1000)
+  for (const sq of squares) {
+    sq.x = Math.floor(Math.random() * sqCols.value)
+    sq.y = Math.floor(Math.random() * sqRows.value)
+  }
+  sqTimer = setInterval(moveSquares, 1000)
 
   const observer = new ResizeObserver(([entry]) => {
     const w = entry.target.clientWidth
@@ -46,8 +60,7 @@ onMounted(() => {
     if (nc !== sqCols.value || nr !== sqRows.value) {
       sqCols.value = nc
       sqRows.value = nr
-      sqX.value = Math.min(sqX.value, sqCols.value - 1)
-      sqY.value = Math.min(sqY.value, sqRows.value - 1)
+      clampSquares()
     }
   })
   if (heroRef.value) observer.observe(heroRef.value)
@@ -73,6 +86,57 @@ function startTyping() {
   }, 100)
 }
 
+// Terminal prompt typing/deleting cycle
+const counts = ref({ moments: 0, articles: 0, members: 0 })
+
+const terminalCommands = computed(() => [
+  { cmd: 'ls -la ~/moments/', output: `${counts.value.moments} moments` },
+  { cmd: 'ls -la ~/articles/', output: `${counts.value.articles} articles` },
+  { cmd: 'ls -la ~/members/', output: `${counts.value.members} members` },
+  { cmd: 'cat /etc/motd', output: 'Welcome!' },
+  { cmd: 'echo $USER', output: auth.user?.nickname || 'visitor' }
+])
+const terminalTyped = ref('')
+const terminalOutput = ref('')
+const terminalDeleting = ref(false)
+let terminalCycleTimer = null
+let terminalPauseTimer = null
+let cmdIdx = 0
+
+function terminalCycle() {
+  clearTimeout(terminalPauseTimer)
+  const cmd = terminalCommands.value[cmdIdx % terminalCommands.value.length]
+  let i = 0
+  terminalDeleting.value = false
+  terminalOutput.value = ''
+  clearInterval(terminalCycleTimer)
+
+  terminalCycleTimer = setInterval(() => {
+    if (!terminalDeleting.value) {
+      terminalTyped.value = cmd.cmd.slice(0, i + 1)
+      i++
+      if (i > cmd.cmd.length) {
+        clearInterval(terminalCycleTimer)
+        terminalOutput.value = cmd.output
+        terminalPauseTimer = setTimeout(() => {
+          terminalDeleting.value = true
+          let j = cmd.cmd.length
+          terminalCycleTimer = setInterval(() => {
+            terminalTyped.value = cmd.cmd.slice(0, j)
+            j--
+            if (j < 0) {
+              clearInterval(terminalCycleTimer)
+              terminalOutput.value = ''
+              cmdIdx++
+              terminalPauseTimer = setTimeout(() => terminalCycle(), 1500)
+            }
+          }, 40)
+        }, 3000)
+      }
+    }
+  }, 100)
+}
+
 watch(() => locale.locale, () => {
   startTyping()
 })
@@ -80,17 +144,26 @@ watch(() => locale.locale, () => {
 onMounted(async () => {
   startTyping()
   try {
-    const [mRes, aRes] = await Promise.all([
+    const [mRes, aRes, uRes] = await Promise.all([
       momentAPI.getTimeline(1, 5),
-      articleAPI.getList(1, 5)
+      articleAPI.getList(1, 5),
+      userAPI.getList(1, 1)
     ])
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
+    counts.value.moments = mRes.data.data.total || 0
+    counts.value.articles = aRes.data.data.total || 0
+    counts.value.members = uRes.data.data.total || 0
   } catch (e) {
     console.error(e)
   } finally {
     loading.value = false
+    terminalCycle()
   }
+})
+onUnmounted(() => {
+  clearInterval(terminalCycleTimer)
+  clearTimeout(terminalPauseTimer)
 })
 </script>
 
@@ -99,10 +172,12 @@ onMounted(async () => {
     <!-- Hero + Terminal -->
     <section class="hero-terminal" ref="heroRef" style="position:relative;overflow:hidden">
       <div
-        class="hero-terminal__sq"
+        v-for="(sq, i) in squares"
+        :key="i"
+        :class="['hero-terminal__sq', sq.cls]"
         :style="{
-          left: sqX * GRID + 'px',
-          top: sqY * GRID + 'px'
+          left: sq.x * GRID + 'px',
+          top: sq.y * GRID + 'px'
         }"
       ></div>
       <div class="hero-terminal__inner container-wide">
@@ -113,15 +188,12 @@ onMounted(async () => {
           <p class="hero-terminal__subtitle">{{ typed }} <span class="cursor cursor--square">▌</span></p>
         </div>
         <div class="hero-terminal__cli">
-          <pre class="terminal__text">
-<span class="terminal__line"><span class="terminal__prompt">$</span> ssh zincoid-website</span>
+          <pre class="terminal__text"><span class="terminal__line"><span class="terminal__prompt">$</span> ssh zincoid-website</span>
 <span class="terminal__line"><span class="terminal__dim">&gt; authenticating...</span></span>
 <span class="terminal__line"><span class="terminal__prompt">$</span> whoami</span>
 <span class="terminal__line"><span class="terminal__dim">&gt; {{ auth.user?.nickname || 'visitor' }}</span></span>
-<span class="terminal__line"><span class="terminal__prompt">$</span> ls ~/</span>
-<span class="terminal__line"><span class="terminal__dim"><router-link to="/moments" class="terminal__link">moments/</router-link>  <router-link to="/articles" class="terminal__link">articles/</router-link>  <router-link to="/users" class="terminal__link">members/</router-link></span></span>
-<span class="terminal__line"><span class="terminal__prompt">$</span> <span class="terminal__cursor">_</span></span>
-          </pre>
+<span class="terminal__line"><span class="terminal__prompt">$</span> {{ terminalTyped }}<span class="terminal__cursor">_</span></span>
+<span v-if="terminalOutput" class="terminal__line"><span class="terminal__dim">&gt; {{ terminalOutput }}</span></span></pre>
         </div>
       </div>
     </section>
@@ -167,10 +239,23 @@ onMounted(async () => {
   width: 20px;
   height: 20px;
   margin: 2px;
-  background: #ff3333;
+  border-radius: 3px;
+  border: 1px solid;
   transition: left 0.12s ease, top 0.12s ease;
   pointer-events: none;
   z-index: 1;
+}
+.hero-terminal__sq--red {
+  background: rgba(255, 51, 51, 0.1);
+  border-color: rgba(255, 51, 51, 0.1);
+}
+.hero-terminal__sq--green {
+  background: rgba(63, 185, 80, 0.1);
+  border-color: rgba(63, 185, 80, 0.1);
+}
+.hero-terminal__sq--blue {
+  background: rgba(88, 166, 255, 0.1);
+  border-color: rgba(88, 166, 255, 0.1);
 }
 
 /* Hero + Terminal */
@@ -180,7 +265,8 @@ onMounted(async () => {
     linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
     #0d1117;
   background-size: 24px 24px;
-  padding: 48px 0;
+  display: flex;
+  align-items: center;
   height: 288px;
   margin-bottom: var(--spacing-3xl);
 }
@@ -304,10 +390,14 @@ onMounted(async () => {
   .hero-terminal {
     height: auto;
     min-height: 288px;
+    padding: 48px 0;
+    overflow: hidden;
   }
   .hero-terminal__cli {
     overflow-x: auto;
     max-width: 100%;
+    height: 168px;
+    overflow-y: hidden;
   }
 }
 

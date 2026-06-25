@@ -9,6 +9,17 @@ import ContactButtons from '@/components/ContactButtons.vue'
 
 const { t } = useI18n()
 
+const skillColors = [
+  { bg: '#dbeafe', fg: '#2563eb' },
+  { bg: '#dcfce7', fg: '#16a34a' },
+  { bg: '#fce7f3', fg: '#db2777' },
+  { bg: '#fef3c7', fg: '#d97706' },
+  { bg: '#ede9fe', fg: '#7c3aed' },
+  { bg: '#cffafe', fg: '#0891b2' },
+  { bg: '#fee2e2', fg: '#dc2626' },
+  { bg: '#e0e7ff', fg: '#4f46e5' },
+]
+
 const route = useRoute()
 const user = ref(null)
 const moments = ref([])
@@ -47,7 +58,7 @@ onMounted(async () => {
         <p v-if="user.bio" class="profile-bio">{{ user.bio }}</p>
 
         <div v-if="user.skills?.length" class="profile-skills">
-          <span v-for="skill in user.skills" :key="skill" class="skill-tag">{{ skill }}</span>
+          <span v-for="(skill, i) in user.skills" :key="skill" class="skill-tag" :style="{ background: skillColors[i % skillColors.length].bg, color: skillColors[i % skillColors.length].fg }">{{ skill }}</span>
         </div>
       </div>
 
@@ -73,6 +84,10 @@ onMounted(async () => {
       <p v-if="!articles.length" class="empty-state">{{ t('user.articlesEmpty') }}</p>
     </div>
   </div>
+
+  <router-link to="/users" class="back-fab" :title="t('common.backToList')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+  </router-link>
 </template>
 
 <style scoped>
@@ -141,7 +156,7 @@ onMounted(async () => {
 .profile-skills {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -149,8 +164,6 @@ onMounted(async () => {
   font-size: var(--text-xs);
   padding: 2px 10px;
   border-radius: var(--rounded-full);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
   font-weight: var(--weight-medium);
 }
 

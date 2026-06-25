@@ -3,8 +3,10 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
@@ -42,42 +44,76 @@ watch(isLogin, () => {
 
 onMounted(startSequence)
 
-// Glowing red square — dynamic grid tracking
-const GRID = 40
-const sqX = ref(0)
-const sqY = ref(0)
-const sqCols = ref(16)
-const sqRows = ref(12)
-let sqTimer = null
+// Conway's Game of Life
+const GRID = 24
+const cells = ref([]) // flat array of {x, y} for alive cells
 const leftPanel = ref(null)
 
-function moveSquare() {
-  const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]]
-  const [dx, dy] = dirs[Math.floor(Math.random() * 4)]
-  sqX.value = (sqX.value + dx + sqCols.value) % sqCols.value
-  sqY.value = (sqY.value + dy + sqRows.value) % sqRows.value
+let grid = []       // 2D number[][] for computation (grid[y][x])
+let cols = 0
+let rows = 0
+let gameTimer = null
+
+function countNeighbors(g, x, y) {
+  let n = 0
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue
+      n += g[(y + dy + rows) % rows][(x + dx + cols) % cols]
+    }
+  }
+  return n
+}
+
+function tick() {
+  const ng = Array.from({ length: rows }, () => Array(cols).fill(0))
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const n = countNeighbors(grid, x, y)
+      ng[y][x] = grid[y][x]
+        ? (n === 2 || n === 3 ? 1 : 0)
+        : (n === 3 ? 1 : 0)
+    }
+  }
+  grid = ng
+  flatten()
+}
+
+function flatten() {
+  const alive = []
+  for (let y = 0; y < rows; y++)
+    for (let x = 0; x < cols; x++)
+      if (grid[y][x]) alive.push({ x, y })
+  cells.value = alive
+}
+
+function resizeGrid(c, r) {
+  const ng = Array.from({ length: r }, (_, y) =>
+    Array.from({ length: c }, (_, x) =>
+      y < rows && x < cols ? grid[y][x] : Math.random() < 0.25 ? 1 : 0
+    )
+  )
+  cols = c; rows = r; grid = ng
+  flatten()
 }
 
 onMounted(() => {
-  sqX.value = Math.floor(Math.random() * sqCols.value)
-  sqY.value = Math.floor(Math.random() * sqRows.value)
-  sqTimer = setInterval(moveSquare, 1000)
+  cols = Math.floor(leftPanel.value.clientWidth / GRID)
+  rows = Math.floor(leftPanel.value.clientHeight / GRID)
+  grid = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() < 0.2 ? 1 : 0)
+  )
+  flatten()
+  gameTimer = setInterval(tick, 250)
 
   const observer = new ResizeObserver(([entry]) => {
-    const w = entry.target.clientWidth
-    const h = entry.target.clientHeight
-    const nc = Math.floor(w / GRID)
-    const nr = Math.floor(h / GRID)
-    if (nc !== sqCols.value || nr !== sqRows.value) {
-      sqCols.value = nc
-      sqRows.value = nr
-      sqX.value = Math.min(sqX.value, sqCols.value - 1)
-      sqY.value = Math.min(sqY.value, sqRows.value - 1)
-    }
+    const nc = Math.floor(entry.target.clientWidth / GRID)
+    const nr = Math.floor(entry.target.clientHeight / GRID)
+    if (nc !== cols || nr !== rows) resizeGrid(nc, nr)
   })
-  if (leftPanel.value) observer.observe(leftPanel.value)
+  observer.observe(leftPanel.value)
   onUnmounted(() => {
-    clearInterval(sqTimer)
+    clearInterval(gameTimer)
     observer.disconnect()
   })
 })
@@ -97,7 +133,7 @@ async function handleLogin() {
     await auth.login({ username: form.value.username, password: form.value.password })
     router.push('/')
   } catch (err) {
-    error.value = err.response?.data?.message || t('auth.loginFailed')
+    error.value = getMessage(err, 'auth.loginFailed')
   } finally {
     loading.value = false
   }
@@ -118,7 +154,7 @@ async function handleRegister() {
     await auth.register({ username: form.value.username, password: form.value.password, nickname: form.value.nickname })
     router.push('/')
   } catch (err) {
-    error.value = err.response?.data?.message || t('auth.registerFailed')
+    error.value = getMessage(err, 'auth.registerFailed')
   } finally {
     loading.value = false
   }
@@ -141,12 +177,14 @@ function switchTo(path) {
 
 <template>
   <div class="auth-split">
-    <div class="auth-split__left" ref="leftPanel">
+    <div class="auth-split__left" :class="{ 'auth-split__left--register': !isLogin }" ref="leftPanel">
       <div
+        v-for="(cell, i) in cells"
+        :key="i"
         class="auth-split__sq"
         :style="{
-          left: sqX * GRID + 'px',
-          top: sqY * GRID + 'px'
+          left: cell.x * GRID + 'px',
+          top: cell.y * GRID + 'px'
         }"
       ></div>
       <div class="auth-brand">
@@ -159,13 +197,11 @@ function switchTo(path) {
 ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚═╝╚═════╝ ╚══════╝
         </pre>
         <div class="auth-terminal">
-          <pre class="auth-terminal__text">
-<span class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> ssh zincoid-website</span>
+          <pre class="auth-terminal__text"><span class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> ssh zincoid-website</span>
 <span class="auth-terminal__line"><span class="auth-terminal__dim">&gt; authenticating...</span></span>
 <span class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> {{ typedCmd }}<span v-if="step === 0" class="cursor">_</span></span>
 <span v-if="step >= 1" class="auth-terminal__line"><span class="auth-terminal__dim">&gt; {{ isLogin ? 'returning_user' : 'new_user' }}</span></span>
-<span v-if="step === 2" class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> <span class="auth-terminal__cursor">_</span></span>
-          </pre>
+<span v-if="step === 2" class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> <span class="auth-terminal__cursor">_</span></span></pre>
         </div>
       </div>
     </div>
@@ -232,12 +268,13 @@ function switchTo(path) {
 
 /* ── Left: Brand + Terminal ── */
 .auth-split__left {
-  flex: 1;
+  flex: 0 0 585px;
+  max-width: 52%;
   background:
-    linear-gradient(rgba(255,255,255,0.03) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 2px, transparent 2px),
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
     #0d1117;
-  background-size: 40px 40px;
+  background-size: 24px 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,13 +285,15 @@ function switchTo(path) {
 
 .auth-split__sq {
   position: absolute;
-  width: 30px;
-  height: 30px;
-  margin: 5px;
-  background: #ff3333;
-  transition: left 0.12s ease, top 0.12s ease;
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  background: rgba(88, 166, 255, 0.05);
   pointer-events: none;
   z-index: 1;
+}
+.auth-split__left--register .auth-split__sq {
+  background: rgba(63, 185, 80, 0.05);
 }
 
 .auth-brand {
@@ -393,12 +432,24 @@ function switchTo(path) {
   .auth-split {
     flex-direction: column;
     min-height: auto;
+    margin-bottom: 0;
   }
   .auth-split__left {
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    flex: 0 0 200px;
+    max-width: none;
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+  .auth-brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-3xl);
+    text-align: left;
   }
   .auth-brand__ascii {
-    font-size: clamp(0.22rem, 0.6vw, 0.4rem);
+    font-size: clamp(0.35rem, 0.8vw, 0.5rem);
+    margin: 0;
+    flex-shrink: 0;
   }
   .auth-terminal__text {
     font-size: var(--text-xs);

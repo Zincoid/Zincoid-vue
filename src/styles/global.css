@@ -358,18 +358,18 @@ th {
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+  background: rgba(128, 128, 128, 0.35);
   border-radius: var(--rounded-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: rgba(128, 128, 128, 0.55);
 }
 
 /* ── Selection ── */
@@ -412,5 +412,79 @@ th {
   }
   .page-header {
     padding-top: var(--spacing-xl);
+  }
+}
+
+/* Fixed back-to-list FAB */
+.back-fab {
+  position: fixed;
+  right: var(--spacing-xl);
+  bottom: 75px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+.back-fab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.like-fab {
+  position: fixed;
+  right: var(--spacing-xl);
+  bottom: 135px;
+  z-index: 50;
+}
+.like-fab .like-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0 !important;
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+}
+.like-fab .like-btn:hover,
+.like-fab .like-btn--active {
+  border-color: var(--color-danger) !important;
+  color: var(--color-danger) !important;
+  background: var(--color-danger-bg) !important;
+}
+.like-fab .like-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.like-fab .like-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.like-fab .like-btn span {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .back-fab {
+    bottom: 105px;
+  }
+  .like-fab {
+    bottom: 165px;
   }
 }
