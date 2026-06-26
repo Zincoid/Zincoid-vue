@@ -61,7 +61,7 @@ async function toggle() {
   padding: 4px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
-  background: transparent;
+  background: var(--color-surface);
   color: var(--color-text-secondary);
   font-size: var(--text-sm);
   cursor: pointer;
@@ -78,7 +78,7 @@ async function toggle() {
   color: var(--color-danger);
 }
 .like-btn:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
+  pointer-events: none;
 }
 </style>

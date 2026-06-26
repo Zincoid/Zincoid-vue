@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { fileAPI, authAPI } from '@/api'
+import { fileAPI, userAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -54,7 +54,7 @@ async function handleUpload(e) {
   const file = e.target.files[0]
   if (!file) return
   try {
-    const { data } = await fileAPI.upload(file, 'AVATAR', null)
+    const { data } = await fileAPI.upload(file, 2, auth.user.id)
     profile.value.avatar = data.data.url
     message.value = ''
     error.value = ''
@@ -72,6 +72,10 @@ async function handleUpload(e) {
 async function saveProfile() {
   message.value = ''
   error.value = ''
+  if (profile.value.username.length < 3 || profile.value.username.length > 50) {
+    error.value = t('auth.usernameLength')
+    return
+  }
   try {
     const payload = {
       ...profile.value,
@@ -87,6 +91,14 @@ async function saveProfile() {
 async function changePassword() {
   pwdMessage.value = ''
   pwdError.value = ''
+  if (!pwdForm.value.oldPassword) {
+    pwdError.value = t('auth.required')
+    return
+  }
+  if (pwdForm.value.newPassword.length < 6 || pwdForm.value.newPassword.length > 100) {
+    pwdError.value = t('auth.passwordLength')
+    return
+  }
   try {
     await auth.changePassword(pwdForm.value)
     pwdMessage.value = t('profile.passwordChanged')
@@ -99,7 +111,7 @@ async function changePassword() {
 async function deleteAccount() {
   if (!confirm(t('profile.deleteAccountConfirm'))) return
   try {
-    await authAPI.deleteMe()
+    await userAPI.deleteMe()
     auth.logout()
   } catch (err) {
     error.value = getMessage(err, 'profile.deleteFailed')
@@ -195,11 +207,11 @@ async function deleteAccount() {
             <div class="fields">
               <div class="field">
                 <label class="field__label">{{ t('profile.oldPassword') }}</label>
-                <input v-model="pwdForm.oldPassword" class="field__input" type="password" autocomplete="off" />
+                <input v-model="pwdForm.oldPassword" class="field__input" type="password" autocomplete="off" :placeholder="t('profile.oldPasswordPlaceholder')" />
               </div>
               <div class="field">
                 <label class="field__label">{{ t('profile.newPassword') }}</label>
-                <input v-model="pwdForm.newPassword" class="field__input" type="password" autocomplete="new-password" />
+                <input v-model="pwdForm.newPassword" class="field__input" type="password" autocomplete="new-password" :placeholder="t('profile.newPasswordPlaceholder')" />
               </div>
             </div>
 
@@ -428,6 +440,10 @@ async function deleteAccount() {
 
   .profile-sidebar {
     padding-top: 0;
+  }
+
+  .profile-main {
+    width: 100%;
   }
 
   .field-row {

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { authAPI } from '@/api'
+import { authAPI, userAPI } from '@/api'
 import router from '@/router'
 
 export const useAuthStore = defineStore('auth', () => {
@@ -29,20 +29,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchMe() {
-    const { data } = await authAPI.getMe()
+    const { data } = await userAPI.getMe()
     user.value = data.data
     localStorage.setItem('user', JSON.stringify(data.data))
   }
 
   async function updateProfile(form) {
-    const { data } = await authAPI.updateProfile(form)
+    const { data } = await userAPI.updateProfile(form)
     user.value = data.data
     localStorage.setItem('user', JSON.stringify(data.data))
     return data.data
   }
 
   async function changePassword(form) {
-    await authAPI.changePassword(form)
+    await userAPI.changePassword(form)
   }
 
   function logout() {

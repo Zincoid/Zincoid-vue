@@ -62,7 +62,7 @@ async function save() {
   try {
     const contentMd = await mdEditor.value.resolveImages(form.value.contentMd)
     if (coverFile.value) {
-      const { data } = await fileAPI.upload(coverFile.value, 'ARTICLE', null)
+      const { data } = await fileAPI.upload(coverFile.value)
       form.value.coverImage = data.data.url
     }
     const payload = { ...form.value, contentMd }
@@ -131,13 +131,13 @@ async function save() {
 </template>
 
 <style scoped>
-.editor-page { padding: var(--spacing-2xl) 0 var(--spacing-4xl); }
+.editor-page { padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-4xl); }
 h1 { margin-bottom: var(--spacing-2xl); }
 .fields { display: flex; flex-direction: column; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
 .field { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .field label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); }
 .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
-.cover-preview { width: 200px; height: 112px; object-fit: cover; border-radius: var(--rounded-md); border: 1px solid var(--color-border); margin-top: var(--spacing-sm); }
+.cover-preview { max-width: 200px; max-height: 200px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); margin-top: var(--spacing-sm); background: var(--color-bg-alt); }
 .hidden-input { display: none; }
 
 .error-msg { margin-bottom: var(--spacing-lg); }

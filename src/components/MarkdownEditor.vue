@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { fileAPI } from '@/api'
@@ -56,18 +56,37 @@ function handleUploadImage(e) {
 
 function removePending(idx) {
   const blobUrl = pendingPreviews.value[idx]
-  const content = props.modelValue.replace(`![${pendingFiles.value[idx].name}](${blobUrl})`, '').replace(/\n{2,}/g, '\n\n').trimStart()
-  URL.revokeObjectURL(blobUrl)
   pendingFiles.value.splice(idx, 1)
   pendingPreviews.value.splice(idx, 1)
+  URL.revokeObjectURL(blobUrl)
+  const content = removeImageMarkdown(props.modelValue, blobUrl)
   emit('update:modelValue', content)
 }
+
+function removeImageMarkdown(content, url) {
+  const escaped = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return content
+    .replace(new RegExp(`!\\[[^\\]]*\\]\\(${escaped}\\)\\s*`, 'g'), '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trimStart()
+}
+
+watch(() => props.modelValue, () => {
+  for (let i = pendingPreviews.value.length - 1; i >= 0; i--) {
+    const escaped = pendingPreviews.value[i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    if (!new RegExp(`!\\[[^\\]]*\\]\\(${escaped}\\)`).test(props.modelValue)) {
+      URL.revokeObjectURL(pendingPreviews.value[i])
+      pendingPreviews.value.splice(i, 1)
+      pendingFiles.value.splice(i, 1)
+    }
+  }
+})
 
 async function resolveImages(content) {
   if (!pendingFiles.value.length) return content
   let resolved = content
   for (let i = 0; i < pendingFiles.value.length; i++) {
-    const { data } = await fileAPI.upload(pendingFiles.value[i], 'ARTICLE', null)
+    const { data } = await fileAPI.upload(pendingFiles.value[i])
     resolved = resolved.replace(pendingPreviews.value[i], data.data.url)
   }
   pendingPreviews.value.forEach(p => URL.revokeObjectURL(p))

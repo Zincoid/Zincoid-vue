@@ -79,7 +79,7 @@ async function saveEdit() {
   try {
     const newUrls = []
     for (const file of editNewFiles.value) {
-      const { data } = await fileAPI.upload(file, 'MOMENT', null)
+      const { data } = await fileAPI.upload(file)
       newUrls.push(data.data.url)
     }
     await momentAPI.update(route.params.id, {
@@ -193,7 +193,7 @@ watch(likeLiked, (liked) => {
       <div class="edit-block">
         <textarea v-model="editContent" class="edit-textarea" :placeholder="t('moment.placeholder')"></textarea>
 
-        <div v-if="editKeepImages.length" class="edit-media-grid">
+        <div v-if="editKeepImages.length || editNewPreviews.length" class="edit-media-grid">
           <div v-for="(img, i) in editKeepImages" :key="'keep'+i" class="edit-media-item">
             <img v-if="mediaType(img) === 'image'" :src="img" alt="" />
             <div v-else-if="mediaType(img) === 'video'" class="edit-video-thumb">
@@ -207,9 +207,6 @@ watch(likeLiked, (liked) => {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
           </div>
-        </div>
-
-        <div v-if="editNewPreviews.length" class="edit-media-grid">
           <div v-for="(p, i) in editNewPreviews" :key="'new'+i" class="edit-media-item">
             <img v-if="p.type === 'image'" :src="p.url" alt="" />
             <div v-else-if="p.type === 'video'" class="edit-video-thumb">

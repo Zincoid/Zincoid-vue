@@ -9,9 +9,10 @@ export function useError() {
       const key = `errors.${msg}`
       const translated = t(key)
       if (translated !== key) return translated
+      return msg
     }
     if (fallbackKey) return t(fallbackKey)
-    return msg || t('common.failed')
+    return t('common.failed')
   }
 
   return { getMessage }

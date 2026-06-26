@@ -462,15 +462,16 @@ th {
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
 }
-.like-fab .like-btn:hover,
+.like-fab .like-btn:hover {
+  border-color: var(--color-danger) !important;
+  color: var(--color-danger) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
 .like-fab .like-btn--active {
   border-color: var(--color-danger) !important;
   color: var(--color-danger) !important;
-  background: var(--color-danger-bg) !important;
-}
-.like-fab .like-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  background: var(--color-surface) !important;
 }
 .like-fab .like-btn svg {
   width: 18px;

@@ -65,7 +65,7 @@ async function submitMoment() {
   try {
     const urls = []
     for (const file of newImageFiles.value) {
-      const { data } = await fileAPI.upload(file, 'MOMENT', null)
+      const { data } = await fileAPI.upload(file)
       urls.push(data.data.url)
     }
     await momentAPI.create({

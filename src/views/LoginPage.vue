@@ -144,7 +144,11 @@ async function handleRegister() {
     error.value = t('auth.required')
     return
   }
-  if (form.value.password.length < 6) {
+  if (form.value.username.length < 3 || form.value.username.length > 50) {
+    error.value = t('auth.usernameLength')
+    return
+  }
+  if (form.value.password.length < 6 || form.value.password.length > 100) {
     error.value = t('auth.passwordLength')
     return
   }
