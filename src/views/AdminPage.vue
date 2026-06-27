@@ -8,8 +8,10 @@ const { t } = useI18n()
 const { getMessage } = useError()
 
 const configs = ref([])
-const message = ref('')
-const error = ref('')
+const configMessage = ref('')
+const configError = ref('')
+const toolMessage = ref('')
+const toolError = ref('')
 const cleaning = ref(false)
 const logicCleanup = ref(false)
 
@@ -18,17 +20,17 @@ onMounted(async () => {
     const { data } = await configAPI.listAll()
     configs.value = data.data || []
   } catch (e) {
-    error.value = t('admin.loadFailed')
+    configError.value = t('admin.loadFailed')
   }
 })
 
 async function saveConfig(config) {
   try {
     await configAPI.update(config.configKey, config.configValue)
-    message.value = t('admin.saved', { key: config.configKey })
-    setTimeout(() => message.value = '', 2000)
+    configMessage.value = t('admin.saved', { key: config.configKey })
+    setTimeout(() => configMessage.value = '', 2000)
   } catch (err) {
-    error.value = getMessage(err, 'admin.saveFailed')
+    configError.value = getMessage(err, 'admin.saveFailed')
   }
 }
 
@@ -38,10 +40,10 @@ async function runCleanup() {
   cleaning.value = true
   try {
     await fileAPI.cleanup(logicCleanup.value)
-    message.value = t('admin.cleanupSuccess')
-    setTimeout(() => message.value = '', 2000)
+    toolMessage.value = t('admin.cleanupSuccess')
+    setTimeout(() => toolMessage.value = '', 2000)
   } catch (err) {
-    error.value = getMessage(err, 'admin.cleanupFailed')
+    toolError.value = getMessage(err, 'admin.cleanupFailed')
   } finally {
     cleaning.value = false
   }
@@ -57,8 +59,8 @@ async function runCleanup() {
 
     <section class="section">
       <h2>{{ t('admin.config') }}</h2>
-      <p v-if="message" class="msg msg--success">{{ message }}</p>
-      <p v-if="error" class="msg msg--error">{{ error }}</p>
+      <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
+      <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
       <div class="config-list">
         <div v-for="cfg in configs" :key="cfg.id" class="config-item">
@@ -79,16 +81,20 @@ async function runCleanup() {
 
     <section class="section">
       <h2>{{ t('admin.tools') }}</h2>
+      <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
+      <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
       <div class="tool-item">
         <div class="tool-info">
           <span class="tool-label">{{ t('admin.cleanupFiles') }}</span>
           <span class="tool-desc">{{ t('admin.cleanupFilesDesc') }}</span>
         </div>
-        <label class="toggle">
-          <input type="checkbox" v-model="logicCleanup" />
-          <span class="toggle__slider"></span>
+        <div class="toggle">
+          <label class="toggle__switch">
+            <input type="checkbox" v-model="logicCleanup" />
+            <span class="toggle__slider"></span>
+          </label>
           <span class="toggle__label">{{ t('admin.logicCleanup') }}</span>
-        </label>
+        </div>
         <button class="btn btn--danger" :disabled="cleaning" @click="runCleanup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           {{ cleaning ? t('common.cleaning') : t('admin.cleanup') }}
@@ -117,8 +123,9 @@ h2 { margin-bottom: var(--spacing-lg); }
 .tool-item .btn { font-size: var(--text-sm); }
 .tool-item .btn svg { width: 16px; height: 16px; }
 
-.toggle { display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; white-space: nowrap; }
-.toggle input { display: none; }
+.toggle { display: flex; align-items: center; gap: var(--spacing-sm); white-space: nowrap; }
+.toggle__switch { cursor: pointer; display: flex; align-items: center; }
+.toggle__switch input { display: none; }
 .toggle__slider { position: relative; width: 44px; height: 24px; background: var(--color-border); border-radius: var(--rounded-full); transition: background var(--transition-fast); }
 .toggle__slider::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: var(--rounded-full); transition: transform var(--transition-fast); }
 .toggle input:checked + .toggle__slider { background: var(--color-orange, #f0ad4e); }
