@@ -11,6 +11,7 @@ const configs = ref([])
 const message = ref('')
 const error = ref('')
 const cleaning = ref(false)
+const logicCleanup = ref(false)
 
 onMounted(async () => {
   try {
@@ -31,11 +32,12 @@ async function saveConfig(config) {
   }
 }
 
-async function cleanupFiles() {
-  if (!confirm(t('admin.cleanupConfirm'))) return
+async function runCleanup() {
+  const confirmMsg = logicCleanup.value ? t('admin.deepCleanupConfirm') : t('admin.cleanupConfirm')
+  if (!confirm(confirmMsg)) return
   cleaning.value = true
   try {
-    await fileAPI.cleanup()
+    await fileAPI.cleanup(logicCleanup.value)
     message.value = t('admin.cleanupSuccess')
     setTimeout(() => message.value = '', 2000)
   } catch (err) {
@@ -82,7 +84,12 @@ async function cleanupFiles() {
           <span class="tool-label">{{ t('admin.cleanupFiles') }}</span>
           <span class="tool-desc">{{ t('admin.cleanupFilesDesc') }}</span>
         </div>
-        <button class="btn btn--danger" :disabled="cleaning" @click="cleanupFiles">
+        <label class="toggle">
+          <input type="checkbox" v-model="logicCleanup" />
+          <span class="toggle__slider"></span>
+          <span class="toggle__label">{{ t('admin.logicCleanup') }}</span>
+        </label>
+        <button class="btn btn--danger" :disabled="cleaning" @click="runCleanup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           {{ cleaning ? t('common.cleaning') : t('admin.cleanup') }}
         </button>
@@ -102,10 +109,21 @@ h2 { margin-bottom: var(--spacing-lg); }
 .config-key { font-weight: var(--weight-medium); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .config-desc { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .config-value-row { display: flex; gap: var(--spacing-sm); align-items: center; flex-shrink: 0; }
-.tool-item { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
-.tool-info { display: flex; flex-direction: column; gap: 2px; }
+.tool-item { display: flex; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.tool-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.tool-item .btn { margin-left: auto; }
 .tool-label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
 .tool-desc { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.tool-item .btn { font-size: var(--text-sm); }
+.tool-item .btn svg { width: 16px; height: 16px; }
+
+.toggle { display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; white-space: nowrap; }
+.toggle input { display: none; }
+.toggle__slider { position: relative; width: 44px; height: 24px; background: var(--color-border); border-radius: var(--rounded-full); transition: background var(--transition-fast); }
+.toggle__slider::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: var(--rounded-full); transition: transform var(--transition-fast); }
+.toggle input:checked + .toggle__slider { background: var(--color-orange, #f0ad4e); }
+.toggle input:checked + .toggle__slider::after { transform: translateX(20px); }
+.toggle__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
 
 .config-input { width: 280px; }
 @media (max-width: 640px) {

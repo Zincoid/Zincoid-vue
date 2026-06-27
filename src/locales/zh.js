@@ -158,6 +158,9 @@ export default {
     cleanupFilesDesc: '删除磁盘和数据库中不匹配的孤立文件与记录',
     cleanup: '清理',
     cleanupConfirm: '确定要清理文件吗？将删除所有孤立文件和数据库记录。',
+    deepCleanup: '逻辑模式',
+    deepCleanupConfirm: '确定要启用逻辑模式吗？将额外检查已关联文件对应的业务数据是否存在，若已被删除则同时移除文件。',
+    logicCleanup: 'Logic Mode',
     cleanupSuccess: '清理完成',
     cleanupFailed: '清理失败'
   },

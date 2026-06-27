@@ -91,7 +91,7 @@ export const fileAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   },
-  cleanup: () => api.delete('/files/cleanup')
+  cleanup: (isLogic = false) => api.delete('/files/cleanup', { params: { isLogic } })
 }
 
 // ── Likes ──

@@ -158,6 +158,9 @@ export default {
     cleanupFilesDesc: 'Remove orphaned files on disk and orphaned database records',
     cleanup: 'Cleanup',
     cleanupConfirm: 'Are you sure you want to clean up files? This will delete all orphaned files and database records.',
+    deepCleanup: 'Logic cleanup',
+    deepCleanupConfirm: 'Logic cleanup will also check linked files against business data and remove files whose related entity no longer exists.',
+    logicCleanup: 'Logic Mode',
     cleanupSuccess: 'Cleanup completed',
     cleanupFailed: 'Cleanup failed'
   },
