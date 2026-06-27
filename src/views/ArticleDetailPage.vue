@@ -292,7 +292,7 @@ watch(likeLiked, (liked) => {
   position: fixed;
   left: max(calc((100vw - var(--content-max-width)) / 2 - 260px), var(--spacing-xl));
   top: calc(var(--navbar-height) + var(--spacing-2xl));
-  bottom: 80px;
+  bottom: 56px;
   width: 220px;
   overflow-y: auto;
   z-index: 40;
