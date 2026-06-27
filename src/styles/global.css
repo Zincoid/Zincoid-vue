@@ -392,6 +392,10 @@ th {
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+  html {
+    zoom: 0.75;
+  }
+
   :root {
     --navbar-height: 56px;
   }
