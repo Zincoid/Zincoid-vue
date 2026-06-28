@@ -1,18 +1,49 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
+import { userAPI } from '@/api'
 
 const { t } = useI18n()
+const { getMessage } = useError()
+const auth = useAuthStore()
 
-defineProps({
+const props = defineProps({
   user: { type: Object, required: true }
 })
 
+const emit = defineEmits(['update:user', 'delete:user'])
+
 const router = useRouter()
+
+function goDetail() {
+  router.push(`/members/${props.user.id}`)
+}
+
+async function toggleStatus() {
+  try {
+    const next = props.user.status === 1 ? 0 : 1
+    await userAPI.updateStatus(props.user.id, next)
+    emit('update:user', { ...props.user, status: next })
+  } catch (err) {
+    alert(getMessage(err, 'common.failed'))
+  }
+}
+
+async function handleDelete() {
+  if (!confirm(t('profile.deleteAccountConfirm'))) return
+  try {
+    await userAPI.deleteUser(props.user.id)
+    emit('delete:user', props.user.id)
+  } catch (err) {
+    alert(getMessage(err, 'common.failed'))
+  }
+}
 </script>
 
 <template>
-  <div class="user-card" @click="router.push(`/members/${user.id}`)">
+  <div class="user-card" @click="goDetail">
     <img
       v-if="user.avatar"
       :src="user.avatar"
@@ -26,8 +57,21 @@ const router = useRouter()
       <h4 class="user-card__name">
         {{ user.nickname }}
         <span v-if="user.gender !== null && user.gender !== undefined" class="user-card__pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
+        <span v-if="user.status === 0" class="user-card__disabled-tag">{{ t('user.disabled') }}</span>
       </h4>
       <span v-if="user.title" class="user-card__title">{{ user.title }}</span>
+    </div>
+    <div v-if="auth.isAdmin" class="user-card__actions">
+      <button class="user-card__btn" @click.stop="toggleStatus" :title="user.status === 1 ? 'Disable' : 'Enable'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path v-if="user.status === 0" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <path v-else d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          <line x1="1" y1="1" x2="23" y2="23" v-if="user.status === 0"/>
+        </svg>
+      </button>
+      <button class="user-card__btn user-card__btn--danger" @click.stop="handleDelete" title="Delete user">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
     </div>
   </div>
 </template>
@@ -78,6 +122,7 @@ const router = useRouter()
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .user-card__name {
@@ -96,11 +141,46 @@ const router = useRouter()
   color: var(--color-text-secondary);
 }
 
+.user-card__disabled-tag {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  padding: 1px 6px;
+  border-radius: var(--rounded-full);
+}
+
 .user-card__title {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.user-card__actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.user-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  z-index: 1;
+}
+.user-card__btn:hover {
+  color: var(--color-text-heading);
+  background: var(--color-bg-alt);
+}
+.user-card__btn--danger:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
 </style>

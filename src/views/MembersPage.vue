@@ -45,6 +45,20 @@ function onPageChange(p) {
   page.value = p
   fetchData()
 }
+
+function updateUser(updated) {
+  const update = (list) => {
+    const i = list.findIndex(u => u.id === updated.id)
+    if (i !== -1) list[i] = updated
+  }
+  update(admins.value)
+  update(users.value)
+}
+
+function removeUser(id) {
+  admins.value = admins.value.filter(u => u.id !== id)
+  users.value = users.value.filter(u => u.id !== id)
+}
 </script>
 
 <template>
@@ -58,13 +72,13 @@ function onPageChange(p) {
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
         <div class="user-grid">
-          <UserCard v-for="u in admins" :key="u.id" :user="u" />
+          <UserCard v-for="u in admins" :key="u.id" :user="u" @update:user="updateUser" @delete:user="removeUser" />
         </div>
       </div>
       <div v-if="users.length" class="user-section">
         <h2 v-if="admins.length" class="user-section__title user-section__title--member">{{ t('user.members') }}</h2>
         <div class="user-grid">
-          <UserCard v-for="u in users" :key="u.id" :user="u" />
+          <UserCard v-for="u in users" :key="u.id" :user="u" @update:user="updateUser" @delete:user="removeUser" />
         </div>
       </div>
     </template>

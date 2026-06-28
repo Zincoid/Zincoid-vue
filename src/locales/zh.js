@@ -70,7 +70,8 @@ export default {
     heHim: '(他)',
     sheHer: '(她)',
     admin: '管理',
-    members: '用户'
+    members: '用户',
+    disabled: '已禁用'
   },
   comment: {
     title: '{count} 条评论',

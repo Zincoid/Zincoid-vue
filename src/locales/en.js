@@ -70,7 +70,8 @@ export default {
     heHim: 'he/him',
     sheHer: 'she/her',
     admin: 'Admin',
-    members: 'User'
+    members: 'User',
+    disabled: 'Disabled'
   },
   comment: {
     title: '{count} Comments',

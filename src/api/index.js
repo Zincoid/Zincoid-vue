@@ -45,7 +45,9 @@ export const userAPI = {
   updateProfile: (data) => api.put('/users', data),
   updateAvatar: (avatar) => api.put('/users/avatar', { avatar }),
   changePassword: (data) => api.put('/users/password', data),
-  deleteMe: () => api.delete('/users')
+  deleteMe: () => api.delete('/users'),
+  updateStatus: (id, status) => api.put(`/users/${id}/status`, null, { params: { status } }),
+  deleteUser: (id) => api.delete(`/users/${id}`)
 }
 
 // ── Moments ──
