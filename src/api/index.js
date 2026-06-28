@@ -59,7 +59,8 @@ export const momentAPI = {
   unpin: (id) => api.put(`/moments/${id}/unpin`),
   getTimeline: (page = 1, size = 10) => api.get('/moments/public', { params: { page, size } }),
   getByUser: (userId, page = 1, size = 10) => api.get(`/moments/public/user/${userId}`, { params: { page, size } }),
-  getDetail: (id) => api.get(`/moments/public/${id}`)
+  getDetail: (id) => api.get(`/moments/public/${id}`),
+  getRandom: () => api.get('/moments/public/random')
 }
 
 // ── Articles ──
@@ -71,6 +72,7 @@ export const articleAPI = {
   unpin: (id) => api.put(`/articles/${id}/unpin`),
   getList: (page = 1, size = 10) => api.get('/articles/public', { params: { page, size } }),
   getByUser: (userId, page = 1, size = 10) => api.get(`/articles/public/user/${userId}`, { params: { page, size } }),
+  getRandom: () => api.get('/articles/public/random'),
   getDetail: (id) => api.get(`/articles/public/${id}`)
 }
 

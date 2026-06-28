@@ -12,6 +12,7 @@ const auth = useAuthStore()
 const locale = useLocaleStore()
 const moments = ref([])
 const articles = ref([])
+const featured = ref(null)
 const loading = ref(true)
 const typed = ref('')
 const typingDone = ref(false)
@@ -150,16 +151,22 @@ watch(() => locale.locale, () => {
 onMounted(async () => {
   startTyping()
   try {
-    const [mRes, aRes, uRes] = await Promise.all([
+    const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
+    const [mRes, aRes, uRes, rRes] = await Promise.all([
       momentAPI.getTimeline(1, 5),
       articleAPI.getList(1, 5),
-      userAPI.getList(1, 1)
+      userAPI.getList(1, 1),
+      randomAPI
     ])
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
     counts.value.moments = mRes.data.data.total || 0
     counts.value.articles = aRes.data.data.total || 0
     counts.value.members = uRes.data.data.total || 0
+    if (rRes.data.data) {
+      const type = rRes.config.url.includes('moments') ? 'moment' : 'article'
+      featured.value = { ...rRes.data.data, _type: type }
+    }
   } catch (e) {
     console.error(e)
   } finally {
@@ -203,6 +210,15 @@ onUnmounted(() => {
         </div>
       </div>
     </section>
+
+    <!-- Featured Random -->
+    <div v-if="featured" class="featured container-wide">
+      <div class="featured__card">
+        <h2 class="featured__title"># Random<span class="cursor">_</span></h2>
+        <MomentCard v-if="featured._type === 'moment'" :moment="featured" />
+        <ArticleCard v-else :article="featured" />
+      </div>
+    </div>
 
     <!-- Recent Moments & Articles -->
     <div
@@ -377,6 +393,21 @@ onUnmounted(() => {
 }
 
 /* Sections */
+.featured {
+  margin-bottom: var(--spacing-3xl);
+}
+.featured__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--spacing-lg);
+}
+.featured__card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-2xl);
+}
+
 .section {
   margin-bottom: var(--spacing-3xl);
 }
@@ -410,7 +441,7 @@ onUnmounted(() => {
 
 .recent-grid {
   display: grid;
-  grid-template-columns: minmax(400px, 1fr) 1fr;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
   gap: var(--spacing-2xl);
   align-items: start;
 
