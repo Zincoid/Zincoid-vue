@@ -6,7 +6,8 @@ const { t } = useI18n()
 const props = defineProps({
   page: { type: Number, default: 1 },
   pages: { type: Number, default: 1 },
-  total: { type: Number, default: 0 }
+  total: { type: Number, default: 0 },
+  size: { type: Number, default: 10 }
 })
 
 const emit = defineEmits(['change'])
@@ -19,75 +20,93 @@ function go(page) {
 </script>
 
 <template>
-  <div class="pagination" v-if="pages > 1">
-    <button
-      class="pagination__btn"
-      :disabled="page <= 1"
-      @click="go(page - 1)"
-    >
-      {{ t('common.prev') }}
-    </button>
-    <template v-for="p in pages" :key="p">
+  <div class="pagination" v-if="total > 0">
+    <div class="pagination__info">
+      <span class="pagination__total">{{ t('common.total', { total }) }}</span>
+      <span class="pagination__sep">/</span>
+      <span class="pagination__size">{{ t('common.perPage', { size }) }}</span>
+    </div>
+    <div class="pagination__controls" v-if="pages > 1">
       <button
-        v-if="p === 1 || p === pages || Math.abs(p - page) <= 2"
         class="pagination__btn"
-        :class="{ 'pagination__btn--active': p === page }"
-        @click="go(p)"
+        :disabled="page <= 1"
+        @click="go(page - 1)"
       >
-        {{ p }}
+        {{ t('common.prev') }}
       </button>
-      <span v-else-if="Math.abs(p - page) === 3" class="pagination__dots">…</span>
-    </template>
-    <button
-      class="pagination__btn"
-      :disabled="page >= pages"
-      @click="go(page + 1)"
-    >
-      {{ t('common.next') }}
-    </button>
+      <template v-for="p in pages" :key="p">
+        <button
+          v-if="p === 1 || p === pages || Math.abs(p - page) <= 2"
+          class="pagination__btn"
+          :class="{ 'pagination__btn--active': p === page }"
+          @click="go(p)"
+        >
+          {{ p }}
+        </button>
+        <span v-else-if="Math.abs(p - page) === 3" class="pagination__dots">…</span>
+      </template>
+      <button
+        class="pagination__btn"
+        :disabled="page >= pages"
+        @click="go(page + 1)"
+      >
+        {{ t('common.next') }}
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .pagination {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-xs);
   margin-top: var(--spacing-2xl);
 }
 
+.pagination__info {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.pagination__sep {
+  color: var(--color-border);
+}
+
+.pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
 .pagination__btn {
-  min-width: 36px;
-  height: 36px;
+  min-width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-md);
+  border: none;
+  border-radius: var(--rounded-sm);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  color: var(--color-text);
-  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  background: transparent;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
-.pagination__btn:hover:not(:disabled):not(.pagination__btn--active) {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-light);
+.pagination__btn:hover:not(:disabled) {
+  color: var(--color-text-heading);
 }
 .pagination__btn--active {
-  background: #111827;
-  border-color: #111827;
-  color: white;
-  box-shadow: var(--shadow-sm);
-}
-.pagination__btn:active:not(:disabled) {
-  transform: scale(0.95);
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
 }
 .pagination__btn:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 

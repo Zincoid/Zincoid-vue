@@ -226,6 +226,8 @@ export default {
     download: 'Download',
     close: 'Close',
     pin: 'Pin',
-    unpin: 'Unpin'
+    unpin: 'Unpin',
+    total: '{total} items',
+    perPage: '{size} per page'
   }
 }

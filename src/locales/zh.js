@@ -226,6 +226,8 @@ export default {
     download: '下载',
     close: '关闭',
     pin: '置顶',
-    unpin: '取消置顶'
+    unpin: '取消置顶',
+    total: '共 {total} 条',
+    perPage: '每页 {size} 条'
   }
 }

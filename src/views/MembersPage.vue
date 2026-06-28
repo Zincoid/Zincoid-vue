@@ -1,28 +1,37 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useConfig } from '@/composables/useConfig'
 import { userAPI } from '@/api'
 import UserCard from '@/components/UserCard.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const users = ref([])
 const page = ref(1)
 const pages = ref(1)
+const total = ref(0)
+const pageSize = ref(20)
 const loading = ref(true)
 
 const admins = computed(() => users.value.filter(u => u.role === 1))
 const regulars = computed(() => users.value.filter(u => u.role !== 1))
 
-onMounted(() => fetchUsers())
+onMounted(async () => {
+  await loadConfig()
+  fetchUsers()
+})
 
 async function fetchUsers() {
   loading.value = true
   try {
-    const { data } = await userAPI.getList(page.value, 20)
+    pageSize.value = parseInt(getConfig('page_size', '20'))
+    const { data } = await userAPI.getList(page.value, pageSize.value)
     users.value = data.data.records || []
     pages.value = data.data.pages || 1
+    total.value = data.data.total || 0
   } catch (e) {
     console.error(e)
   } finally {
@@ -59,7 +68,7 @@ function onPageChange(p) {
     </template>
     <p v-else-if="!loading" class="empty-state">{{ t('user.empty') }}</p>
 
-    <Pagination :page="page" :pages="pages" @change="onPageChange" />
+    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 </template>
 

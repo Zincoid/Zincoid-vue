@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useConfig } from '@/composables/useConfig'
 import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -10,10 +11,13 @@ import Pagination from '@/components/Pagination.vue'
 const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const moments = ref([])
 const page = ref(1)
 const pages = ref(1)
+const total = ref(0)
+const pageSize = ref(10)
 const loading = ref(true)
 const showEditor = ref(false)
 
@@ -23,14 +27,19 @@ const newImageFiles = ref([])
 const newImagePreviews = ref([])
 const posting = ref(false)
 
-onMounted(() => fetchMoments())
+onMounted(async () => {
+  await loadConfig()
+  fetchMoments()
+})
 
 async function fetchMoments() {
   loading.value = true
   try {
-    const { data } = await momentAPI.getTimeline(page.value, 10)
+    pageSize.value = parseInt(getConfig('page_size', '10'))
+    const { data } = await momentAPI.getTimeline(page.value, pageSize.value)
     moments.value = data.data.records || []
     pages.value = data.data.pages || 1
+    total.value = data.data.total || 0
   } catch (e) {
     console.error(e)
   } finally {
@@ -152,7 +161,7 @@ async function submitMoment() {
     </div>
     <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
 
-    <Pagination :page="page" :pages="pages" @change="onPageChange" />
+    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 </template>
 

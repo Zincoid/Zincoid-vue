@@ -2,25 +2,34 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useConfig } from '@/composables/useConfig'
 import { articleAPI } from '@/api'
 import ArticleCard from '@/components/ArticleCard.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
+const { load: loadConfig, get: getConfig } = useConfig()
 const articles = ref([])
 const page = ref(1)
 const pages = ref(1)
+const total = ref(0)
+const pageSize = ref(10)
 const loading = ref(true)
 
-onMounted(() => fetchArticles())
+onMounted(async () => {
+  await loadConfig()
+  fetchArticles()
+})
 
 async function fetchArticles() {
   loading.value = true
   try {
-    const { data } = await articleAPI.getList(page.value, 10)
+    pageSize.value = parseInt(getConfig('page_size', '10'))
+    const { data } = await articleAPI.getList(page.value, pageSize.value)
     articles.value = data.data.records || []
     pages.value = data.data.pages || 1
+    total.value = data.data.total || 0
   } catch (e) {
     console.error(e)
   } finally {
@@ -53,7 +62,7 @@ function onPageChange(p) {
     </div>
     <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
 
-    <Pagination :page="page" :pages="pages" @change="onPageChange" />
+    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 </template>
 
