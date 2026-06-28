@@ -221,7 +221,7 @@ function closeMenu() {
 }
 .navbar__item:hover {
   color: var(--color-text-heading);
-  background: var(--color-bg-alt);
+  background: rgba(128, 128, 128, 0.15);
 }
 .navbar__item--active {
   color: var(--color-primary);
@@ -234,28 +234,28 @@ function closeMenu() {
 .navbar__item--admin { border-bottom: 2px solid rgba(107, 33, 168, 0.25); }
 .navbar__item--moments.navbar__item--active {
   color: #db2777;
-  background: rgba(219, 39, 119, 0.08);
+  background: rgba(219, 39, 119, 0.12);
   border-bottom: 4px solid #db2777;
 }
 .navbar__item--articles.navbar__item--active {
   color: #16a34a;
-  background: rgba(22, 163, 74, 0.08);
+  background: rgba(22, 163, 74, 0.12);
   border-bottom: 4px solid #16a34a;
 }
 .navbar__item--members.navbar__item--active {
   color: #2563eb;
-  background: rgba(37, 99, 235, 0.08);
+  background: rgba(37, 99, 235, 0.12);
   border-bottom: 4px solid #2563eb;
 }
 .navbar__item--admin.navbar__item--active {
   color: #6b21a8;
-  background: rgba(107, 33, 168, 0.08);
+  background: rgba(107, 33, 168, 0.12);
   border-bottom: 4px solid #6b21a8;
 }
 .navbar__item--profile.navbar__item--active,
 .navbar__item--signin.navbar__item--active {
   color: #111827;
-  background: rgba(17, 27, 39, 0.08);
+  background: rgba(17, 27, 39, 0.12);
   border-bottom: 4px solid #111827;
 }
 
