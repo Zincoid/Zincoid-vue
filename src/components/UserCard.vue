@@ -55,7 +55,7 @@ async function handleDelete() {
     </span>
     <div class="user-card__info">
       <h4 class="user-card__name">
-        {{ user.nickname }}
+        <span class="user-card__name-text">{{ user.nickname }}</span>
         <span v-if="user.gender !== null && user.gender !== undefined" class="user-card__pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         <span v-if="user.status === 0" class="user-card__disabled-tag">{{ t('user.disabled') }}</span>
       </h4>
@@ -132,13 +132,21 @@ async function handleDelete() {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.user-card__name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-card__pronouns {
   font-size: var(--text-xs);
   font-weight: var(--weight-normal);
   color: var(--color-text-secondary);
+  flex-shrink: 0;
 }
 
 .user-card__disabled-tag {
@@ -147,6 +155,8 @@ async function handleDelete() {
   background: var(--color-danger-bg);
   padding: 1px 6px;
   border-radius: var(--rounded-full);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .user-card__title {
