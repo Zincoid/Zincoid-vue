@@ -224,6 +224,8 @@ export default {
     email: '邮箱',
     x: 'X',
     download: '下载',
-    close: '关闭'
+    close: '关闭',
+    pin: '置顶',
+    unpin: '取消置顶'
   }
 }

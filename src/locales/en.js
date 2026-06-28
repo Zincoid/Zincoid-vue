@@ -224,6 +224,8 @@ export default {
     email: 'Email',
     x: 'X',
     download: 'Download',
-    close: 'Close'
+    close: 'Close',
+    pin: 'Pin',
+    unpin: 'Unpin'
   }
 }
