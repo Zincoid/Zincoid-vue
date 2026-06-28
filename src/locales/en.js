@@ -13,6 +13,8 @@ export default {
     subtitle: 'Personal Website',
     recentMoments: 'Recent Moments',
     recentArticles: 'Recent Articles',
+    random: 'Random',
+    shuffle: 'Shuffle',
     viewAll: 'View all →'
   },
   moment: {

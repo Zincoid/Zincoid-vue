@@ -19,6 +19,17 @@ const typingDone = ref(false)
 let typingTimer = null
 const collapsed = ref(null) // 'moments' | 'articles' | null
 
+async function refreshFeatured() {
+  try {
+    const api = Math.random() < 0.5 ? momentAPI.getRandom : articleAPI.getRandom
+    const res = await api()
+    if (res.data.data) {
+      const type = res.config.url.includes('moments') ? 'moment' : 'article'
+      featured.value = { ...res.data.data, _type: type }
+    }
+  } catch (e) { console.error(e) }
+}
+
 // Colored squares on grid — dynamic tracking
 const GRID = 24
 const sqCols = ref(20)
@@ -214,7 +225,13 @@ onUnmounted(() => {
     <!-- Featured Random -->
     <div v-if="featured" class="featured container-wide">
       <div class="featured__card">
-        <h2 class="featured__title"># Random<span class="cursor">_</span></h2>
+        <div class="featured__header">
+          <h2 class="featured__title"># {{ t('home.random') }}<span class="cursor">_</span></h2>
+          <button class="featured__refresh" @click="refreshFeatured">
+            {{ t('home.shuffle') }}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
         <MomentCard v-if="featured._type === 'moment'" :moment="featured" />
         <ArticleCard v-else :article="featured" />
       </div>
@@ -396,10 +413,27 @@ onUnmounted(() => {
 .featured {
   margin-bottom: var(--spacing-3xl);
 }
+.featured__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
 .featured__title {
   font-size: var(--text-lg);
   font-weight: var(--weight-medium);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 0;
+}
+.featured__refresh {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--rounded-full);
+  transition: all var(--transition-fast);
+}
+.featured__refresh:hover {
+  background: var(--color-bg-alt);
 }
 .featured__card {
   background: var(--color-surface);
