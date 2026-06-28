@@ -157,6 +157,7 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
 }
 
