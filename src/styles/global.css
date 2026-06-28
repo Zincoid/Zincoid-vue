@@ -249,7 +249,9 @@ th {
   width: 100%;
 }
 .btn:disabled {
-  opacity: 0.5;
+  background: var(--color-border-light);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
   cursor: not-allowed;
   pointer-events: none;
 }
