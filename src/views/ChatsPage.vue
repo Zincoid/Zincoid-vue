@@ -26,6 +26,9 @@ const previewOpen = ref(false)
 const live = ref(true)
 let pollTimer = null
 
+const lastScrollTop = ref(0)
+const inputOffset = ref(0)
+
 function startPoll() {
   stopPoll()
   pollTimer = setInterval(pollNew, 3000)
@@ -40,13 +43,28 @@ watch(live, (v) => {
   else stopPoll()
 })
 
+function onChatScroll() {
+  const st = window.scrollY
+  const delta = st - lastScrollTop.value
+  if (delta < -2) {
+    inputOffset.value = 200
+  } else if (delta > 2) {
+    inputOffset.value = 0
+  }
+  lastScrollTop.value = st
+}
+
 onMounted(async () => {
   await fetchMessages()
   scrollBottom()
   startPoll()
+  window.addEventListener('scroll', onChatScroll, { passive: true })
 })
 
-onUnmounted(() => stopPoll())
+onUnmounted(() => {
+  stopPoll()
+  window.removeEventListener('scroll', onChatScroll)
+})
 
 async function fetchMessages() {
   try {
@@ -188,7 +206,7 @@ function openPreview(src) {
       </template>
     </div>
 
-    <div v-if="auth.isLoggedIn" class="chat-input-area">
+    <div v-if="auth.isLoggedIn" class="chat-input-area" :style="{ transform: `translate(-50%, ${inputOffset}px)` }">
       <div v-if="uploadFile" class="chat-input__file-tag">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
         {{ uploadFile.name }}
@@ -214,7 +232,7 @@ function openPreview(src) {
         </button>
       </div>
     </div>
-    <p v-else class="chat-login-hint">
+    <p v-else class="chat-login-hint" :style="{ transform: `translate(-50%, ${inputOffset}px)` }">
       {{ t('chat.loginHint') }} <router-link to="/login">{{ t('auth.login') }}</router-link>
     </p>
 
@@ -360,22 +378,23 @@ function openPreview(src) {
   position: relative;
   max-width: 280px;
   aspect-ratio: 16 / 9;
-  background: #000;
+  background: var(--color-bg);
   border-radius: var(--rounded-md);
   overflow: hidden;
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color var(--transition-fast);
 }
-.chat-msg__video-card:hover { border-color: #f9a8d4; }
 .chat-msg__video-card video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.85;
+  border: 0;
+  outline: 0;
 }
+.chat-msg__video-card:hover { border-color: #f9a8d4; }
 
 .chat-msg__video-play {
   position: absolute;
@@ -425,14 +444,17 @@ function openPreview(src) {
   transform: translateX(-50%);
   width: calc(var(--content-max-width) - 2 * var(--spacing-xl));
   max-width: calc(100% - 2 * var(--spacing-xl));
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
-  border-radius: var(--rounded-xl);
+  border-radius: 28px;
   z-index: 50;
   padding: var(--spacing-md);
-  border-radius: 28px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  transition: transform 0.15s ease-out;
+}
+[data-theme="dark"] .chat-input-area {
+  background: rgba(26, 29, 39, 0.7);
 }
 
 .chat-input__file-tag {
@@ -557,12 +579,16 @@ function openPreview(src) {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   padding: var(--spacing-md);
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
-  border-radius: var(--rounded-xl);
+  border-radius: 28px;
   z-index: 50;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  transition: transform 0.15s ease-out;
+}
+[data-theme="dark"] .chat-login-hint {
+  background: rgba(26, 29, 39, 0.7);
 }
 
 .chat-login-hint a {
