@@ -62,7 +62,6 @@ onMounted(async () => {
     if (max > 0) pollSize.value = max
   } catch (e) { /* use default 50 */ }
   await fetchMessages()
-  scrollBottom()
   startPoll()
   window.addEventListener('scroll', onChatScroll, { passive: true })
 })
@@ -87,7 +86,7 @@ async function fetchMessages() {
 
 function scrollBottom() {
   nextTick(() => {
-    if (chatEl.value) chatEl.value.scrollTop = chatEl.value.scrollHeight
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
   })
 }
 
@@ -99,7 +98,7 @@ async function pollNew() {
     const newMsgs = list.filter(m => !existingIds.has(m.id))
     if (newMsgs.length > 0) {
       messages.value.push(...newMsgs)
-      const atBottom = chatEl.value && chatEl.value.scrollTop + chatEl.value.clientHeight >= chatEl.value.scrollHeight - 60
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
       if (atBottom) scrollBottom()
     }
   } catch (e) { /* ignore */ }
@@ -233,6 +232,9 @@ function openPreview(src) {
           rows="2"
           @keydown.enter.exact.prevent="handleSend"
         ></textarea>
+        <button class="chat-scroll-bottom-btn" @click="scrollBottom" title="Scroll to bottom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
         <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -559,6 +561,27 @@ function openPreview(src) {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.12);
+}
+
+.chat-scroll-bottom-btn {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: var(--rounded-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.chat-scroll-bottom-btn:hover {
+  color: #f9a8d4;
+  border-color: #f9a8d4;
+  background: rgba(249, 168, 212, 0.08);
 }
 
 .chat-send-btn {
