@@ -204,6 +204,15 @@ export default {
     articles: '文章',
     members: '成员'
   },
+  notification: {
+    title: '通知',
+    empty: '暂无通知',
+    commentedYour: '评论了你的',
+    repliedYour: '回复了你的评论',
+    moment: '动态',
+    article: '文章',
+    markRead: '全部已读'
+  },
   common: {
     loading: '加载中...',
     posting: '发布中...',
@@ -217,6 +226,10 @@ export default {
     save: '保存',
     update: '更新',
     failed: '操作失败',
+    justNow: '刚刚',
+    minAgo: '分钟前',
+    hourAgo: '小时前',
+    dayAgo: '天前',
     prev: '上一页',
     next: '下一页',
     preview: '预览',

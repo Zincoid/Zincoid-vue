@@ -111,3 +111,12 @@ export const configAPI = {
   listAll: () => api.get('/configs/all'),
   update: (key, value) => api.put(`/configs/${key}`, null, { params: { value } })
 }
+
+// ── Notifications ──
+export const notificationAPI = {
+  getList: () => api.get('/notifications'),
+  getUnreadCount: () => api.get('/notifications/count'),
+  markRead: () => api.put('/notifications/read'),
+  delete: (id) => api.delete(`/notifications/${id}`),
+  deleteAll: () => api.delete('/notifications')
+}

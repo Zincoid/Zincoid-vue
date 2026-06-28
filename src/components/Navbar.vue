@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useLocaleStore } from '@/stores/locale'
 import { useI18n } from '@/composables/useI18n'
+import { notificationAPI } from '@/api'
 
 const router = useRouter()
 const route = useRoute()
@@ -11,6 +12,72 @@ const auth = useAuthStore()
 const locale = useLocaleStore()
 const { t } = useI18n()
 const menuOpen = ref(false)
+const unreadCount = ref(0)
+const notifOpen = ref(false)
+const notifications = ref([])
+const notifLoading = ref(false)
+
+function fetchUnreadCount() {
+  if (!auth.isLoggedIn) return
+  notificationAPI.getUnreadCount().then(res => {
+    unreadCount.value = res.data?.data ?? 0
+  }).catch(() => {})
+}
+
+function fetchNotifications() {
+  if (!auth.isLoggedIn) return
+  notifLoading.value = true
+  notificationAPI.getList().then(res => {
+    notifications.value = res.data?.data ?? []
+  }).catch(() => {}).finally(() => {
+    notifLoading.value = false
+  })
+}
+
+watch(() => auth.isLoggedIn, (val) => {
+  if (val) fetchUnreadCount()
+}, { immediate: true })
+
+function toggleNotif() {
+  notifOpen.value = !notifOpen.value
+  if (notifOpen.value) fetchNotifications()
+}
+
+function closeNotif() {
+  notifOpen.value = false
+}
+
+function goNotification(n) {
+  closeNotif()
+  const name = n.relatedType === 0 ? 'MomentDetail' : 'ArticleDetail'
+  router.push({ name, params: { id: n.relatedId } })
+}
+
+function deleteOne(n) {
+  notificationAPI.delete(n.id).then(() => {
+    notifications.value = notifications.value.filter(x => x.id !== n.id)
+    if (!n.isRead) unreadCount.value = Math.max(0, unreadCount.value - 1)
+  }).catch(() => {})
+}
+
+function markAllRead() {
+  notificationAPI.markRead().then(() => {
+    unreadCount.value = 0
+    notifications.value.forEach(x => x.isRead = true)
+  }).catch(() => {})
+}
+
+function formatTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const now = new Date()
+  const diff = now - d
+  if (diff < 60000) return t('common.justNow') || '刚刚'
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' ' + (t('common.minAgo') || '分钟前')
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' ' + (t('common.hourAgo') || '小时前')
+  if (diff < 604800000) return Math.floor(diff / 86400000) + ' ' + (t('common.dayAgo') || '天前')
+  return d.toLocaleDateString()
+}
 
 const navLinks = computed(() => {
   const links = [
@@ -45,6 +112,15 @@ function closeMenu() {
         <span class="navbar__brand-text navbar__brand-text--light">'s</span>
       </router-link>
 
+      <button v-if="auth.isLoggedIn" class="navbar__notif-mobile-bell" @click.stop="toggleNotif">
+        <svg v-if="notifOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span v-if="unreadCount > 0" class="navbar__notif-mobile-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+      </button>
+
       <button class="navbar__burger" :class="{ 'navbar__burger--open': menuOpen }" @click="toggleMenu" :aria-expanded="menuOpen">
         <span></span>
         <span></span>
@@ -76,6 +152,16 @@ function closeMenu() {
 
         <div class="navbar__actions">
           <template v-if="auth.isLoggedIn">
+            <div class="navbar__notif">
+              <button class="navbar__notif-bell" @click.stop="toggleNotif">
+                <svg v-if="notifOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span v-if="unreadCount > 0" class="navbar__notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+              </button>
+            </div>
             <router-link to="/profile" class="navbar__item navbar__item--profile" :class="{ 'navbar__item--active': isActive('/profile') }">
               <img
                 v-if="auth.user?.avatar"
@@ -112,6 +198,46 @@ function closeMenu() {
         </div>
       </div>
     </div>
+    <div v-if="notifOpen" class="navbar__notif-dropdown">
+      <div class="navbar__notif-dropdown-header">
+        <span class="navbar__notif-dropdown-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          {{ t('notification.title') }}
+        </span>
+        <button v-if="unreadCount > 0" class="navbar__notif-markread" @click="markAllRead">
+          {{ t('notification.markRead') }}
+        </button>
+      </div>
+      <div class="navbar__notif-dropdown-body">
+        <p v-if="notifLoading" class="navbar__notif-empty">{{ t('common.loading') }}</p>
+        <p v-else-if="notifications.length === 0" class="navbar__notif-empty">{{ t('notification.empty') }}</p>
+        <div v-else class="navbar__notif-list">
+          <div
+            v-for="n in notifications"
+            :key="n.id"
+            class="navbar__notif-item"
+            :class="{ 'navbar__notif-item--unread': !n.isRead }"
+            @click="goNotification(n)"
+          >
+            <img v-if="n.senderAvatar" :src="n.senderAvatar" class="navbar__notif-sender-avatar" />
+            <span v-else class="navbar__notif-sender-placeholder">{{ (n.senderNickname || '?')[0] }}</span>
+            <div class="navbar__notif-item-body">
+              <div class="navbar__notif-item-text">
+                <strong>{{ n.senderNickname }}</strong>
+                {{ n.isReply ? t('notification.repliedYour') : t('notification.commentedYour') }}
+                {{ n.relatedType === 0 ? t('notification.moment') : t('notification.article') }}
+              </div>
+              <div class="navbar__notif-item-snippet" v-if="n.commentSnippet">{{ n.commentSnippet }}</div>
+              <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
+            </div>
+            <button class="navbar__notif-item-delete" @click.stop="deleteOne(n)" :title="t('common.delete')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="notifOpen" class="navbar__notif-backdrop" @click="closeNotif"></div>
   </nav>
 </template>
 
@@ -157,12 +283,40 @@ function closeMenu() {
   color: var(--color-text-secondary);
 }
 
+.navbar__notif-mobile-bell {
+  display: none;
+  position: relative;
+  margin-left: auto;
+  margin-right: var(--spacing-lg);
+  padding: var(--spacing-xs);
+  color: var(--color-text);
+  z-index: 101;
+}
+
+.navbar__notif-mobile-badge {
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: var(--weight-bold);
+  border-radius: var(--rounded-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding-top: 1px;
+}
+
 .navbar__burger {
   display: none;
   flex-direction: column;
   gap: 5px;
   padding: var(--spacing-xs);
-  margin-left: auto;
   margin-right: var(--spacing-md);
   z-index: 101;
 }
@@ -306,8 +460,217 @@ function closeMenu() {
   color: var(--color-danger);
 }
 
+/* notification */
+.navbar__notif {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: var(--spacing-md);
+}
+
+.navbar__notif-bell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--spacing-md) 0 var(--spacing-lg);
+  color: var(--color-text);
+  transition: color var(--transition-fast);
+}
+.navbar__notif-bell:hover {
+  color: #f9a8d4;
+}
+
+.navbar__notif-badge {
+  position: absolute;
+  top: 16px;
+  right: 2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: var(--weight-bold);
+  border-radius: var(--rounded-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.navbar__notif-dropdown {
+  position: fixed;
+  top: calc(var(--navbar-height) + 8px);
+  right: var(--spacing-lg);
+  width: 360px;
+  max-width: calc(100vw - 2 * var(--spacing-lg));
+  max-height: 480px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  z-index: 103;
+}
+
+.navbar__notif-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.navbar__notif-dropdown-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.navbar__notif-markread {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  border-radius: var(--rounded-md);
+  transition: background var(--transition-fast);
+}
+.navbar__notif-markread:hover {
+  background: var(--color-primary-light);
+}
+
+.navbar__notif-dropdown-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+}
+
+.navbar__notif-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  padding: var(--spacing-xl) 0;
+}
+
+.navbar__notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar__notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.navbar__notif-item:hover {
+  background: var(--color-bg-alt);
+}
+.navbar__notif-item--unread {
+  position: relative;
+}
+.navbar__notif-item--unread::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rounded-full);
+  background: var(--color-danger);
+}
+
+.navbar__notif-sender-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-full);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.navbar__notif-sender-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-full);
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  flex-shrink: 0;
+}
+
+.navbar__notif-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.navbar__notif-item-text {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.navbar__notif-item-snippet {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar__notif-item-time {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.navbar__notif-item-delete {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  border-radius: var(--rounded-full);
+  opacity: 0;
+  transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+.navbar__notif-item:hover .navbar__notif-item-delete {
+  opacity: 1;
+}
+.navbar__notif-item-delete:hover {
+  color: var(--color-danger);
+  background: rgba(229, 83, 75, 0.1);
+}
+
+.navbar__notif-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 102;
+}
+
 @media (max-width: 960px) {
   .navbar__brand { border-bottom: none; }
+  .navbar__notif-mobile-bell {
+    display: flex;
+    align-items: center;
+  }
+  .navbar__notif {
+    display: none;
+  }
   .navbar__burger {
     display: flex;
   }

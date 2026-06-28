@@ -204,6 +204,15 @@ export default {
     articles: 'Articles',
     members: 'Members'
   },
+  notification: {
+    title: 'Notifications',
+    empty: 'No notifications',
+    commentedYour: 'commented on your',
+    repliedYour: 'replied to your comment',
+    moment: 'moment',
+    article: 'article',
+    markRead: 'Mark all read'
+  },
   common: {
     loading: 'Loading...',
     posting: 'Posting...',
@@ -217,6 +226,10 @@ export default {
     save: 'Save',
     update: 'Update',
     failed: 'Failed',
+    justNow: 'just now',
+    minAgo: 'min ago',
+    hourAgo: 'h ago',
+    dayAgo: 'd ago',
     prev: 'Prev',
     next: 'Next',
     preview: 'Preview',
