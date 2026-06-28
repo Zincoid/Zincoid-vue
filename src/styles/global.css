@@ -396,6 +396,10 @@ th {
     zoom: 0.75;
   }
 
+  body, #app {
+    min-height: 133.33vh;
+  }
+
   :root {
     --navbar-height: 56px;
   }
