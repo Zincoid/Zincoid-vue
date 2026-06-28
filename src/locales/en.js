@@ -171,7 +171,14 @@ export default {
     deepCleanupConfirm: 'Logic cleanup will also check linked files against business data and remove files whose related entity no longer exists.',
     logicCleanup: 'Logic Mode',
     cleanupSuccess: 'Cleanup completed',
-    cleanupFailed: 'Cleanup failed'
+    cleanupFailed: 'Cleanup failed',
+    resetPassword: 'Force password reset',
+    resetPasswordDesc: 'Enter username and new password to overwrite',
+    resetPasswordPlaceholder: 'Username',
+    newPasswordPlaceholder: 'New password',
+    reset: 'Reset',
+    resetSuccess: 'Password updated',
+    resetFailed: 'Reset failed'
   },
   errors: {
     'Username already exists': 'Username already exists',

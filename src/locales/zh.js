@@ -171,7 +171,14 @@ export default {
     deepCleanupConfirm: '确定要启用逻辑模式吗？将额外检查已关联文件对应的业务数据是否存在，若已被删除则同时移除文件。',
     logicCleanup: '逻辑模式',
     cleanupSuccess: '清理完成',
-    cleanupFailed: '清理失败'
+    cleanupFailed: '清理失败',
+    resetPassword: '强制更新密码',
+    resetPasswordDesc: '输入用户名和新密码，直接覆盖旧密码',
+    resetPasswordPlaceholder: '用户名',
+    newPasswordPlaceholder: '新密码',
+    reset: '重置',
+    resetSuccess: '密码已更新',
+    resetFailed: '重置失败'
   },
   errors: {
     'Username already exists': '用户名已存在',

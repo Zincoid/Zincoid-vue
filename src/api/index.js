@@ -47,7 +47,8 @@ export const userAPI = {
   changePassword: (data) => api.put('/users/password', data),
   deleteMe: () => api.delete('/users'),
   updateStatus: (id, status) => api.put(`/users/${id}/status`, null, { params: { status } }),
-  deleteUser: (id) => api.delete(`/users/${id}`)
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  resetPassword: (username, password) => api.put('/users/password/reset', { username, password })
 }
 
 // ── Moments ──

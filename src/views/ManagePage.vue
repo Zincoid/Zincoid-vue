@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { configAPI, fileAPI } from '@/api'
+import { configAPI, fileAPI, userAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -14,6 +14,20 @@ const toolMessage = ref('')
 const toolError = ref('')
 const cleaning = ref(false)
 const logicCleanup = ref(false)
+const resetUsername = ref('')
+const resetPassword = ref('')
+const resetting = ref(false)
+const resetOpen = ref(false)
+
+function openReset() {
+  resetOpen.value = true
+  resetUsername.value = ''
+  resetPassword.value = ''
+}
+
+function cancelReset() {
+  resetOpen.value = false
+}
 
 onMounted(async () => {
   try {
@@ -46,6 +60,22 @@ async function runCleanup() {
     toolError.value = getMessage(err, 'admin.cleanupFailed')
   } finally {
     cleaning.value = false
+  }
+}
+
+async function handleReset() {
+  if (!resetUsername.value.trim() || !resetPassword.value.trim()) return
+  if (!confirm(`${t('admin.resetPassword')}：${resetUsername.value.trim()}`)) return
+  resetting.value = true
+  try {
+    await userAPI.resetPassword(resetUsername.value.trim(), resetPassword.value)
+    toolMessage.value = t('admin.resetSuccess')
+    resetOpen.value = false
+    setTimeout(() => toolMessage.value = '', 2000)
+  } catch (err) {
+    toolError.value = getMessage(err, 'admin.resetFailed')
+  } finally {
+    resetting.value = false
   }
 }
 </script>
@@ -83,6 +113,29 @@ async function runCleanup() {
       <h2>{{ t('admin.tools') }}</h2>
       <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
       <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
+      <div class="tool-item" :class="{ 'tool-item--open': resetOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('admin.resetPassword') }}</span>
+          <span class="tool-desc">{{ t('admin.resetPasswordDesc') }}</span>
+          <div v-if="resetOpen" class="config-value-row reset-row">
+            <div class="reset-inputs">
+              <input v-model="resetUsername" class="field__input config-input" :placeholder="t('admin.resetPasswordPlaceholder')" />
+              <input v-model="resetPassword" type="password" class="field__input config-input" :placeholder="t('admin.newPasswordPlaceholder')" />
+            </div>
+            <div class="reset-actions">
+              <button class="btn btn--ghost" @click="cancelReset">{{ t('common.cancel') }}</button>
+              <button class="btn btn--primary" :disabled="resetting || !resetUsername.trim() || !resetPassword.trim()" @click="handleReset">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ t('common.confirm') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button v-if="!resetOpen" class="btn btn--danger" @click="openReset">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          {{ t('admin.reset') }}
+        </button>
+      </div>
       <div class="tool-item">
         <div class="tool-info">
           <span class="tool-label">{{ t('admin.cleanupFiles') }}</span>
@@ -119,6 +172,7 @@ h2 { margin-bottom: var(--spacing-lg); }
 .tool-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .tool-item .btn { margin-left: auto; }
 .tool-label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
+.tool-item + .tool-item { margin-top: var(--spacing-lg); }
 .tool-desc { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .tool-item .btn { font-size: var(--text-sm); }
 .tool-item .btn svg { width: 16px; height: 16px; }
@@ -132,6 +186,10 @@ h2 { margin-bottom: var(--spacing-lg); }
 .toggle input:checked + .toggle__slider::after { transform: translateX(20px); }
 .toggle__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
 
+.tool-item--open { align-items: flex-start; }
+.reset-row { justify-content: space-between; width: 100%; margin-top: var(--spacing-sm); }
+.reset-inputs { display: flex; gap: var(--spacing-sm); }
+.reset-actions { display: flex; gap: var(--spacing-sm); }
 .config-input { width: 280px; }
 @media (max-width: 640px) {
   .config-item { flex-direction: column; align-items: stretch; }
