@@ -81,9 +81,9 @@ function formatTime(iso) {
   const now = new Date()
   const diff = now - d
   if (diff < 60000) return t('common.justNow') || '刚刚'
-  if (diff < 3600000) return Math.floor(diff / 60000) + ' ' + (t('common.minAgo') || '分钟前')
-  if (diff < 86400000) return Math.floor(diff / 3600000) + ' ' + (t('common.hourAgo') || '小时前')
-  if (diff < 604800000) return Math.floor(diff / 86400000) + ' ' + (t('common.dayAgo') || '天前')
+  if (diff < 3600000) { const m = Math.floor(diff / 60000); return m + ' ' + (m === 1 ? t('common.minAgo1') || '1 minute ago' : t('common.minAgo') || 'minutes ago') }
+  if (diff < 86400000) { const h = Math.floor(diff / 3600000); return h + ' ' + (h === 1 ? t('common.hourAgo1') || '1 hour ago' : t('common.hourAgo') || 'hours ago') }
+  if (diff < 604800000) { const d = Math.floor(diff / 86400000); return d + ' ' + (d === 1 ? t('common.dayAgo1') || '1 day ago' : t('common.dayAgo') || 'days ago') }
   return d.toLocaleDateString()
 }
 
@@ -552,6 +552,9 @@ function closeMenu() {
   justify-content: space-between;
   padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: 0 var(--spacing-sm);
   font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
 }
