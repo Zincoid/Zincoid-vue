@@ -222,11 +222,12 @@ export default {
   notification: {
     title: '通知',
     empty: '暂无通知',
-    commentedYour: '评论了你的',
-    repliedYour: '回复了你的评论',
-    moment: '动态',
-    article: '文章',
-    markRead: '全部已读'
+    commentedMoment: '评论了你的动态',
+    commentedArticle: '评论了你的文章',
+    repliedMoment: '在动态中回复了你的评论',
+    repliedArticle: '在文章中回复了你的评论',
+    markRead: '全部已读',
+    deleteAll: '清除全部'
   },
   common: {
     loading: '加载中...',

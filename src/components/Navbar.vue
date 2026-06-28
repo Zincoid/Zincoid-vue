@@ -67,6 +67,14 @@ function markAllRead() {
   }).catch(() => {})
 }
 
+function deleteAll() {
+  if (notifications.value.length === 0) return
+  notificationAPI.deleteAll().then(() => {
+    notifications.value = []
+    unreadCount.value = 0
+  }).catch(() => {})
+}
+
 function formatTime(iso) {
   if (!iso) return ''
   const d = new Date(iso)
@@ -209,9 +217,14 @@ function closeMenu() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           {{ t('notification.title') }}
         </span>
-        <button v-if="unreadCount > 0" class="navbar__notif-markread" @click="markAllRead">
-          {{ t('notification.markRead') }}
-        </button>
+        <div class="navbar__notif-header-actions">
+          <button v-if="notifications.length > 0" class="navbar__notif-deleteall" @click="deleteAll">
+            {{ t('notification.deleteAll') }}
+          </button>
+          <button v-if="unreadCount > 0" class="navbar__notif-markread" @click="markAllRead">
+            {{ t('notification.markRead') }}
+          </button>
+        </div>
       </div>
       <div class="navbar__notif-dropdown-body">
         <p v-if="notifLoading" class="navbar__notif-empty">{{ t('common.loading') }}</p>
@@ -229,8 +242,9 @@ function closeMenu() {
             <div class="navbar__notif-item-body">
               <div class="navbar__notif-item-text">
                 <strong>{{ n.senderNickname }}</strong>
-                {{ n.isReply ? t('notification.repliedYour') : t('notification.commentedYour') }}
-                {{ n.relatedType === 0 ? t('notification.moment') : t('notification.article') }}
+                {{ n.isReply
+                  ? (n.relatedType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
+                  : (n.relatedType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
               </div>
               <div class="navbar__notif-item-snippet" v-if="n.commentSnippet">{{ n.commentSnippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
@@ -520,7 +534,7 @@ function closeMenu() {
   position: fixed;
   top: calc(var(--navbar-height) + 8px);
   right: var(--spacing-lg);
-  width: 360px;
+  width: 400px;
   max-width: calc(100vw - 2 * var(--spacing-lg));
   max-height: 480px;
   background: var(--color-surface);
@@ -546,6 +560,23 @@ function closeMenu() {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-sm);
+}
+
+.navbar__notif-header-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.navbar__notif-deleteall {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  padding: 2px 8px;
+  border-radius: var(--rounded-md);
+  transition: all var(--transition-fast);
+}
+.navbar__notif-deleteall:hover {
+  color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.06);
 }
 
 .navbar__notif-markread {

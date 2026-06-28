@@ -222,11 +222,12 @@ export default {
   notification: {
     title: 'Notifications',
     empty: 'No notifications',
-    commentedYour: 'commented on your',
-    repliedYour: 'replied to your comment',
-    moment: 'moment',
-    article: 'article',
-    markRead: 'Mark all read'
+    commentedMoment: 'commented on your moment',
+    commentedArticle: 'commented on your article',
+    repliedMoment: 'replied to your comment in a moment',
+    repliedArticle: 'replied to your comment in an article',
+    markRead: 'Mark all read',
+    deleteAll: 'Clear all'
   },
   common: {
     loading: 'Loading...',
