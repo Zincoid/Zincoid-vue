@@ -46,9 +46,9 @@ watch(live, (v) => {
 function onChatScroll() {
   const st = window.scrollY
   const delta = st - lastScrollTop.value
-  if (delta < -2) {
+  if (delta < -1) {
     inputOffset.value = 200
-  } else if (delta > 2) {
+  } else if (delta > 1) {
     inputOffset.value = 0
   }
   lastScrollTop.value = st
