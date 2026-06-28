@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { chatAPI, fileAPI } from '@/api'
+import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 
@@ -25,6 +25,7 @@ const previewOpen = ref(false)
 
 const live = ref(true)
 let pollTimer = null
+const pollSize = ref(50)
 
 const lastScrollTop = ref(0)
 const inputOffset = ref(0)
@@ -55,6 +56,11 @@ function onChatScroll() {
 }
 
 onMounted(async () => {
+  try {
+    const { data } = await configAPI.get()
+    const max = parseInt(data.data?.message_max_count)
+    if (max > 0) pollSize.value = max
+  } catch (e) { /* use default 50 */ }
   await fetchMessages()
   scrollBottom()
   startPoll()
@@ -68,7 +74,7 @@ onUnmounted(() => {
 
 async function fetchMessages() {
   try {
-    const { data } = await chatAPI.getList(page.value)
+    const { data } = await chatAPI.getList(page.value, pollSize.value)
     const list = data.data?.records || []
     if (list.length === 0) hasMore.value = false
     messages.value = [...list, ...messages.value]
@@ -87,7 +93,7 @@ function scrollBottom() {
 
 async function pollNew() {
   try {
-    const { data } = await chatAPI.getList(1, 50)
+    const { data } = await chatAPI.getList(1, pollSize.value)
     const list = data.data?.records || []
     const existingIds = new Set(messages.value.map(m => m.id))
     const newMsgs = list.filter(m => !existingIds.has(m.id))
