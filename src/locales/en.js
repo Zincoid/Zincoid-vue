@@ -132,6 +132,8 @@ export default {
   auth: {
     login: 'Login',
     register: 'Register',
+    loggingIn: 'Logging in...',
+    registering: 'Registering...',
     username: 'Username',
     password: 'Password',
     confirmPassword: 'Confirm password',

@@ -252,7 +252,7 @@ function switchTo(path) {
           <p v-if="error" class="auth-form__error">{{ error }}</p>
 
           <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
-            {{ loading ? t('common.loading') : (isLogin ? t('auth.login') : t('auth.register')) }}
+            {{ loading ? (isLogin ? t('auth.loggingIn') : t('auth.registering')) : (isLogin ? t('auth.login') : t('auth.register')) }}
           </button>
         </form>
 

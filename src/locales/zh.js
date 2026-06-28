@@ -132,6 +132,8 @@ export default {
   auth: {
     login: '登录',
     register: '注册',
+    loggingIn: '登录中...',
+    registering: '注册中...',
     username: '用户名',
     password: '密码',
     confirmPassword: '确认密码',
