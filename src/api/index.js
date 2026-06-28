@@ -39,7 +39,7 @@ export const authAPI = {
 
 // ── Users ──
 export const userAPI = {
-  getList: (page = 1, size = 20) => api.get('/users/public', { params: { page, size } }),
+  getList: (page = 1, size = 20, role) => api.get('/users/public', { params: { page, size, role } }),
   getDetail: (id) => api.get(`/users/public/${id}`),
   getMe: () => api.get('/users'),
   updateProfile: (data) => api.put('/users', data),

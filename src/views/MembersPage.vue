@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { userAPI } from '@/api'
@@ -9,6 +9,7 @@ import Pagination from '@/components/Pagination.vue'
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
 
+const admins = ref([])
 const users = ref([])
 const page = ref(1)
 const pages = ref(1)
@@ -16,22 +17,23 @@ const total = ref(0)
 const pageSize = ref(20)
 const loading = ref(true)
 
-const admins = computed(() => users.value.filter(u => u.role === 1))
-const regulars = computed(() => users.value.filter(u => u.role !== 1))
-
 onMounted(async () => {
   await loadConfig()
-  fetchUsers()
+  fetchData()
 })
 
-async function fetchUsers() {
+async function fetchData() {
   loading.value = true
   try {
     pageSize.value = parseInt(getConfig('page_size', '20'))
-    const { data } = await userAPI.getList(page.value, pageSize.value)
-    users.value = data.data.records || []
-    pages.value = data.data.pages || 1
-    total.value = data.data.total || 0
+    const [adminRes, userRes] = await Promise.all([
+      userAPI.getList(1, 100, 1),
+      userAPI.getList(page.value, pageSize.value, 0)
+    ])
+    admins.value = adminRes.data.data.records || []
+    users.value = userRes.data.data.records || []
+    pages.value = userRes.data.data.pages || 1
+    total.value = userRes.data.data.total || 0
   } catch (e) {
     console.error(e)
   } finally {
@@ -41,7 +43,7 @@ async function fetchUsers() {
 
 function onPageChange(p) {
   page.value = p
-  fetchUsers()
+  fetchData()
 }
 </script>
 
@@ -52,17 +54,17 @@ function onPageChange(p) {
       <p class="page-header__subtitle">{{ t('user.subtitle') }}</p>
     </div>
 
-    <template v-if="users.length">
+    <template v-if="admins.length || users.length">
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
         <div class="user-grid">
           <UserCard v-for="u in admins" :key="u.id" :user="u" />
         </div>
       </div>
-      <div v-if="regulars.length" class="user-section">
+      <div v-if="users.length" class="user-section">
         <h2 v-if="admins.length" class="user-section__title user-section__title--member">{{ t('user.members') }}</h2>
         <div class="user-grid">
-          <UserCard v-for="u in regulars" :key="u.id" :user="u" />
+          <UserCard v-for="u in users" :key="u.id" :user="u" />
         </div>
       </div>
     </template>
