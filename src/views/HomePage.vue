@@ -16,6 +16,7 @@ const loading = ref(true)
 const typed = ref('')
 const typingDone = ref(false)
 let typingTimer = null
+const collapsed = ref(null) // 'moments' | 'articles' | null
 
 // Colored squares on grid — dynamic tracking
 const GRID = 24
@@ -64,9 +65,14 @@ onMounted(() => {
     }
   })
   if (heroRef.value) observer.observe(heroRef.value)
+
+  const mq = window.matchMedia('(max-width: 1200px)')
+  const onMqChange = (e) => { if (e.matches) collapsed.value = null }
+  mq.addEventListener('change', onMqChange)
   onUnmounted(() => {
     clearInterval(sqTimer)
     observer.disconnect()
+    mq.removeEventListener('change', onMqChange)
   })
 })
 
@@ -199,32 +205,66 @@ onUnmounted(() => {
     </section>
 
     <!-- Recent Moments & Articles -->
-    <div class="recent-grid container-wide">
-      <section class="section">
-        <div class="section__card">
-          <div class="section__header">
-            <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
-            <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
+    <div
+      class="recent-grid container-wide"
+      :class="{
+        'recent-grid--collapse-left': collapsed === 'moments',
+        'recent-grid--collapse-right': collapsed === 'articles'
+      }"
+    >
+      <!-- Moments -->
+      <template v-if="collapsed !== 'moments'">
+        <section class="section">
+          <div class="section__card">
+            <div class="section__header">
+              <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
+              <div class="section__header-actions">
+                <button class="section__collapse-btn" @click="collapsed = 'moments'" title="Collapse">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
+              </div>
+            </div>
+            <div class="moments-grid" v-if="moments.length">
+              <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
+            </div>
+            <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
           </div>
-          <div class="moments-grid" v-if="moments.length">
-            <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
-          </div>
-          <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
+        </section>
+      </template>
+      <template v-else>
+        <div class="collapsed-sidebar" @click="collapsed = null">
+          <span class="collapsed-sidebar__label"># {{ t('home.recentMoments') }}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
-      </section>
+      </template>
 
-      <section class="section">
-        <div class="section__card">
-          <div class="section__header">
-            <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
-            <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
+      <!-- Articles -->
+      <template v-if="collapsed !== 'articles'">
+        <section class="section">
+          <div class="section__card">
+            <div class="section__header">
+              <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
+              <div class="section__header-actions">
+                <button class="section__collapse-btn" @click="collapsed = 'articles'" title="Collapse">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
+              </div>
+            </div>
+            <div class="articles-list" v-if="articles.length">
+              <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
+            </div>
+            <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
           </div>
-          <div class="articles-list" v-if="articles.length">
-            <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
-          </div>
-          <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
+        </section>
+      </template>
+      <template v-else>
+        <div class="collapsed-sidebar" @click="collapsed = null">
+          <span class="collapsed-sidebar__label"># {{ t('home.recentArticles') }}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </div>
-      </section>
+      </template>
     </div>
   </div>
 </template>
@@ -370,15 +410,79 @@ onUnmounted(() => {
 
 .recent-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(400px, 1fr) 1fr;
   gap: var(--spacing-2xl);
   align-items: start;
+
+}
+.recent-grid--collapse-left {
+  grid-template-columns: 36px 1fr;
+}
+.recent-grid--collapse-right {
+  grid-template-columns: 1fr 36px;
+}
+
+.section__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.section__collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rounded-full);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+.section__collapse-btn:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-text-heading);
+}
+
+.collapsed-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 120px;
+}
+.collapsed-sidebar:hover {
+  border-color: #f9a8d4;
+  color: #f9a8d4;
+}
+.collapsed-sidebar__label {
+  writing-mode: vertical-rl;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.1em;
 }
 
 @media (max-width: 1200px) {
   .recent-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
+  }
+  .recent-grid--collapse-left,
+  .recent-grid--collapse-right {
+    grid-template-columns: 1fr;
+  }
+  .section__collapse-btn {
+    display: none;
+  }
+  .collapsed-sidebar {
+    display: none;
   }
   .section {
     margin-bottom: var(--spacing-xl);
