@@ -168,7 +168,7 @@ async function deleteAccount() {
           <h2 class="card__title">{{ t('profile.information') }}</h2>
           <div class="fields">
             <div class="field">
-              <label class="field__label">{{ t('profile.username') }}</label>
+              <label class="field__label">{{ t('profile.username') }} <span class="field__required">*</span></label>
               <input v-model="profile.username" class="field__input" />
             </div>
             <div class="field">
@@ -231,15 +231,15 @@ async function deleteAccount() {
           <template v-if="showPwdForm">
             <div class="fields">
               <div class="field">
-                <label class="field__label">{{ t('profile.oldPassword') }}</label>
+                <label class="field__label">{{ t('profile.oldPassword') }} <span class="field__required">*</span></label>
                 <input v-model="pwdForm.oldPassword" class="field__input" type="password" autocomplete="off" :placeholder="t('profile.oldPasswordPlaceholder')" />
               </div>
               <div class="field">
-                <label class="field__label">{{ t('profile.newPassword') }}</label>
+                <label class="field__label">{{ t('profile.newPassword') }} <span class="field__required">*</span></label>
                 <input v-model="pwdForm.newPassword" class="field__input" type="password" autocomplete="new-password" :placeholder="t('profile.newPasswordPlaceholder')" />
               </div>
               <div class="field">
-                <label class="field__label">{{ t('auth.confirmPassword') }}</label>
+                <label class="field__label">{{ t('auth.confirmPassword') }} <span class="field__required">*</span></label>
                 <input v-model="pwdForm.confirmPassword" class="field__input" type="password" autocomplete="new-password" :placeholder="t('auth.confirmPasswordPlaceholder')" />
               </div>
             </div>

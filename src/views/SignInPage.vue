@@ -233,7 +233,7 @@ function switchTo(path) {
 
         <form class="auth-form" @submit.prevent="handleSubmit">
           <div class="field">
-            <label class="field__label">{{ t('auth.username') }}</label>
+            <label class="field__label">{{ t('auth.username') }} <span v-if="!isLogin" class="field__required">*</span></label>
             <input v-model="form.username" class="field__input" type="text" autocomplete="username" />
           </div>
           <div v-if="!isLogin" class="field">
@@ -241,11 +241,11 @@ function switchTo(path) {
             <input v-model="form.nickname" class="field__input" type="text" />
           </div>
           <div class="field">
-            <label class="field__label">{{ t('auth.password') }}</label>
+            <label class="field__label">{{ t('auth.password') }} <span v-if="!isLogin" class="field__required">*</span></label>
             <input v-model="form.password" class="field__input" type="password" autocomplete="off" />
           </div>
           <div v-if="!isLogin" class="field">
-            <label class="field__label">{{ t('auth.confirmPassword') }}</label>
+            <label class="field__label">{{ t('auth.confirmPassword') }} <span class="field__required">*</span></label>
             <input v-model="form.confirmPassword" class="field__input" type="password" autocomplete="off" />
           </div>
 
