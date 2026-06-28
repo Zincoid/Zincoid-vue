@@ -63,11 +63,11 @@ function toggleExpand(parentId) {
   expandedParents.value = s
 }
 
-function countReplies(comments, parentId) {
+function countReplies(comments) {
   let count = 0
   for (const c of comments) {
-    if (c.parentId === parentId) count++
-    if (c.replies?.length) count += countReplies(c.replies, parentId)
+    count++
+    if (c.replies?.length) count += countReplies(c.replies)
   }
   return count
 }
@@ -140,11 +140,11 @@ const visibleComments = computed(() => {
                   {{ t('comment.delete') }}
                 </button>
                 <button
-                  v-if="comment.depth === 0 && countReplies(props.comments, comment.id) > 0"
+                  v-if="comment.depth === 0 && comment.replies?.length"
                   class="comment__toggle-btn"
                   @click="toggleExpand(comment.id)"
                 >
-                  {{ expandedParents.has(comment.id) ? t('comment.hideReplies') : t('comment.showReplies', { count: countReplies(props.comments, comment.id) }) }}
+                  {{ expandedParents.has(comment.id) ? t('comment.hideReplies') : t('comment.showReplies', { count: countReplies(comment.replies) }) }}
                 </button>
               </div>
             </div>
@@ -205,7 +205,7 @@ const visibleComments = computed(() => {
 
 .comment__indent {
   display: none;
-  width: 28px;
+  width: 36px;
   flex-shrink: 0;
 }
 
@@ -217,16 +217,14 @@ const visibleComments = computed(() => {
 .comment__thread-line {
   width: 2px;
   height: calc(100% - 16px);
-  margin: 8px auto 0;
+  margin: 8px 0 0 23px;
   border-radius: var(--rounded-full);
   background: var(--color-border);
+  transition: background var(--transition-fast);
 }
 
-.comment--depth-1 .comment__thread-line {
-  background: var(--color-border);
-}
-.comment--depth-2 .comment__thread-line {
-  background: var(--color-border-light);
+.comment:hover .comment__thread-line {
+  background: #f9a8d4;
 }
 
 .comment__content-wrap {
@@ -236,19 +234,6 @@ const visibleComments = computed(() => {
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
   border-radius: var(--rounded-md);
-  border-left: 3px solid transparent;
-  transition: border-color var(--transition-fast);
-}
-
-.comment--depth-0 .comment__content-wrap {
-  border-left-color: transparent;
-}
-.comment--depth-1 .comment__content-wrap {
-  border-left-color: var(--color-border);
-  background: var(--color-bg);
-}
-.comment--depth-2 .comment__content-wrap {
-  border-left-color: var(--color-border-light);
 }
 
 .comment__avatar {
