@@ -159,15 +159,17 @@ watch(likeLiked, (liked) => {
   <div class="article-detail container" v-if="article">
     <nav v-if="tocItems.length" class="article-toc">
       <div class="toc-title">{{ t('article.toc') }}</div>
-      <ul class="toc-list">
-        <li
-          v-for="item in tocItems"
-          :key="item.id"
-          :class="['toc-item', `toc-level-${item.level}`, { 'toc-active': activeTocId === item.id }]"
-        >
-          <a :href="`#${item.id}`" @click.prevent="scrollToHeading(item.id)">{{ item.text }}</a>
-        </li>
-      </ul>
+      <div class="toc-scroll">
+        <ul class="toc-list">
+          <li
+            v-for="item in tocItems"
+            :key="item.id"
+            :class="['toc-item', `toc-level-${item.level}`, { 'toc-active': activeTocId === item.id }]"
+          >
+            <a :href="`#${item.id}`" @click.prevent="scrollToHeading(item.id)">{{ item.text }}</a>
+          </li>
+        </ul>
+      </div>
     </nav>
     <div class="article-header">
       <span v-if="article.isPinned" class="pin-badge">{{ t('article.pinned') }}</span>
@@ -285,18 +287,45 @@ watch(likeLiked, (liked) => {
 .recent-liker-avatar:hover { border-color: var(--color-primary-light); }
 
 /* TOC */
-.article-toc::-webkit-scrollbar { width: 3px; }
-.article-toc::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.25); border-radius: var(--rounded-full); }
-.article-toc::-webkit-scrollbar-track { background: transparent; }
 .article-toc {
   position: fixed;
   left: max(calc((100vw - var(--content-max-width)) / 2 - 260px), var(--spacing-xl));
   top: calc(var(--navbar-height) + var(--spacing-2xl));
   bottom: 56px;
   width: 220px;
-  overflow-y: auto;
   z-index: 40;
+  display: flex;
+  flex-direction: column;
+}
+.toc-scroll::-webkit-scrollbar { width: 3px; }
+.toc-scroll::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.08); border-radius: var(--rounded-full); }
+.toc-scroll::-webkit-scrollbar-track { background: transparent; }
+.article-toc:hover .toc-scroll::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); }
+.toc-scroll {
+  flex: 1;
+  overflow-y: auto;
   padding-right: var(--spacing-md);
+  position: relative;
+}
+.toc-scroll::before,
+.toc-scroll::after {
+  content: '';
+  display: block;
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 16px;
+  flex-shrink: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.toc-scroll::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--color-bg), transparent);
+}
+.toc-scroll::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--color-bg), transparent);
 }
 .toc-title {
   font-size: var(--text-xs);
