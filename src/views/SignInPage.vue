@@ -118,7 +118,7 @@ onMounted(() => {
   })
 })
 
-const form = ref({ username: '', password: '', nickname: '' })
+const form = ref({ username: '', password: '', confirmPassword: '', nickname: '' })
 const error = ref('')
 const loading = ref(false)
 
@@ -140,7 +140,7 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
-  if (!form.value.username || !form.value.password) {
+  if (!form.value.username || !form.value.password || !form.value.confirmPassword) {
     error.value = t('auth.required')
     return
   }
@@ -152,10 +152,14 @@ async function handleRegister() {
     error.value = t('auth.passwordLength')
     return
   }
+  if (form.value.password !== form.value.confirmPassword) {
+    error.value = t('auth.passwordMismatch')
+    return
+  }
   loading.value = true
   error.value = ''
   try {
-    await auth.register({ username: form.value.username, password: form.value.password, nickname: form.value.nickname })
+    await auth.register({ username: form.value.username, password: form.value.password, confirmPassword: form.value.confirmPassword, nickname: form.value.nickname })
     router.push('/')
   } catch (err) {
     error.value = getMessage(err, 'auth.registerFailed')
@@ -173,7 +177,7 @@ function handleSubmit() {
 }
 
 function switchTo(path) {
-  form.value = { username: '', password: '', nickname: '' }
+  form.value = { username: '', password: '', confirmPassword: '', nickname: '' }
   error.value = ''
   router.push(path)
 }
@@ -232,13 +236,17 @@ function switchTo(path) {
             <label class="field__label">{{ t('auth.username') }}</label>
             <input v-model="form.username" class="field__input" type="text" autocomplete="username" />
           </div>
+          <div v-if="!isLogin" class="field">
+            <label class="field__label">{{ t('profile.nickname') }}</label>
+            <input v-model="form.nickname" class="field__input" type="text" />
+          </div>
           <div class="field">
             <label class="field__label">{{ t('auth.password') }}</label>
             <input v-model="form.password" class="field__input" type="password" autocomplete="off" />
           </div>
           <div v-if="!isLogin" class="field">
-            <label class="field__label">{{ t('profile.nickname') }}</label>
-            <input v-model="form.nickname" class="field__input" type="text" />
+            <label class="field__label">{{ t('auth.confirmPassword') }}</label>
+            <input v-model="form.confirmPassword" class="field__input" type="password" autocomplete="off" />
           </div>
 
           <p v-if="error" class="auth-form__error">{{ error }}</p>

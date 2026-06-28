@@ -10,13 +10,13 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/LoginPage.vue'),
+    component: () => import('@/views/SignInPage.vue'),
     meta: { guest: true, title: 'Login' }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('@/views/LoginPage.vue'),
+    component: () => import('@/views/SignInPage.vue'),
     meta: { guest: true, title: 'Register' }
   },
   {
@@ -26,21 +26,21 @@ const routes = [
     meta: { requiresAuth: true, title: 'Profile' }
   },
   {
-    path: '/users',
-    name: 'UserList',
-    component: () => import('@/views/UserListPage.vue'),
+    path: '/members',
+    name: 'MemberList',
+    component: () => import('@/views/MembersPage.vue'),
     meta: { title: 'Members' }
   },
   {
-    path: '/users/:id',
-    name: 'UserDetail',
-    component: () => import('@/views/UserDetailPage.vue'),
+    path: '/members/:id',
+    name: 'MemberDetail',
+    component: () => import('@/views/MemberDetailPage.vue'),
     meta: { title: 'Member' }
   },
   {
     path: '/moments',
     name: 'Moments',
-    component: () => import('@/views/MomentTimelinePage.vue'),
+    component: () => import('@/views/MomentsPage.vue'),
     meta: { title: 'Moments' }
   },
   {
@@ -52,7 +52,7 @@ const routes = [
   {
     path: '/articles',
     name: 'Articles',
-    component: () => import('@/views/ArticleListPage.vue'),
+    component: () => import('@/views/ArticlesPage.vue'),
     meta: { title: 'Articles' }
   },
   {
@@ -74,9 +74,9 @@ const routes = [
     meta: { requiresAuth: true, title: 'Edit Article' }
   },
   {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('@/views/AdminPage.vue'),
+    path: '/manage',
+    name: 'Manage',
+    component: () => import('@/views/ManagePage.vue'),
     meta: { requiresAuth: true, requiresAdmin: true, title: 'Manage' }
   },
   {

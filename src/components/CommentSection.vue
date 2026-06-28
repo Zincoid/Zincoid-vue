@@ -116,10 +116,10 @@ const visibleComments = computed(() => {
           </div>
           <div class="comment__content-wrap">
             <div class="comment__avatar">
-              <router-link v-if="comment.userAvatar" :to="`/users/${comment.userId}`">
+              <router-link v-if="comment.userAvatar" :to="`/members/${comment.userId}`">
                 <img :src="comment.userAvatar" alt="" />
               </router-link>
-              <router-link v-else :to="`/users/${comment.userId}`">
+              <router-link v-else :to="`/members/${comment.userId}`">
                 <span>{{ (comment.userNickname || 'U')[0] }}</span>
               </router-link>
             </div>

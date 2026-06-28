@@ -38,7 +38,7 @@ function goDetail() {
 
 function goUser(e) {
   e.stopPropagation()
-  router.push(`/users/${props.moment.userId}`)
+  router.push(`/members/${props.moment.userId}`)
 }
 </script>
 

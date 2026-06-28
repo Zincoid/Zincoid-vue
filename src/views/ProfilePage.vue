@@ -25,7 +25,7 @@ const message = ref('')
 const error = ref('')
 
 // Password
-const pwdForm = ref({ oldPassword: '', newPassword: '' })
+const pwdForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
 const pwdMessage = ref('')
 const pwdError = ref('')
 const showPwdForm = ref(false)
@@ -58,11 +58,8 @@ async function handleUpload(e) {
     profile.value.avatar = data.data.url
     message.value = ''
     error.value = ''
-    const payload = {
-      ...profile.value,
-      skills: skillsInput.value.split(',').map(s => s.trim()).filter(Boolean)
-    }
-    await auth.updateProfile(payload)
+    await userAPI.updateAvatar(data.data.url)
+    await auth.fetchMe()
     message.value = t('profile.avatarUpdated')
   } catch (err) {
     error.value = t('profile.uploadFailed')
@@ -76,12 +73,36 @@ async function saveProfile() {
     error.value = t('auth.usernameLength')
     return
   }
+  if (profile.value.contacts) {
+    try {
+      const obj = JSON.parse(profile.value.contacts)
+      if (typeof obj !== 'object' || Array.isArray(obj)) {
+        error.value = t('profile.contactsJsonHint')
+        return
+      }
+    } catch {
+      error.value = t('profile.contactsJsonHint')
+      return
+    }
+  }
   try {
+    const { avatar, ...rest } = profile.value
     const payload = {
-      ...profile.value,
+      ...rest,
       skills: skillsInput.value.split(',').map(s => s.trim()).filter(Boolean)
     }
-    await auth.updateProfile(payload)
+    const updated = await auth.updateProfile(payload)
+    profile.value = {
+      username: updated.username || '',
+      nickname: updated.nickname || '',
+      gender: updated.gender ?? null,
+      title: updated.title || '',
+      bio: updated.bio || '',
+      avatar: updated.avatar || '',
+      skills: updated.skills || [],
+      contacts: updated.contacts || ''
+    }
+    skillsInput.value = (updated.skills || []).join(', ')
     message.value = t('profile.saved')
   } catch (err) {
     error.value = getMessage(err, 'profile.saveFailed')
@@ -99,10 +120,14 @@ async function changePassword() {
     pwdError.value = t('auth.passwordLength')
     return
   }
+  if (pwdForm.value.newPassword !== pwdForm.value.confirmPassword) {
+    pwdError.value = t('auth.passwordMismatch')
+    return
+  }
   try {
     await auth.changePassword(pwdForm.value)
     pwdMessage.value = t('profile.passwordChanged')
-    pwdForm.value = { oldPassword: '', newPassword: '' }
+    pwdForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
   } catch (err) {
     pwdError.value = getMessage(err, 'profile.pwdUpdateFailed')
   }
@@ -212,6 +237,10 @@ async function deleteAccount() {
               <div class="field">
                 <label class="field__label">{{ t('profile.newPassword') }}</label>
                 <input v-model="pwdForm.newPassword" class="field__input" type="password" autocomplete="new-password" :placeholder="t('profile.newPasswordPlaceholder')" />
+              </div>
+              <div class="field">
+                <label class="field__label">{{ t('auth.confirmPassword') }}</label>
+                <input v-model="pwdForm.confirmPassword" class="field__input" type="password" autocomplete="new-password" :placeholder="t('auth.confirmPasswordPlaceholder')" />
               </div>
             </div>
 

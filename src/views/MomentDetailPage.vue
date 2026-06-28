@@ -168,7 +168,7 @@ watch(likeLiked, (liked) => {
   <div class="detail container" v-if="moment">
     <!-- Header -->
     <div class="detail__header">
-      <router-link :to="`/users/${moment.userId}`" class="detail__user">
+      <router-link :to="`/members/${moment.userId}`" class="detail__user">
         <img v-if="moment.userAvatar" :src="moment.userAvatar" class="detail__avatar" />
         <span v-else class="detail__avatar-placeholder">{{ (moment.userNickname || 'U')[0] }}</span>
         <span class="detail__nickname">{{ moment.userNickname }}</span>
@@ -284,7 +284,7 @@ watch(likeLiked, (liked) => {
         <router-link
           v-for="liker in moment.recentLikers"
           :key="liker.userId"
-          :to="`/users/${liker.userId}`"
+          :to="`/members/${liker.userId}`"
           class="recent-liker-link"
         >
           <img :src="liker.avatar" :title="liker.nickname" class="recent-liker-avatar" alt="" />

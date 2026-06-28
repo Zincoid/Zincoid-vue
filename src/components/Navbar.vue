@@ -16,10 +16,10 @@ const navLinks = computed(() => {
   const links = [
     { to: '/moments', label: t('nav.moments'), icon: 'moments' },
     { to: '/articles', label: t('nav.articles'), icon: 'articles' },
-    { to: '/users', label: t('nav.members'), icon: 'members' }
+    { to: '/members', label: t('nav.members'), icon: 'members' }
   ]
   if (auth.isAdmin) {
-    links.push({ to: '/admin', label: t('nav.manage'), icon: 'admin' })
+    links.push({ to: '/manage', label: t('nav.manage'), icon: 'admin' })
   }
   return links
 })
@@ -91,7 +91,7 @@ function closeMenu() {
               {{ t('nav.logout') }}
             </button>
           </template>
-          <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') }">
+          <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') || isActive('/register') }">
             <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
             {{ t('nav.signIn') }}
           </router-link>

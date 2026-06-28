@@ -6,10 +6,10 @@ const { t } = useI18n()
 <template>
   <div class="not-found container-narrow">
     <pre class="not-found__ascii">
-  _  _    ___  _  _
-  | \| |  / _ \| \| |
-  | .' | | (_) | .' |
-  |_|\_|  \___/|_|\_|
+_  _  ___  _  _
+| \| |/ _ \| \| |
+| .' | (_) | .' |
+|_|\_|\___/|_|\_|
     </pre>
     <h1>404</h1>
     <p>{{ t('notFound.message') }}</p>

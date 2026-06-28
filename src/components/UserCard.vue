@@ -12,7 +12,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <div class="user-card" @click="router.push(`/users/${user.id}`)">
+  <div class="user-card" @click="router.push(`/members/${user.id}`)">
     <img
       v-if="user.avatar"
       :src="user.avatar"

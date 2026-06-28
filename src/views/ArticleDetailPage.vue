@@ -174,7 +174,7 @@ watch(likeLiked, (liked) => {
       <h1 class="article-title">{{ article.title }}</h1>
 
       <div class="article-meta">
-        <router-link :to="`/users/${article.userId}`" class="article-author">
+        <router-link :to="`/members/${article.userId}`" class="article-author">
           <img v-if="article.userAvatar" :src="article.userAvatar" class="author-avatar" alt="" />
           <span v-else class="author-avatar-placeholder">{{ (article.userNickname || 'U')[0] }}</span>
           <span class="author-nickname">{{ article.userNickname }}</span>
@@ -215,7 +215,7 @@ watch(likeLiked, (liked) => {
         <router-link
           v-for="liker in article.recentLikers"
           :key="liker.userId"
-          :to="`/users/${liker.userId}`"
+          :to="`/members/${liker.userId}`"
           class="recent-liker-link"
         >
           <img :src="liker.avatar" :title="liker.nickname" class="recent-liker-avatar" alt="" />

@@ -43,6 +43,7 @@ export const userAPI = {
   getDetail: (id) => api.get(`/users/public/${id}`),
   getMe: () => api.get('/users'),
   updateProfile: (data) => api.put('/users', data),
+  updateAvatar: (avatar) => api.put('/users/avatar', { avatar }),
   changePassword: (data) => api.put('/users/password', data),
   deleteMe: () => api.delete('/users')
 }
