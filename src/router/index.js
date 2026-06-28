@@ -74,6 +74,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'Edit Article' }
   },
   {
+    path: '/chats',
+    name: 'Chats',
+    component: () => import('@/views/ChatsPage.vue'),
+    meta: { title: 'Chats' }
+  },
+  {
     path: '/manage',
     name: 'Manage',
     component: () => import('@/views/ManagePage.vue'),

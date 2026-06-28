@@ -2,6 +2,7 @@ export default {
   nav: {
     moments: '动态',
     articles: '文章',
+    chats: '聊天',
     members: '成员',
     manage: '管理',
     signIn: '登录',
@@ -209,7 +210,14 @@ export default {
   footer: {
     moments: '动态',
     articles: '文章',
+    chats: '聊天',
     members: '成员'
+  },
+  chat: {
+    title: '聊天',
+    subtitle: '公共聊天',
+    placeholder: '输入消息...',
+    loginHint: '登录后即可参与聊天。'
   },
   notification: {
     title: '通知',

@@ -2,6 +2,7 @@ export default {
   nav: {
     moments: 'Moments',
     articles: 'Articles',
+    chats: 'Chats',
     members: 'Members',
     manage: 'Manage',
     signIn: 'Sign In',
@@ -209,7 +210,14 @@ export default {
   footer: {
     moments: 'Moments',
     articles: 'Articles',
+    chats: 'Chats',
     members: 'Members'
+  },
+  chat: {
+    title: 'Chats',
+    subtitle: 'Public chat',
+    placeholder: 'Type a message...',
+    loginHint: 'Log in to join the chat.'
   },
   notification: {
     title: 'Notifications',

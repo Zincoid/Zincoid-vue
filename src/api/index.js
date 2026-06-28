@@ -113,6 +113,12 @@ export const configAPI = {
   update: (key, value) => api.put(`/configs/${key}`, null, { params: { value } })
 }
 
+// ── Chats ──
+export const chatAPI = {
+  getList: (page = 1, size = 50) => api.get('/chats/public', { params: { page, size } }),
+  send: (content, file) => api.post('/chats', null, { params: { content, file } })
+}
+
 // ── Notifications ──
 export const notificationAPI = {
   getList: () => api.get('/notifications'),
