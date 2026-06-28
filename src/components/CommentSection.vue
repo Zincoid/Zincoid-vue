@@ -271,6 +271,7 @@ const visibleComments = computed(() => {
   height: 100%;
   align-items: center;
   justify-content: center;
+  color: inherit;
 }
 .comment__avatar img {
   width: 100%;

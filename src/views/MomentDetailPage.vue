@@ -307,8 +307,10 @@ watch(likeLiked, (liked) => {
           :key="liker.userId"
           :to="`/members/${liker.userId}`"
           class="recent-liker-link"
+          :title="liker.nickname"
         >
-          <img :src="liker.avatar" :title="liker.nickname" class="recent-liker-avatar" alt="" />
+          <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
+          <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
         </router-link>
       </div>
     </div>
@@ -369,6 +371,7 @@ watch(likeLiked, (liked) => {
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }
 .recent-liker-avatar { width: 28px; height: 28px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-surface); cursor: pointer; }
 .recent-liker-avatar:hover { border-color: var(--color-primary-light); }
+.recent-liker-placeholder { display: flex; align-items: center; justify-content: center; background: var(--color-primary); color: white; font-size: 10px; font-weight: var(--weight-medium); object-fit: unset; }
 .edit-block { display: flex; flex-direction: column; gap: var(--spacing-md); }
 .edit-textarea { width: 100%; min-height: 100px; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-family: inherit; font-size: var(--text-sm); line-height: var(--leading-normal); color: var(--color-text); background: var(--color-bg); resize: vertical; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .edit-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-light); }
