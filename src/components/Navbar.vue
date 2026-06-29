@@ -56,6 +56,7 @@ function goNotification(n) {
     }).catch(() => {})
   }
   const name = n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
+  if (n.targetId == null) return
   router.push({ name, params: { id: n.targetId } })
 }
 

@@ -79,11 +79,13 @@ function scrollToHeading(id) {
 }
 
 onMounted(async () => {
+  const id = Number(route.params.id)
+  if (isNaN(id)) return
   try {
     const [aRes, cRes, lRes] = await Promise.all([
-      articleAPI.getDetail(route.params.id),
-      commentAPI.getArticle(route.params.id),
-      likeAPI.getStatus(1, Number(route.params.id))
+      articleAPI.getDetail(id),
+      commentAPI.getArticle(id),
+      likeAPI.getStatus(1, id)
     ])
     article.value = aRes.data.data
     comments.value = cRes.data.data || []

@@ -97,11 +97,13 @@ async function saveEdit() {
 }
 
 onMounted(async () => {
+  const id = Number(route.params.id)
+  if (isNaN(id)) return
   try {
     const [mRes, cRes, lRes] = await Promise.all([
-      momentAPI.getDetail(route.params.id),
-      commentAPI.getMoment(route.params.id),
-      likeAPI.getStatus(0, Number(route.params.id))
+      momentAPI.getDetail(id),
+      commentAPI.getMoment(id),
+      likeAPI.getStatus(0, id)
     ])
     moment.value = mRes.data.data
     comments.value = cRes.data.data || []
