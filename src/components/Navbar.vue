@@ -49,8 +49,14 @@ function closeNotif() {
 
 function goNotification(n) {
   closeNotif()
-  const name = n.relatedType === 0 ? 'MomentDetail' : 'ArticleDetail'
-  router.push({ name, params: { id: n.relatedId } })
+  if (!n.isRead) {
+    notificationAPI.markOne(n.id).then(() => {
+      n.isRead = true
+      unreadCount.value = Math.max(0, unreadCount.value - 1)
+    }).catch(() => {})
+  }
+  const name = n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
+  router.push({ name, params: { id: n.targetId } })
 }
 
 function deleteOne(n) {
@@ -242,11 +248,11 @@ function closeMenu() {
             <div class="navbar__notif-item-body">
               <div class="navbar__notif-item-text">
                 <strong>{{ n.senderNickname }}</strong>
-                {{ n.isReply
-                  ? (n.relatedType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
-                  : (n.relatedType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
+                {{ n.relatedType === 5
+                  ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
+                  : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
               </div>
-              <div class="navbar__notif-item-snippet" v-if="n.commentSnippet">{{ n.commentSnippet }}</div>
+              <div class="navbar__notif-item-snippet" v-if="n.snippet">{{ n.snippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
             </div>
             <button class="navbar__notif-item-delete" @click.stop="deleteOne(n)" :title="t('common.delete')">

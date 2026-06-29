@@ -124,6 +124,7 @@ export const notificationAPI = {
   getList: () => api.get('/notifications'),
   getUnreadCount: () => api.get('/notifications/count'),
   markRead: () => api.put('/notifications/read'),
+  markOne: (id) => api.put(`/notifications/${id}/read`),
   delete: (id) => api.delete(`/notifications/${id}`),
   deleteAll: () => api.delete('/notifications')
 }
