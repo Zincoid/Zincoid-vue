@@ -767,7 +767,18 @@ function closeMenu() {
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 857px) {
+  .navbar__links .navbar__item {
+    min-width: auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  .navbar__links .navbar__nav-icon {
+    margin-right: var(--spacing-xs);
+  }
+  .navbar__links .navbar__label {
+    display: inline;
+  }
   .navbar__brand { border-bottom: none; }
   .navbar__mobile-actions {
     display: flex;
