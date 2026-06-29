@@ -200,6 +200,30 @@ th {
   background: var(--color-primary);
   color: white;
 }
+.quick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-full);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.quick-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.quick-btn--active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
 .btn--ghost {
   border-color: transparent;
   color: var(--color-text-secondary);
@@ -467,6 +491,35 @@ th {
   box-shadow: var(--shadow-lg);
 }
 
+.pin-fab {
+  position: fixed;
+  right: var(--spacing-xl);
+  bottom: 135px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+.pin-fab:hover {
+  border-color: #d97706;
+  color: #d97706;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.pin-fab--active {
+  border-color: #d97706;
+  color: #d97706;
+}
+
 .like-fab {
   position: fixed;
   right: var(--spacing-xl);
@@ -514,5 +567,8 @@ th {
   }
   .like-fab {
     bottom: 165px;
+  }
+  .pin-fab {
+    bottom: 195px;
   }
 }

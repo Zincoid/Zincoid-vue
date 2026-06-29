@@ -33,7 +33,8 @@ export default {
     postFailed: 'Failed to post',
     deleteError: 'Failed to delete',
     placeholder: "What's on your mind?",
-    updateFailed: 'Failed to update'
+    updateFailed: 'Failed to update',
+    pinnedFirst: 'Pinned'
   },
   article: {
     title: 'Articles',
@@ -59,7 +60,8 @@ export default {
     loadFailed: 'Failed to load article',
     saveFailed: 'Save failed',
     deleteError: 'Failed to delete',
-    toc: 'On this page'
+    toc: 'On this page',
+    pinnedFirst: 'Pinned'
   },
   user: {
     title: 'Members',

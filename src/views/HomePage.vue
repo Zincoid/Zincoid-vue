@@ -167,17 +167,19 @@ onMounted(async () => {
   startTyping()
   try {
     const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
-    const [mRes, aRes, uRes, rRes, cfgRes] = await Promise.all([
-      momentAPI.getTimeline(1, 5),
-      articleAPI.getList(1, 5),
+    const [mRes, aRes, mtRes, atRes, uRes, rRes, cfgRes] = await Promise.all([
+      momentAPI.getHomeFeed(5),
+      articleAPI.getHomeFeed(5),
+      momentAPI.getTimeline(1, 1),
+      articleAPI.getList(1, 1),
       userAPI.getList(1, 1),
       randomAPI,
       configAPI.get()
     ])
-    moments.value = mRes.data.data.records || []
-    articles.value = aRes.data.data.records || []
-    counts.value.moments = mRes.data.data.total || 0
-    counts.value.articles = aRes.data.data.total || 0
+    moments.value = mRes.data.data || []
+    articles.value = aRes.data.data || []
+    counts.value.moments = mtRes.data.data.total || 0
+    counts.value.articles = atRes.data.data.total || 0
     counts.value.members = uRes.data.data.total || 0
     if (rRes.data.data) {
       const type = rRes.config.url.includes('moments') ? 'moment' : 'article'

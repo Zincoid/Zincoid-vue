@@ -33,7 +33,8 @@ export default {
     postFailed: '发布失败',
     deleteError: '删除失败',
     placeholder: '在想什么？',
-    updateFailed: '更新失败'
+    updateFailed: '更新失败',
+    pinnedFirst: '置顶'
   },
   article: {
     title: '文章',
@@ -59,7 +60,8 @@ export default {
     loadFailed: '加载文章失败',
     saveFailed: '保存失败',
     deleteError: '删除失败',
-    toc: '目录'
+    toc: '目录',
+    pinnedFirst: '置顶'
   },
   user: {
     title: '成员',

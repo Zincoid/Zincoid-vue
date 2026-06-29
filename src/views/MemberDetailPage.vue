@@ -3,11 +3,14 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { userAPI, momentAPI, articleAPI } from '@/api'
 import { useI18n } from '@/composables/useI18n'
+import { useConfig } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import ContactButtons from '@/components/ContactButtons.vue'
+import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const skillColors = [
   { bg: '#dbeafe', fg: '#2563eb' },
@@ -22,30 +25,49 @@ const skillColors = [
 
 const route = useRoute()
 const user = ref(null)
+const userId = ref(null)
 const moments = ref([])
 const articles = ref([])
 const tab = ref('moments')
 const notFound = ref(false)
 
+const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
+const aPage = ref(1); const aPages = ref(1); const aTotal = ref(0)
+const pageSize = ref(10)
+
 onMounted(async () => {
   try {
+    await loadConfig()
+    pageSize.value = parseInt(getConfig('page_size', '10'))
     const username = route.params.username
     const userPromise = username
       ? userAPI.getByUsername(username)
       : userAPI.getDetail(route.params.id)
     const uRes = await userPromise
-    const userId = uRes.data.data?.id
-    const [mRes, aRes] = await Promise.all([
-      momentAPI.getByUser(userId, 1, 10),
-      articleAPI.getByUser(userId, 1, 10)
-    ])
     user.value = uRes.data.data
-    moments.value = mRes.data.data.records || []
-    articles.value = aRes.data.data.records || []
+    userId.value = uRes.data.data.id
+    await Promise.all([fetchMoments(), fetchArticles()])
   } catch (e) {
     notFound.value = e.response?.data?.code === 404
   }
 })
+
+async function fetchMoments() {
+  const { data } = await momentAPI.getByUser(userId.value, mPage.value, pageSize.value)
+  moments.value = data.data.records || []
+  mPages.value = data.data.pages || 1
+  mTotal.value = data.data.total || 0
+}
+
+async function fetchArticles() {
+  const { data } = await articleAPI.getByUser(userId.value, aPage.value, pageSize.value)
+  articles.value = data.data.records || []
+  aPages.value = data.data.pages || 1
+  aTotal.value = data.data.total || 0
+}
+
+function onMPage(p) { mPage.value = p; fetchMoments() }
+function onAPage(p) { aPage.value = p; fetchArticles() }
 </script>
 
 <template>
@@ -86,10 +108,12 @@ onMounted(async () => {
     <div class="tab-content" v-if="tab === 'moments'">
       <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
       <p v-if="!moments.length" class="empty-state">{{ t('user.momentsEmpty') }}</p>
+      <Pagination :page="mPage" :pages="mPages" :total="mTotal" :size="pageSize" @change="onMPage" />
     </div>
     <div class="tab-content" v-else>
       <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
       <p v-if="!articles.length" class="empty-state">{{ t('user.articlesEmpty') }}</p>
+      <Pagination :page="aPage" :pages="aPages" :total="aTotal" :size="pageSize" @change="onAPage" />
     </div>
   </div>
 
