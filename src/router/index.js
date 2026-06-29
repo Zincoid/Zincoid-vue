@@ -106,9 +106,6 @@ const routes = [
   }
 ]
 
-let healthChecked = false
-let serverAvailable = true
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -120,17 +117,10 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   if (to.path === '/maintenance') return next()
 
-  if (!healthChecked || !serverAvailable) {
-    try {
-      await healthAPI.check()
-      serverAvailable = true
-    } catch {
-      serverAvailable = false
-    }
-    healthChecked = true
-    if (!serverAvailable) {
-      return next('/maintenance')
-    }
+  try {
+    await healthAPI.check()
+  } catch {
+    return next('/maintenance')
   }
 
   const token = localStorage.getItem('token')
