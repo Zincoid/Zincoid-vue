@@ -4,13 +4,16 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
+import { useMention } from '@/composables/useMention'
 import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
+import MentionDropdown from '@/components/MentionDropdown.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
+const mention = useMention()
 const { load: loadConfig, get: getConfig } = useConfig()
 
 const moments = ref([])
@@ -26,6 +29,7 @@ const newContent = ref('')
 const newImageFiles = ref([])
 const newImagePreviews = ref([])
 const posting = ref(false)
+const momentTextarea = ref(null)
 
 onMounted(async () => {
   await loadConfig()
@@ -51,6 +55,11 @@ function onPageChange(p) {
   page.value = p
   fetchMoments()
   window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function onMomentInput(e) {
+  newContent.value = e.target.value
+  mention.onInput(e.target)
 }
 
 function handleUpload(e) {
@@ -112,11 +121,19 @@ async function submitMoment() {
     <!-- Editor -->
     <div v-if="showEditor" class="editor">
       <textarea
-        v-model="newContent"
+        ref="momentTextarea"
+        :value="newContent"
         class="editor__input"
         :placeholder="t('moment.placeholder')"
         rows="3"
+        @input="onMomentInput"
+        @keydown.esc="mention.close()"
       ></textarea>
+      <MentionDropdown
+        :suggestions="mention.suggestions"
+        :pos="mention.mentionPos"
+        @select="(username) => mention.insert(momentTextarea, username)"
+      />
 
       <div v-if="newImagePreviews.length" class="editor__images">
         <div v-for="(item, i) in newImagePreviews" :key="i" class="editor__image-wrap">

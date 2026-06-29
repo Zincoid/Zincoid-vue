@@ -4,10 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useMention } from '@/composables/useMention'
 import { momentAPI, commentAPI, likeAPI, fileAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import MentionDropdown from '@/components/MentionDropdown.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -15,6 +17,8 @@ const { getMessage } = useError()
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const mention = useMention()
+const editTextarea = ref(null)
 const moment = ref(null)
 const comments = ref([])
 const loading = ref(true)
@@ -39,6 +43,11 @@ function mediaType(url) {
   if (['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(ext)) return 'video'
   if (['mp3', 'wav', 'aac', 'flac'].includes(ext)) return 'audio'
   return 'image'
+}
+
+function onEditInput(e) {
+  editContent.value = e.target.value
+  mention.onInput(e.target)
 }
 
 function startEdit() {
@@ -214,7 +223,19 @@ watch(likeLiked, (liked) => {
 
     <template v-if="editing">
       <div class="edit-block">
-        <textarea v-model="editContent" class="edit-textarea" :placeholder="t('moment.placeholder')"></textarea>
+        <textarea
+          ref="editTextarea"
+          :value="editContent"
+          class="edit-textarea"
+          :placeholder="t('moment.placeholder')"
+          @input="onEditInput"
+          @keydown.esc="mention.close()"
+        ></textarea>
+        <MentionDropdown
+          :suggestions="mention.suggestions"
+          :pos="mention.mentionPos"
+          @select="(username) => mention.insert(editTextarea, username)"
+        />
 
         <div v-if="editKeepImages.length || editNewPreviews.length" class="edit-media-grid">
           <div v-for="(img, i) in editKeepImages" :key="'keep'+i" class="edit-media-item">

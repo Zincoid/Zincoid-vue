@@ -3,13 +3,16 @@ import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useMention } from '@/composables/useMention'
 import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
+import MentionDropdown from '@/components/MentionDropdown.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
+const mention = useMention()
 
 const messages = ref([])
 const content = ref('')
@@ -22,6 +25,7 @@ const uploadFile = ref(null)
 const uploading = ref(false)
 const previewSrc = ref(null)
 const previewOpen = ref(false)
+const chatTextarea = ref(null)
 
 const live = ref(true)
 let pollTimer = null
@@ -125,6 +129,11 @@ async function handleSend() {
   } finally {
     sending.value = false
   }
+}
+
+function onChatInput(e) {
+  content.value = e.target.value
+  mention.onInput(e.target)
 }
 
 function onFileChange(e) {
@@ -239,12 +248,20 @@ function openPreview(src) {
           <input type="file" @change="onFileChange" accept="image/*,video/*" />
         </label>
         <textarea
-          v-model="content"
+          ref="chatTextarea"
+          :value="content"
           class="chat-input__textarea"
           :placeholder="t('chat.placeholder')"
           rows="2"
+          @input="onChatInput"
+          @keydown.esc="mention.close()"
           @keydown.enter.exact.prevent="handleSend"
         ></textarea>
+        <MentionDropdown
+          :suggestions="mention.suggestions"
+          :pos="mention.mentionPos"
+          @select="(username) => mention.insert(chatTextarea, username)"
+        />
         <button class="chat-scroll-bottom-btn" @click="scrollBottom" title="Scroll to bottom">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>

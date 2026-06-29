@@ -2,7 +2,9 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useMention } from '@/composables/useMention'
 import { formatDate } from '@/utils/format'
+import MentionDropdown from '@/components/MentionDropdown.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -14,9 +16,16 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'delete'])
 
 const auth = useAuthStore()
+const mention = useMention()
 const content = ref('')
 const replyTo = ref(null)
+const commentTextarea = ref(null)
 const submitting = ref(false)
+
+function onCommentInput(e) {
+  content.value = e.target.value
+  mention.onInput(e.target)
+}
 
 function handleSubmit() {
   if (!content.value.trim()) return
@@ -160,11 +169,19 @@ const visibleComments = computed(() => {
       </p>
       <div class="comments__row">
         <textarea
-          v-model="content"
+          ref="commentTextarea"
+          :value="content"
           class="comments__input"
           :placeholder="replyTo ? t('comment.replyPlaceholder') : t('comment.placeholder')"
           rows="3"
+          @input="onCommentInput"
+          @keydown.esc="mention.close()"
         ></textarea>
+        <MentionDropdown
+          :suggestions="mention.suggestions"
+          :pos="mention.mentionPos"
+          @select="(username) => mention.insert(commentTextarea, username)"
+        />
         <button
           class="btn btn--primary"
           :disabled="!content.trim() || submitting"
