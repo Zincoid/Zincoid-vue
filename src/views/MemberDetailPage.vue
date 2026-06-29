@@ -52,6 +52,7 @@ onMounted(async () => {
       <div class="profile-info">
         <div class="profile-name-row">
           <h1 class="profile-name">{{ user.nickname }}</h1>
+          <span class="profile-username">@{{ user.username }}</span>
           <span v-if="user.gender !== null && user.gender !== undefined" class="profile-pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         </div>
         <p v-if="user.title" class="profile-title">{{ user.title }}</p>
@@ -131,6 +132,12 @@ onMounted(async () => {
 }
 
 .profile-name { font-size: var(--text-2xl); margin: 0; }
+
+.profile-username {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-normal);
+}
 
 .profile-pronouns {
   font-size: var(--text-sm);

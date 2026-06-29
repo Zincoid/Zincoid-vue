@@ -65,6 +65,7 @@ export default {
     title: '成员',
     subtitle: '所有成员',
     empty: '暂无成员。',
+    searchPlaceholder: '搜索用户名或昵称...',
     moments: '动态',
     articles: '文章',
     momentsEmpty: '暂无动态。',

@@ -65,6 +65,7 @@ export default {
     title: 'Members',
     subtitle: 'All members',
     empty: 'No members found.',
+    searchPlaceholder: 'Search username or nickname...',
     moments: 'Moments',
     articles: 'Articles',
     momentsEmpty: 'No moments yet.',

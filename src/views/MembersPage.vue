@@ -16,19 +16,32 @@ const pages = ref(1)
 const total = ref(0)
 const pageSize = ref(20)
 const loading = ref(true)
+const keyword = ref('')
+let searchTimer = null
 
 onMounted(async () => {
   await loadConfig()
   fetchData()
 })
 
+function onSearch() {
+  page.value = 1
+  fetchData()
+}
+
+function onSearchInput() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => onSearch(), 300)
+}
+
 async function fetchData() {
   loading.value = true
   try {
     pageSize.value = parseInt(getConfig('page_size', '20'))
+    const kw = keyword.value.trim() || null
     const [adminRes, userRes] = await Promise.all([
       userAPI.getList(1, 100, 1),
-      userAPI.getList(page.value, pageSize.value, 0)
+      userAPI.getList(page.value, pageSize.value, 0, kw)
     ])
     admins.value = adminRes.data.data.records || []
     users.value = userRes.data.data.records || []
@@ -68,6 +81,16 @@ function removeUser(id) {
       <p class="page-header__subtitle">{{ t('user.subtitle') }}</p>
     </div>
 
+    <div class="user-search">
+      <input
+        v-model="keyword"
+        type="text"
+        class="field__input user-search__input"
+        :placeholder="t('user.searchPlaceholder')"
+        @input="onSearchInput"
+      />
+    </div>
+
     <template v-if="admins.length || users.length">
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
@@ -90,6 +113,8 @@ function removeUser(id) {
 
 <style scoped>
 .user-list { padding-bottom: var(--spacing-4xl); }
+.user-search { margin-bottom: var(--spacing-xl); }
+.user-search__input { width: 100%; }
 .user-section { margin-bottom: var(--spacing-2xl); }
 .user-section__title { font-size: var(--text-lg); font-weight: var(--weight-medium); margin-bottom: var(--spacing-lg); color: var(--color-text-heading); padding-left: var(--spacing-md); border-left: 4px solid; }
 .user-section__title--admin { border-left-color: #dc2626; }
