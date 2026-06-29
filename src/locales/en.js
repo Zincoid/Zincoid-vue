@@ -75,7 +75,7 @@ export default {
     admin: 'Admin',
     members: 'User',
     disabled: 'Disabled',
-    notFound: 'User not found'
+    notFound: 'User not found.'
   },
   comment: {
     title: '{count} Comments',

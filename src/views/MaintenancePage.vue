@@ -4,8 +4,8 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="not-found container-narrow">
-    <pre class="not-found__ascii">
+  <div class="maintenance container-narrow">
+    <pre class="maintenance__ascii">
  __  __   _    ___  _   _ _____
 |  \/  | /_\  |_ _|| \ | |__ __|
 | |\/| |/ _ \  | | |  \| | | |
@@ -18,11 +18,11 @@ const { t } = useI18n()
 </template>
 
 <style scoped>
-.not-found {
+.maintenance {
   text-align: center;
   padding: var(--spacing-5xl) 0;
 }
-.not-found__ascii {
+.maintenance__ascii {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--color-text-secondary);

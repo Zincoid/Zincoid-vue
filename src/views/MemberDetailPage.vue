@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { userAPI, momentAPI, articleAPI } from '@/api'
 import { useI18n } from '@/composables/useI18n'
 import MomentCard from '@/components/MomentCard.vue'
@@ -21,11 +21,11 @@ const skillColors = [
 ]
 
 const route = useRoute()
-const router = useRouter()
 const user = ref(null)
 const moments = ref([])
 const articles = ref([])
 const tab = ref('moments')
+const notFound = ref(false)
 
 onMounted(async () => {
   try {
@@ -43,15 +43,14 @@ onMounted(async () => {
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
   } catch (e) {
-    if (e.response?.data?.code === 404) {
-      router.replace('/not-found')
-    }
+    notFound.value = e.response?.data?.code === 404
   }
 })
 </script>
 
 <template>
-  <div class="user-detail container" v-if="user">
+  <p v-if="notFound" class="empty-state container" style="padding-top:var(--spacing-5xl)">{{ t('user.notFound') }}</p>
+  <div class="user-detail container" v-else-if="user">
     <!-- Profile header -->
     <div class="profile-header">
       <img v-if="user.avatar" :src="user.avatar" class="profile-avatar" />
