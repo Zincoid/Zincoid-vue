@@ -19,7 +19,11 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    if (!error.response) {
+      router.push('/maintenance')
+      return Promise.reject(error)
+    }
+    if (error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       router.push('/login')
