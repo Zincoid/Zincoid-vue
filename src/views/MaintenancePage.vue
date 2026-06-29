@@ -13,7 +13,7 @@ const { t } = useI18n()
     </pre>
     <h1>503</h1>
     <p>{{ t('maintenance.message') }}</p>
-    <button class="btn btn--outline" @click="location.reload()">{{ t('maintenance.retry') }}</button>
+    <router-link to="/" class="btn btn--outline">{{ t('maintenance.retry') }}</router-link>
   </div>
 </template>
 
