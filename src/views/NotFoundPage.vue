@@ -6,7 +6,7 @@ const { t } = useI18n()
 <template>
   <div class="not-found container-narrow">
     <pre class="not-found__ascii">
-_  _  ___  _  _
+ _  _  ___  _  _
 | \| |/ _ \| \| |
 | .' | (_) | .' |
 |_|\_|\___/|_|\_|
@@ -30,6 +30,8 @@ _  _  ___  _  _
   line-height: 1.5;
   background: none;
   border: none;
+  text-align: left;
+  display: inline-block;
 }
 h1 { font-size: 4rem; color: var(--color-primary); margin-bottom: var(--spacing-sm); }
 p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); }

@@ -6,10 +6,10 @@ const { t } = useI18n()
 <template>
   <div class="not-found container-narrow">
     <pre class="not-found__ascii">
- __  __   _   _   _   _   ___ ___
-|  \/  | /_\ | \ | | |_ _|_ _/ __|
-| |\/| |/ _ \|  \| |  | | | | (_
-|_|  |_/_/ \_\_|\_| |___|___\___|
+ __  __   _    ___  _   _ _____
+|  \/  | /_\  |_ _|| \ | |__ __|
+| |\/| |/ _ \  | | |  \| | | |
+|_|  |_/_/ \_\|___||_|\__| |_|
     </pre>
     <h1>503</h1>
     <p>{{ t('maintenance.message') }}</p>
@@ -30,6 +30,8 @@ const { t } = useI18n()
   line-height: 1.5;
   background: none;
   border: none;
+  text-align: left;
+  display: inline-block;
 }
 h1 { font-size: 4rem; color: var(--color-primary); margin-bottom: var(--spacing-sm); }
 p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); }
