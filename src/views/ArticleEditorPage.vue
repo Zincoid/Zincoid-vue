@@ -26,6 +26,7 @@ const error = ref('')
 const publishing = ref(false)
 const coverFile = ref(null)
 const coverPreview = ref('')
+const coverRemoved = ref(false)
 
 onMounted(async () => {
   if (isEdit.value) {
@@ -50,6 +51,14 @@ function handleCoverUpload(e) {
   if (!file) return
   coverFile.value = file
   coverPreview.value = URL.createObjectURL(file)
+  coverRemoved.value = false
+}
+
+function removeCover() {
+  coverFile.value = null
+  coverPreview.value = ''
+  form.value.coverImage = ''
+  coverRemoved.value = true
 }
 
 async function save() {
@@ -61,7 +70,9 @@ async function save() {
   error.value = ''
   try {
     const contentMd = await mdEditor.value.resolveImages(form.value.contentMd)
-    if (coverFile.value) {
+    if (coverRemoved.value) {
+      form.value.coverImage = ''
+    } else if (coverFile.value) {
       const { data } = await fileAPI.upload(coverFile.value)
       form.value.coverImage = data.data.url
     }
@@ -106,7 +117,10 @@ async function save() {
             <input type="file" accept="image/*" class="hidden-input" @change="handleCoverUpload" />
           </label>
         </div>
-        <img v-if="coverPreview || form.coverImage" :src="coverPreview || form.coverImage" class="cover-preview" />
+        <div v-if="coverPreview || form.coverImage" class="cover-preview-wrap">
+          <img :src="coverPreview || form.coverImage" class="cover-preview" />
+          <button class="cover-preview-remove" @click="removeCover" title="Remove cover">&times;</button>
+        </div>
       </div>
 
       <div class="field">
@@ -137,7 +151,10 @@ h1 { margin-bottom: var(--spacing-2xl); }
 .field { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .field label { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); }
 .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
-.cover-preview { max-width: 200px; max-height: 200px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); margin-top: var(--spacing-sm); background: var(--color-bg-alt); }
+.cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
+.cover-preview { max-width: 200px; max-height: 200px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }
+.cover-preview-remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cover-preview-remove:hover { background: var(--color-red, #e74c3c); color: #fff; border-color: var(--color-red, #e74c3c); }
 .hidden-input { display: none; }
 
 .error-msg { margin-bottom: var(--spacing-lg); }
