@@ -1,6 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { healthAPI } from '@/api'
 
 const routes = [
+  {
+    path: '/maintenance',
+    name: 'Maintenance',
+    component: () => import('@/views/MaintenancePage.vue'),
+    meta: { title: 'Maintenance' }
+  },
   {
     path: '/',
     name: 'Home',
@@ -99,6 +106,9 @@ const routes = [
   }
 ]
 
+let healthChecked = false
+let serverAvailable = true
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -107,7 +117,20 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  if (!healthChecked && to.path !== '/maintenance') {
+    try {
+      await healthAPI.check()
+      serverAvailable = true
+    } catch {
+      serverAvailable = false
+    }
+    healthChecked = true
+    if (!serverAvailable) {
+      return next('/maintenance')
+    }
+  }
+
   const token = localStorage.getItem('token')
   const user = JSON.parse(localStorage.getItem('user') || 'null')
 

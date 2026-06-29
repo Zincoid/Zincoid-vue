@@ -234,6 +234,10 @@ export default {
     'Verification code already requested, please wait': 'Verification code already requested, please wait',
     'New email is the same as current email': 'New email is the same as current email'
   },
+  maintenance: {
+    message: 'Server is currently unavailable. Please try again later.',
+    retry: 'Retry'
+  },
   notFound: {
     message: "The page you're looking for doesn't exist.",
     goHome: 'Go Home'

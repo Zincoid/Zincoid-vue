@@ -123,6 +123,11 @@ export const chatAPI = {
   delete: (messageId) => api.delete(`/chats/${messageId}`)
 }
 
+// ── Health ──
+export const healthAPI = {
+  check: () => api.get('/health')
+}
+
 // ── Notifications ──
 export const notificationAPI = {
   getList: () => api.get('/notifications'),

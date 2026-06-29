@@ -234,6 +234,10 @@ export default {
     'Verification code already requested, please wait': '验证码已请求，请稍后再试',
     'New email is the same as current email': '新邮箱与当前邮箱相同'
   },
+  maintenance: {
+    message: '服务器暂时不可用，请稍后重试。',
+    retry: '重试'
+  },
   notFound: {
     message: '页面不存在。',
     goHome: '返回首页'
