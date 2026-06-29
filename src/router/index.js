@@ -118,7 +118,9 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  if (!healthChecked && to.path !== '/maintenance') {
+  if (to.path === '/maintenance') return next()
+
+  if (!healthChecked || !serverAvailable) {
     try {
       await healthAPI.check()
       serverAvailable = true
