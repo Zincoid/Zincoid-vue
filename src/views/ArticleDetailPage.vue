@@ -4,8 +4,10 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useConfig } from '@/composables/useConfig'
 import { articleAPI, commentAPI, likeAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
+import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import { formatDate } from '@/utils/format'
 import hljs from 'highlight.js'
@@ -13,10 +15,15 @@ import 'highlight.js/styles/github-dark.css'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
 const auth = useAuthStore()
 const article = ref(null)
 const comments = ref([])
+const commentPage = ref(1)
+const commentPages = ref(1)
+const commentTotal = ref(0)
+const commentSize = ref(10)
 const loading = ref(true)
 const likeLiked = ref(false)
 const likeCount = ref(0)
@@ -79,16 +86,20 @@ function scrollToHeading(id) {
 }
 
 onMounted(async () => {
+  await loadConfig()
+  commentSize.value = parseInt(getConfig('page_size', '10'))
   const id = Number(route.params.id)
   if (isNaN(id)) return
   try {
     const [aRes, cRes, lRes] = await Promise.all([
       articleAPI.getDetail(id),
-      commentAPI.getArticle(id),
+      commentAPI.getArticle(id, 1, commentSize.value),
       likeAPI.getStatus(1, id)
     ])
     article.value = aRes.data.data
-    comments.value = cRes.data.data || []
+    comments.value = cRes.data.data.records || []
+    commentPages.value = cRes.data.data.pages || 1
+    commentTotal.value = cRes.data.data.total || 0
     likeLiked.value = lRes.data.data.liked
     likeCount.value = lRes.data.data.count
 
@@ -110,8 +121,7 @@ onBeforeUnmount(() => {
 async function handleComment({ content, parentId }) {
   try {
     await commentAPI.addArticle(route.params.id, { content, parentId })
-    const { data } = await commentAPI.getArticle(route.params.id)
-    comments.value = data.data || []
+    await fetchComments()
   } catch (err) {
     alert(getMessage(err, 'comment.postFailed'))
   }
@@ -121,11 +131,22 @@ async function handleDeleteComment(commentId) {
   if (!confirm(t('comment.deleteConfirm'))) return
   try {
     await commentAPI.delete(commentId)
-    const { data } = await commentAPI.getArticle(route.params.id)
-    comments.value = data.data || []
+    await fetchComments()
   } catch (err) {
     alert(getMessage(err, 'comment.deleteFailed'))
   }
+}
+
+async function fetchComments() {
+  const { data } = await commentAPI.getArticle(route.params.id, commentPage.value, commentSize.value)
+  comments.value = data.data.records || []
+  commentPages.value = data.data.pages || 1
+  commentTotal.value = data.data.total || 0
+}
+
+function onCommentPageChange(p) {
+  commentPage.value = p
+  fetchComments()
 }
 
 async function togglePin() {
@@ -257,6 +278,7 @@ watch(likeLiked, (liked) => {
       @submit="handleComment"
       @delete="handleDeleteComment"
     />
+    <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
   </div>
   <p v-else-if="!loading" class="empty-state">{{ t('article.notFound') }}</p>
 

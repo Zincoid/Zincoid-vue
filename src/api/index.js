@@ -90,8 +90,8 @@ export const articleAPI = {
 export const commentAPI = {
   addMoment: (momentId, data) => api.post(`/comments/moment/${momentId}`, data),
   addArticle: (articleId, data) => api.post(`/comments/article/${articleId}`, data),
-  getMoment: (momentId) => api.get(`/comments/public/moment/${momentId}`),
-  getArticle: (articleId) => api.get(`/comments/public/article/${articleId}`),
+  getMoment: (momentId, page = 1, size = 10) => api.get(`/comments/public/moment/${momentId}`, { params: { page, size } }),
+  getArticle: (articleId, page = 1, size = 10) => api.get(`/comments/public/article/${articleId}`, { params: { page, size } }),
   delete: (commentId) => api.delete(`/comments/${commentId}`)
 }
 
