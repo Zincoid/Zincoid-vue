@@ -306,6 +306,7 @@ export default {
     pin: 'Pin',
     unpin: 'Unpin',
     total: '{total} items',
+    currentPage: 'Page {page}',
     perPage: '{size} per page'
   }
 }

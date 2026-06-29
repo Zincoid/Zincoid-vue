@@ -37,14 +37,15 @@ function go(page) {
       <template v-for="p in pages" :key="p">
         <button
           v-if="p === 1 || p === pages || Math.abs(p - page) <= 2"
-          class="pagination__btn"
+          class="pagination__btn pagination__num"
           :class="{ 'pagination__btn--active': p === page }"
           @click="go(p)"
         >
           {{ p }}
         </button>
-        <span v-else-if="Math.abs(p - page) === 3" class="pagination__dots">…</span>
+        <span v-else-if="Math.abs(p - page) === 3" class="pagination__dots pagination__num">…</span>
       </template>
+      <span class="pagination__current">{{ t('common.currentPage', { page, pages }) }}</span>
       <button
         class="pagination__btn"
         :disabled="page >= pages"
@@ -89,6 +90,7 @@ function go(page) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
   border: none;
   border-radius: var(--rounded-sm);
   font-size: var(--text-sm);
@@ -110,8 +112,30 @@ function go(page) {
   cursor: not-allowed;
 }
 
+.pagination__current {
+  display: none;
+}
+
 .pagination__dots {
   padding: 0 var(--spacing-xs);
   color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  .pagination__num {
+    display: none;
+  }
+  .pagination__btn {
+    font-size: var(--text-xs);
+  }
+  .pagination__current {
+    display: inline;
+    padding: 0 var(--spacing-sm);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+  .pagination__info {
+    font-size: var(--text-xs);
+  }
 }
 </style>

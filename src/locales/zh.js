@@ -306,6 +306,7 @@ export default {
     pin: '置顶',
     unpin: '取消置顶',
     total: '共 {total} 条',
-    perPage: '每页 {size} 条'
+    perPage: '每页 {size} 条',
+    currentPage: '第 {page} 页'
   }
 }
