@@ -45,8 +45,8 @@ export const useAuthStore = defineStore('auth', () => {
     await userAPI.changePassword(form)
   }
 
-  function logout() {
-    authAPI.logout().catch(() => {})
+  async function logout() {
+    try { await authAPI.logout(); } catch {}
     token.value = ''
     user.value = null
     localStorage.removeItem('token')

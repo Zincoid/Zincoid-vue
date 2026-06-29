@@ -172,7 +172,7 @@ onMounted(async () => {
       articleAPI.getList(1, 5),
       userAPI.getList(1, 1),
       randomAPI,
-      configAPI.listAll()
+      configAPI.get()
     ])
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
@@ -183,8 +183,10 @@ onMounted(async () => {
       const type = rRes.config.url.includes('moments') ? 'moment' : 'article'
       featured.value = { ...rRes.data.data, _type: type }
     }
-    const cfgs = cfgRes.data.data || []
-    for (const c of cfgs) configMap.value[c.configKey] = c.configValue
+    const cfgs = cfgRes.data.data || {}
+    for (const [key, value] of Object.entries(cfgs)) {
+      configMap.value[key] = value
+    }
     startTyping()
   } catch (e) {
     console.error(e)
