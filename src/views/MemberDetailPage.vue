@@ -127,7 +127,7 @@ onMounted(async () => {
 
 .profile-name-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--spacing-lg);
 }
 
