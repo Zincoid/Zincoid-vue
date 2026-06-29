@@ -6,10 +6,10 @@ const { t } = useI18n()
 <template>
   <div class="maintenance container-narrow">
     <pre class="maintenance__ascii">
- __  __   _    ___  _   _ _____
-|  \/  | /_\  |_ _|| \ | |__ __|
-| |\/| |/ _ \  | | |  \| | | |
-|_|  |_/_/ \_\|___||_|\__| |_|
+ __  __   _   ___ _  _ _____
+|  \/  | /_\ |_ _| \| |_   _|
+| |\/| |/ _ \ | || .' | | |
+|_|  |_/_/ \_\___|_|\_| |_|
     </pre>
     <h1>503</h1>
     <p>{{ t('maintenance.message') }}</p>
