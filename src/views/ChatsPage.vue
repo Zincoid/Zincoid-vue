@@ -144,6 +144,18 @@ function isAudio(path) {
   return /\.(mp3|wav|aac|flac|ogg)(\?|$)/i.test(path)
 }
 
+function canDelete(msg) {
+  return auth.isLoggedIn && (auth.user?.id === msg.userId || auth.isAdmin)
+}
+
+async function handleDelete(msg) {
+  if (!confirm(t('chat.deleteConfirm'))) return
+  try {
+    await chatAPI.delete(msg.id)
+    messages.value = messages.value.filter(m => m.id !== msg.id)
+  } catch (e) { /* ignore */ }
+}
+
 function openPreview(src) {
   previewSrc.value = src
   previewOpen.value = true
@@ -169,6 +181,7 @@ function openPreview(src) {
             <div class="chat-msg__meta">
               <span class="chat-msg__author">{{ msg.userNickname }}</span>
               <span class="chat-msg__time">{{ formatDate(msg.createdAt) }}</span>
+              <button v-if="canDelete(msg)" class="chat-msg__delete" @click="handleDelete(msg)" :title="t('common.delete')">&times;</button>
             </div>
             <div v-if="msg.content" class="chat-msg__content">{{ msg.content }}</div>
             <div v-if="msg.file" class="chat-msg__file">
@@ -354,6 +367,24 @@ function openPreview(src) {
   font-size: 10px;
   color: var(--color-text-tertiary, #999);
   letter-spacing: .02em;
+}
+
+.chat-msg__delete {
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--color-text-tertiary, #999);
+  padding: 0 4px;
+  line-height: 1;
+  border-radius: var(--rounded-sm);
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+.chat-msg:hover .chat-msg__delete {
+  opacity: 1;
+}
+.chat-msg__delete:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
 
 .chat-msg__content {

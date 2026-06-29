@@ -238,7 +238,8 @@ export default {
     title: '聊天',
     subtitle: '公共聊天',
     placeholder: '输入消息...',
-    loginHint: '登录后即可参与聊天。'
+    loginHint: '登录后即可参与聊天。',
+    deleteConfirm: '确定删除这条消息？'
   },
   notification: {
     title: '通知',

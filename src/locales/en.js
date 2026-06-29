@@ -238,7 +238,8 @@ export default {
     title: 'Chats',
     subtitle: 'Public chat',
     placeholder: 'Type a message...',
-    loginHint: 'Log in to join the chat.'
+    loginHint: 'Log in to join the chat.',
+    deleteConfirm: 'Delete this message?'
   },
   notification: {
     title: 'Notifications',

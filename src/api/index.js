@@ -118,7 +118,8 @@ export const configAPI = {
 // ── Chats ──
 export const chatAPI = {
   getList: (page = 1, size = 50) => api.get('/chats/public', { params: { page, size } }),
-  send: (content, file) => api.post('/chats', null, { params: { content, file } })
+  send: (content, file) => api.post('/chats', null, { params: { content, file } }),
+  delete: (messageId) => api.delete(`/chats/${messageId}`)
 }
 
 // ── Notifications ──
