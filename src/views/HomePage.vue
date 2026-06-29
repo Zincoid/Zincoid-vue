@@ -3,7 +3,7 @@ import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
-import { momentAPI, articleAPI, userAPI } from '@/api'
+import { momentAPI, articleAPI, userAPI, configAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 
@@ -18,6 +18,10 @@ const typed = ref('')
 const typingDone = ref(false)
 let typingTimer = null
 const collapsed = ref(null) // 'moments' | 'articles' | null
+const configMap = ref({})
+const subtitleText = computed(() => {
+  return locale.locale === 'zh' ? configMap.value['site_desc_zh'] : configMap.value['site_desc_en']
+})
 
 async function refreshFeatured() {
   try {
@@ -91,7 +95,7 @@ onMounted(() => {
 function startTyping() {
   typingDone.value = false
   typed.value = ''
-  const text = t('home.subtitle')
+  const text = subtitleText.value || 'Zincoid'
   let i = 0
   clearInterval(typingTimer)
   typingTimer = setInterval(() => {
@@ -163,11 +167,12 @@ onMounted(async () => {
   startTyping()
   try {
     const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
-    const [mRes, aRes, uRes, rRes] = await Promise.all([
+    const [mRes, aRes, uRes, rRes, cfgRes] = await Promise.all([
       momentAPI.getTimeline(1, 5),
       articleAPI.getList(1, 5),
       userAPI.getList(1, 1),
-      randomAPI
+      randomAPI,
+      configAPI.listAll()
     ])
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
@@ -178,6 +183,9 @@ onMounted(async () => {
       const type = rRes.config.url.includes('moments') ? 'moment' : 'article'
       featured.value = { ...rRes.data.data, _type: type }
     }
+    const cfgs = cfgRes.data.data || []
+    for (const c of cfgs) configMap.value[c.configKey] = c.configValue
+    startTyping()
   } catch (e) {
     console.error(e)
   } finally {

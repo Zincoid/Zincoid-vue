@@ -11,7 +11,6 @@ export default {
     lang: '中文'
   },
   home: {
-    subtitle: 'Personal Website',
     recentMoments: 'Recent Moments',
     recentArticles: 'Recent Articles',
     random: 'Random',
