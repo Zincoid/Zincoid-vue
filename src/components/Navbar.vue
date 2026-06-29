@@ -753,7 +753,7 @@ function closeMenu() {
   z-index: 102;
 }
 
-@media (max-width: 1260px) {
+@media (max-width: 1275px) {
   .navbar__links .navbar__item {
     min-width: auto;
     padding: 0 var(--spacing-lg);
