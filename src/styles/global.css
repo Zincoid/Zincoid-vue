@@ -191,6 +191,15 @@ th {
   background: var(--color-danger);
   color: white;
 }
+.btn--primary-outline {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+}
+.btn--primary-outline:hover {
+  background: var(--color-primary);
+  color: white;
+}
 .btn--ghost {
   border-color: transparent;
   color: var(--color-text-secondary);

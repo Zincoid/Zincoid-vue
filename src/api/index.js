@@ -129,5 +129,6 @@ export const notificationAPI = {
   markRead: () => api.put('/notifications/read'),
   markOne: (id) => api.put(`/notifications/${id}/read`),
   delete: (id) => api.delete(`/notifications/${id}`),
-  deleteAll: () => api.delete('/notifications')
+  deleteAll: () => api.delete('/notifications'),
+  broadcast: (content) => api.post('/notifications/broadcast', { content })
 }

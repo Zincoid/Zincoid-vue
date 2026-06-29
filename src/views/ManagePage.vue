@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { configAPI, fileAPI, userAPI } from '@/api'
+import { configAPI, fileAPI, userAPI, notificationAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -18,6 +18,35 @@ const resetUsername = ref('')
 const resetPassword = ref('')
 const resetting = ref(false)
 const resetOpen = ref(false)
+
+const broadcastContent = ref('')
+const broadcasting = ref(false)
+const broadcastOpen = ref(false)
+
+function openBroadcast() {
+  broadcastOpen.value = true
+  broadcastContent.value = ''
+}
+
+function cancelBroadcast() {
+  broadcastOpen.value = false
+}
+
+async function handleBroadcast() {
+  if (!broadcastContent.value.trim()) return
+  if (!confirm(t('admin.broadcastConfirmTitle'))) return
+  broadcasting.value = true
+  try {
+    await notificationAPI.broadcast(broadcastContent.value.trim())
+    toolMessage.value = t('admin.broadcastSuccess')
+    broadcastOpen.value = false
+    setTimeout(() => toolMessage.value = '', 2000)
+  } catch (err) {
+    toolError.value = getMessage(err, 'admin.broadcastFailed')
+  } finally {
+    broadcasting.value = false
+  }
+}
 
 function openReset() {
   resetOpen.value = true
@@ -113,14 +142,39 @@ async function handleReset() {
       <h2>{{ t('admin.tools') }}</h2>
       <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
       <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
+      <div class="tool-item" :class="{ 'tool-item--open': broadcastOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('admin.broadcast') }}</span>
+          <span class="tool-desc">{{ t('admin.broadcastDesc') }}</span>
+          <div v-if="broadcastOpen" class="config-value-row reset-row">
+            <input
+              v-model="broadcastContent"
+              class="field__input"
+              :placeholder="t('admin.broadcastPlaceholder')"
+              style="flex: 1; min-width: 0;"
+            />
+            <div class="reset-actions">
+              <button class="btn btn--ghost" @click="cancelBroadcast">{{ t('common.cancel') }}</button>
+              <button class="btn btn--primary" :disabled="broadcasting || !broadcastContent.trim()" @click="handleBroadcast">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                {{ broadcasting ? t('common.posting') : t('admin.broadcastConfirm') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button v-if="!broadcastOpen" class="btn btn--primary-outline" @click="openBroadcast">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          {{ t('admin.broadcastSend') }}
+        </button>
+      </div>
       <div class="tool-item" :class="{ 'tool-item--open': resetOpen }">
         <div class="tool-info">
           <span class="tool-label">{{ t('admin.resetPassword') }}</span>
           <span class="tool-desc">{{ t('admin.resetPasswordDesc') }}</span>
           <div v-if="resetOpen" class="config-value-row reset-row">
-            <div class="reset-inputs">
-              <input v-model="resetUsername" class="field__input config-input" :placeholder="t('admin.resetPasswordPlaceholder')" />
-              <input v-model="resetPassword" type="password" class="field__input config-input" :placeholder="t('admin.newPasswordPlaceholder')" />
+            <div class="reset-inputs" style="flex: 1; min-width: 0;">
+              <input v-model="resetUsername" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('admin.resetPasswordPlaceholder')" />
+              <input v-model="resetPassword" type="password" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('admin.newPasswordPlaceholder')" />
             </div>
             <div class="reset-actions">
               <button class="btn btn--ghost" @click="cancelReset">{{ t('common.cancel') }}</button>

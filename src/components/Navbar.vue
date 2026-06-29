@@ -16,6 +16,8 @@ const unreadCount = ref(0)
 const notifOpen = ref(false)
 const notifications = ref([])
 const notifLoading = ref(false)
+const broadcastMessage = ref(null)
+const broadcastSender = ref(null)
 
 function fetchUnreadCount() {
   if (!auth.isLoggedIn) return
@@ -55,6 +57,7 @@ function goNotification(n) {
       unreadCount.value = Math.max(0, unreadCount.value - 1)
     }).catch(() => {})
   }
+  if (n.relatedType === 5) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -253,15 +256,17 @@ function closeMenu() {
             <div class="navbar__notif-item-body">
               <div class="navbar__notif-item-text">
                 <strong>{{ n.senderNickname }}</strong>
-                {{ n.relatedType === 2
-                  ? t('notification.mentionedMoment')
-                  : n.relatedType === 3
-                    ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
-                    : n.relatedType === 4
-                      ? t('notification.mentionedChat')
-                      : n.relatedType === 1
-                        ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
-                        : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
+                {{ n.relatedType === 5
+                  ? t('notification.system')
+                  : n.relatedType === 2
+                    ? t('notification.mentionedMoment')
+                    : n.relatedType === 3
+                      ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
+                      : n.relatedType === 4
+                        ? t('notification.mentionedChat')
+                        : n.relatedType === 1
+                          ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
+                          : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
               </div>
               <div class="navbar__notif-item-snippet" v-if="n.snippet">{{ n.snippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
@@ -275,6 +280,24 @@ function closeMenu() {
     </div>
     <div v-if="notifOpen" class="navbar__notif-backdrop" @click="closeNotif"></div>
   </nav>
+  <Teleport to="body">
+    <Transition name="broadcast">
+      <div v-if="broadcastMessage" class="broadcast-overlay" @click.self="broadcastMessage = null">
+        <div class="broadcast-modal">
+          <div class="broadcast-modal__bar"></div>
+          <button class="broadcast-modal__close" @click="broadcastMessage = null">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <div class="broadcast-modal__icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <h3 class="broadcast-modal__title">{{ t('notification.system') }}</h3>
+          <p class="broadcast-modal__sender" v-if="broadcastSender">{{ broadcastSender }}</p>
+          <p class="broadcast-modal__body">{{ broadcastMessage }}</p>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -860,5 +883,100 @@ function closeMenu() {
   .navbar__footer .navbar__item--logout-mobile:hover {
     color: var(--color-danger);
   }
+}
+
+.broadcast-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+.broadcast-modal {
+  background: var(--color-surface);
+  border-radius: var(--rounded-xl);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-xl);
+}
+.broadcast-modal__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f9a8d4, #db2777);
+}
+.broadcast-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  border-radius: var(--rounded-full);
+  transition: all var(--transition-fast);
+}
+.broadcast-modal__close:hover {
+  color: var(--color-text);
+  background: var(--color-bg-alt);
+}
+.broadcast-modal__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: rgba(219, 39, 119, 0.12);
+  color: #db2777;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-md);
+}
+.broadcast-modal__title {
+  text-align: center;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-heading);
+  margin-bottom: var(--spacing-xs);
+}
+.broadcast-modal__sender {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: #db2777;
+  font-weight: var(--weight-medium);
+  margin-bottom: var(--spacing-lg);
+}
+.broadcast-modal__body {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+  background: var(--color-bg-alt);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+.broadcast-enter-active,
+.broadcast-leave-active {
+  transition: opacity .2s ease;
+}
+.broadcast-enter-active .broadcast-modal,
+.broadcast-leave-active .broadcast-modal {
+  transition: transform .2s ease;
+}
+.broadcast-enter-from,
+.broadcast-leave-to {
+  opacity: 0;
+}
+.broadcast-enter-from .broadcast-modal,
+.broadcast-leave-to .broadcast-modal {
+  transform: scale(0.95);
 }
 </style>

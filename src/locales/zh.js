@@ -194,7 +194,15 @@ export default {
     newPasswordPlaceholder: '新密码',
     reset: '重置',
     resetSuccess: '密码已更新',
-    resetFailed: '重置失败'
+    resetFailed: '重置失败',
+    broadcast: '系统公告',
+    broadcastDesc: '向所有活跃用户发送系统通知',
+    broadcastPlaceholder: '公告内容...',
+    broadcastSend: '广播',
+    broadcastConfirm: '发送',
+    broadcastConfirmTitle: '确定要向所有活跃用户发送此公告吗？',
+    broadcastSuccess: '公告已发送',
+    broadcastFailed: '公告发送失败'
   },
   errors: {
     'Username already exists': '用户名已存在',
@@ -253,6 +261,7 @@ export default {
     mentionedCommentMoment: '在动态评论中@了你',
     mentionedCommentArticle: '在文章评论中@了你',
     mentionedChat: '在聊天中@了你',
+    system: '系统公告',
     markRead: '全部已读',
     deleteAll: '清除全部'
   },

@@ -194,7 +194,15 @@ export default {
     newPasswordPlaceholder: 'New password',
     reset: 'Reset',
     resetSuccess: 'Password updated',
-    resetFailed: 'Reset failed'
+    resetFailed: 'Reset failed',
+    broadcast: 'System Broadcast',
+    broadcastDesc: 'Send a notification to all active users',
+    broadcastPlaceholder: 'Broadcast message...',
+    broadcastSend: 'Broadcast',
+    broadcastConfirm: 'Send',
+    broadcastConfirmTitle: 'Are you sure you want to send this broadcast to all active users?',
+    broadcastSuccess: 'Broadcast sent',
+    broadcastFailed: 'Broadcast failed'
   },
   errors: {
     'Username already exists': 'Username already exists',
@@ -253,6 +261,7 @@ export default {
     mentionedCommentMoment: 'mentioned you in a moment comment',
     mentionedCommentArticle: 'mentioned you in an article comment',
     mentionedChat: 'mentioned you in chat',
+    system: 'System broadcast',
     markRead: 'Mark all read',
     deleteAll: 'Clear all'
   },
