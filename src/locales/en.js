@@ -220,7 +220,7 @@ export default {
     'Email is required': 'Email is required',
     'Verification code is required': 'Verification code is required',
     'Please wait before requesting a new code': 'Verification code already requested. Please wait',
-    'Verification code already requested. Please wait': 'Verification code already requested. Please wait',
+    'Verification code already requested, please wait': 'Verification code already requested, please wait',
     'New email is the same as current email': 'New email is the same as current email'
   },
   notFound: {

@@ -220,7 +220,7 @@ export default {
     'Email is required': '邮箱不能为空',
     'Verification code is required': '验证码不能为空',
     'Please wait before requesting a new code': '验证码已请求，请稍后再试',
-    'Verification code already requested. Please wait': '验证码已请求，请稍后再试',
+    'Verification code already requested, please wait': '验证码已请求，请稍后再试',
     'New email is the same as current email': '新邮箱与当前邮箱相同'
   },
   notFound: {
