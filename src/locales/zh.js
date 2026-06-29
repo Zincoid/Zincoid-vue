@@ -248,6 +248,10 @@ export default {
     commentedArticle: '评论了你的文章',
     repliedMoment: '在动态中回复了你的评论',
     repliedArticle: '在文章中回复了你的评论',
+    mentionedMoment: '在动态中@了你',
+    mentionedCommentMoment: '在动态评论中@了你',
+    mentionedCommentArticle: '在文章评论中@了你',
+    mentionedChat: '在聊天中@了你',
     markRead: '全部已读',
     deleteAll: '清除全部'
   },

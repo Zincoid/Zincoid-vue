@@ -248,6 +248,10 @@ export default {
     commentedArticle: 'commented on your article',
     repliedMoment: 'replied to your comment in a moment',
     repliedArticle: 'replied to your comment in an article',
+    mentionedMoment: 'mentioned you in a moment',
+    mentionedCommentMoment: 'mentioned you in a moment comment',
+    mentionedCommentArticle: 'mentioned you in an article comment',
+    mentionedChat: 'mentioned you in chat',
     markRead: 'Mark all read',
     deleteAll: 'Clear all'
   },

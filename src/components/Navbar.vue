@@ -55,6 +55,10 @@ function goNotification(n) {
       unreadCount.value = Math.max(0, unreadCount.value - 1)
     }).catch(() => {})
   }
+  if (n.targetType === 3) {
+    router.push('/chats')
+    return
+  }
   const name = n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
   if (n.targetId == null) return
   router.push({ name, params: { id: n.targetId } })
@@ -249,9 +253,15 @@ function closeMenu() {
             <div class="navbar__notif-item-body">
               <div class="navbar__notif-item-text">
                 <strong>{{ n.senderNickname }}</strong>
-                {{ n.relatedType === 5
-                  ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
-                  : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
+                {{ n.relatedType === 2
+                  ? t('notification.mentionedMoment')
+                  : n.relatedType === 3
+                    ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
+                    : n.relatedType === 4
+                      ? t('notification.mentionedChat')
+                      : n.relatedType === 1
+                        ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
+                        : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
               </div>
               <div class="navbar__notif-item-snippet" v-if="n.snippet">{{ n.snippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
