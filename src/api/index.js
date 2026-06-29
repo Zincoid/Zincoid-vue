@@ -34,7 +34,8 @@ export default api
 export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
-  logout: () => api.post('/auth/logout')
+  logout: () => api.post('/auth/logout'),
+  sendCode: (email) => api.post('/auth/send-code', { email })
 }
 
 // ── Users ──
@@ -48,7 +49,8 @@ export const userAPI = {
   deleteMe: () => api.delete('/users'),
   updateStatus: (id, status) => api.put(`/users/${id}/status`, null, { params: { status } }),
   deleteUser: (id) => api.delete(`/users/${id}`),
-  resetPassword: (username, password) => api.put('/users/password/reset', { username, password })
+  resetPassword: (username, password) => api.put('/users/password/reset', { username, password }),
+  changeEmail: (data) => api.put('/users/email', data)
 }
 
 // ── Moments ──

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { fileAPI, userAPI } from '@/api'
+import { fileAPI, userAPI, authAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -29,6 +29,15 @@ const pwdForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
 const pwdMessage = ref('')
 const pwdError = ref('')
 const showPwdForm = ref(false)
+
+// Email
+const emailForm = ref({ email: '', code: '' })
+const emailMessage = ref('')
+const emailError = ref('')
+const sendingEmail = ref(false)
+const emailCountdown = ref(0)
+let emailTimer = null
+const showEmailForm = ref(false)
 
 onMounted(async () => {
   try {
@@ -140,6 +149,48 @@ async function deleteAccount() {
     auth.logout()
   } catch (err) {
     error.value = getMessage(err, 'profile.deleteFailed')
+  }
+}
+
+async function handleSendEmailCode() {
+  if (!emailForm.value.email || !/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+    emailError.value = t('auth.emailRequired')
+    return
+  }
+  sendingEmail.value = true
+  emailError.value = ''
+  try {
+    await authAPI.sendCode(emailForm.value.email)
+    emailCountdown.value = 60
+    emailTimer = setInterval(() => {
+      emailCountdown.value--
+      if (emailCountdown.value <= 0) clearInterval(emailTimer)
+    }, 1000)
+  } catch (err) {
+    emailError.value = getMessage(err, 'Failed to send code')
+  } finally {
+    sendingEmail.value = false
+  }
+}
+
+async function changeEmail() {
+  emailMessage.value = ''
+  emailError.value = ''
+  if (!emailForm.value.email || !/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+    emailError.value = t('auth.emailRequired')
+    return
+  }
+  if (!emailForm.value.code.trim()) {
+    emailError.value = t('auth.codeRequired')
+    return
+  }
+  try {
+    await userAPI.changeEmail(emailForm.value)
+    emailMessage.value = t('profile.emailChanged')
+    emailForm.value = { email: '', code: '' }
+    await auth.fetchMe()
+  } catch (err) {
+    emailError.value = getMessage(err, 'profile.emailUpdateFailed')
   }
 }
 </script>
@@ -260,6 +311,49 @@ async function deleteAccount() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             {{ t('profile.changePassword') }}
           </button>
+        </div>
+
+        <div class="card">
+          <h2 class="card__title">{{ t('profile.changeEmail') }}</h2>
+
+          <template v-if="showEmailForm">
+            <div class="fields">
+              <div class="field">
+                <label class="field__label">{{ t('auth.email') }} <span class="field__required">*</span></label>
+                <div style="display:flex;gap:var(--spacing-sm)">
+                  <input v-model="emailForm.email" class="field__input" style="flex:1" type="email" :placeholder="t('auth.emailPlaceholder')" />
+                  <button class="btn btn--outline" :disabled="sendingEmail || emailCountdown > 0" @click="handleSendEmailCode" type="button">
+                    {{ emailCountdown > 0 ? emailCountdown + 's' : (sendingEmail ? '...' : t('auth.sendCode')) }}
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label">{{ t('auth.code') }} <span class="field__required">*</span></label>
+                <input v-model="emailForm.code" class="field__input" type="text" maxlength="6" :placeholder="t('auth.codePlaceholder')" />
+              </div>
+            </div>
+
+            <p v-if="emailMessage" class="msg msg--success">{{ emailMessage }}</p>
+            <p v-if="emailError" class="msg msg--error">{{ emailError }}</p>
+
+            <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
+              <button class="btn btn--outline btn--full" @click="showEmailForm = false; emailForm = { email: '', code: '' }; emailError = ''; emailMessage = ''; clearInterval(emailTimer); emailCountdown = 0">{{ t('common.cancel') }}</button>
+              <button class="btn btn--primary btn--full" @click="changeEmail">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                {{ t('common.confirm') }}
+              </button>
+            </div>
+          </template>
+
+          <template v-else>
+            <p v-if="auth.user?.email" class="card__desc">{{ t('profile.currentEmail') }}: {{ auth.user.email }}</p>
+            <div class="card__actions">
+              <button class="btn btn--outline btn--full" @click="showEmailForm = true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                {{ t('profile.changeEmail') }}
+              </button>
+            </div>
+          </template>
         </div>
 
         <div class="card">

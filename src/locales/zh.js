@@ -130,7 +130,11 @@ export default {
     confirm: '确认',
     deleteAccount: '注销账号',
     deleteAccountDesc: '永久删除账号及所有数据，此操作不可撤销。',
-    deleteAccountConfirm: '确定要注销账号？此操作不可撤销。'
+    deleteAccountConfirm: '确定要注销账号？此操作不可撤销。',
+    changeEmail: '修改邮箱',
+    currentEmail: '当前绑定邮箱',
+    emailChanged: '邮箱修改成功！',
+    emailUpdateFailed: '邮箱修改失败'
   },
   auth: {
     login: '登录',
@@ -153,7 +157,17 @@ export default {
     passwordLength: '密码需6-100个字符',
     registerFailed: '注册失败',
     welcomeBack: '欢迎回来',
-    joinUs: '加入我们'
+    joinUs: '加入我们',
+    email: '邮箱',
+    emailPlaceholder: '请输入邮箱',
+    sendCode: '发送验证码',
+    codeSent: '已发送',
+    code: '验证码',
+    codePlaceholder: '请输入6位验证码',
+    emailRequired: '请输入邮箱地址',
+    codeRequired: '请输入验证码',
+    invalidCode: '验证码错误或已过期',
+    emailRegistered: '邮箱已被注册'
   },
   admin: {
     title: '管理',
@@ -200,7 +214,13 @@ export default {
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',
     'Only founder can unpin articles': '仅管理员可取消置顶文章',
-    'Internal server error': '服务器内部错误'
+    'Internal server error': '服务器内部错误',
+    'Invalid or expired verification code': '验证码错误或已过期',
+    'Email already registered': '邮箱已被注册',
+    'Email is required': '邮箱不能为空',
+    'Verification code is required': '验证码不能为空',
+    'Please wait before requesting a new code': '验证码已请求，请稍后再试',
+    'Verification code already requested. Please wait': '验证码已请求，请稍后再试'
   },
   notFound: {
     message: '页面不存在。',

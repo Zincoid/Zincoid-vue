@@ -130,7 +130,11 @@ export default {
     confirm: 'Confirm',
     deleteAccount: 'Delete Account',
     deleteAccountDesc: 'Permanently delete your account and all associated data. This cannot be undone.',
-    deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone.'
+    deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone.',
+    changeEmail: 'Change Email',
+    currentEmail: 'Current email',
+    emailChanged: 'Email changed!',
+    emailUpdateFailed: 'Failed to change email'
   },
   auth: {
     login: 'Login',
@@ -153,7 +157,17 @@ export default {
     passwordLength: 'Password must be 6-100 characters',
     registerFailed: 'Registration failed',
     welcomeBack: 'Welcome back',
-    joinUs: 'Join us'
+    joinUs: 'Join us',
+    email: 'Email',
+    emailPlaceholder: 'Enter your email',
+    sendCode: 'Send Code',
+    codeSent: 'Sent',
+    code: 'Verification Code',
+    codePlaceholder: '6-digit code',
+    emailRequired: 'Please enter your email',
+    codeRequired: 'Please enter the verification code',
+    invalidCode: 'Invalid or expired verification code',
+    emailRegistered: 'Email already registered'
   },
   admin: {
     title: 'Manage',
@@ -200,7 +214,13 @@ export default {
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',
     'Only founder can unpin articles': 'Only admin can unpin articles',
-    'Internal server error': 'Internal server error'
+    'Internal server error': 'Internal server error',
+    'Invalid or expired verification code': 'Invalid or expired verification code',
+    'Email already registered': 'Email already registered',
+    'Email is required': 'Email is required',
+    'Verification code is required': 'Verification code is required',
+    'Please wait before requesting a new code': 'Verification code already requested. Please wait',
+    'Verification code already requested. Please wait': 'Verification code already requested. Please wait'
   },
   notFound: {
     message: "The page you're looking for doesn't exist.",

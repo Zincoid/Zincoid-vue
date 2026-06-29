@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { authAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -114,13 +115,38 @@ onMounted(() => {
   observer.observe(leftPanel.value)
   onUnmounted(() => {
     clearInterval(gameTimer)
+    if (countdownTimer) clearInterval(countdownTimer)
     observer.disconnect()
   })
 })
 
-const form = ref({ username: '', password: '', confirmPassword: '', nickname: '' })
+const form = ref({ username: '', password: '', confirmPassword: '', nickname: '', email: '', code: '' })
 const error = ref('')
 const loading = ref(false)
+const sending = ref(false)
+const countdown = ref(0)
+let countdownTimer = null
+
+async function handleSendCode() {
+  if (!form.value.email || !/\S+@\S+\.\S+/.test(form.value.email)) {
+    error.value = t('auth.emailRequired')
+    return
+  }
+  sending.value = true
+  error.value = ''
+  try {
+    await authAPI.sendCode(form.value.email)
+    countdown.value = 60
+    countdownTimer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) clearInterval(countdownTimer)
+    }, 1000)
+  } catch (err) {
+    error.value = getMessage(err, 'Failed to send code')
+  } finally {
+    sending.value = false
+  }
+}
 
 async function handleLogin() {
   if (!form.value.username || !form.value.password) {
@@ -156,10 +182,18 @@ async function handleRegister() {
     error.value = t('auth.passwordMismatch')
     return
   }
+  if (!form.value.email || !/\S+@\S+\.\S+/.test(form.value.email)) {
+    error.value = t('auth.emailRequired')
+    return
+  }
+  if (!form.value.code.trim()) {
+    error.value = t('auth.codeRequired')
+    return
+  }
   loading.value = true
   error.value = ''
   try {
-    await auth.register({ username: form.value.username, password: form.value.password, confirmPassword: form.value.confirmPassword, nickname: form.value.nickname })
+    await auth.register({ username: form.value.username, password: form.value.password, confirmPassword: form.value.confirmPassword, nickname: form.value.nickname, email: form.value.email, code: form.value.code })
     router.push('/')
   } catch (err) {
     error.value = getMessage(err, 'auth.registerFailed')
@@ -177,7 +211,8 @@ function handleSubmit() {
 }
 
 function switchTo(path) {
-  form.value = { username: '', password: '', confirmPassword: '', nickname: '' }
+  form.value = { username: '', password: '', confirmPassword: '', nickname: '', email: '', code: '' }
+  if (countdownTimer) { clearInterval(countdownTimer); countdown.value = 0 }
   error.value = ''
   router.push(path)
 }
@@ -248,12 +283,27 @@ function switchTo(path) {
             <label class="field__label">{{ t('auth.confirmPassword') }} <span class="field__required">*</span></label>
             <input v-model="form.confirmPassword" class="field__input" type="password" autocomplete="off" />
           </div>
+          <div v-if="!isLogin" class="field">
+            <label class="field__label">{{ t('auth.email') }} <span class="field__required">*</span></label>
+            <div style="display:flex;gap:var(--spacing-sm)">
+              <input v-model="form.email" class="field__input" style="flex:1" type="email" />
+              <button class="btn btn--outline" :disabled="sending || countdown > 0" @click="handleSendCode" type="button">
+                {{ countdown > 0 ? countdown + 's' : (sending ? '...' : t('auth.sendCode')) }}
+              </button>
+            </div>
+          </div>
+          <div v-if="!isLogin" class="field">
+            <label class="field__label">{{ t('auth.code') }} <span class="field__required">*</span></label>
+            <input v-model="form.code" class="field__input" type="text" maxlength="6" />
+          </div>
 
           <p v-if="error" class="auth-form__error">{{ error }}</p>
 
-          <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
-            {{ loading ? (isLogin ? t('auth.loggingIn') : t('auth.registering')) : (isLogin ? t('auth.login') : t('auth.register')) }}
-          </button>
+          <div class="auth-form__actions">
+            <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
+              {{ loading ? (isLogin ? t('auth.loggingIn') : t('auth.registering')) : (isLogin ? t('auth.login') : t('auth.register')) }}
+            </button>
+          </div>
         </form>
 
         <p class="auth-form__switch">
@@ -417,6 +467,25 @@ function switchTo(path) {
 .auth-form .field__input {
   border-radius: var(--rounded-sm);
 }
+.field__row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+.field__input--flex {
+  flex: 1;
+  min-width: 0;
+}
+.auth-form .btn--sm {
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+.auth-form__actions {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-lg);
+}
+
 .auth-form .btn--primary {
   background: #111827;
 }
@@ -443,6 +512,7 @@ function switchTo(path) {
 @media (max-width: 768px) {
   .auth-split {
     flex-direction: column;
+    height: auto;
     min-height: auto;
     margin-bottom: 0;
   }
@@ -468,6 +538,7 @@ function switchTo(path) {
   }
   .auth-split__right {
     padding: var(--spacing-xl);
+    padding-bottom: var(--spacing-4xl);
   }
 }
 </style>
