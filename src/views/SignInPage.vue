@@ -128,8 +128,12 @@ const countdown = ref(0)
 let countdownTimer = null
 
 async function handleSendCode() {
-  if (!form.value.email || !/\S+@\S+\.\S+/.test(form.value.email)) {
+  if (!form.value.email) {
     error.value = t('auth.emailRequired')
+    return
+  }
+  if (!/\S+@\S+\.\S+/.test(form.value.email)) {
+    error.value = t('auth.invalidEmailFormat')
     return
   }
   sending.value = true
@@ -182,8 +186,12 @@ async function handleRegister() {
     error.value = t('auth.passwordMismatch')
     return
   }
-  if (!form.value.email || !/\S+@\S+\.\S+/.test(form.value.email)) {
+  if (!form.value.email) {
     error.value = t('auth.emailRequired')
+    return
+  }
+  if (!/\S+@\S+\.\S+/.test(form.value.email)) {
+    error.value = t('auth.invalidEmailFormat')
     return
   }
   if (!form.value.code.trim()) {
@@ -266,7 +274,7 @@ function switchTo(path) {
 
         <h2 class="auth-form__heading">{{ isLogin ? t('auth.welcomeBack') : t('auth.joinUs') }}</h2>
 
-        <form class="auth-form" @submit.prevent="handleSubmit">
+        <form class="auth-form" novalidate @submit.prevent="handleSubmit">
           <div class="field">
             <label class="field__label">{{ t('auth.username') }} <span v-if="!isLogin" class="field__required">*</span></label>
             <input v-model="form.username" class="field__input" type="text" autocomplete="username" />

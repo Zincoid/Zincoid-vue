@@ -165,6 +165,7 @@ export default {
     code: 'Verification Code',
     codePlaceholder: '6-digit code',
     emailRequired: 'Please enter your email',
+    invalidEmailFormat: 'Invalid email format',
     codeRequired: 'Please enter the verification code',
     invalidCode: 'Invalid or expired verification code',
     emailRegistered: 'Email already registered'

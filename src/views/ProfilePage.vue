@@ -153,8 +153,12 @@ async function deleteAccount() {
 }
 
 async function handleSendEmailCode() {
-  if (!emailForm.value.email || !/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+  if (!emailForm.value.email) {
     emailError.value = t('auth.emailRequired')
+    return
+  }
+  if (!/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+    emailError.value = t('auth.invalidEmailFormat')
     return
   }
   sendingEmail.value = true
@@ -176,8 +180,12 @@ async function handleSendEmailCode() {
 async function changeEmail() {
   emailMessage.value = ''
   emailError.value = ''
-  if (!emailForm.value.email || !/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+  if (!emailForm.value.email) {
     emailError.value = t('auth.emailRequired')
+    return
+  }
+  if (!/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+    emailError.value = t('auth.invalidEmailFormat')
     return
   }
   if (!emailForm.value.code.trim()) {

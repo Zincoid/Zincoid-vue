@@ -165,6 +165,7 @@ export default {
     code: '验证码',
     codePlaceholder: '请输入6位验证码',
     emailRequired: '请输入邮箱地址',
+    invalidEmailFormat: '邮箱格式错误',
     codeRequired: '请输入验证码',
     invalidCode: '验证码错误或已过期',
     emailRegistered: '邮箱已被注册'
