@@ -366,6 +366,7 @@ const visibleComments = computed(() => {
 
 .comments__row {
   display: flex;
+  position: relative;
   gap: var(--spacing-sm);
   align-items: stretch;
 }

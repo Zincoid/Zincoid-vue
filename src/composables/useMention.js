@@ -63,19 +63,18 @@ export function useMention() {
   }
 
   function getCaretPixelPos(textarea, charIdx) {
+    const container = textarea.offsetParent
     const style = window.getComputedStyle(textarea)
-    const taRect = textarea.getBoundingClientRect()
-
     const mirror = document.createElement('div')
-    mirror.style.position = 'fixed'
-    mirror.style.top = taRect.top + 'px'
-    mirror.style.left = taRect.left + 'px'
+    mirror.style.position = 'absolute'
+    mirror.style.top = textarea.offsetTop + 'px'
+    mirror.style.left = textarea.offsetLeft + 'px'
     mirror.style.visibility = 'hidden'
     mirror.style.whiteSpace = 'pre-wrap'
     mirror.style.wordWrap = 'break-word'
     mirror.style.overflowWrap = 'break-word'
-    mirror.style.width = taRect.width + 'px'
-    mirror.style.height = taRect.height + 'px'
+    mirror.style.width = textarea.clientWidth + 'px'
+    mirror.style.height = textarea.clientHeight + 'px'
     mirror.style.font = style.font
     mirror.style.fontSize = style.fontSize
     mirror.style.fontFamily = style.fontFamily
@@ -86,19 +85,19 @@ export function useMention() {
     mirror.style.letterSpacing = style.letterSpacing
     mirror.style.overflowY = 'auto'
     mirror.textContent = textarea.value.substring(0, charIdx) + '​'
-    document.body.appendChild(mirror)
+    container.appendChild(mirror)
+    mirror.scrollTop = textarea.scrollTop
 
     const span = document.createElement('span')
     span.textContent = '​'
     mirror.appendChild(span)
 
-    const rect = span.getBoundingClientRect()
-    document.body.removeChild(mirror)
-
-    return {
-      top: rect.top - 8,
-      left: rect.left + 8
+    const result = {
+      top: textarea.offsetTop + span.offsetTop - 8,
+      left: textarea.offsetLeft + span.offsetLeft + 8
     }
+    container.removeChild(mirror)
+    return result
   }
 
   return reactive({ suggestions, mentionActive, mentionPos, onInput, insert, close })

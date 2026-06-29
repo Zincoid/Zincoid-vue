@@ -186,7 +186,7 @@ async function submitMoment() {
 .timeline { padding-bottom: var(--spacing-4xl); }
 .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-lg); }
 
-.editor { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); }
+.editor { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-md); position: relative; }
 .editor__input { width: 100%; padding: var(--spacing-sm) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); line-height: var(--leading-normal); background: var(--color-bg); color: var(--color-text); resize: vertical; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .editor__input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-light); }
 .editor__images { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }

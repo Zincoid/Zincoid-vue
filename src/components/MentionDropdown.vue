@@ -1,18 +1,31 @@
 <script setup>
-defineProps({
+import { ref, watch, nextTick } from 'vue'
+
+const props = defineProps({
   suggestions: { type: Array, default: () => [] },
   pos: { type: Object, default: () => ({ top: 0, left: 0 }) }
 })
 const emit = defineEmits(['select'])
+
+const scrollEl = ref(null)
+const hasScrollbar = ref(false)
+
+watch(() => props.suggestions, () => {
+  nextTick(() => {
+    if (scrollEl.value) {
+      hasScrollbar.value = scrollEl.value.scrollHeight > scrollEl.value.clientHeight
+    }
+  })
+}, { immediate: true })
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      v-if="suggestions.length"
-      class="mention-dropdown"
-      :style="{ top: pos.top + 'px', left: pos.left + 'px' }"
-    >
+  <div
+    v-if="suggestions.length"
+    class="mention-dropdown"
+    :style="{ top: pos.top + 'px', left: pos.left + 'px' }"
+  >
+    <div ref="scrollEl" class="mention-dropdown__scroll" :class="{ 'mention-dropdown__scroll--bar': hasScrollbar }">
       <div
         v-for="user in suggestions"
         :key="user.id"
@@ -25,25 +38,30 @@ const emit = defineEmits(['select'])
         <span class="mention-dropdown__username">@{{ user.username }}</span>
       </div>
     </div>
-  </Teleport>
+  </div>
 </template>
 
 <style scoped>
 .mention-dropdown {
-  position: fixed;
+  position: absolute;
   z-index: 200;
   transform: translateY(-100%);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
-  box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  padding: 4px;
   min-width: 200px;
-  max-height: 196px;
-  overflow-y: auto;
-  padding: var(--spacing-xs);
 }
-.mention-dropdown::-webkit-scrollbar { width: 4px; }
-.mention-dropdown::-webkit-scrollbar-thumb {
+.mention-dropdown__scroll {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.mention-dropdown__scroll--bar {
+  padding-right: 4px;
+}
+.mention-dropdown__scroll::-webkit-scrollbar { width: 4px; }
+.mention-dropdown__scroll::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 2px;
 }

@@ -536,6 +536,7 @@ function openPreview(src) {
 
 .chat-input__row {
   display: flex;
+  position: relative;
   gap: var(--spacing-sm);
   align-items: flex-end;
 }
