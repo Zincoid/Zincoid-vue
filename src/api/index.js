@@ -42,6 +42,7 @@ export const authAPI = {
 export const userAPI = {
   getList: (page = 1, size = 20, role, keyword) => api.get('/users/public', { params: { page, size, role, keyword } }),
   getDetail: (id) => api.get(`/users/public/${id}`),
+  getByUsername: (username) => api.get(`/users/public/username/${username}`),
   getMe: () => api.get('/users'),
   updateProfile: (data) => api.put('/users', data),
   updateAvatar: (avatar) => api.put('/users/avatar', { avatar }),

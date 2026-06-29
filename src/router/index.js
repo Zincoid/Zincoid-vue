@@ -32,6 +32,12 @@ const routes = [
     meta: { title: 'Members' }
   },
   {
+    path: '/members/@:username',
+    name: 'MemberDetailByUsername',
+    component: () => import('@/views/MemberDetailPage.vue'),
+    meta: { title: 'Member' }
+  },
+  {
     path: '/members/:id',
     name: 'MemberDetail',
     component: () => import('@/views/MemberDetailPage.vue'),

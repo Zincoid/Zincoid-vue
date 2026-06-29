@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useMention } from '@/composables/useMention'
+import { parseMentions } from '@/composables/useMentionLink'
 import { momentAPI, commentAPI, likeAPI, fileAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
@@ -20,6 +21,8 @@ const auth = useAuthStore()
 const mention = useMention()
 const editTextarea = ref(null)
 const moment = ref(null)
+const parsedContent = computed(() => parseMentions(moment.value?.content))
+
 const comments = ref([])
 const loading = ref(true)
 const viewerSrc = ref('')
@@ -282,7 +285,12 @@ watch(likeLiked, (liked) => {
       </div>
     </template>
     <template v-else>
-      <p v-if="moment.content" class="detail__content">{{ moment.content }}</p>
+      <p v-if="moment.content" class="detail__content">
+        <template v-for="(part, i) in parsedContent" :key="i">
+          <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
+          <span v-else>{{ part.text }}</span>
+        </template>
+      </p>
 
       <div v-if="moment.images?.length" class="detail__medias">
         <template v-for="(img, i) in moment.images" :key="i">
@@ -411,4 +419,11 @@ watch(likeLiked, (liked) => {
 .edit-actions__right { display: flex; gap: var(--spacing-sm); }
 .edit-btn { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); padding-left: calc(var(--spacing-lg) + 2px); padding-right: calc(var(--spacing-lg) + 2px); font-size: var(--text-xs); }
 .hidden-input { display: none; }
+.mention-link {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+.mention-link:hover {
+  text-decoration: underline;
+}
 </style>

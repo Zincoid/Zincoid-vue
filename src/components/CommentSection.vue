@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useMention } from '@/composables/useMention'
+import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 
@@ -89,7 +90,8 @@ const flatComments = computed(() => {
   }
   return list.map(c => ({
     ...c,
-    parentNickname: c.parentId ? map.get(c.parentId)?.userNickname : null
+    parentNickname: c.parentId ? map.get(c.parentId)?.userNickname : null,
+    parsedContent: parseMentions(c.content)
   }))
 })
 
@@ -138,7 +140,12 @@ const visibleComments = computed(() => {
                 <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
               </div>
               <p v-if="comment.parentNickname" class="comment__reply-to">{{ t('comment.replyTo') }} <span class="comment__reply-target">@{{ comment.parentNickname }}</span></p>
-              <p class="comment__content">{{ comment.content }}</p>
+              <p class="comment__content">
+                <template v-for="(part, i) in comment.parsedContent" :key="i">
+                  <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
+                  <span v-else>{{ part.text }}</span>
+                </template>
+              </p>
               <div class="comment__actions">
                 <button class="comment__reply-btn" @click="startReply(comment)">{{ t('comment.reply') }}</button>
                 <button
@@ -395,6 +402,13 @@ const visibleComments = computed(() => {
 .comments__login-hint {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+}
+.mention-link {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+.mention-link:hover {
+  text-decoration: underline;
 }
 
 </style>

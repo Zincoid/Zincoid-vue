@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useMention } from '@/composables/useMention'
+import { parseMentions } from '@/composables/useMentionLink'
 import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
@@ -15,6 +16,7 @@ const auth = useAuthStore()
 const mention = useMention()
 
 const messages = ref([])
+const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedContent: parseMentions(m.content) })))
 const content = ref('')
 const sending = ref(false)
 const loading = ref(true)
@@ -181,7 +183,7 @@ function openPreview(src) {
     <div class="chat-box" ref="chatEl">
       <p v-if="loading" class="chat-loading">{{ t('common.loading') }}</p>
       <template v-else>
-        <div v-for="msg in messages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
+        <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
             <img v-if="msg.userAvatar" :src="msg.userAvatar" alt="" />
             <span v-else>{{ (msg.userNickname || '?')[0] }}</span>
@@ -192,7 +194,12 @@ function openPreview(src) {
               <span class="chat-msg__time">{{ formatDate(msg.createdAt) }}</span>
               <button v-if="canDelete(msg)" class="chat-msg__delete" @click="handleDelete(msg)" :title="t('common.delete')">&times;</button>
             </div>
-            <div v-if="msg.content" class="chat-msg__content">{{ msg.content }}</div>
+            <div v-if="msg.content" class="chat-msg__content">
+              <template v-for="(part, i) in msg.parsedContent" :key="i">
+                <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
+                <span v-else>{{ part.text }}</span>
+              </template>
+            </div>
             <div v-if="msg.file" class="chat-msg__file">
               <img
                 v-if="isImage(msg.file)"
@@ -672,5 +679,12 @@ function openPreview(src) {
 .chat-login-hint a {
   color: var(--color-primary);
   font-weight: var(--weight-medium);
+}
+.mention-link {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+.mention-link:hover {
+  text-decoration: underline;
 }
 </style>

@@ -74,7 +74,8 @@ export default {
     sheHer: '(她)',
     admin: '管理',
     members: '用户',
-    disabled: '已禁用'
+    disabled: '已禁用',
+    notFound: '用户不存在'
   },
   comment: {
     title: '{count} 条评论',

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { formatDate } from '@/utils/format'
+import { parseMentions } from '@/composables/useMentionLink'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
 
@@ -24,6 +25,8 @@ const images = computed(() => {
   if (!props.moment.images) return []
   return props.moment.images
 })
+
+const parsedContent = computed(() => parseMentions(props.moment.content))
 
 function mediaType(url) {
   const ext = url.split('.').pop().toLowerCase()
@@ -63,7 +66,12 @@ function goUser(e) {
       <span v-if="moment.isPinned" class="moment-card__pin">{{ t('moment.pinned') }}</span>
     </div>
 
-    <p v-if="moment.content" class="moment-card__content">{{ moment.content }}</p>
+    <p v-if="moment.content" class="moment-card__content">
+      <template v-for="(part, i) in parsedContent" :key="i">
+        <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
+        <span v-else>{{ part.text }}</span>
+      </template>
+    </p>
 
     <div v-if="images.length" class="moment-card__medias">
       <template v-for="(img, i) in images" :key="i">
@@ -291,5 +299,12 @@ function goUser(e) {
 }
 .stat--views svg {
   opacity: 0.6;
+}
+.mention-link {
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+}
+.mention-link:hover {
+  text-decoration: underline;
 }
 </style>

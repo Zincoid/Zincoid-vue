@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { userAPI, momentAPI, articleAPI } from '@/api'
 import { useI18n } from '@/composables/useI18n'
 import MomentCard from '@/components/MomentCard.vue'
@@ -21,6 +21,7 @@ const skillColors = [
 ]
 
 const route = useRoute()
+const router = useRouter()
 const user = ref(null)
 const moments = ref([])
 const articles = ref([])
@@ -28,16 +29,23 @@ const tab = ref('moments')
 
 onMounted(async () => {
   try {
-    const [uRes, mRes, aRes] = await Promise.all([
-      userAPI.getDetail(route.params.id),
-      momentAPI.getByUser(route.params.id, 1, 10),
-      articleAPI.getByUser(route.params.id, 1, 10)
+    const username = route.params.username
+    const userPromise = username
+      ? userAPI.getByUsername(username)
+      : userAPI.getDetail(route.params.id)
+    const uRes = await userPromise
+    const userId = uRes.data.data?.id
+    const [mRes, aRes] = await Promise.all([
+      momentAPI.getByUser(userId, 1, 10),
+      articleAPI.getByUser(userId, 1, 10)
     ])
     user.value = uRes.data.data
     moments.value = mRes.data.data.records || []
     articles.value = aRes.data.data.records || []
   } catch (e) {
-    console.error(e)
+    if (e.response?.data?.code === 404) {
+      router.replace('/not-found')
+    }
   }
 })
 </script>

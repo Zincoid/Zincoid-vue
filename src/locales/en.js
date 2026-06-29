@@ -74,7 +74,8 @@ export default {
     sheHer: 'she/her',
     admin: 'Admin',
     members: 'User',
-    disabled: 'Disabled'
+    disabled: 'Disabled',
+    notFound: 'User not found'
   },
   comment: {
     title: '{count} Comments',
