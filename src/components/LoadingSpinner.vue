@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useConfig } from '@/composables/useConfig'
 
 const props = defineProps({
   visible: { type: Boolean, default: true }
@@ -9,10 +10,15 @@ const props = defineProps({
 const emit = defineEmits(['done'])
 
 const { t } = useI18n()
+const { load: loadConfig, get: getConfig } = useConfig()
+loadConfig()
 
 const messages = computed(() => t('common.loadingMessages') || [])
 const show = ref(props.visible)
 let timer = null
+
+const holdMs = computed(() => parseInt(getConfig('loading_spinner_hold', '250')))
+const fadeMs = computed(() => parseInt(getConfig('loading_spinner_fade', '125')))
 
 watch(() => props.visible, (v) => {
   clearTimeout(timer)
@@ -21,7 +27,7 @@ watch(() => props.visible, (v) => {
   } else {
     timer = setTimeout(() => {
       show.value = false
-    }, 250)
+    }, holdMs.value)
   }
 })
 
@@ -38,7 +44,7 @@ function pick() {
 
 <template>
   <Transition name="loader-fade" @after-leave="onAfterLeave">
-    <div v-if="show" class="loader">
+    <div v-if="show" class="loader" :style="{ '--fade-ms': fadeMs + 'ms' }">
       <span class="loader__prompt">&gt;</span>
       <span class="loader__text">{{ pick() }}</span>
       <span class="loader__dot">.</span>
@@ -51,7 +57,7 @@ function pick() {
 
 <style scoped>
 .loader-fade-leave-active {
-  transition: opacity 0.125s ease, max-height 0.125s ease, margin 0.125s ease;
+  transition: opacity var(--fade-ms, 125ms) ease, max-height var(--fade-ms, 125ms) ease, margin var(--fade-ms, 125ms) ease;
   overflow: hidden;
 }
 .loader-fade-leave-to {
