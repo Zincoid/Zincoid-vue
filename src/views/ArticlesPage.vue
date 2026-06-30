@@ -6,6 +6,7 @@ import { useConfig } from '@/composables/useConfig'
 import { articleAPI } from '@/api'
 import ArticleCard from '@/components/ArticleCard.vue'
 import Pagination from '@/components/Pagination.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -58,7 +59,8 @@ function onPageChange(p) {
         </router-link>
     </div>
 
-    <div class="articles-list" v-if="articles.length">
+    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <div class="articles-list" v-else-if="articles.length">
       <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
     </div>
     <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>

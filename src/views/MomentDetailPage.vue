@@ -13,6 +13,7 @@ import Pagination from '@/components/Pagination.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -210,7 +211,8 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <div class="detail container" v-if="moment">
+  <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+  <div class="detail container" v-else-if="moment">
     <!-- Header -->
     <div class="detail__header">
       <router-link :to="`/members/${moment.userId}`" class="detail__user">

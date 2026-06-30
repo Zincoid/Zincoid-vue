@@ -9,6 +9,7 @@ import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -181,7 +182,7 @@ function openPreview(src) {
     </div>
 
     <div class="chat-box" ref="chatEl">
-      <p v-if="loading" class="chat-loading">{{ t('common.loading') }}</p>
+      <LoadingSpinner v-if="loading" :message="t('common.loading')" />
       <template v-else>
         <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
@@ -313,13 +314,6 @@ function openPreview(src) {
 .chat-box::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 2px;
-}
-
-.chat-loading {
-  text-align: center;
-  color: var(--color-text-secondary);
-  margin: auto;
-  font-size: var(--text-sm);
 }
 
 /* ── Message bubble ── */

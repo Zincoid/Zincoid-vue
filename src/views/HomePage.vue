@@ -6,6 +6,7 @@ import { useLocaleStore } from '@/stores/locale'
 import { momentAPI, articleAPI, userAPI, configAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -250,7 +251,9 @@ onUnmounted(() => {
     </div>
 
     <!-- Recent Moments & Articles -->
+    <LoadingSpinner v-if="loading" />
     <div
+      v-else
       class="recent-grid container-wide"
       :class="{
         'recent-grid--collapse-left': collapsed === 'moments',

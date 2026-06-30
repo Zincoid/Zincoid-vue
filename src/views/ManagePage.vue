@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { configAPI, fileAPI, userAPI, healthAPI, notificationAPI } from '@/api'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -10,6 +11,7 @@ const { getMessage } = useError()
 const configs = ref([])
 const configMessage = ref('')
 const configError = ref('')
+const configLoading = ref(true)
 const toolMessage = ref('')
 const toolError = ref('')
 const cleaning = ref(false)
@@ -64,6 +66,8 @@ onMounted(async () => {
     configs.value = data.data || []
   } catch (e) {
     configError.value = t('admin.loadFailed')
+  } finally {
+    configLoading.value = false
   }
 })
 
@@ -141,7 +145,8 @@ async function handleReset() {
       <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
       <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
-      <div class="config-list">
+      <LoadingSpinner v-if="configLoading" />
+      <div v-else class="config-list">
         <div v-for="cfg in configs" :key="cfg.id" class="config-item">
           <div class="config-info">
             <span class="config-key">{{ cfg.configKey }}</span>

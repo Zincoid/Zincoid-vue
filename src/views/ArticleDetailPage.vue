@@ -9,6 +9,7 @@ import { articleAPI, commentAPI, likeAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { formatDate } from '@/utils/format'
 import 'highlight.js/styles/github-dark.css'
 
@@ -188,7 +189,8 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <div class="article-detail container" v-if="article">
+  <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+  <div class="article-detail container" v-else-if="article">
     <nav v-if="tocItems.length" class="article-toc">
       <div class="toc-title">{{ t('article.toc') }}</div>
       <div class="toc-scroll">

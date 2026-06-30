@@ -9,6 +9,7 @@ import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -174,7 +175,8 @@ async function submitMoment() {
     </div>
 
     <!-- Timeline -->
-    <div class="timeline-list" v-if="moments.length">
+    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <div class="timeline-list" v-else-if="moments.length">
       <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
     </div>
     <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>

@@ -5,6 +5,7 @@ import { useConfig } from '@/composables/useConfig'
 import { userAPI } from '@/api'
 import UserCard from '@/components/UserCard.vue'
 import Pagination from '@/components/Pagination.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
@@ -91,7 +92,8 @@ function removeUser(id) {
       />
     </div>
 
-    <template v-if="admins.length || users.length">
+    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <template v-else-if="admins.length || users.length">
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
         <div class="user-grid">
