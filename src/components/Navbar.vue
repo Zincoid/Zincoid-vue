@@ -256,7 +256,8 @@ function closeMenu() {
         </div>
       </div>
     </div>
-    <div v-if="notifOpen" class="navbar__notif-dropdown">
+    <Transition name="notif-drop">
+      <div v-if="notifOpen" class="navbar__notif-dropdown">
       <div class="navbar__notif-dropdown-header">
         <span class="navbar__notif-dropdown-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -319,7 +320,10 @@ function closeMenu() {
         </template>
       </div>
     </div>
-    <div v-if="notifOpen" class="navbar__notif-backdrop" @click="closeNotif"></div>
+    </Transition>
+    <Transition name="notif-fade">
+      <div v-if="notifOpen" class="navbar__notif-backdrop" @click="closeNotif"></div>
+    </Transition>
   </nav>
   <Teleport to="body">
     <Transition name="broadcast">
@@ -823,6 +827,34 @@ function closeMenu() {
   z-index: 102;
 }
 
+.notif-drop-enter-active,
+.notif-drop-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.notif-drop-enter-from,
+.notif-drop-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.notif-fade-enter-active,
+.notif-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.notif-fade-enter-from,
+.notif-fade-leave-to {
+  opacity: 0;
+}
+
+.navbar__links .navbar__label {
+  overflow: hidden;
+  max-width: 200px;
+  opacity: 1;
+  transition: max-width 0.2s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+.navbar__links .navbar__nav-icon {
+  transition: margin-right 0.2s ease;
+}
 @media (max-width: 1200px) {
   .navbar__links .navbar__item {
     min-width: auto;
@@ -833,7 +865,8 @@ function closeMenu() {
     margin-right: 0;
   }
   .navbar__links .navbar__label {
-    display: none;
+    max-width: 0;
+    opacity: 0;
   }
 }
 
@@ -848,6 +881,8 @@ function closeMenu() {
   }
   .navbar__links .navbar__label {
     display: inline;
+    max-width: 200px;
+    opacity: 1;
   }
   .navbar__brand { border-bottom: none; }
   .navbar__mobile-actions {
