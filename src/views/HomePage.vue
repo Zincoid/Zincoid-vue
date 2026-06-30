@@ -334,7 +334,7 @@ onUnmounted(() => {
         <div
           v-for="(sq, i) in squares"
           :key="i"
-          :class="['hero-terminal__sq', sq.cls]"
+          :class="['hero-terminal__sq', 'hero-terminal__sq--square', sq.cls]"
           :style="{
             left: sq.x * GRID + 'px',
             top: sq.y * GRID + 'px'
@@ -482,17 +482,21 @@ onUnmounted(() => {
   pointer-events: none;
   z-index: 1;
 }
+.hero-terminal__sq--square {
+  border: none;
+  border-radius: 0;
+}
 .hero-terminal__sq--red {
-  background: rgba(255, 51, 51, 0.1);
-  border-color: rgba(255, 51, 51, 0.1);
+  background: rgba(255, 51, 51, 0.25);
+  border-color: rgba(255, 51, 51, 0.25);
 }
 .hero-terminal__sq--green {
-  background: rgba(63, 185, 80, 0.1);
-  border-color: rgba(63, 185, 80, 0.1);
+  background: rgba(63, 185, 80, 0.25);
+  border-color: rgba(63, 185, 80, 0.25);
 }
 .hero-terminal__sq--blue {
-  background: rgba(88, 166, 255, 0.1);
-  border-color: rgba(88, 166, 255, 0.1);
+  background: rgba(88, 166, 255, 0.25);
+  border-color: rgba(88, 166, 255, 0.25);
 }
 .hero-terminal__sq--drop {
   background: #58a6ff;
