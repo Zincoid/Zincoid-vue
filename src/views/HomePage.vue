@@ -78,7 +78,7 @@ function clampSquares() {
 
 // ── Pixel raindrop animation ──
 function spawnRipplePixel(cx, cy, color) {
-  ripples.push({ cx, cy, rx: 0.5, ry: 0.2, opacity: 0.9, color })
+  ripples.push({ cx, cy, rx: 0.5, ry: 0.2, opacity: 0.9, color, age: 0 })
 }
 
 function stepRaindrop() {
@@ -106,11 +106,14 @@ function stepRaindrop() {
 
   for (let i = ripples.length - 1; i >= 0; i--) {
     const r = ripples[i]
-    r.rx += 1.2
-    r.ry += 0.6
-    r.opacity -= 0.07
-    if (r.opacity <= 0 || r.rx > 12) { ripples.splice(i, 1); continue }
+    r.rx += 1.0
+    r.ry += 0.5
+    r.age++
+    r.opacity -= 0.055
+    if (r.opacity <= 0 || r.age > 20) { ripples.splice(i, 1); continue }
   }
+
+  rebuildRippleCells()
 }
 
 function stopRaindrop() {
@@ -119,12 +122,13 @@ function stopRaindrop() {
 }
 
 // Generate ellipse pixel cells from ripple data
-const rippleCells = computed(() => {
-  const cells = []
+const rippleCells = ref([])
+
+function rebuildRippleCells() {
+  const map = new Map()
   for (const r of ripples) {
     const rr = Math.round(r.rx)
     const ry = Math.max(1, Math.round(r.rx * 0.35))
-    // Fill the ellipse area
     for (let dy = -ry; dy <= ry; dy++) {
       const row = Math.round(r.cy + dy)
       if (row < 0 || row >= sqRows.value) continue
@@ -134,14 +138,18 @@ const rippleCells = computed(() => {
         if (col >= 0 && col < sqCols.value) {
           const dist = Math.sqrt(dx * dx + (dy / 0.35) ** 2)
           const op = r.opacity * (1 - dist / rr) * (dist > rr * 0.7 ? 0.5 : 1)
-          if (op > 0.05)
-            cells.push({ x: col, y: row, opacity: op, color: r.color, key: `${r.cx}-${r.cy}-${row}-${col}` })
+          if (op > 0.015) {
+            const key = `${r.cx}-${r.cy}-${row}-${col}`
+            if (!map.has(key) || map.get(key).opacity < op) {
+              map.set(key, { x: col, y: row, opacity: op, color: r.color })
+            }
+          }
         }
       }
     }
   }
-  return cells
-})
+  rippleCells.value = Array.from(map.values())
+}
 
 onMounted(() => {
   randomizeSquares()
