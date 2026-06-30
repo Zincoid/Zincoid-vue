@@ -32,7 +32,7 @@ export default {
     delete: '删除',
     postFailed: '发布失败',
     deleteError: '删除失败',
-    placeholder: '在想什么？',
+    placeholder: '在想什么？@ 提及用户...',
     updateFailed: '更新失败',
     pinnedFirst: '置顶'
   },
@@ -253,7 +253,7 @@ export default {
   chat: {
     title: '聊天',
     subtitle: '公共聊天',
-    placeholder: '输入消息...',
+    placeholder: '输入消息，@ 提及用户...',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？'
   },

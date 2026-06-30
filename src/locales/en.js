@@ -32,7 +32,7 @@ export default {
     delete: 'Delete',
     postFailed: 'Failed to post',
     deleteError: 'Failed to delete',
-    placeholder: "What's on your mind?",
+    placeholder: "What's on your mind? @ to mention...",
     updateFailed: 'Failed to update',
     pinnedFirst: 'Pinned'
   },
@@ -253,7 +253,7 @@ export default {
   chat: {
     title: 'Chats',
     subtitle: 'Public chat',
-    placeholder: 'Type a message...',
+    placeholder: 'Type a message, @ to mention...',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?'
   },
