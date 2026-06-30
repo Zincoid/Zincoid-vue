@@ -166,7 +166,6 @@ watch(() => locale.locale, () => {
 })
 
 onMounted(async () => {
-  startTyping()
   try {
     const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
     const [mRes, aRes, mtRes, atRes, uRes, rRes, cfgRes] = await Promise.all([
