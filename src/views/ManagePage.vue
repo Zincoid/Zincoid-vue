@@ -98,9 +98,11 @@ async function runRecordsCleanup() {
   if (!confirm(t('admin.cleanupRecordsConfirm'))) return
   recordsCleaning.value = true
   try {
-    await healthAPI.cleanupRecords()
-    toolMessage.value = t('admin.cleanupSuccess')
-    setTimeout(() => toolMessage.value = '', 2000)
+    const res = await healthAPI.cleanupRecords()
+    const counts = res.data?.data ?? {}
+    const parts = Object.entries(counts).map(([k, v]) => `${t(`admin.${k}`)} ${v}`).join(', ')
+    toolMessage.value = `${t('admin.cleanupSuccess')}：${parts || t('admin.cleanupNone')}`
+    setTimeout(() => toolMessage.value = '', 4000)
   } catch (err) {
     toolError.value = getMessage(err, 'admin.cleanupFailed')
   } finally {
