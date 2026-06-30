@@ -469,7 +469,7 @@ th {
 /* Fixed back-to-list FAB */
 .back-fab {
   position: fixed;
-  right: var(--spacing-xl);
+  right: var(--spacing-4xl);
   bottom: 75px;
   width: 48px;
   height: 48px;
@@ -493,7 +493,7 @@ th {
 
 .pin-fab {
   position: fixed;
-  right: var(--spacing-xl);
+  right: var(--spacing-4xl);
   bottom: 135px;
   width: 48px;
   height: 48px;
@@ -522,7 +522,7 @@ th {
 
 .like-fab {
   position: fixed;
-  right: var(--spacing-xl);
+  right: var(--spacing-4xl);
   bottom: 135px;
   z-index: 50;
 }
@@ -563,12 +563,12 @@ th {
 
 @media (max-width: 768px) {
   .back-fab {
-    bottom: 105px;
+    bottom: 80px;
   }
   .like-fab {
-    bottom: 165px;
+    bottom: 140px;
   }
   .pin-fab {
-    bottom: 195px;
+    bottom: 150px;
   }
 }
