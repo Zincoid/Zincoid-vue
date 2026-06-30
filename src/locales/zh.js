@@ -285,6 +285,7 @@ export default {
     mentionedChat: '在聊天中@了你',
     likedMoment: '点赞了你的动态',
     likedArticle: '点赞了你的文章',
+    registered: '注册了新账号',
     system: '系统公告',
     markRead: '全部已读',
     deleteAll: '清除全部'
@@ -346,6 +347,7 @@ export default {
     unpin: '取消置顶',
     total: '共 {total} 条',
     perPage: '每页 {size} 条',
-    currentPage: '第 {page} 页'
+    currentPage: '第 {page} 页',
+    notSet: '未设置'
   }
 }

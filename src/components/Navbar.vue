@@ -89,6 +89,7 @@ function goNotification(n) {
     }).catch(() => {})
   }
   if (n.relatedType === 5) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; return }
+  if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -291,7 +292,9 @@ function closeMenu() {
                 <strong>{{ n.senderNickname }}</strong>
                 {{ n.relatedType === 5
                   ? t('notification.system')
-                  : n.relatedType === 6
+                  : n.relatedType === 7
+                    ? t('notification.registered')
+                    : n.relatedType === 6
                     ? (n.targetType === 0 ? t('notification.likedMoment') : t('notification.likedArticle'))
                     : n.relatedType === 2
                       ? t('notification.mentionedMoment')

@@ -285,6 +285,7 @@ export default {
     mentionedChat: 'mentioned you in chat',
     likedMoment: 'liked your moment',
     likedArticle: 'liked your article',
+    registered: 'registered a new account',
     system: 'System broadcast',
     markRead: 'Mark all read',
     deleteAll: 'Clear all'
@@ -348,6 +349,7 @@ export default {
     unpin: 'Unpin',
     total: '{total} items',
     currentPage: 'Page {page}',
-    perPage: '{size} per page'
+    perPage: '{size} per page',
+    notSet: 'Not set'
   }
 }
