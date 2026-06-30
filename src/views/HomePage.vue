@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
@@ -40,7 +40,7 @@ async function refreshFeatured() {
 const GRID = 24
 const sqCols = ref(20)
 const sqRows = ref(12)
-let sqTimer = null
+let animTimer = null
 const heroRef = ref(null)
 const squares = reactive([
   { x: 0, y: 0, cls: 'hero-terminal__sq--red' },
@@ -48,11 +48,9 @@ const squares = reactive([
   { x: 0, y: 0, cls: 'hero-terminal__sq--blue' }
 ])
 
-let raindropRaf = null
-let raindropDrops = []
-let raindropRipples = []
-let raindropLastTime = 0
-const rainCanvas = ref(null)
+// Pixel raindrop animation (grid-based)
+const drops = reactive([])    // [{x, y, color}]
+const ripples = reactive([])  // [{cx, cy, rx, ry, opacity, color}]
 const animationType = ref('squares')
 
 function randomizeSquares() {
@@ -78,9 +76,76 @@ function clampSquares() {
   }
 }
 
+// ── Pixel raindrop animation ──
+function spawnRipplePixel(cx, cy, color) {
+  ripples.push({ cx, cy, rx: 0.5, ry: 0.2, opacity: 0.9, color })
+}
+
+function stepRaindrop() {
+  // Spawn
+  if (Math.random() < 0.5) {
+    const color = Math.random() < 0.3 ? '#3fb950' : '#58a6ff'
+    drops.push({ x: Math.floor(Math.random() * sqCols.value), y: -1, color, age: 0 })
+  }
+
+  for (let i = drops.length - 1; i >= 0; i--) {
+    const d = drops[i]
+    d.x += 1
+    d.y += 2
+    d.age++
+
+    const offGrid = d.y >= sqRows.value - 1 || d.x >= sqCols.value
+    const splash = d.age > 2 && Math.random() < 0.1
+    if (offGrid || splash) {
+      const sx = Math.min(Math.max(d.x, 0), sqCols.value - 1)
+      const sy = offGrid ? sqRows.value - 1 : d.y
+      spawnRipplePixel(sx, sy, d.color)
+      drops.splice(i, 1)
+    }
+  }
+
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    const r = ripples[i]
+    r.rx += 1.2
+    r.ry += 0.6
+    r.opacity -= 0.07
+    if (r.opacity <= 0 || r.rx > 12) { ripples.splice(i, 1); continue }
+  }
+}
+
+function stopRaindrop() {
+  drops.splice(0)
+  ripples.splice(0)
+}
+
+// Generate ellipse pixel cells from ripple data
+const rippleCells = computed(() => {
+  const cells = []
+  for (const r of ripples) {
+    const rr = Math.round(r.rx)
+    const ry = Math.max(1, Math.round(r.rx * 0.35))
+    // Fill the ellipse area
+    for (let dy = -ry; dy <= ry; dy++) {
+      const row = Math.round(r.cy + dy)
+      if (row < 0 || row >= sqRows.value) continue
+      const half = Math.round(rr * Math.sqrt(1 - (dy / ry) ** 2))
+      for (let dx = -half; dx <= half; dx++) {
+        const col = Math.round(r.cx + dx)
+        if (col >= 0 && col < sqCols.value) {
+          const dist = Math.sqrt(dx * dx + (dy / 0.35) ** 2)
+          const op = r.opacity * (1 - dist / rr) * (dist > rr * 0.7 ? 0.5 : 1)
+          if (op > 0.05)
+            cells.push({ x: col, y: row, opacity: op, color: r.color, key: `${r.cx}-${r.cy}-${row}-${col}` })
+        }
+      }
+    }
+  }
+  return cells
+})
+
 onMounted(() => {
   randomizeSquares()
-  sqTimer = setInterval(moveSquares, 1000)
+  animTimer = setInterval(moveSquares, 1000)
   const observer = new ResizeObserver(([entry]) => {
     const w = entry.target.clientWidth
     const h = entry.target.clientHeight
@@ -91,10 +156,6 @@ onMounted(() => {
       sqRows.value = nr
       clampSquares()
     }
-    if (rainCanvas.value) {
-      rainCanvas.value.width = w
-      rainCanvas.value.height = h
-    }
   })
   if (heroRef.value) observer.observe(heroRef.value)
 
@@ -102,8 +163,7 @@ onMounted(() => {
   const onMqChange = (e) => { if (e.matches) collapsed.value = null }
   mq.addEventListener('change', onMqChange)
   onUnmounted(() => {
-    clearInterval(sqTimer)
-    if (raindropRaf) cancelAnimationFrame(raindropRaf)
+    clearInterval(animTimer)
     observer.disconnect()
     mq.removeEventListener('change', onMqChange)
   })
@@ -125,91 +185,10 @@ function startTyping() {
   }, 100)
 }
 
-// ── Raindrop canvas animation ──
-function initRaindrop() {
-  const canvas = rainCanvas.value
-  if (!canvas || !heroRef.value) return
-  canvas.width = heroRef.value.clientWidth
-  canvas.height = heroRef.value.clientHeight
-  const ctx = canvas.getContext('2d')
-  raindropDrops = []
-  raindropRipples = []
-  raindropLastTime = performance.now()
-
-  function spawnRipple(x, y, color) {
-    raindropRipples.push({
-      x, y, rx: 0, ry: 0,
-      maxRx: 25 + Math.random() * 20,
-      speed: 0.4 + Math.random() * 0.4,
-      opacity: 0.8 + Math.random() * 0.2,
-      color
-    })
-  }
-
-  function loop(time) {
-    const dt = Math.min(time - raindropLastTime, 50)
-    raindropLastTime = time
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    if (Math.random() < 0.35) {
-      const angle = -0.3 + Math.random() * 0.2
-      raindropDrops.push({
-        x: Math.random() * canvas.width * 1.2 - canvas.width * 0.1,
-        y: -15,
-        vx: Math.sin(angle) * (3 + Math.random() * 2),
-        vy: Math.cos(angle) * (3 + Math.random() * 2),
-        len: 10 + Math.random() * 14,
-        opacity: 0.3 + Math.random() * 0.4,
-        color: Math.random() < 0.3 ? '#3fb950' : '#58a6ff'
-      })
-    }
-
-    for (let i = raindropDrops.length - 1; i >= 0; i--) {
-      const d = raindropDrops[i]
-      d.x += d.vx * (dt / 16)
-      d.y += d.vy * (dt / 16)
-      ctx.beginPath()
-      ctx.moveTo(d.x, d.y)
-      ctx.lineTo(d.x - d.vx * 0.3 * d.len, d.y - d.vy * 0.3 * d.len)
-      ctx.strokeStyle = d.color + Math.round(d.opacity * 80).toString(16).padStart(2, '0')
-      ctx.lineWidth = 1.5
-      ctx.stroke()
-      if (d.y > canvas.height + 10 || d.x < -20 || d.x > canvas.width + 20) {
-        if (d.y > canvas.height - 10 && d.y < canvas.height + 30)
-          spawnRipple(d.x, canvas.height, d.color)
-        raindropDrops.splice(i, 1)
-      }
-    }
-
-    for (let i = raindropRipples.length - 1; i >= 0; i--) {
-      const r = raindropRipples[i]
-      r.rx += r.speed * (dt / 16)
-      r.ry += r.speed * 0.35 * (dt / 16)
-      r.opacity -= 0.015 * (dt / 16)
-      if (r.opacity <= 0 || r.rx > r.maxRx) { raindropRipples.splice(i, 1); continue }
-
-      const grad = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.rx)
-      grad.addColorStop(0, r.color + Math.round(r.opacity * 30).toString(16).padStart(2, '0'))
-      grad.addColorStop(0.6, r.color + Math.round(r.opacity * 15).toString(16).padStart(2, '0'))
-      grad.addColorStop(1, r.color + '00')
-      ctx.beginPath(); ctx.ellipse(r.x, r.y, r.rx, r.ry, 0, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill()
-      ctx.beginPath(); ctx.ellipse(r.x, r.y, r.rx, r.ry, 0, 0, Math.PI * 2)
-      ctx.strokeStyle = r.color + Math.round(r.opacity * 60).toString(16).padStart(2, '0'); ctx.lineWidth = 1; ctx.stroke()
-      const ix = r.rx * 0.6, iy = r.ry * 0.6
-      ctx.beginPath(); ctx.ellipse(r.x, r.y, ix, iy, 0, 0, Math.PI * 2)
-      ctx.strokeStyle = r.color + Math.round(r.opacity * 30).toString(16).padStart(2, '0'); ctx.lineWidth = 0.5; ctx.stroke()
-    }
-
-    raindropRaf = requestAnimationFrame(loop)
-  }
-
-  raindropRaf = requestAnimationFrame(loop)
-}
-
 function startHeroAnimation() {
   if (animationType.value === 'raindrop') {
-    clearInterval(sqTimer)
-    nextTick(() => initRaindrop())
+    clearInterval(animTimer)
+    animTimer = setInterval(stepRaindrop, 150)
   }
 }
 
@@ -309,8 +288,7 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(terminalCycleTimer)
   clearTimeout(terminalPauseTimer)
-  clearInterval(sqTimer)
-  if (raindropRaf) cancelAnimationFrame(raindropRaf)
+  clearInterval(animTimer)
 })
 </script>
 
@@ -329,7 +307,31 @@ onUnmounted(() => {
           }"
         ></div>
       </template>
-      <canvas v-else-if="animationType === 'raindrop'" ref="rainCanvas" class="hero-canvas"></canvas>
+      <template v-else-if="animationType === 'raindrop'">
+        <div
+          v-for="(d, i) in drops"
+          :key="'d'+i"
+          class="hero-terminal__sq hero-terminal__sq--drop"
+          :style="{
+            left: d.x * GRID + 'px',
+            top: d.y * GRID + 'px',
+            background: d.color,
+            borderColor: d.color
+          }"
+        ></div>
+        <div
+          v-for="(c, i) in rippleCells"
+          :key="c.key || ('r'+i)"
+          class="hero-terminal__sq hero-terminal__sq--ripple"
+          :style="{
+            left: c.x * GRID + 'px',
+            top: c.y * GRID + 'px',
+            background: c.color,
+            borderColor: c.color,
+            opacity: c.opacity
+          }"
+        ></div>
+      </template>
       <div class="hero-terminal__inner container-wide">
         <div class="hero-terminal__brand">
           <h1 class="hero-terminal__title">
@@ -457,6 +459,19 @@ onUnmounted(() => {
 .hero-terminal__sq--blue {
   background: rgba(88, 166, 255, 0.1);
   border-color: rgba(88, 166, 255, 0.1);
+}
+.hero-terminal__sq--drop {
+  background: #58a6ff;
+  border-color: #58a6ff;
+  opacity: 0.7;
+  border-radius: 0 !important;
+  transition: none !important;
+}
+.hero-terminal__sq--ripple {
+  border-color: currentColor;
+  background: currentColor;
+  transition: none !important;
+  border-radius: 0 !important;
 }
 
 /* Hero + Terminal */
@@ -720,12 +735,4 @@ onUnmounted(() => {
   }
 }
 
-.hero-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
 </style>
