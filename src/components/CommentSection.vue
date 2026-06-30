@@ -12,7 +12,8 @@ const { t } = useI18n()
 const props = defineProps({
   comments: { type: Array, default: () => [] },
   targetId: { type: [Number, String], required: true },
-  targetType: { type: String, required: true } // 'moment' | 'article'
+  targetType: { type: String, required: true }, // 'moment' | 'article'
+  total: { type: Number, default: 0 }
 })
 
 const emit = defineEmits(['submit', 'delete'])
@@ -142,7 +143,7 @@ const visibleComments = computed(() => {
 
 <template>
   <div class="comments">
-    <h4 class="comments__title">{{ t('comment.title', { count: flatComments.length }) }}</h4>
+    <h4 class="comments__title">{{ t('comment.title', { count: total || flatComments.length }) }}</h4>
 
     <div class="comments__list" v-if="flatComments.length">
       <template v-for="comment in visibleComments" :key="comment.id">

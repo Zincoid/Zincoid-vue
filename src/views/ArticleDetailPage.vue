@@ -10,7 +10,6 @@ import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import { formatDate } from '@/utils/format'
-import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 
 const { t } = useI18n()
@@ -275,6 +274,7 @@ watch(likeLiked, (liked) => {
       :comments="comments"
       :target-id="route.params.id"
       target-type="article"
+      :total="commentTotal"
       @submit="handleComment"
       @delete="handleDeleteComment"
     />
