@@ -34,6 +34,7 @@ const loading = ref(true)
 const loadingDone = ref(false)
 const notFound = ref(false)
 const banned = ref(false)
+const pinnedFirst = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
 const aPage = ref(1); const aPages = ref(1); const aTotal = ref(0)
@@ -61,14 +62,14 @@ onMounted(async () => {
 })
 
 async function fetchMoments() {
-  const { data } = await momentAPI.getByUser(userId.value, mPage.value, pageSize.value)
+  const { data } = await momentAPI.getByUser(userId.value, mPage.value, pageSize.value, pinnedFirst.value)
   moments.value = data.data.records || []
   mPages.value = data.data.pages || 1
   mTotal.value = data.data.total || 0
 }
 
 async function fetchArticles() {
-  const { data } = await articleAPI.getByUser(userId.value, aPage.value, pageSize.value)
+  const { data } = await articleAPI.getByUser(userId.value, aPage.value, pageSize.value, pinnedFirst.value)
   articles.value = data.data.records || []
   aPages.value = data.data.pages || 1
   aTotal.value = data.data.total || 0
@@ -127,6 +128,16 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
     </div>
   </div>
 
+  <button
+    class="pin-fab"
+    :class="{ 'pin-fab--active': pinnedFirst }"
+    @click="pinnedFirst = !pinnedFirst; mPage = 1; aPage = 1; fetchMoments(); fetchArticles()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 17v5"/>
+      <path v-if="pinnedFirst" d="M15 9.34V7h1a2 2 0 0 0 0-4H7.89"/><path v-if="pinnedFirst" d="m2 2 20 20"/><path v-if="pinnedFirst" d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h7.32"/>
+      <path v-else d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v3.76z"/>
+    </svg>
+  </button>
   <router-link to="/members" class="back-fab" :title="t('common.backToList')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
   </router-link>

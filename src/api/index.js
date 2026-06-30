@@ -67,7 +67,7 @@ export const momentAPI = {
   unpin: (id) => api.put(`/moments/${id}/unpin`),
   getTimeline: (page = 1, size = 10, pinned = false) => api.get('/moments/public', { params: { page, size, pinned } }),
   getHomeFeed: (size = 10) => api.get('/moments/public/home', { params: { size } }),
-  getByUser: (userId, page = 1, size = 10) => api.get(`/moments/public/user/${userId}`, { params: { page, size } }),
+  getByUser: (userId, page = 1, size = 10, pinned = false) => api.get(`/moments/public/user/${userId}`, { params: { page, size, pinned } }),
   getDetail: (id) => api.get(`/moments/public/${id}`),
   getRandom: () => api.get('/moments/public/random')
 }
@@ -81,7 +81,7 @@ export const articleAPI = {
   unpin: (id) => api.put(`/articles/${id}/unpin`),
   getList: (page = 1, size = 10, pinned = false) => api.get('/articles/public', { params: { page, size, pinned } }),
   getHomeFeed: (size = 10) => api.get('/articles/public/home', { params: { size } }),
-  getByUser: (userId, page = 1, size = 10) => api.get(`/articles/public/user/${userId}`, { params: { page, size } }),
+  getByUser: (userId, page = 1, size = 10, pinned = false) => api.get(`/articles/public/user/${userId}`, { params: { page, size, pinned } }),
   getRandom: () => api.get('/articles/public/random'),
   getDetail: (id) => api.get(`/articles/public/${id}`)
 }
