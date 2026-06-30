@@ -53,6 +53,12 @@ const drops = reactive([])    // [{x, y, color}]
 const ripples = reactive([])  // [{cx, cy, rx, ry, opacity, color}]
 const animationType = ref('squares')
 
+// Rain cycle: light ~15s → heavy ~7.5s → loop
+let rainCycleTick = 0
+const RAIN_CYCLE_LIGHT = 100
+const RAIN_CYCLE_TOTAL = 150
+const isHeavyRain = () => rainCycleTick > RAIN_CYCLE_LIGHT
+
 function randomizeSquares() {
   for (const sq of squares) {
     sq.x = Math.floor(Math.random() * sqCols.value)
@@ -77,13 +83,18 @@ function clampSquares() {
 }
 
 // ── Pixel raindrop animation ──
-function spawnRipplePixel(cx, cy, color) {
-  ripples.push({ cx, cy, rx: 0.5, ry: 0.2, opacity: 0.9, color, age: 0 })
+function spawnRipplePixel(cx, cy, color, opacity) {
+  ripples.push({ cx, cy, rx: 0.5, ry: 0.2, opacity, color, age: 0 })
 }
 
 function stepRaindrop() {
+  rainCycleTick++
+  const heavy = isHeavyRain()
+  if (rainCycleTick > RAIN_CYCLE_TOTAL) rainCycleTick = 0
+
   // Spawn
-  if (Math.random() < 0.5) {
+  const spawnRate = heavy ? 0.9 : 0.35
+  if (Math.random() < spawnRate) {
     const color = Math.random() < 0.3 ? '#3fb950' : '#58a6ff'
     drops.push({ x: Math.floor(Math.random() * sqCols.value), y: -1, color, age: 0 })
   }
@@ -99,7 +110,8 @@ function stepRaindrop() {
     if (offGrid || splash) {
       const sx = Math.min(Math.max(d.x, 0), sqCols.value - 1)
       const sy = offGrid ? sqRows.value - 1 : d.y
-      spawnRipplePixel(sx, sy, d.color)
+      const rippleOpacity = heavy ? 1.0 : 0.1 + Math.random() * 0.9
+      spawnRipplePixel(sx, sy, d.color, rippleOpacity)
       drops.splice(i, 1)
     }
   }
