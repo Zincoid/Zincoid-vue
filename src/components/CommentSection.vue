@@ -143,7 +143,7 @@ const visibleComments = computed(() => {
 
 <template>
   <div class="comments">
-    <h4 class="comments__title">{{ t('comment.title', { count: total || flatComments.length }) }}</h4>
+    <h4 class="comments__title">{{ t('comment.title', { count: total }) }}</h4>
 
     <div class="comments__list" v-if="flatComments.length">
       <template v-for="comment in visibleComments" :key="comment.id">
