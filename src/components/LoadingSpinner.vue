@@ -51,7 +51,7 @@ function pick() {
 
 <style scoped>
 .loader-fade-leave-active {
-  transition: opacity 0.25s ease, max-height 0.25s ease, margin 0.25s ease;
+  transition: opacity 0.125s ease, max-height 0.125s ease, margin 0.125s ease;
   overflow: hidden;
 }
 .loader-fade-leave-to {
@@ -66,9 +66,9 @@ function pick() {
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: var(--spacing-lg) var(--spacing-lg);
-  margin: var(--spacing-lg) 0;
-  max-height: 80px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  margin: var(--spacing-sm) 0;
+  max-height: 48px;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }

@@ -4,20 +4,29 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useLocaleStore } from '@/stores/locale'
 import { useI18n } from '@/composables/useI18n'
+import { useConfig } from '@/composables/useConfig'
 import { notificationAPI } from '@/api'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const locale = useLocaleStore()
 const { t } = useI18n()
+const { load: loadConfig, get: getConfig } = useConfig()
+loadConfig()
 const menuOpen = ref(false)
 const unreadCount = ref(0)
 const notifOpen = ref(false)
 const notifications = ref([])
 const notifLoading = ref(false)
+const notifLoadingDone = ref(false)
 const broadcastMessage = ref(null)
 const broadcastSender = ref(null)
+const notifPage = ref(1)
+const notifPages = ref(1)
+const notifTotal = ref(0)
+const notifLoadingMore = ref(false)
 
 function fetchUnreadCount() {
   if (!auth.isLoggedIn) return
@@ -29,10 +38,32 @@ function fetchUnreadCount() {
 function fetchNotifications() {
   if (!auth.isLoggedIn) return
   notifLoading.value = true
-  notificationAPI.getList().then(res => {
-    notifications.value = res.data?.data ?? []
+  notifLoadingDone.value = false
+  notifPage.value = 1
+  const size = parseInt(getConfig('page_size', '5'))
+  notificationAPI.getList(1, size).then(res => {
+    const data = res.data?.data
+    notifications.value = data?.records ?? []
+    notifPages.value = data?.pages ?? 1
+    notifTotal.value = data?.total ?? 0
   }).catch(() => {}).finally(() => {
     notifLoading.value = false
+  })
+}
+
+function loadMore() {
+  if (notifLoadingMore.value || notifPage.value >= notifPages.value) return
+  notifLoadingMore.value = true
+  const nextPage = notifPage.value + 1
+  const size = parseInt(getConfig('page_size', '5'))
+  notificationAPI.getList(nextPage, size).then(res => {
+    const data = res.data?.data
+    notifications.value.push(...(data?.records ?? []))
+    notifPage.value = nextPage
+    notifPages.value = data?.pages ?? 1
+    notifTotal.value = data?.total ?? 0
+  }).catch(() => {}).finally(() => {
+    notifLoadingMore.value = false
   })
 }
 
@@ -241,9 +272,10 @@ function closeMenu() {
         </div>
       </div>
       <div class="navbar__notif-dropdown-body">
-        <p v-if="notifLoading" class="navbar__notif-empty">{{ t('common.loading') }}</p>
-        <p v-else-if="notifications.length === 0" class="navbar__notif-empty">{{ t('notification.empty') }}</p>
-        <div v-else class="navbar__notif-list">
+        <LoadingSpinner :visible="notifLoading" @done="notifLoadingDone = true" />
+        <template v-if="notifLoadingDone">
+          <p v-if="notifications.length === 0" class="navbar__notif-empty">{{ t('notification.empty') }}</p>
+          <div v-else class="navbar__notif-list">
           <div
             v-for="n in notifications"
             :key="n.id"
@@ -278,6 +310,13 @@ function closeMenu() {
             </button>
           </div>
         </div>
+          <button
+            v-if="notifPage < notifPages"
+            class="navbar__notif-loadmore"
+            :disabled="notifLoadingMore"
+            @click="loadMore"
+          >{{ notifLoadingMore ? t('common.loading') : t('common.loadMore') }}</button>
+        </template>
       </div>
     </div>
     <div v-if="notifOpen" class="navbar__notif-backdrop" @click="closeNotif"></div>
@@ -646,6 +685,27 @@ function closeMenu() {
   color: var(--color-text-secondary);
   font-size: var(--text-sm);
   padding: var(--spacing-xl) 0;
+}
+
+.navbar__notif-loadmore {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  font-size: var(--text-xs);
+  font-family: inherit;
+  color: var(--color-primary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.navbar__notif-loadmore:hover {
+  background: var(--color-primary-light);
+}
+.navbar__notif-loadmore:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .navbar__notif-list {

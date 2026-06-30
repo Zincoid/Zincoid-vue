@@ -290,6 +290,7 @@ export default {
   },
   common: {
     loading: 'Loading...',
+    loadMore: 'Load more...',
     loadingMessages: [
       'Compiling', 'Hashing', 'Parsing', 'Indexing', 'Fetching', 'Decrypting',
       'Rendering', 'Scanning', 'Building', 'Connecting', 'Routing', 'Deploying',

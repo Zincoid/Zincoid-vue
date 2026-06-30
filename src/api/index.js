@@ -138,7 +138,7 @@ export const healthAPI = {
 
 // ── Notifications ──
 export const notificationAPI = {
-  getList: () => api.get('/notifications'),
+  getList: (page = 1, size = 5) => api.get('/notifications', { params: { page, size } }),
   getUnreadCount: () => api.get('/notifications/count'),
   markRead: () => api.put('/notifications/read'),
   markOne: (id) => api.put(`/notifications/${id}/read`),

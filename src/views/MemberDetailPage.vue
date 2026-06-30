@@ -8,6 +8,7 @@ import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import ContactButtons from '@/components/ContactButtons.vue'
 import Pagination from '@/components/Pagination.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
@@ -29,6 +30,8 @@ const userId = ref(null)
 const moments = ref([])
 const articles = ref([])
 const tab = ref('moments')
+const loading = ref(true)
+const loadingDone = ref(false)
 const notFound = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
@@ -49,6 +52,8 @@ onMounted(async () => {
     await Promise.all([fetchMoments(), fetchArticles()])
   } catch (e) {
     notFound.value = e.response?.data?.code === 404
+  } finally {
+    loading.value = false
   }
 })
 
@@ -71,8 +76,9 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
 </script>
 
 <template>
-  <p v-if="notFound" class="empty-state container" style="padding-top:var(--spacing-5xl)">{{ t('user.notFound') }}</p>
-  <div class="user-detail container" v-else-if="user">
+  <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+  <p v-if="loadingDone && notFound" class="empty-state container" style="padding-top:var(--spacing-5xl)">{{ t('user.notFound') }}</p>
+  <div class="user-detail container" v-else-if="loadingDone && user">
     <!-- Profile header -->
     <div class="profile-header">
       <img v-if="user.avatar" :src="user.avatar" class="profile-avatar" />
