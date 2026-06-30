@@ -25,6 +25,7 @@ const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
 const loading = ref(true)
+const loadingDone = ref(false)
 const likeLiked = ref(false)
 const likeCount = ref(0)
 
@@ -189,8 +190,8 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading" />
-  <div class="article-detail container" v-else-if="article">
+  <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+  <div class="article-detail container" v-if="loadingDone && article">
     <nav v-if="tocItems.length" class="article-toc">
       <div class="toc-title">{{ t('article.toc') }}</div>
       <div class="toc-scroll">
@@ -282,7 +283,7 @@ watch(likeLiked, (liked) => {
     />
     <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
   </div>
-  <p v-else-if="!loading" class="empty-state">{{ t('article.notFound') }}</p>
+  <p v-if="loadingDone && !article" class="empty-state">{{ t('article.notFound') }}</p>
 
   <router-link to="/articles" class="back-fab" :title="t('common.backToList')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>

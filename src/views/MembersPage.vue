@@ -17,6 +17,7 @@ const pages = ref(1)
 const total = ref(0)
 const pageSize = ref(20)
 const loading = ref(true)
+const loadingDone = ref(false)
 const keyword = ref('')
 let searchTimer = null
 
@@ -92,8 +93,8 @@ function removeUser(id) {
       />
     </div>
 
-    <LoadingSpinner v-if="loading" />
-    <template v-else-if="admins.length || users.length">
+    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+    <template v-if="loadingDone && (admins.length || users.length)">
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
         <div class="user-grid">
@@ -107,7 +108,7 @@ function removeUser(id) {
         </div>
       </div>
     </template>
-    <p v-else-if="!loading" class="empty-state">{{ t('user.empty') }}</p>
+    <p v-if="loadingDone && !admins.length && !users.length" class="empty-state">{{ t('user.empty') }}</p>
 
     <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>

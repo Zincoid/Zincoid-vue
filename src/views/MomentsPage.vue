@@ -24,6 +24,7 @@ const total = ref(0)
 const pageSize = ref(10)
 const pinnedFirst = ref(false)
 const loading = ref(true)
+const loadingDone = ref(false)
 const showEditor = ref(false)
 
 // Post form
@@ -175,11 +176,13 @@ async function submitMoment() {
     </div>
 
     <!-- Timeline -->
-    <LoadingSpinner v-if="loading" />
-    <div class="timeline-list" v-else-if="moments.length">
-      <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
-    </div>
-    <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
+    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+    <template v-if="loadingDone">
+      <div v-if="moments.length" class="timeline-list">
+        <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
+      </div>
+      <p v-else class="empty-state">{{ t('moment.empty') }}</p>
+    </template>
 
     <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>

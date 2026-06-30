@@ -21,6 +21,7 @@ const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedCon
 const content = ref('')
 const sending = ref(false)
 const loading = ref(true)
+const loadingDone = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
 const chatEl = ref(null)
@@ -182,8 +183,8 @@ function openPreview(src) {
     </div>
 
     <div class="chat-box" ref="chatEl">
-      <LoadingSpinner v-if="loading" />
-      <template v-else>
+      <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+      <template v-if="loadingDone">
         <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
             <img v-if="msg.userAvatar" :src="msg.userAvatar" alt="" />

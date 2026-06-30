@@ -33,6 +33,7 @@ const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
 const loading = ref(true)
+const loadingDone = ref(false)
 const viewerSrc = ref('')
 const viewerVisible = ref(false)
 const likeLiked = ref(false)
@@ -211,8 +212,8 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading" />
-  <div class="detail container" v-else-if="moment">
+  <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+  <div class="detail container" v-if="loadingDone && moment">
     <!-- Header -->
     <div class="detail__header">
       <router-link :to="`/members/${moment.userId}`" class="detail__user">
@@ -380,7 +381,7 @@ watch(likeLiked, (liked) => {
     />
     <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
   </div>
-  <p v-else-if="!loading" class="empty-state">{{ t('moment.notFound') }}</p>
+  <p v-if="loadingDone && !moment" class="empty-state">{{ t('moment.notFound') }}</p>
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 

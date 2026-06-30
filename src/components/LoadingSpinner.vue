@@ -1,43 +1,74 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 
 const props = defineProps({
-  message: { type: String, default: '' }
+  visible: { type: Boolean, default: true }
 })
+
+const emit = defineEmits(['done'])
 
 const { t } = useI18n()
 
 const messages = computed(() => t('common.loadingMessages') || [])
+const show = ref(props.visible)
+let timer = null
+
+watch(() => props.visible, (v) => {
+  clearTimeout(timer)
+  if (v) {
+    show.value = true
+  } else {
+    timer = setTimeout(() => {
+      show.value = false
+    }, 250)
+  }
+})
+
+function onAfterLeave() {
+  emit('done')
+}
+
+onBeforeUnmount(() => clearTimeout(timer))
 
 function pick() {
   return messages.value[Math.floor(Math.random() * messages.value.length)] || ''
 }
-
-const text = computed(() => {
-  if (props.message) return props.message.replace(/\.+$/, '')
-  return pick()
-})
 </script>
 
 <template>
-  <div class="loader">
-    <span class="loader__prompt">&gt;</span>
-    <span class="loader__text">{{ text }}</span>
-    <span class="loader__dot">.</span>
-    <span class="loader__dot">.</span>
-    <span class="loader__dot">.</span>
-    <span class="loader__cursor">▌</span>
-  </div>
+  <Transition name="loader-fade" @after-leave="onAfterLeave">
+    <div v-if="show" class="loader">
+      <span class="loader__prompt">&gt;</span>
+      <span class="loader__text">{{ pick() }}</span>
+      <span class="loader__dot">.</span>
+      <span class="loader__dot">.</span>
+      <span class="loader__dot">.</span>
+      <span class="loader__cursor">▌</span>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
+.loader-fade-leave-active {
+  transition: opacity 0.25s ease, max-height 0.25s ease, margin 0.25s ease;
+  overflow: hidden;
+}
+.loader-fade-leave-to {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .loader {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: var(--spacing-3xl) var(--spacing-lg);
+  padding: var(--spacing-lg) var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+  max-height: 80px;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
 }

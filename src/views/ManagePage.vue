@@ -12,6 +12,7 @@ const configs = ref([])
 const configMessage = ref('')
 const configError = ref('')
 const configLoading = ref(true)
+const configDone = ref(false)
 const toolMessage = ref('')
 const toolError = ref('')
 const cleaning = ref(false)
@@ -145,8 +146,8 @@ async function handleReset() {
       <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
       <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
-      <LoadingSpinner v-if="configLoading" />
-      <div v-else class="config-list">
+      <LoadingSpinner :visible="configLoading" @done="configDone = true" />
+      <div v-if="configDone" class="config-list">
         <div v-for="cfg in configs" :key="cfg.id" class="config-item">
           <div class="config-info">
             <span class="config-key">{{ cfg.configKey }}</span>

@@ -18,6 +18,7 @@ const total = ref(0)
 const pageSize = ref(10)
 const pinnedFirst = ref(false)
 const loading = ref(true)
+const loadingDone = ref(false)
 
 onMounted(async () => {
   await loadConfig()
@@ -59,11 +60,13 @@ function onPageChange(p) {
         </router-link>
     </div>
 
-    <LoadingSpinner v-if="loading" />
-    <div class="articles-list" v-else-if="articles.length">
-      <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
-    </div>
-    <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
+    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+    <template v-if="loadingDone">
+      <div v-if="articles.length" class="articles-list">
+        <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
+      </div>
+      <p v-else class="empty-state">{{ t('article.empty') }}</p>
+    </template>
 
     <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>

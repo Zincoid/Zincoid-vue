@@ -15,6 +15,7 @@ const moments = ref([])
 const articles = ref([])
 const featured = ref(null)
 const loading = ref(true)
+const loadingDone = ref(false)
 const typed = ref('')
 const typingDone = ref(false)
 let typingTimer = null
@@ -251,9 +252,9 @@ onUnmounted(() => {
     </div>
 
     <!-- Recent Moments & Articles -->
-    <LoadingSpinner v-if="loading" />
+    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <div
-      v-else
+      v-if="loadingDone"
       class="recent-grid container-wide"
       :class="{
         'recent-grid--collapse-left': collapsed === 'moments',
