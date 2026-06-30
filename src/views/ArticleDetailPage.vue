@@ -105,14 +105,20 @@ onMounted(async () => {
     likeCount.value = lRes.data.data.count
 
     buildToc()
-    await nextTick()
-    injectHeadingIds()
-    setupScrollSpy()
   } catch (e) {
     console.error(e)
   } finally {
     loading.value = false
   }
+})
+
+let tocDone = false
+watch(loadingDone, async (done) => {
+  if (!done || tocDone) return
+  tocDone = true
+  await nextTick()
+  injectHeadingIds()
+  setupScrollSpy()
 })
 
 onBeforeUnmount(() => {
