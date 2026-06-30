@@ -397,12 +397,6 @@ function closeMenu() {
   margin-top: 5px;
   color: var(--color-text);
   z-index: 101;
-  border-radius: var(--rounded-md);
-  transition: color var(--transition-fast), background var(--transition-fast);
-}
-.navbar__notif-mobile-bell:hover {
-  color: #f9a8d4;
-  background: rgba(249, 168, 212, 0.08);
 }
 
 .navbar__notif-mobile-badge {
@@ -597,8 +591,6 @@ function closeMenu() {
 }
 .navbar__notif-bell:hover {
   color: #f9a8d4;
-  background: rgba(249, 168, 212, 0.08);
-  border-radius: var(--rounded-md);
 }
 
 .navbar__notif-badge {
