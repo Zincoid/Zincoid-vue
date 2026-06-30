@@ -92,6 +92,7 @@ export const commentAPI = {
   addArticle: (articleId, data) => api.post(`/comments/article/${articleId}`, data),
   getMoment: (momentId, page = 1, size = 10) => api.get(`/comments/public/moment/${momentId}`, { params: { page, size } }),
   getArticle: (articleId, page = 1, size = 10) => api.get(`/comments/public/article/${articleId}`, { params: { page, size } }),
+  getReplies: (parentId) => api.get(`/comments/public/replies/${parentId}`),
   delete: (commentId) => api.delete(`/comments/${commentId}`)
 }
 

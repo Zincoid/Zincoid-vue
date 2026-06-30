@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useMention } from '@/composables/useMention'
 import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
+import { commentAPI } from '@/api'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 
 const { t } = useI18n()
@@ -52,7 +53,16 @@ function cancelReply() {
   content.value = ''
 }
 
-// Recursive comment depth using flat rendering
+const loadedReplies = ref(new Map())
+const loadingReply = ref(null)
+
+const allComments = computed(() => {
+  return props.comments.map(c => ({
+    ...c,
+    replies: loadedReplies.value.get(c.id) ?? c.replies ?? []
+  }))
+})
+
 function flattenComments(comments, depth = 0) {
   const result = []
   for (const c of comments) {
@@ -66,12 +76,31 @@ function flattenComments(comments, depth = 0) {
 
 const expandedParents = ref(new Set())
 
-function toggleExpand(parentId) {
+async function toggleExpand(parentId) {
   const s = new Set(expandedParents.value)
-  if (s.has(parentId)) s.delete(parentId)
-  else s.add(parentId)
+  if (s.has(parentId)) {
+    s.delete(parentId)
+    expandedParents.value = s
+    return
+  }
+  if (!loadedReplies.value.has(parentId)) {
+    loadingReply.value = parentId
+    try {
+      const { data } = await commentAPI.getReplies(parentId)
+      const newMap = new Map(loadedReplies.value)
+      newMap.set(parentId, data.data || [])
+      loadedReplies.value = newMap
+    } catch { /* ignore */ }
+    loadingReply.value = null
+  }
+  s.add(parentId)
   expandedParents.value = s
 }
+
+watch(() => props.comments, () => {
+  loadedReplies.value = new Map()
+  expandedParents.value = new Set()
+})
 
 function countReplies(comments) {
   let count = 0
@@ -83,7 +112,7 @@ function countReplies(comments) {
 }
 
 const flatComments = computed(() => {
-  const list = flattenComments(props.comments)
+  const list = flattenComments(allComments.value)
   const map = new Map()
   for (const c of list) {
     map.set(c.id, c)
@@ -99,7 +128,6 @@ const visibleComments = computed(() => {
   const expanded = expandedParents.value
   return flatComments.value.filter(c => {
     if (c.depth === 0) return true
-    // Check if any ancestor is collapsed
     let p = c.parentId
     while (p) {
       const parent = flatComments.value.find(fc => fc.id === p)
@@ -156,11 +184,12 @@ const visibleComments = computed(() => {
                   {{ t('comment.delete') }}
                 </button>
                 <button
-                  v-if="comment.depth === 0 && comment.replies?.length"
+                  v-if="comment.depth === 0 && comment.replyCount > 0"
                   class="comment__toggle-btn"
                   @click="toggleExpand(comment.id)"
                 >
-                  {{ expandedParents.has(comment.id) ? t('comment.hideReplies') : t('comment.showReplies', { count: countReplies(comment.replies) }) }}
+                  <template v-if="loadingReply === comment.id">{{ t('common.loading') }}</template>
+                  <template v-else>{{ expandedParents.has(comment.id) ? t('comment.hideReplies') : t('comment.showReplies', { count: comment.replyCount }) }}</template>
                 </button>
               </div>
             </div>
