@@ -251,7 +251,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Recent Moments & Articles -->
-    <LoadingSpinner v-if="loading" />
+    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
     <div
       v-else
       class="recent-grid container-wide"

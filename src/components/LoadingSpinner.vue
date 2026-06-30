@@ -1,50 +1,56 @@
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   message: { type: String, default: '' }
 })
+
+const stripped = computed(() => props.message.replace(/\.+$/, ''))
 </script>
 
 <template>
-  <div class="spinner-wrap">
-    <div class="spinner">
-      <div class="spinner__dot spinner__dot--1"></div>
-      <div class="spinner__dot spinner__dot--2"></div>
-      <div class="spinner__dot spinner__dot--3"></div>
-    </div>
-    <p v-if="message" class="spinner__msg">{{ message }}</p>
+  <div class="loader">
+    <span class="loader__prompt">&gt;</span>
+    <span class="loader__text">{{ stripped }}</span>
+    <span class="loader__dot">.</span>
+    <span class="loader__dot">.</span>
+    <span class="loader__dot">.</span>
+    <span class="loader__cursor">▌</span>
   </div>
 </template>
 
 <style scoped>
-.spinner-wrap {
+.loader {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
+  gap: 0;
   padding: var(--spacing-3xl) var(--spacing-lg);
-}
-.spinner {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.spinner__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--rounded-full);
-  background: var(--color-primary);
-  animation: dotPulse 1.4s ease-in-out infinite;
-}
-.spinner__dot--1 { animation-delay: 0s; }
-.spinner__dot--2 { animation-delay: 0.2s; }
-.spinner__dot--3 { animation-delay: 0.4s; }
-@keyframes dotPulse {
-  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
-  40% { opacity: 1; transform: scale(1); }
-}
-.spinner__msg {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+}
+.loader__prompt {
+  color: #58a6ff;
+  margin-right: 0.5em;
+}
+.loader__text {
+  color: #8b949e;
+}
+.loader__dot {
+  animation: dotFade 0.3s steps(1) infinite;
+}
+.loader__dot:nth-child(2) { animation-delay: 0.05s; }
+.loader__dot:nth-child(3) { animation-delay: 0.1s; }
+@keyframes dotFade {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+.loader__cursor {
+  margin-left: 0.4em;
+  color: #58a6ff;
+  animation: blink 0.3s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
 }
 </style>
