@@ -155,7 +155,11 @@ function rebuildRippleCells() {
         const col = Math.round(r.cx + dx)
         if (col >= 0 && col < sqCols.value) {
           const dist = Math.sqrt(dx * dx + (dy / 0.35) ** 2)
-          const op = r.opacity * (1 - dist / rr) * (dist > rr * 0.7 ? 0.5 : 1)
+          const t = dist / rr
+          const outer = t > 0.7 ? 0.5 : 1
+          const op = animationType.value === 'raindrop_sin'
+            ? r.opacity * Math.sin(t * Math.PI) * outer
+            : r.opacity * (1 - t) * outer
           if (op > 0.015) {
             const key = `${r.cx}-${r.cy}-${row}-${col}`
             if (!map.has(key) || map.get(key).opacity < op) {
@@ -212,7 +216,7 @@ function startTyping() {
 }
 
 function startHeroAnimation() {
-  if (animationType.value === 'raindrop') {
+  if (animationType.value !== 'squares') {
     clearInterval(animTimer)
     rainPhase = 'light'
     rainPhaseTick = 0
@@ -302,8 +306,9 @@ onMounted(async () => {
       configMap.value[key] = value
     }
     const rawAnim = configMap.value['hero_animation'] || 'squares'
+    const anims = ['squares', 'raindrop', 'raindrop_sin']
     animationType.value = rawAnim === 'random'
-      ? (Math.random() < 0.5 ? 'squares' : 'raindrop')
+      ? anims[Math.floor(Math.random() * anims.length)]
       : rawAnim
     startHeroAnimation()
     startTyping()
@@ -336,7 +341,7 @@ onUnmounted(() => {
           }"
         ></div>
       </template>
-      <template v-else-if="animationType === 'raindrop'">
+      <template v-else-if="animationType !== 'squares'">
         <div
           v-for="(d, i) in drops"
           :key="'d'+i"
