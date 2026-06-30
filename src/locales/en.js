@@ -77,6 +77,7 @@ export default {
     admin: 'Admin',
     members: 'User',
     disabled: 'Disabled',
+    bannedMessage: 'Account disabled.',
     notFound: 'User not found.'
   },
   comment: {

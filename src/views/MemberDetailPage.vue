@@ -33,6 +33,7 @@ const tab = ref('moments')
 const loading = ref(true)
 const loadingDone = ref(false)
 const notFound = ref(false)
+const banned = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
 const aPage = ref(1); const aPages = ref(1); const aTotal = ref(0)
@@ -51,7 +52,9 @@ onMounted(async () => {
     userId.value = uRes.data.data.id
     await Promise.all([fetchMoments(), fetchArticles()])
   } catch (e) {
-    notFound.value = e.response?.data?.code === 404
+    const code = e.response?.data?.code
+    notFound.value = code === 404
+    banned.value = code === 403
   } finally {
     loading.value = false
   }
@@ -78,6 +81,7 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
 <template>
   <LoadingSpinner :visible="loading" @done="loadingDone = true" />
   <p v-if="loadingDone && notFound" class="empty-state container" style="padding-top:var(--spacing-5xl)">{{ t('user.notFound') }}</p>
+  <p v-else-if="loadingDone && banned" class="empty-state container" style="padding-top:var(--spacing-5xl)">{{ t('user.bannedMessage') }}</p>
   <div class="user-detail container" v-else-if="loadingDone && user">
     <!-- Profile header -->
     <div class="profile-header">
