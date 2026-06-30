@@ -182,7 +182,7 @@ function openPreview(src) {
     </div>
 
     <div class="chat-box" ref="chatEl">
-      <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+      <LoadingSpinner v-if="loading" />
       <template v-else>
         <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">

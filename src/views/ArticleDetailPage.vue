@@ -189,7 +189,7 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+  <LoadingSpinner v-if="loading" />
   <div class="article-detail container" v-else-if="article">
     <nav v-if="tocItems.length" class="article-toc">
       <div class="toc-title">{{ t('article.toc') }}</div>

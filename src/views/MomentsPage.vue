@@ -175,7 +175,7 @@ async function submitMoment() {
     </div>
 
     <!-- Timeline -->
-    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <LoadingSpinner v-if="loading" />
     <div class="timeline-list" v-else-if="moments.length">
       <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
     </div>

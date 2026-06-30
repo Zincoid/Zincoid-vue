@@ -15,8 +15,8 @@ export function useI18n() {
       msg = msg[k]
     }
     if (msg == null) return key
+    if (Array.isArray(msg)) return msg
     if (typeof msg === 'function') return msg(params)
-    // Replace {param} placeholders
     return msg.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? `{${k}}`)
   }
 

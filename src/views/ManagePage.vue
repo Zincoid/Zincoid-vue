@@ -145,7 +145,7 @@ async function handleReset() {
       <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
       <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
-      <LoadingSpinner v-if="configLoading" :message="t('common.loading')" />
+      <LoadingSpinner v-if="configLoading" />
       <div v-else class="config-list">
         <div v-for="cfg in configs" :key="cfg.id" class="config-item">
           <div class="config-info">

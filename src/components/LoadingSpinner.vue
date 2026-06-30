@@ -1,17 +1,29 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from '@/composables/useI18n'
 
 const props = defineProps({
   message: { type: String, default: '' }
 })
 
-const stripped = computed(() => props.message.replace(/\.+$/, ''))
+const { t } = useI18n()
+
+const messages = computed(() => t('common.loadingMessages') || [])
+
+function pick() {
+  return messages.value[Math.floor(Math.random() * messages.value.length)] || ''
+}
+
+const text = computed(() => {
+  if (props.message) return props.message.replace(/\.+$/, '')
+  return pick()
+})
 </script>
 
 <template>
   <div class="loader">
     <span class="loader__prompt">&gt;</span>
-    <span class="loader__text">{{ stripped }}</span>
+    <span class="loader__text">{{ text }}</span>
     <span class="loader__dot">.</span>
     <span class="loader__dot">.</span>
     <span class="loader__dot">.</span>

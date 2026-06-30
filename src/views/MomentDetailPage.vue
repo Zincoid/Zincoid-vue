@@ -211,7 +211,7 @@ watch(likeLiked, (liked) => {
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+  <LoadingSpinner v-if="loading" />
   <div class="detail container" v-else-if="moment">
     <!-- Header -->
     <div class="detail__header">

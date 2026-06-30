@@ -92,7 +92,7 @@ function removeUser(id) {
       />
     </div>
 
-    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <LoadingSpinner v-if="loading" />
     <template v-else-if="admins.length || users.length">
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>

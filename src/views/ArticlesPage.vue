@@ -59,7 +59,7 @@ function onPageChange(p) {
         </router-link>
     </div>
 
-    <LoadingSpinner v-if="loading" :message="t('common.loading')" />
+    <LoadingSpinner v-if="loading" />
     <div class="articles-list" v-else-if="articles.length">
       <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
     </div>
