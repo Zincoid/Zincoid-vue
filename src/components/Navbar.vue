@@ -855,7 +855,7 @@ function closeMenu() {
 .navbar__links .navbar__nav-icon {
   transition: margin-right 0.2s ease;
 }
-@media (max-width: 1200px) {
+@media (max-width: 1275px) {
   .navbar__links .navbar__item {
     min-width: auto;
     padding: 0 var(--spacing-lg);
