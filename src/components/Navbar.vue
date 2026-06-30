@@ -108,7 +108,7 @@ function deleteOne(n) {
 function markAllRead() {
   notificationAPI.markRead().then(() => {
     unreadCount.value = 0
-    notifications.value.forEach(x => x.isRead = true)
+    fetchNotifications()
   }).catch(() => {})
 }
 
