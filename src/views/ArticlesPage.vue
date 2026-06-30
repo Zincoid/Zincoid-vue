@@ -68,11 +68,10 @@ function onPageChange(p) {
       <p v-else class="empty-state">{{ t('article.empty') }}</p>
     </template>
 
-    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
+    <Pagination v-if="loadingDone" :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 
   <button
-    class="pin-fab"
     :class="{ 'pin-fab--active': pinnedFirst }"
     :title="t('article.pinnedFirst')"
     @click="pinnedFirst = !pinnedFirst; page = 1; fetchArticles()"

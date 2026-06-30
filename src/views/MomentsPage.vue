@@ -184,7 +184,7 @@ async function submitMoment() {
       <p v-else class="empty-state">{{ t('moment.empty') }}</p>
     </template>
 
-    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
+    <Pagination v-if="loadingDone" :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 
   <button

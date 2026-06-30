@@ -110,7 +110,7 @@ function removeUser(id) {
     </template>
     <p v-if="loadingDone && !admins.length && !users.length" class="empty-state">{{ t('user.empty') }}</p>
 
-    <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
+    <Pagination v-if="loadingDone" :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
   </div>
 </template>
 
