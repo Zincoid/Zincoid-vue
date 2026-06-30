@@ -215,7 +215,11 @@ export default {
     broadcastConfirm: '发送',
     broadcastConfirmTitle: '确定要向所有活跃用户发送此公告吗？',
     broadcastSuccess: '公告已发送',
-    broadcastFailed: '公告发送失败'
+    broadcastFailed: '公告发送失败',
+    cleanupFile_orphanDb: '废弃记录',
+    cleanupFile_orphanDisk: '废弃文件',
+    cleanupFile_unlinked: '未关联',
+    cleanupFile_invalidRef: '无效引用'
   },
   errors: {
     'Username already exists': '用户名已存在',

@@ -215,7 +215,11 @@ export default {
     broadcastConfirm: 'Send',
     broadcastConfirmTitle: 'Are you sure you want to send this broadcast to all active users?',
     broadcastSuccess: 'Broadcast sent',
-    broadcastFailed: 'Broadcast failed'
+    broadcastFailed: 'Broadcast failed',
+    cleanupFile_orphanDb: 'Orphan DB',
+    cleanupFile_orphanDisk: 'Orphan files',
+    cleanupFile_unlinked: 'Unlinked',
+    cleanupFile_invalidRef: 'Invalid refs'
   },
   errors: {
     'Username already exists': 'Username already exists',

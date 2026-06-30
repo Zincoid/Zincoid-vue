@@ -82,9 +82,11 @@ async function runCleanup() {
   if (!confirm(confirmMsg)) return
   cleaning.value = true
   try {
-    await fileAPI.cleanup(logicCleanup.value)
-    toolMessage.value = t('admin.cleanupSuccess')
-    setTimeout(() => toolMessage.value = '', 2000)
+    const res = await fileAPI.cleanup(logicCleanup.value)
+    const counts = res.data?.data ?? {}
+    const parts = Object.entries(counts).map(([k, v]) => `${t(`admin.cleanupFile_${k}`)} ${v}`).join(', ')
+    toolMessage.value = `${t('admin.cleanupSuccess')}：${parts || t('admin.cleanupNone')}`
+    setTimeout(() => toolMessage.value = '', 4000)
   } catch (err) {
     toolError.value = getMessage(err, 'admin.cleanupFailed')
   } finally {
