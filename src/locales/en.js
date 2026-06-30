@@ -191,6 +191,9 @@ export default {
     logicCleanup: 'Logic Mode',
     cleanupSuccess: 'Cleanup completed',
     cleanupFailed: 'Cleanup failed',
+    cleanupRecords: 'Cleanup records',
+    cleanupRecordsDesc: 'Remove all orphaned comments, likes, notifications and other invalid records',
+    cleanupRecordsConfirm: 'Delete all orphaned messages, comments, likes and notifications?',
     resetPassword: 'Force password reset',
     resetPasswordDesc: 'Enter username and new password to overwrite',
     resetPasswordPlaceholder: 'Username',
@@ -268,6 +271,8 @@ export default {
     mentionedCommentMoment: 'mentioned you in a moment comment',
     mentionedCommentArticle: 'mentioned you in an article comment',
     mentionedChat: 'mentioned you in chat',
+    likedMoment: 'liked your moment',
+    likedArticle: 'liked your article',
     system: 'System broadcast',
     markRead: 'Mark all read',
     deleteAll: 'Clear all'

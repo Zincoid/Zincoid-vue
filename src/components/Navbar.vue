@@ -258,15 +258,17 @@ function closeMenu() {
                 <strong>{{ n.senderNickname }}</strong>
                 {{ n.relatedType === 5
                   ? t('notification.system')
-                  : n.relatedType === 2
-                    ? t('notification.mentionedMoment')
-                    : n.relatedType === 3
-                      ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
-                      : n.relatedType === 4
-                        ? t('notification.mentionedChat')
-                        : n.relatedType === 1
-                          ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
-                          : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
+                  : n.relatedType === 6
+                    ? (n.targetType === 0 ? t('notification.likedMoment') : t('notification.likedArticle'))
+                    : n.relatedType === 2
+                      ? t('notification.mentionedMoment')
+                      : n.relatedType === 3
+                        ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
+                        : n.relatedType === 4
+                          ? t('notification.mentionedChat')
+                          : n.relatedType === 1
+                            ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
+                            : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
               </div>
               <div class="navbar__notif-item-snippet" v-if="n.snippet">{{ n.snippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>

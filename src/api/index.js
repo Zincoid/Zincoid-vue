@@ -107,7 +107,7 @@ export const fileAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   },
-  cleanup: (isLogic = false) => api.delete('/files/cleanup', { params: { isLogic } })
+  cleanup: (isLogic = false) => api.delete('/health/cleanup', { params: { isLogic } })
 }
 
 // ── Likes ──
@@ -132,7 +132,8 @@ export const chatAPI = {
 
 // ── Health ──
 export const healthAPI = {
-  check: () => api.get('/health')
+  check: () => api.get('/health'),
+  cleanupRecords: () => api.post('/health/cleanup')
 }
 
 // ── Notifications ──

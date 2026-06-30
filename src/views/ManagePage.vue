@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { configAPI, fileAPI, userAPI, notificationAPI } from '@/api'
+import { configAPI, fileAPI, userAPI, healthAPI, notificationAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -89,6 +89,22 @@ async function runCleanup() {
     toolError.value = getMessage(err, 'admin.cleanupFailed')
   } finally {
     cleaning.value = false
+  }
+}
+
+const recordsCleaning = ref(false)
+
+async function runRecordsCleanup() {
+  if (!confirm(t('admin.cleanupRecordsConfirm'))) return
+  recordsCleaning.value = true
+  try {
+    await healthAPI.cleanupRecords()
+    toolMessage.value = t('admin.cleanupSuccess')
+    setTimeout(() => toolMessage.value = '', 2000)
+  } catch (err) {
+    toolError.value = getMessage(err, 'admin.cleanupFailed')
+  } finally {
+    recordsCleaning.value = false
   }
 }
 
@@ -205,6 +221,16 @@ async function handleReset() {
         <button class="btn btn--danger" :disabled="cleaning" @click="runCleanup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           {{ cleaning ? t('common.cleaning') : t('admin.cleanup') }}
+        </button>
+      </div>
+      <div class="tool-item">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('admin.cleanupRecords') }}</span>
+          <span class="tool-desc">{{ t('admin.cleanupRecordsDesc') }}</span>
+        </div>
+        <button class="btn btn--danger" :disabled="recordsCleaning" @click="runRecordsCleanup">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          {{ recordsCleaning ? t('common.cleaning') : t('admin.cleanup') }}
         </button>
       </div>
     </section>

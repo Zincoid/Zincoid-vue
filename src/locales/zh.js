@@ -191,6 +191,9 @@ export default {
     logicCleanup: '逻辑模式',
     cleanupSuccess: '清理完成',
     cleanupFailed: '清理失败',
+    cleanupRecords: '清理数据',
+    cleanupRecordsDesc: '清除所有孤立的评论、点赞、通知等无效数据记录',
+    cleanupRecordsConfirm: '确定要清理无效数据吗？将删除所有孤立的消息、评论、点赞和通知记录。',
     resetPassword: '强制更新密码',
     resetPasswordDesc: '输入用户名和新密码，直接覆盖旧密码',
     resetPasswordPlaceholder: '用户名',
@@ -268,6 +271,8 @@ export default {
     mentionedCommentMoment: '在动态评论中@了你',
     mentionedCommentArticle: '在文章评论中@了你',
     mentionedChat: '在聊天中@了你',
+    likedMoment: '点赞了你的动态',
+    likedArticle: '点赞了你的文章',
     system: '系统公告',
     markRead: '全部已读',
     deleteAll: '清除全部'
