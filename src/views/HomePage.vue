@@ -53,11 +53,13 @@ const drops = reactive([])    // [{x, y, color}]
 const ripples = reactive([])  // [{cx, cy, rx, ry, opacity, color}]
 const animationType = ref('squares')
 
-// Rain cycle: light ~15s → heavy ~7.5s → loop
-let rainCycleTick = 0
-const RAIN_CYCLE_LIGHT = 100
-const RAIN_CYCLE_TOTAL = 150
-const isHeavyRain = () => rainCycleTick > RAIN_CYCLE_LIGHT
+// Rain cycle with random phase durations
+let rainPhase = 'light'
+let rainPhaseTick = 0
+let rainPhaseLength = 0
+const randomRainLength = (phase) => phase === 'light'
+  ? 50 + Math.floor(Math.random() * 100)  // 50-149 ticks
+  : 30 + Math.floor(Math.random() * 70)    // 30-99 ticks
 
 function randomizeSquares() {
   for (const sq of squares) {
@@ -88,9 +90,13 @@ function spawnRipplePixel(cx, cy, color, opacity) {
 }
 
 function stepRaindrop() {
-  rainCycleTick++
-  const heavy = isHeavyRain()
-  if (rainCycleTick > RAIN_CYCLE_TOTAL) rainCycleTick = 0
+  rainPhaseTick++
+  if (rainPhaseTick > rainPhaseLength) {
+    rainPhase = rainPhase === 'light' ? 'heavy' : 'light'
+    rainPhaseLength = randomRainLength(rainPhase)
+    rainPhaseTick = 0
+  }
+  const heavy = rainPhase === 'heavy'
 
   // Spawn
   const spawnRate = heavy ? 0.9 : 0.35
@@ -208,6 +214,9 @@ function startTyping() {
 function startHeroAnimation() {
   if (animationType.value === 'raindrop') {
     clearInterval(animTimer)
+    rainPhase = 'light'
+    rainPhaseTick = 0
+    rainPhaseLength = randomRainLength('light')
     animTimer = setInterval(stepRaindrop, 150)
   }
 }
