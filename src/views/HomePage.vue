@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
@@ -36,7 +36,7 @@ async function refreshFeatured() {
   } catch (e) { console.error(e) }
 }
 
-// Colored squares on grid — dynamic tracking
+// Colored squares on grid
 const GRID = 24
 const sqCols = ref(20)
 const sqRows = ref(12)
@@ -47,6 +47,20 @@ const squares = reactive([
   { x: 0, y: 0, cls: 'hero-terminal__sq--green' },
   { x: 0, y: 0, cls: 'hero-terminal__sq--blue' }
 ])
+
+let raindropRaf = null
+let raindropDrops = []
+let raindropRipples = []
+let raindropLastTime = 0
+const rainCanvas = ref(null)
+const animationType = ref('squares')
+
+function randomizeSquares() {
+  for (const sq of squares) {
+    sq.x = Math.floor(Math.random() * sqCols.value)
+    sq.y = Math.floor(Math.random() * sqRows.value)
+  }
+}
 
 function moveSquares() {
   const dirs = [[0, -1], [0, 1], [-1, 0], [1, 0]]
@@ -65,12 +79,8 @@ function clampSquares() {
 }
 
 onMounted(() => {
-  for (const sq of squares) {
-    sq.x = Math.floor(Math.random() * sqCols.value)
-    sq.y = Math.floor(Math.random() * sqRows.value)
-  }
+  randomizeSquares()
   sqTimer = setInterval(moveSquares, 1000)
-
   const observer = new ResizeObserver(([entry]) => {
     const w = entry.target.clientWidth
     const h = entry.target.clientHeight
@@ -81,6 +91,10 @@ onMounted(() => {
       sqRows.value = nr
       clampSquares()
     }
+    if (rainCanvas.value) {
+      rainCanvas.value.width = w
+      rainCanvas.value.height = h
+    }
   })
   if (heroRef.value) observer.observe(heroRef.value)
 
@@ -89,6 +103,7 @@ onMounted(() => {
   mq.addEventListener('change', onMqChange)
   onUnmounted(() => {
     clearInterval(sqTimer)
+    if (raindropRaf) cancelAnimationFrame(raindropRaf)
     observer.disconnect()
     mq.removeEventListener('change', onMqChange)
   })
@@ -108,6 +123,94 @@ function startTyping() {
       typingDone.value = true
     }
   }, 100)
+}
+
+// ── Raindrop canvas animation ──
+function initRaindrop() {
+  const canvas = rainCanvas.value
+  if (!canvas || !heroRef.value) return
+  canvas.width = heroRef.value.clientWidth
+  canvas.height = heroRef.value.clientHeight
+  const ctx = canvas.getContext('2d')
+  raindropDrops = []
+  raindropRipples = []
+  raindropLastTime = performance.now()
+
+  function spawnRipple(x, y, color) {
+    raindropRipples.push({
+      x, y, rx: 0, ry: 0,
+      maxRx: 25 + Math.random() * 20,
+      speed: 0.4 + Math.random() * 0.4,
+      opacity: 0.8 + Math.random() * 0.2,
+      color
+    })
+  }
+
+  function loop(time) {
+    const dt = Math.min(time - raindropLastTime, 50)
+    raindropLastTime = time
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    if (Math.random() < 0.35) {
+      const angle = -0.3 + Math.random() * 0.2
+      raindropDrops.push({
+        x: Math.random() * canvas.width * 1.2 - canvas.width * 0.1,
+        y: -15,
+        vx: Math.sin(angle) * (3 + Math.random() * 2),
+        vy: Math.cos(angle) * (3 + Math.random() * 2),
+        len: 10 + Math.random() * 14,
+        opacity: 0.3 + Math.random() * 0.4,
+        color: Math.random() < 0.3 ? '#3fb950' : '#58a6ff'
+      })
+    }
+
+    for (let i = raindropDrops.length - 1; i >= 0; i--) {
+      const d = raindropDrops[i]
+      d.x += d.vx * (dt / 16)
+      d.y += d.vy * (dt / 16)
+      ctx.beginPath()
+      ctx.moveTo(d.x, d.y)
+      ctx.lineTo(d.x - d.vx * 0.3 * d.len, d.y - d.vy * 0.3 * d.len)
+      ctx.strokeStyle = d.color + Math.round(d.opacity * 80).toString(16).padStart(2, '0')
+      ctx.lineWidth = 1.5
+      ctx.stroke()
+      if (d.y > canvas.height + 10 || d.x < -20 || d.x > canvas.width + 20) {
+        if (d.y > canvas.height - 10 && d.y < canvas.height + 30)
+          spawnRipple(d.x, canvas.height, d.color)
+        raindropDrops.splice(i, 1)
+      }
+    }
+
+    for (let i = raindropRipples.length - 1; i >= 0; i--) {
+      const r = raindropRipples[i]
+      r.rx += r.speed * (dt / 16)
+      r.ry += r.speed * 0.35 * (dt / 16)
+      r.opacity -= 0.015 * (dt / 16)
+      if (r.opacity <= 0 || r.rx > r.maxRx) { raindropRipples.splice(i, 1); continue }
+
+      const grad = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.rx)
+      grad.addColorStop(0, r.color + Math.round(r.opacity * 30).toString(16).padStart(2, '0'))
+      grad.addColorStop(0.6, r.color + Math.round(r.opacity * 15).toString(16).padStart(2, '0'))
+      grad.addColorStop(1, r.color + '00')
+      ctx.beginPath(); ctx.ellipse(r.x, r.y, r.rx, r.ry, 0, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill()
+      ctx.beginPath(); ctx.ellipse(r.x, r.y, r.rx, r.ry, 0, 0, Math.PI * 2)
+      ctx.strokeStyle = r.color + Math.round(r.opacity * 60).toString(16).padStart(2, '0'); ctx.lineWidth = 1; ctx.stroke()
+      const ix = r.rx * 0.6, iy = r.ry * 0.6
+      ctx.beginPath(); ctx.ellipse(r.x, r.y, ix, iy, 0, 0, Math.PI * 2)
+      ctx.strokeStyle = r.color + Math.round(r.opacity * 30).toString(16).padStart(2, '0'); ctx.lineWidth = 0.5; ctx.stroke()
+    }
+
+    raindropRaf = requestAnimationFrame(loop)
+  }
+
+  raindropRaf = requestAnimationFrame(loop)
+}
+
+function startHeroAnimation() {
+  if (animationType.value === 'raindrop') {
+    clearInterval(sqTimer)
+    nextTick(() => initRaindrop())
+  }
 }
 
 // Terminal prompt typing/deleting cycle
@@ -190,6 +293,11 @@ onMounted(async () => {
     for (const [key, value] of Object.entries(cfgs)) {
       configMap.value[key] = value
     }
+    const rawAnim = configMap.value['hero_animation'] || 'squares'
+    animationType.value = rawAnim === 'random'
+      ? (Math.random() < 0.5 ? 'squares' : 'raindrop')
+      : rawAnim
+    startHeroAnimation()
     startTyping()
   } catch (e) {
     console.error(e)
@@ -201,6 +309,8 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(terminalCycleTimer)
   clearTimeout(terminalPauseTimer)
+  clearInterval(sqTimer)
+  if (raindropRaf) cancelAnimationFrame(raindropRaf)
 })
 </script>
 
@@ -208,15 +318,18 @@ onUnmounted(() => {
   <div class="home">
     <!-- Hero + Terminal -->
     <section class="hero-terminal" ref="heroRef" style="position:relative;overflow:hidden">
-      <div
-        v-for="(sq, i) in squares"
-        :key="i"
-        :class="['hero-terminal__sq', sq.cls]"
-        :style="{
-          left: sq.x * GRID + 'px',
-          top: sq.y * GRID + 'px'
-        }"
-      ></div>
+      <template v-if="animationType === 'squares'">
+        <div
+          v-for="(sq, i) in squares"
+          :key="i"
+          :class="['hero-terminal__sq', sq.cls]"
+          :style="{
+            left: sq.x * GRID + 'px',
+            top: sq.y * GRID + 'px'
+          }"
+        ></div>
+      </template>
+      <canvas v-else-if="animationType === 'raindrop'" ref="rainCanvas" class="hero-canvas"></canvas>
       <div class="hero-terminal__inner container-wide">
         <div class="hero-terminal__brand">
           <h1 class="hero-terminal__title">
@@ -605,5 +718,14 @@ onUnmounted(() => {
     padding: var(--spacing-lg);
     border-radius: var(--rounded-md);
   }
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
 }
 </style>

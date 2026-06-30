@@ -72,6 +72,7 @@ function onPageChange(p) {
   </div>
 
   <button
+    class="pin-fab"
     :class="{ 'pin-fab--active': pinnedFirst }"
     :title="t('article.pinnedFirst')"
     @click="pinnedFirst = !pinnedFirst; page = 1; fetchArticles()"
