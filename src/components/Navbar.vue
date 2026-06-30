@@ -677,7 +677,15 @@ function closeMenu() {
 .navbar__notif-dropdown-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  border-right: 4px solid transparent;
+}
+.navbar__notif-dropdown-body::-webkit-scrollbar { width: 4px; }
+.navbar__notif-dropdown-body::-webkit-scrollbar-track {
+  margin: 6px 0;
+}
+.navbar__notif-dropdown-body::-webkit-scrollbar-thumb {
+  background: var(--color-border);
 }
 
 .navbar__notif-empty {
