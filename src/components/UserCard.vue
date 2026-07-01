@@ -28,7 +28,7 @@ async function toggleStatus() {
     await userAPI.updateStatus(props.user.id, next)
     emit('update:user', { ...props.user, status: next })
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
   }
 }
 
@@ -38,7 +38,7 @@ async function handleDelete() {
     await userAPI.deleteUser(props.user.id)
     emit('delete:user', props.user.id)
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
   }
 }
 </script>
