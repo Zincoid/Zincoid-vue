@@ -124,7 +124,7 @@ async function handleSubmit() {
         <router-link to="/login" class="btn btn--primary btn--lg">{{ t('auth.backToLogin') }}</router-link>
       </div>
 
-      <p class="forgot-card__back">
+      <p v-if="!success" class="forgot-card__back">
         <router-link to="/login">{{ t('auth.backToLogin') }}</router-link>
       </p>
     </div>
