@@ -11,7 +11,7 @@ const router = useRouter()
 
 const form = ref({ email: '', code: '', newPassword: '', confirmPassword: '' })
 const error = ref('')
-const success = ref('')
+const success = ref(false)
 const loading = ref(false)
 const sending = ref(false)
 const countdown = ref(0)
@@ -74,7 +74,7 @@ async function handleSubmit() {
       newPassword: form.value.newPassword,
       confirmPassword: form.value.confirmPassword
     })
-    success.value = t('auth.resetSuccess')
+    success.value = true
   } catch (err) {
     error.value = getMessage(err, 'common.failed')
   } finally {
@@ -120,7 +120,7 @@ async function handleSubmit() {
       </form>
 
       <div v-else class="forgot-success">
-        <p class="forgot-success__text">{{ success }}</p>
+        <p class="forgot-success__text">{{ t('auth.resetSuccess') }}</p>
         <router-link to="/login" class="btn btn--primary btn--lg">{{ t('auth.backToLogin') }}</router-link>
       </div>
 
