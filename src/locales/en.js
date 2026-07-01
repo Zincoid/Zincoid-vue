@@ -158,7 +158,7 @@ export default {
     loginHere: 'Login here',
     loginFailed: 'Invalid username or password',
     tokenExpired: 'Token expired, please log in again',
-    required: 'Please fill in required fields.',
+    required: 'Please fill in required fields',
     usernameLength: 'Username must be 3-50 characters',
     passwordLength: 'Password must be 6-100 characters',
     registerFailed: 'Registration failed',

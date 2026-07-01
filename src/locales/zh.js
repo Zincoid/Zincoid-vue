@@ -158,7 +158,7 @@ export default {
     loginHere: '立即登录',
     loginFailed: '用户名或密码错误',
     tokenExpired: 'Token 已过期，请重新登录',
-    required: '请填写必填字段。',
+    required: '请填写必填字段',
     usernameLength: '用户名需3-50个字符',
     passwordLength: '密码需6-100个字符',
     registerFailed: '注册失败',
