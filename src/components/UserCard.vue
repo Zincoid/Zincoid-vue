@@ -1,9 +1,9 @@
 <script setup>
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { formatActiveTime } from '@/utils/format'
 import { userAPI } from '@/api'
 
 const { t } = useI18n()
@@ -15,21 +15,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:user', 'delete:user'])
-
-const activeText = computed(() => {
-  const raw = props.user.activeAt
-  if (!raw) return ''
-  const d = new Date(raw)
-  const now = new Date()
-  const isToday = d.getFullYear() === now.getFullYear()
-    && d.getMonth() === now.getMonth()
-    && d.getDate() === now.getDate()
-  if (isToday) return d.toTimeString().slice(0, 8)
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-})
 
 const router = useRouter()
 
@@ -79,7 +64,7 @@ async function handleDelete() {
         <div class="user-card__title-inner">
           <span v-if="user.title" class="user-card__title">{{ user.title }}</span>
           <span v-else class="user-card__title">&nbsp;</span>
-          <span class="user-card__active">{{ t('user.lastActive') }}: {{ activeText }}</span>
+          <span class="user-card__active">{{ t('user.lastActive') }}: {{ formatActiveTime(user.activeAt) }}</span>
         </div>
       </div>
     </div>
