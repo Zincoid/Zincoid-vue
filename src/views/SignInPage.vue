@@ -329,6 +329,10 @@ function switchTo(path) {
             <span class="auth-form__switch-btn" @click="switchTo('/login')">{{ t('auth.loginHere') }}</span>
           </template>
         </p>
+        <p v-if="isLogin" class="auth-form__forgot">
+          {{ t('auth.forgotPassword') }}
+          <router-link to="/forgot-password" class="auth-form__switch-btn">{{ t('auth.resetHere') }}</router-link>
+        </p>
       </div>
     </div>
   </div>
@@ -497,6 +501,13 @@ function switchTo(path) {
 .auth-form__actions {
   border-top: 1px solid var(--color-border);
   padding-top: var(--spacing-lg);
+}
+
+.auth-form__forgot {
+  text-align: center;
+  margin-top: var(--spacing-xs);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .auth-form .btn--primary {

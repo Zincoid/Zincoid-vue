@@ -174,7 +174,18 @@ export default {
     invalidEmailFormat: 'Invalid email format',
     codeRequired: 'Please enter the verification code',
     invalidCode: 'Invalid or expired verification code',
-    emailRegistered: 'Email already registered'
+    emailRegistered: 'Email already registered',
+    forgotPassword: 'Forgot password?',
+    resetHere: 'Reset here',
+    forgotPasswordTitle: 'Reset Password',
+    forgotPasswordDesc: 'Enter your registered email and verification code to reset your password',
+    newPassword: 'New Password',
+    newPasswordPlaceholder: '6-100 characters required',
+    resetPassword: 'Reset Password',
+    resetting: 'Resetting...',
+    resetSuccess: 'Password reset successfully, please login',
+    backToLogin: 'Back to Login',
+    emailNotFound: 'Email not registered'
   },
   admin: {
     title: 'Manage',
@@ -251,7 +262,8 @@ export default {
     'Verification code is required': 'Verification code is required',
     'Please wait before requesting a new code': 'Verification code already requested. Please wait',
     'Verification code already requested, please wait': 'Verification code already requested, please wait',
-    'New email is the same as current email': 'New email is the same as current email'
+    'New email is the same as current email': 'New email is the same as current email',
+    'Email not registered': 'Email not registered'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',

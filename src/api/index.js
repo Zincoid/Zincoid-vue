@@ -38,7 +38,8 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
   logout: () => api.post('/auth/logout'),
-  sendCode: (email) => api.post('/auth/send-code', { email })
+  sendCode: (email) => api.post('/auth/send-code', { email }),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data)
 }
 
 // ── Users ──

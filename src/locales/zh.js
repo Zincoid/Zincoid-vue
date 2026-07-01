@@ -174,7 +174,18 @@ export default {
     invalidEmailFormat: '邮箱格式错误',
     codeRequired: '请输入验证码',
     invalidCode: '验证码错误或已过期',
-    emailRegistered: '邮箱已被注册'
+    emailRegistered: '邮箱已被注册',
+    forgotPassword: '忘记密码？',
+    resetHere: '立即找回',
+    forgotPasswordTitle: '重置密码',
+    forgotPasswordDesc: '输入注册邮箱和验证码，即可重置密码',
+    newPassword: '新密码',
+    newPasswordPlaceholder: '新密码需6-100字符',
+    resetPassword: '重置密码',
+    resetting: '重置中...',
+    resetSuccess: '密码重置成功，请登录',
+    backToLogin: '返回登录',
+    emailNotFound: '该邮箱未注册'
   },
   admin: {
     title: '管理',
@@ -251,7 +262,8 @@ export default {
     'Verification code is required': '验证码不能为空',
     'Please wait before requesting a new code': '验证码已请求，请稍后再试',
     'Verification code already requested, please wait': '验证码已请求，请稍后再试',
-    'New email is the same as current email': '新邮箱与当前邮箱相同'
+    'New email is the same as current email': '新邮箱与当前邮箱相同',
+    'Email not registered': '该邮箱未注册'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
