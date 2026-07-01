@@ -27,8 +27,7 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       const auth = useAuthStore()
-      auth.token = ''
-      auth.user = null
+      auth.$patch({ token: '', user: null })
       router.push('/login?expired=true')
     }
     return Promise.reject(error)
