@@ -169,6 +169,7 @@ async function handleDelete() {
 .user-card__title-wrap {
   overflow: hidden;
   height: 1.25em;
+  font-size: var(--text-sm);
 }
 .user-card__title-inner {
   display: flex;
