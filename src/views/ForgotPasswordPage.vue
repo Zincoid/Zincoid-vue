@@ -121,10 +121,9 @@ async function handleSubmit() {
 
       <div v-else class="forgot-success">
         <p class="forgot-success__text">{{ t('auth.resetSuccess') }}</p>
-        <router-link to="/login" class="btn btn--primary btn--lg">{{ t('auth.backToLogin') }}</router-link>
       </div>
 
-      <p v-if="!success" class="forgot-card__back">
+      <p class="forgot-card__back">
         <router-link to="/login">{{ t('auth.backToLogin') }}</router-link>
       </p>
     </div>
@@ -209,11 +208,12 @@ async function handleSubmit() {
 }
 
 .forgot-card__back a {
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
   text-decoration: none;
 }
 .forgot-card__back a:hover {
-  color: var(--color-text-heading);
+  color: var(--color-primary-hover);
   text-decoration: underline;
 }
 </style>
