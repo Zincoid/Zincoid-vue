@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 
 export const useLocaleStore = defineStore('locale', () => {
   const saved = localStorage.getItem('locale')
-  const locale = ref(saved || 'en')
+  const locale = ref(saved || 'zh')
   document.documentElement.lang = locale.value
 
   watch(locale, (val) => {
