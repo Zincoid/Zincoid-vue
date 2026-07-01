@@ -43,7 +43,12 @@ watch(isLogin, () => {
   setTimeout(startSequence, 300)
 })
 
-onMounted(startSequence)
+onMounted(() => {
+  startSequence()
+  if (route.query.expired === 'true') {
+    error.value = t('auth.tokenExpired')
+  }
+})
 
 // Conway's Game of Life
 const GRID = 24
