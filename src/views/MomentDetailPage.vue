@@ -117,9 +117,8 @@ async function saveEdit() {
   }
 }
 
-onMounted(async () => {
-  await loadConfig()
-  commentSize.value = parseInt(getConfig('page_size', '10'))
+async function fetchDetail() {
+  loading.value = true
   const id = Number(route.params.id)
   if (isNaN(id)) return
   try {
@@ -139,6 +138,16 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+watch(() => route.params.id, () => {
+  if (route.name === 'MomentDetail') fetchDetail()
+})
+
+onMounted(async () => {
+  await loadConfig()
+  commentSize.value = parseInt(getConfig('page_size', '10'))
+  fetchDetail()
 })
 
 async function handleComment({ content, parentId }) {
