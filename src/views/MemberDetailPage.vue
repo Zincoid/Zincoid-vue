@@ -97,8 +97,8 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
           <span v-if="user.gender !== null && user.gender !== undefined" class="profile-pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         </div>
         <p v-if="user.title" class="profile-title">{{ user.title }}</p>
-        <p v-if="user.bio" class="profile-bio">{{ user.bio }}</p>
         <p v-if="user.activeAt" class="profile-last-active">{{ t('user.lastActive') }}: {{ formatDate(user.activeAt) }}</p>
+        <p v-if="user.bio" class="profile-bio">{{ user.bio }}</p>
 
         <div v-if="user.skills?.length" class="profile-skills">
           <span v-for="(skill, i) in user.skills" :key="skill" class="skill-tag" :style="{ background: skillColors[i % skillColors.length].bg, color: skillColors[i % skillColors.length].fg }">{{ skill }}</span>
@@ -209,7 +209,6 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
 .profile-last-active {
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
-  font-family: var(--font-mono);
 }
 .profile-bio {
   font-size: var(--text-sm);
