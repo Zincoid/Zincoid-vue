@@ -144,7 +144,7 @@ async function handleSendCode() {
   sending.value = true
   error.value = ''
   try {
-    await authAPI.sendCode(form.value.email)
+    await authAPI.sendRegisterCode(form.value.email)
     countdown.value = 60
     countdownTimer = setInterval(() => {
       countdown.value--

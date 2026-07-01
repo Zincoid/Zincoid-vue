@@ -122,7 +122,7 @@ async function handleReset() {
   if (!confirm(`${t('admin.resetPassword')}：${resetUsername.value.trim()}`)) return
   resetting.value = true
   try {
-    await userAPI.resetPassword(resetUsername.value.trim(), resetPassword.value)
+    await userAPI.changePasswordByForce(resetUsername.value.trim(), resetPassword.value)
     toolMessage.value = t('admin.resetSuccess')
     resetOpen.value = false
     setTimeout(() => toolMessage.value = '', 2000)

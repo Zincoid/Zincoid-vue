@@ -164,7 +164,7 @@ async function handleSendEmailCode() {
   sendingEmail.value = true
   emailError.value = ''
   try {
-    await authAPI.sendCode(emailForm.value.email)
+    await authAPI.sendChangeCode(emailForm.value.email)
     emailCountdown.value = 60
     emailTimer = setInterval(() => {
       emailCountdown.value--
@@ -193,7 +193,7 @@ async function changeEmail() {
     return
   }
   try {
-    await userAPI.changeEmail(emailForm.value)
+    await authAPI.change(emailForm.value)
     emailMessage.value = t('profile.emailChanged')
     emailForm.value = { email: '', code: '' }
     await auth.fetchMe()

@@ -31,7 +31,7 @@ async function handleSendCode() {
   sending.value = true
   error.value = ''
   try {
-    await authAPI.sendCode(form.value.email)
+    await authAPI.sendResetCode(form.value.email)
     countdown.value = 60
     countdownTimer = setInterval(() => {
       countdown.value--
@@ -68,7 +68,7 @@ async function handleSubmit() {
   loading.value = true
   error.value = ''
   try {
-    await authAPI.forgotPassword({
+    await authAPI.reset({
       email: form.value.email,
       code: form.value.code,
       newPassword: form.value.newPassword,

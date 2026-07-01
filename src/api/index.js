@@ -36,10 +36,13 @@ export default api
 // ── Auth ──
 export const authAPI = {
   login: (data) => api.post('/auth/login', data),
-  register: (data) => api.post('/auth/register', data),
   logout: () => api.post('/auth/logout'),
-  sendCode: (email) => api.post('/auth/send-code', { email }),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data)
+  register: (data) => api.post('/auth/register', data),
+  reset: (data) => api.put('/auth/reset-password', data),
+  change: (data) => api.put('/auth/change-email', data),
+  sendRegisterCode: (email) => api.post('/auth/register/send-code', { email }),
+  sendResetCode: (email) => api.post('/auth/reset-password/send-code', { email }),
+  sendChangeCode: (email) => api.post('/auth/change-email/send-code', { email })
 }
 
 // ── Users ──
@@ -51,11 +54,10 @@ export const userAPI = {
   updateProfile: (data) => api.put('/users', data),
   updateAvatar: (avatar) => api.put('/users/avatar', { avatar }),
   changePassword: (data) => api.put('/users/password', data),
+  changePasswordByForce: (username, password) => api.put('/users/password/force', { username, password }),
   deleteMe: () => api.delete('/users'),
   updateStatus: (id, status) => api.put(`/users/${id}/status`, null, { params: { status } }),
-  deleteUser: (id) => api.delete(`/users/${id}`),
-  resetPassword: (username, password) => api.put('/users/password/reset', { username, password }),
-  changeEmail: (data) => api.put('/users/email', data)
+  deleteUser: (id) => api.delete(`/users/${id}`)
 }
 
 // ── Moments ──
