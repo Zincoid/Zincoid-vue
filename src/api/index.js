@@ -26,6 +26,9 @@ api.interceptors.response.use(
     if (error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      const auth = useAuthStore()
+      auth.token = ''
+      auth.user = null
       router.push('/login?expired=true')
     }
     return Promise.reject(error)
