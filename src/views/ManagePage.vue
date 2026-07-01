@@ -66,7 +66,7 @@ onMounted(async () => {
     const { data } = await configAPI.listAll()
     configs.value = data.data || []
   } catch (e) {
-    configError.value = t('admin.loadFailed')
+    configError.value = getMessage(e, 'admin.loadFailed')
   } finally {
     configLoading.value = false
   }
@@ -272,7 +272,7 @@ h2 { margin-bottom: var(--spacing-lg); }
 .toggle__switch input { display: none; }
 .toggle__slider { position: relative; width: 44px; height: 24px; background: var(--color-border); border-radius: var(--rounded-full); transition: background var(--transition-fast); }
 .toggle__slider::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: white; border-radius: var(--rounded-full); transition: transform var(--transition-fast); }
-.toggle input:checked + .toggle__slider { background: var(--color-orange, #f0ad4e); }
+.toggle input:checked + .toggle__slider { background: #f0ad4e; }
 .toggle input:checked + .toggle__slider::after { transform: translateX(20px); }
 .toggle__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
 
