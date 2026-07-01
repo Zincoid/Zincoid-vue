@@ -111,7 +111,7 @@ async function saveEdit() {
     moment.value.images = [...editKeepImages.value, ...newUrls]
     editing.value = false
   } catch (err) {
-    alert(getMessage(err, 'moment.updateFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.updateFailed'))
   } finally {
     saving.value = false
   }
@@ -155,7 +155,7 @@ async function handleComment({ content, parentId }) {
     await commentAPI.addMoment(route.params.id, { content, parentId })
     await fetchComments()
   } catch (err) {
-    alert(getMessage(err, 'comment.postFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
   }
 }
 
@@ -165,7 +165,7 @@ async function handleDeleteComment(commentId) {
     await commentAPI.delete(commentId)
     await fetchComments()
   } catch (err) {
-    alert(getMessage(err, 'comment.deleteFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
   }
 }
 
@@ -187,7 +187,7 @@ async function togglePin() {
     await api(moment.value.id)
     moment.value.isPinned = !moment.value.isPinned
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
   }
 }
 
@@ -197,7 +197,7 @@ async function handleDelete() {
     await momentAPI.delete(route.params.id)
     router.push('/moments')
   } catch (err) {
-    alert(getMessage(err, 'moment.deleteError'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.deleteError'))
   }
 }
 

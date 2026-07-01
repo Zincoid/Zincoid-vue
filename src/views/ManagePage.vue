@@ -66,7 +66,7 @@ onMounted(async () => {
     const { data } = await configAPI.listAll()
     configs.value = data.data || []
   } catch (e) {
-    configError.value = getMessage(e, 'admin.loadFailed')
+    if (e?.response?.status !== 401) configError.value = getMessage(e, 'admin.loadFailed')
   } finally {
     configLoading.value = false
   }

@@ -139,7 +139,7 @@ async function handleComment({ content, parentId }) {
     await commentAPI.addArticle(route.params.id, { content, parentId })
     await fetchComments()
   } catch (err) {
-    alert(getMessage(err, 'comment.postFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
   }
 }
 
@@ -149,7 +149,7 @@ async function handleDeleteComment(commentId) {
     await commentAPI.delete(commentId)
     await fetchComments()
   } catch (err) {
-    alert(getMessage(err, 'comment.deleteFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
   }
 }
 
@@ -171,7 +171,7 @@ async function togglePin() {
     await api(article.value.id)
     article.value.isPinned = !article.value.isPinned
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
   }
 }
 
@@ -181,7 +181,7 @@ async function handleDelete() {
     await articleAPI.delete(route.params.id)
     window.location.href = '/#/articles'
   } catch (err) {
-    alert(getMessage(err, 'article.deleteError'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'article.deleteError'))
   }
 }
 

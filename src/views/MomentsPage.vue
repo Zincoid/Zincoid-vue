@@ -100,7 +100,7 @@ async function submitMoment() {
     page.value = 1
     await fetchMoments()
   } catch (err) {
-    alert(getMessage(err, 'moment.postFailed'))
+    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.postFailed'))
   } finally {
     posting.value = false
   }

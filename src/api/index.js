@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
 const api = axios.create({
@@ -26,9 +25,7 @@ api.interceptors.response.use(
     if (error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      const auth = useAuthStore()
-      auth.$patch({ token: '', user: null })
-      router.push('/login?expired=true')
+      window.location.href = '/login?expired=true'
     }
     return Promise.reject(error)
   }
