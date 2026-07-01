@@ -228,6 +228,7 @@ export default {
     'Username cannot be empty': 'Username cannot be empty',
     'Invalid username or password': 'Invalid username or password',
     'Account is disabled': 'Account is disabled',
+    'Account not found': 'Account not found',
     'Old password is incorrect': 'Old password is incorrect',
     'User not found': 'User not found',
     'Moment not found': 'Moment not found',

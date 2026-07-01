@@ -228,6 +228,7 @@ export default {
     'Username cannot be empty': '用户名不能为空',
     'Invalid username or password': '用户名或密码错误',
     'Account is disabled': '账号已被禁用',
+    'Account not found': '账号不存在',
     'Old password is incorrect': '原密码错误',
     'User not found': '用户不存在',
     'Moment not found': '动态不存在',

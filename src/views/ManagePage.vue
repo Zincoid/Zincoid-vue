@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
-import { configAPI, fileAPI, userAPI, healthAPI, notificationAPI } from '@/api'
+import { configAPI, userAPI, healthAPI, notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
@@ -87,7 +87,7 @@ async function runCleanup() {
   if (!confirm(confirmMsg)) return
   cleaning.value = true
   try {
-    const res = await fileAPI.cleanup(logicCleanup.value)
+    const res = await healthAPI.cleanupFiles(logicCleanup.value)
     const counts = res.data?.data ?? {}
     const parts = Object.entries(counts).map(([k, v]) => `${t(`admin.cleanupFile_${k}`)} ${v}`).join(', ')
     toolMessage.value = `${t('admin.cleanupSuccess')}：${parts || t('admin.cleanupNone')}`

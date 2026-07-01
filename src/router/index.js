@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { healthAPI } from '@/api'
 
 const routes = [
   {
@@ -118,7 +117,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === '/maintenance') return next()
 
   try {
-    await healthAPI.check()
+    await fetch('/api/health')
   } catch {
     return next('/maintenance')
   }
