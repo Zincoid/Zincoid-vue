@@ -51,7 +51,7 @@ const squares = reactive([
 // Pixel raindrop animation (grid-based)
 const drops = reactive([])    // [{x, y, color}]
 const ripples = reactive([])  // [{cx, cy, rx, ry, opacity, color}]
-const animationType = ref('squares')
+const animationType = ref(null)
 
 // Rain cycle with random phase durations
 let rainPhase = 'light'
