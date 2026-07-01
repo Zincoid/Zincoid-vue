@@ -18,7 +18,7 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (!error.response || error.response.status >= 500) {
+    if (!error.response || [502, 503, 504].includes(error.response.status)) {
       router.push('/maintenance').catch(() => {})
       return Promise.reject(error)
     }
