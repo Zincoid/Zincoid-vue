@@ -68,7 +68,8 @@ export const momentAPI = {
   getHomeFeed: (size = 10) => api.get('/moments/public/home', { params: { size } }),
   getByUser: (userId, page = 1, size = 10, pinned = false) => api.get(`/moments/public/user/${userId}`, { params: { page, size, pinned } }),
   getDetail: (id) => api.get(`/moments/public/${id}`),
-  getRandom: () => api.get('/moments/public/random')
+  getRandom: () => api.get('/moments/public/random'),
+  addView: (id) => api.post(`/moments/public/${id}/view`)
 }
 
 // ── Articles ──

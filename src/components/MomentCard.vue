@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { formatDate } from '@/utils/format'
 import { parseMentions } from '@/composables/useMentionLink'
+import { momentAPI } from '@/api'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
 
@@ -15,10 +16,13 @@ const props = defineProps({
 const router = useRouter()
 const viewerSrc = ref('')
 const viewerVisible = ref(false)
+const viewCount = ref(props.moment.viewCount || 0)
 
-function previewImage(src) {
+async function previewImage(src) {
   viewerSrc.value = src
   viewerVisible.value = true
+  viewCount.value++
+  momentAPI.addView(props.moment.id).catch(() => {})
 }
 
 const images = computed(() => {
@@ -109,7 +113,7 @@ function goUser(e) {
       <span class="moment-card__stats">
         <span class="stat stat--views">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          {{ moment.viewCount || 0 }} {{ t('moment.views') }}
+          {{ viewCount }} {{ t('moment.views') }}
         </span>
         <span class="stat">· {{ moment.commentCount || 0 }} {{ t('moment.comments') }}</span>
       </span>
