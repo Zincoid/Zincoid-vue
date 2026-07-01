@@ -77,6 +77,7 @@ export default {
     admin: 'Admin',
     members: 'User',
     disabled: 'Disabled',
+    lastActive: 'Last active',
     bannedMessage: 'Account disabled.',
     notFound: 'User not found.'
   },

@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { formatDate } from '@/utils/format'
 import { userAPI } from '@/api'
 
 const { t } = useI18n()
@@ -59,7 +60,13 @@ async function handleDelete() {
         <span v-if="user.gender !== null && user.gender !== undefined" class="user-card__pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         <span v-if="user.status === 0" class="user-card__disabled-tag">{{ t('user.disabled') }}</span>
       </h4>
-      <span v-if="user.title" class="user-card__title">{{ user.title }}</span>
+      <div class="user-card__title-wrap">
+        <div class="user-card__title-inner">
+          <span v-if="user.title" class="user-card__title">{{ user.title }}</span>
+          <span v-else class="user-card__title">&nbsp;</span>
+          <span class="user-card__active">{{ t('user.lastActive') }}: {{ formatDate(user.activeAt) }}</span>
+        </div>
+      </div>
     </div>
     <div v-if="auth.isAdmin" class="user-card__actions">
       <button class="user-card__btn" @click.stop="toggleStatus" :title="user.status === 1 ? 'Disable' : 'Enable'">
@@ -159,12 +166,32 @@ async function handleDelete() {
   white-space: nowrap;
 }
 
-.user-card__title {
+.user-card__title-wrap {
+  overflow: hidden;
+  height: 1.25em;
+}
+.user-card__title-inner {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+.user-card:hover .user-card__title-inner {
+  transform: translateY(-50%);
+}
+.user-card__title,
+.user-card__active {
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0;
+  line-height: 1.25em;
+}
+.user-card__title {
+  color: var(--color-text-secondary);
+}
+.user-card__active {
+  color: var(--color-text-secondary);
 }
 
 .user-card__actions {

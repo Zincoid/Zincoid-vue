@@ -77,6 +77,7 @@ export default {
     admin: '管理',
     members: '用户',
     disabled: '已禁用',
+    lastActive: '上次活跃',
     bannedMessage: '用户已停用。',
     notFound: '用户不存在。'
   },

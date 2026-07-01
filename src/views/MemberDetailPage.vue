@@ -6,6 +6,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
+import { formatDate } from '@/utils/format'
 import ContactButtons from '@/components/ContactButtons.vue'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -97,6 +98,7 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
         </div>
         <p v-if="user.title" class="profile-title">{{ user.title }}</p>
         <p v-if="user.bio" class="profile-bio">{{ user.bio }}</p>
+        <p v-if="user.activeAt" class="profile-last-active">{{ t('user.lastActive') }}: {{ formatDate(user.activeAt) }}</p>
 
         <div v-if="user.skills?.length" class="profile-skills">
           <span v-for="(skill, i) in user.skills" :key="skill" class="skill-tag" :style="{ background: skillColors[i % skillColors.length].bg, color: skillColors[i % skillColors.length].fg }">{{ skill }}</span>
@@ -204,6 +206,11 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
   margin-bottom: var(--spacing-md);
 }
 
+.profile-last-active {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
 .profile-bio {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
