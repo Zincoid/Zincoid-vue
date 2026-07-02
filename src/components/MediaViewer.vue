@@ -36,20 +36,12 @@ function onVisibilityChange() {
   }
 }
 
-function onPageShow(e) {
-  if (e.persisted && props.visible) {
-    onClose()
-  }
-}
-
 onMounted(() => {
   document.addEventListener('visibilitychange', onVisibilityChange)
-  window.addEventListener('pageshow', onPageShow)
 })
 
 onUnmounted(() => {
   document.removeEventListener('visibilitychange', onVisibilityChange)
-  window.removeEventListener('pageshow', onPageShow)
   document.body.style.overflow = ''
 })
 </script>
@@ -66,7 +58,7 @@ onUnmounted(() => {
         </button>
       </div>
       <img v-if="mediaType === 'image'" :src="src" class="viewer-content viewer-image" alt="" @click.stop />
-      <video v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay playsinline @click.stop></video>
+      <video v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay @click.stop></video>
       <audio v-else :src="src" class="viewer-audio" controls autoplay @click.stop></audio>
     </div>
   </Teleport>
