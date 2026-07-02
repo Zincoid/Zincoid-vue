@@ -123,7 +123,8 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === '/maintenance') return next()
 
   try {
-    await fetch('/api/health')
+    const res = await fetch('/api/health')
+    if (!res.ok) return next('/maintenance')
   } catch {
     return next('/maintenance')
   }
