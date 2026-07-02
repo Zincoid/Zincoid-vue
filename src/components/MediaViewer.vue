@@ -1,5 +1,5 @@
 <script setup>
-import { watch, computed, onMounted, onUnmounted } from 'vue'
+import { watch, computed } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 
 const { t } = useI18n()
@@ -29,39 +29,22 @@ watch(() => props.visible, (v) => {
 function onClose() {
   emit('close')
 }
-
-function onVisibilityChange() {
-  if (document.hidden && props.visible) {
-    onClose()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('visibilitychange', onVisibilityChange)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('visibilitychange', onVisibilityChange)
-  document.body.style.overflow = ''
-})
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="visible" class="viewer-overlay" @click.self="onClose">
-      <div class="viewer-toolbar">
-        <a :href="src" download class="viewer-btn" :title="t('common.download')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </a>
-        <button class="viewer-btn" @click="onClose" :title="t('common.close')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <img v-if="mediaType === 'image'" :src="src" class="viewer-content viewer-image" alt="" @click.stop />
-      <video v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay @click.stop></video>
-      <audio v-else :src="src" class="viewer-audio" controls autoplay @click.stop></audio>
+  <div v-if="visible" class="viewer-overlay" @click.self="onClose">
+    <div class="viewer-toolbar">
+      <a :href="src" download class="viewer-btn" :title="t('common.download')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </a>
+      <button class="viewer-btn" @click="onClose" :title="t('common.close')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-  </Teleport>
+    <img v-if="mediaType === 'image'" :src="src" class="viewer-content viewer-image" alt="" @click.stop />
+    <video v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay @click.stop></video>
+    <audio v-else :src="src" class="viewer-audio" controls autoplay @click.stop></audio>
+  </div>
 </template>
 
 <style scoped>
