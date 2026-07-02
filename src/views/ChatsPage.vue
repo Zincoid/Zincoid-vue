@@ -606,8 +606,11 @@ function openPreview(src) {
   resize: none;
   height: 42px;
   font-family: inherit;
+  overflow-y: auto;
+  scrollbar-width: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
+.chat-input__textarea::-webkit-scrollbar { display: none; }
 .chat-input__textarea:focus {
   outline: none;
   border-color: var(--color-primary);
