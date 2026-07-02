@@ -6,7 +6,6 @@ import { formatDate } from '@/utils/format'
 import { parseMentions } from '@/composables/useMentionLink'
 import { momentAPI } from '@/api'
 import MediaViewer from '@/components/MediaViewer.vue'
-import VideoThumb from '@/components/VideoThumb.vue'
 import LikeButton from '@/components/LikeButton.vue'
 
 const { t } = useI18n()
@@ -90,10 +89,13 @@ function goUser(e) {
         />
         <div
           v-else-if="mediaType(img) === 'video'"
-          class="moment-card__media"
+          class="moment-card__media moment-card__video-thumb"
           @click.stop="previewImage(img)"
         >
-          <VideoThumb :src="img" />
+          <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+          <div class="moment-card__play-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
         </div>
         <div
           v-else
@@ -228,6 +230,43 @@ function goUser(e) {
   width: 100%;
   border-radius: var(--rounded-md);
   cursor: pointer;
+}
+.moment-card__video-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-md);
+}
+.moment-card__video-thumb video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+.moment-card__play-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: background var(--transition-fast);
+}
+.moment-card__video-thumb:hover .moment-card__play-icon {
+  background: rgba(255, 255, 255, 0.45);
+}
+.moment-card__play-icon svg {
+  margin-left: 3px;
 }
 .moment-card__audio-thumb {
   aspect-ratio: 16 / 9;

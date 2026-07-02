@@ -11,7 +11,6 @@ import { momentAPI, commentAPI, likeAPI, fileAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
-import VideoThumb from '@/components/VideoThumb.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -277,8 +276,9 @@ watch(likeLiked, (liked) => {
         <div v-if="editKeepImages.length || editNewPreviews.length" class="edit-media-grid">
           <div v-for="(img, i) in editKeepImages" :key="'keep'+i" class="edit-media-item">
             <img v-if="mediaType(img) === 'image'" :src="img" alt="" />
-            <div v-else-if="mediaType(img) === 'video'" class="edit-media-item">
-              <VideoThumb :src="img" />
+            <div v-else-if="mediaType(img) === 'video'" class="edit-video-thumb">
+              <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+              <div class="edit-play-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
             </div>
             <div v-else class="edit-audio-thumb">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -289,8 +289,9 @@ watch(likeLiked, (liked) => {
           </div>
           <div v-for="(p, i) in editNewPreviews" :key="'new'+i" class="edit-media-item">
             <img v-if="p.type === 'image'" :src="p.url" alt="" />
-            <div v-else-if="p.type === 'video'" class="edit-media-item">
-              <VideoThumb :src="p.url" />
+            <div v-else-if="p.type === 'video'" class="edit-video-thumb">
+              <video :src="p.url" muted></video>
+              <div class="edit-play-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
             </div>
             <div v-else class="edit-audio-thumb">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -337,7 +338,10 @@ watch(likeLiked, (liked) => {
             class="detail__media-thumb"
             @click="previewImage(img)"
           >
-            <VideoThumb :src="img" />
+            <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+            <div class="detail__play-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
           </div>
           <div
             v-else
@@ -420,7 +424,11 @@ watch(likeLiked, (liked) => {
 .detail__medias { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 @media (max-width: 600px) { .detail__medias { grid-template-columns: 1fr; } }
 .detail__medias img { width: 100%; border-radius: var(--rounded-md); cursor: pointer; }
-.detail__media-thumb { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: var(--rounded-md); overflow: hidden; cursor: pointer; }
+.detail__media-thumb { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: var(--rounded-md); overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.detail__media-thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+.detail__play-icon { position: relative; width: 60px; height: 60px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; transition: background var(--transition-fast); }
+.detail__media-thumb:hover .detail__play-icon { background: rgba(255,255,255,0.4); }
+.detail__play-icon svg { margin-left: 4px; }
 .detail__audio-thumb { background: var(--color-bg-alt); color: var(--color-text-secondary); transition: background var(--transition-fast); }
 .detail__audio-thumb:hover { background: var(--color-border); }
 .detail__actions-bar { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
@@ -436,6 +444,10 @@ watch(likeLiked, (liked) => {
 .edit-media-grid { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
 .edit-media-item { position: relative; width: 80px; height: 80px; border-radius: var(--rounded-md); overflow: hidden; }
 .edit-media-item img { width: 100%; height: 100%; object-fit: cover; }
+.edit-video-thumb { position: relative; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; }
+.edit-video-thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+.edit-play-icon { position: relative; width: 28px; height: 28px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; color: white; }
+.edit-play-icon svg { margin-left: 2px; }
 .edit-audio-thumb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--color-bg-alt); color: var(--color-text-secondary); }
 .edit-media-remove { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: var(--rounded-full); background: rgba(0,0,0,0.6); color: white; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; }
 .edit-actions { display: flex; justify-content: space-between; align-items: center; }
