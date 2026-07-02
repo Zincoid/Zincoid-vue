@@ -8,6 +8,7 @@ import { parseMentions } from '@/composables/useMentionLink'
 import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
+import VideoThumb from '@/components/VideoThumb.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
@@ -215,11 +216,7 @@ function openPreview(src) {
                 class="chat-msg__video-card"
                 @click="openPreview(msg.file)"
               >
-                <video
-                  :src="msg.file"
-                  preload="metadata"
-                  @loadedmetadata="(e) => e.target.currentTime = 1"
-                ></video>
+                <VideoThumb :src="msg.file" />
                 <div class="chat-msg__video-play">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </div>
@@ -442,15 +439,6 @@ function openPreview(src) {
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color var(--transition-fast);
-}
-.chat-msg__video-card video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 0;
-  outline: 0;
 }
 .chat-msg__video-card:hover { border-color: #f9a8d4; }
 
