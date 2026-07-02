@@ -9,6 +9,7 @@ import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
+import VideoThumb from '@/components/VideoThumb.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
@@ -142,10 +143,7 @@ async function submitMoment() {
         <div v-for="(item, i) in newImagePreviews" :key="i" class="editor__image-wrap">
           <img v-if="item.type === 'image'" :src="item.url" alt="" />
           <div v-else-if="item.type === 'video'" class="editor__video-preview">
-            <video :src="item.url" muted></video>
-            <div class="editor__play-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            </div>
+            <VideoThumb :src="item.url" />
           </div>
           <div v-else class="editor__audio-preview">
             <div class="editor__audio-icon">
@@ -214,10 +212,6 @@ async function submitMoment() {
 .editor__remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-danger); color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .editor__actions { display: flex; gap: var(--spacing-sm); align-items: center; justify-content: flex-end; }
 .editor__actions .btn { flex: 1; }
-.editor__video-preview { position: relative; width: 100%; height: 100%; background: #000; border-radius: var(--rounded-md); overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.editor__video-preview video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-.editor__play-icon { position: relative; width: 28px; height: 28px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; color: white; }
-.editor__play-icon svg { margin-left: 2px; }
 .editor__audio-preview { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--color-bg-alt); border-radius: var(--rounded-md); color: var(--color-text-secondary); }
 .editor__audio-icon { width: 28px; height: 28px; border-radius: var(--rounded-full); background: var(--color-border); display: flex; align-items: center; justify-content: center; }
 .hidden-input { display: none; }

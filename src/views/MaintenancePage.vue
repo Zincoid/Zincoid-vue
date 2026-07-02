@@ -33,7 +33,7 @@ const { t } = useI18n()
   text-align: left;
   display: inline-block;
 }
-h1 { font-size: 4rem; color: var(--color-primary); margin-bottom: var(--spacing-sm); }
+h1 { font-size: 4rem; color: var(--color-danger); margin-bottom: var(--spacing-sm); }
 p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); }
 .btn { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--rounded-md); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer; transition: all var(--transition-fast); text-decoration: none; }
 .btn--outline { border: 1px solid var(--color-border); color: var(--color-text); background: transparent; }

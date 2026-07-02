@@ -1,5 +1,5 @@
 <script setup>
-import { watch, computed } from 'vue'
+import { watch, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 
 const { t } = useI18n()
@@ -29,6 +29,21 @@ watch(() => props.visible, (v) => {
 function onClose() {
   emit('close')
 }
+
+function onVisibilityChange() {
+  if (document.hidden && props.visible) {
+    onClose()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('visibilitychange', onVisibilityChange)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
