@@ -327,9 +327,9 @@ async function changeEmail() {
           <template v-if="showEmailForm">
             <div class="fields">
               <div class="field">
-                <label class="field__label">{{ t('auth.email') }} <span class="field__required">*</span></label>
+                <label class="field__label">{{ t('profile.newEmail') }} <span class="field__required">*</span></label>
                 <div style="display:flex;gap:var(--spacing-sm)">
-                  <input v-model="emailForm.email" class="field__input" style="flex:1" type="email" :placeholder="t('auth.emailPlaceholder')" />
+                  <input v-model="emailForm.email" class="field__input" style="flex:1" type="email" :placeholder="t('profile.newEmailPlaceholder')" />
                   <button class="btn btn--outline" :disabled="sendingEmail || emailCountdown > 0" @click="handleSendEmailCode" type="button">
                     {{ emailCountdown > 0 ? emailCountdown + 's' : (sendingEmail ? '...' : t('auth.sendCode')) }}
                   </button>

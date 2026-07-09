@@ -138,6 +138,8 @@ export default {
     deleteAccountDesc: 'Permanently delete your account and all associated data. This cannot be undone.',
     deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone.',
     changeEmail: 'Change Email',
+    newEmail: 'New Email',
+    newEmailPlaceholder: 'Enter new email',
     currentEmail: 'Current email',
     emailChanged: 'Email changed!',
     emailUpdateFailed: 'Failed to change email'
@@ -165,7 +167,6 @@ export default {
     welcomeBack: 'Welcome back',
     joinUs: 'Join us',
     email: 'Email',
-    emailPlaceholder: 'Enter your email',
     sendCode: 'Send Code',
     codeSent: 'Sent',
     code: 'Verification Code',

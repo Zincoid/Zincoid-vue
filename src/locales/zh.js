@@ -138,6 +138,8 @@ export default {
     deleteAccountDesc: '永久删除账号及所有数据，此操作不可撤销。',
     deleteAccountConfirm: '确定要注销账号？此操作不可撤销。',
     changeEmail: '修改邮箱',
+    newEmail: '新邮箱',
+    newEmailPlaceholder: '请输入新邮箱',
     currentEmail: '当前绑定邮箱',
     emailChanged: '邮箱修改成功！',
     emailUpdateFailed: '邮箱修改失败'
@@ -165,7 +167,6 @@ export default {
     welcomeBack: '欢迎回来',
     joinUs: '加入我们',
     email: '邮箱',
-    emailPlaceholder: '请输入邮箱',
     sendCode: '发送验证码',
     codeSent: '已发送',
     code: '验证码',
