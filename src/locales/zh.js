@@ -182,7 +182,7 @@ export default {
     forgotPasswordDesc: '输入注册邮箱和验证码，即可重置密码',
     newPassword: '新密码',
     newPasswordPlaceholder: '新密码需6-100字符',
-    resetPassword: '重置密码',
+    resetPassword: '重置',
     resetting: '重置中...',
     resetSuccess: '密码重置成功，请登录',
     backToLogin: '返回登录',

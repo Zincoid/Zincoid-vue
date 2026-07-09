@@ -182,7 +182,7 @@ export default {
     forgotPasswordDesc: 'Enter your registered email and verification code to reset your password',
     newPassword: 'New Password',
     newPasswordPlaceholder: '6-100 characters required',
-    resetPassword: 'Reset Password',
+    resetPassword: 'Reset',
     resetting: 'Resetting...',
     resetSuccess: 'Password reset successfully, please login',
     backToLogin: 'Back to Login',

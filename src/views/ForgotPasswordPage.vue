@@ -91,7 +91,7 @@ async function handleSubmit() {
 
       <form v-if="!success" class="forgot-form" novalidate @submit.prevent="handleSubmit">
         <div class="field">
-          <label class="field__label">{{ t('auth.email') }}</label>
+          <label class="field__label">{{ t('auth.email') }} <span class="field__required">*</span></label>
           <div style="display:flex;gap:var(--spacing-sm)">
             <input v-model="form.email" class="field__input" style="flex:1" type="email" autocomplete="email" />
             <button class="btn btn--outline" :disabled="sending || countdown > 0" @click="handleSendCode" type="button">
@@ -100,23 +100,25 @@ async function handleSubmit() {
           </div>
         </div>
         <div class="field">
-          <label class="field__label">{{ t('auth.code') }}</label>
+          <label class="field__label">{{ t('auth.code') }} <span class="field__required">*</span></label>
           <input v-model="form.code" class="field__input" type="text" maxlength="6" autocomplete="off" />
         </div>
         <div class="field">
-          <label class="field__label">{{ t('auth.newPassword') }}</label>
+          <label class="field__label">{{ t('auth.newPassword') }} <span class="field__required">*</span></label>
           <input v-model="form.newPassword" class="field__input" type="password" autocomplete="new-password" />
         </div>
         <div class="field">
-          <label class="field__label">{{ t('auth.confirmPassword') }}</label>
+          <label class="field__label">{{ t('auth.confirmPassword') }} <span class="field__required">*</span></label>
           <input v-model="form.confirmPassword" class="field__input" type="password" autocomplete="off" />
         </div>
 
         <p v-if="error" class="forgot-form__error">{{ error }}</p>
 
-        <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
-          {{ loading ? t('auth.resetting') : t('auth.resetPassword') }}
-        </button>
+        <div class="forgot-form__actions">
+          <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
+            {{ loading ? t('auth.resetting') : t('auth.resetPassword') }}
+          </button>
+        </div>
       </form>
 
       <div v-else class="forgot-success">
@@ -183,6 +185,11 @@ async function handleSubmit() {
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-danger-bg);
   border-radius: var(--rounded-sm);
+}
+
+.forgot-form__actions {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-lg);
 }
 
 .forgot-form .btn--primary {
