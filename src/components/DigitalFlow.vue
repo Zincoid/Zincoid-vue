@@ -2,24 +2,21 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const canvasRef = ref(null)
-let intervalId = null
+let animationId = null
 
-const FONT_SIZE = 13
-const CELL_W = 20
-const CELL_H = 18
+const FONT_SIZE = 12
+const CELL_W = 18
+const CELL_H = 17
 const MARGIN_WIDTH = 140
-const TICK_MS = 200
+const HOT_RADIUS = 100
 
-const COLORS = [
-  'rgba(17,24,39,0.10)',
-  'rgba(17,24,39,0.16)',
-  'rgba(17,24,39,0.22)',
-  'rgba(75,85,99,0.12)',
-  'rgba(75,85,99,0.18)',
-]
+const CHARS = '0123456789ABCDEF'
 
 let cells = []
 let timer = null
+let mouseX = -9999
+let mouseY = -9999
+let lastTime = 0
 
 function buildCells() {
   const w = canvasRef.value?.width || window.innerWidth
@@ -31,51 +28,59 @@ function buildCells() {
 
   for (let x = 4; x < leftEnd - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomDigit(), next: randomDelay() })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.10 + Math.random() * 0.08 })
     }
   }
   for (let x = rightStart + 4; x < w - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomDigit(), next: randomDelay() })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.10 + Math.random() * 0.08 })
     }
   }
 }
 
-function randomDigit() {
-  const chars = '0123456789ABCDEF'
-  return chars[Math.floor(Math.random() * chars.length)]
+function randomChar() {
+  return CHARS[Math.floor(Math.random() * CHARS.length)]
 }
 
-function randomDelay() {
-  return TICK_MS + Math.random() * 3000
-}
-
-function tick() {
+function tick(now) {
   const canvas = canvasRef.value
   if (!canvas) return
-  const ctx = canvas.getContext('2d')
+  const dt = Math.min((now - lastTime) / 1000, 0.1) // seconds, cap at 100ms
+  lastTime = now
 
+  const ctx = canvas.getContext('2d')
+  const w = canvas.width, h = canvas.height
+
+  // Update cells
   for (const cell of cells) {
-    cell.next -= TICK_MS
+    const dx = cell.x - mouseX
+    const dy = cell.y - mouseY
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    const factor = dist < HOT_RADIUS ? 1 - dist / HOT_RADIUS : 0
+
+    // Speed: 0.5s~4s normally, near cursor 0.03s~0.15s
+    const speed = 0.3 + (1 - factor) * 4
+    cell.next -= dt
     if (cell.next <= 0) {
-      cell.v = randomDigit()
-      cell.next = randomDelay()
+      cell.v = randomChar()
+      cell.next = speed * (0.1 + Math.random() * 0.3)
+      // Sudden jump in brightness on change
+      cell.alpha = 0.09 + factor * 0.42 + Math.random() * 0.05
     }
   }
 
-  // Redraw
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  // Draw
+  ctx.clearRect(0, 0, w, h)
   ctx.font = `${FONT_SIZE}px "Courier New", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
   for (const cell of cells) {
-    ctx.fillStyle = COLORS[Math.floor(Math.random() * COLORS.length)]
+    ctx.fillStyle = `rgba(17,24,39,${cell.alpha.toFixed(3)})`
     ctx.fillText(cell.v, cell.x, cell.y)
   }
 
-  // Horizontal fade: visible at edges, transparent toward center
-  const w = canvas.width, h = canvas.height
+  // Horizontal fade
   const fadeW = Math.min(MARGIN_WIDTH, w * 0.15)
   ctx.save()
   ctx.globalCompositeOperation = 'destination-out'
@@ -87,6 +92,8 @@ function tick() {
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, w, h)
   ctx.restore()
+
+  animationId = requestAnimationFrame(tick)
 }
 
 function resize() {
@@ -97,19 +104,27 @@ function resize() {
   buildCells()
 }
 
+function onMouseMove(e) {
+  mouseX = e.clientX
+  mouseY = e.clientY
+}
+
 onMounted(() => {
   resize()
-  intervalId = setInterval(tick, TICK_MS)
+  lastTime = performance.now()
+  animationId = requestAnimationFrame(tick)
   window.addEventListener('resize', () => {
     clearTimeout(timer)
     timer = setTimeout(resize, 300)
   })
+  window.addEventListener('mousemove', onMouseMove)
 })
 
 onUnmounted(() => {
-  clearInterval(intervalId)
+  cancelAnimationFrame(animationId)
   clearTimeout(timer)
   window.removeEventListener('resize', resize)
+  window.removeEventListener('mousemove', onMouseMove)
 })
 </script>
 
