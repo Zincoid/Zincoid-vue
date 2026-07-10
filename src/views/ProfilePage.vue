@@ -164,7 +164,14 @@ async function changePassword() {
   }
 }
 
+const deleteConfirmInput = ref('')
+const showDeleteForm = ref(false)
+
 async function deleteAccount() {
+  if (deleteConfirmInput.value !== auth.user?.username) {
+    error.value = t('profile.deleteConfirmMismatch')
+    return
+  }
   if (!confirm(t('profile.deleteAccountConfirm'))) return
   try {
     await userAPI.deleteMe()
@@ -435,8 +442,23 @@ async function changeEmail() {
         <div class="card">
           <h2 class="card__title card__title--danger">{{ t('profile.deleteAccount') }}</h2>
           <p class="card__desc">{{ t('profile.deleteAccountDesc') }}</p>
-          <div class="card__actions">
-            <button class="btn btn--danger btn--full" @click="deleteAccount">
+
+          <template v-if="showDeleteForm">
+            <div class="field" style="margin-bottom:var(--spacing-md)">
+              <label class="field__label">{{ t('profile.deleteConfirmHint', { username: auth.user?.username }) }} <span class="field__required">*</span></label>
+              <input v-model="deleteConfirmInput" class="field__input" type="text" :placeholder="auth.user?.username" />
+            </div>
+            <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
+              <button class="btn btn--outline btn--full" @click="showDeleteForm = false; deleteConfirmInput = ''">{{ t('common.cancel') }}</button>
+              <button class="btn btn--danger btn--full" :disabled="deleteConfirmInput !== auth.user?.username" @click="deleteAccount">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                {{ t('common.confirm') }}
+              </button>
+            </div>
+          </template>
+
+          <div v-else class="card__actions">
+            <button class="btn btn--danger btn--full" @click="showDeleteForm = true">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               {{ t('profile.deleteAccount') }}
             </button>
@@ -639,6 +661,10 @@ async function changeEmail() {
 }
 .btn--danger:hover {
   opacity: 0.85;
+}
+.btn--danger:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 @media (max-width: 700px) {

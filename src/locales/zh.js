@@ -137,6 +137,8 @@ export default {
     deleteAccount: '注销账号',
     deleteAccountDesc: '永久删除账号及所有数据，此操作不可撤销。',
     deleteAccountConfirm: '确定要注销账号？此操作不可撤销。',
+    deleteConfirmHint: '请输入 "{username}" 以确认',
+    deleteConfirmMismatch: '用户名不匹配',
     changeEmail: '修改邮箱',
     newEmail: '新邮箱',
     newEmailPlaceholder: '请输入新邮箱',
