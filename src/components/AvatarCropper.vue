@@ -274,8 +274,8 @@ watch(dragging, (v) => {
         </div>
 
         <div class="cropper-actions">
-          <button class="btn btn--outline btn--lg" @click="close">{{ t('common.cancel') }}</button>
-          <button class="btn btn--primary btn--lg" @click="confirm">
+          <button class="btn btn--outline btn--lg" style="flex:1" @click="close">{{ t('common.cancel') }}</button>
+          <button class="btn btn--primary btn--lg" style="flex:1" @click="confirm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             {{ t('common.confirm') }}
           </button>
@@ -319,7 +319,14 @@ watch(dragging, (v) => {
   width: 100%;
   aspect-ratio: 1;
   max-height: 400px;
-  background: #1a1a1a;
+  background-image:
+    linear-gradient(45deg, #e5e5e5 25%, transparent 25%),
+    linear-gradient(-45deg, #e5e5e5 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e5e5e5 75%),
+    linear-gradient(-45deg, transparent 75%, #e5e5e5 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #f0f0f0;
   border-radius: var(--rounded-lg);
   overflow: hidden;
   user-select: none;
@@ -356,7 +363,6 @@ watch(dragging, (v) => {
 .cropper-actions {
   display: flex;
   gap: var(--spacing-sm);
-  justify-content: flex-end;
 }
 
 @keyframes cropper-fade-in {
