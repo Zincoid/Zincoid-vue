@@ -370,7 +370,7 @@ async function changeEmail() {
               <!-- Verify old email -->
               <div v-if="auth.user?.email" class="field">
                 <label class="field__label">{{ t('profile.currentEmail') }}: {{ auth.user?.email }}</label>
-                <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }}</p>
+                <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }} <span class="field__required">*</span></p>
                 <div style="display:flex;gap:var(--spacing-sm)">
                   <input v-model="emailForm.oldCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
                   <button class="btn btn--outline" :disabled="sendingOldCode || oldCodeCountdown > 0" @click="sendOldCode" type="button">
@@ -378,6 +378,8 @@ async function changeEmail() {
                   </button>
                 </div>
               </div>
+
+              <hr class="email-divider" />
 
               <!-- Enter new email -->
               <div class="field">
@@ -597,6 +599,8 @@ async function changeEmail() {
 .card .msg {
   margin-top: var(--spacing-lg);
 }
+
+.email-divider { border: none; border-top: 1px solid var(--color-border-light); margin: var(--spacing-xs) 0; }
 
 .card__desc {
   font-size: var(--text-sm);
