@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { fileAPI, userAPI, authAPI } from '@/api'
+import AvatarCropper from '@/components/AvatarCropper.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -23,6 +24,10 @@ const profile = ref({
 const skillsInput = ref('')
 const message = ref('')
 const error = ref('')
+
+// Avatar crop
+const cropSrc = ref('')
+const cropVisible = ref(false)
 
 // Password
 const pwdForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
@@ -59,10 +64,17 @@ onMounted(async () => {
   }
 })
 
-async function handleUpload(e) {
+function handleUpload(e) {
   const file = e.target.files[0]
   if (!file) return
+  cropSrc.value = URL.createObjectURL(file)
+  cropVisible.value = true
+  e.target.value = ''
+}
+
+async function handleCrop(blob) {
   try {
+    const file = new File([blob], 'avatar.png', { type: 'image/png' })
     const { data } = await fileAPI.upload(file, 2, auth.user.id)
     profile.value.avatar = data.data.url
     message.value = ''
@@ -70,6 +82,7 @@ async function handleUpload(e) {
     await userAPI.updateAvatar(data.data.url)
     await auth.fetchMe()
     message.value = t('profile.avatarUpdated')
+    cropVisible.value = false
   } catch (err) {
     error.value = t('profile.uploadFailed')
   }
@@ -376,6 +389,13 @@ async function changeEmail() {
         </div>
       </div>
     </div>
+
+    <AvatarCropper
+      :src="cropSrc"
+      :visible="cropVisible"
+      @crop="handleCrop"
+      @close="cropVisible = false"
+    />
   </div>
 </template>
 
