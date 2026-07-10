@@ -441,12 +441,14 @@ async function changeEmail() {
 
         <div class="card">
           <h2 class="card__title card__title--danger">{{ t('profile.deleteAccount') }}</h2>
-          <p class="card__desc">{{ t('profile.deleteAccountDesc') }}</p>
 
           <template v-if="showDeleteForm">
-            <div class="field" style="margin-bottom:var(--spacing-md)">
-              <label class="field__label">{{ t('profile.deleteConfirmHint', { username: auth.user?.username }) }} <span class="field__required">*</span></label>
-              <input v-model="deleteConfirmInput" class="field__input" type="text" :placeholder="auth.user?.username" />
+            <div class="fields">
+              <div class="field">
+                <label class="field__label">{{ t('profile.deleteAccountDesc') }}</label>
+                <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.deleteConfirmHint', { username: auth.user?.username }) }} <span class="field__required">*</span></p>
+                <input v-model="deleteConfirmInput" class="field__input" type="text" :placeholder="auth.user?.username" />
+              </div>
             </div>
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
               <button class="btn btn--outline btn--full" @click="showDeleteForm = false; deleteConfirmInput = ''">{{ t('common.cancel') }}</button>
@@ -457,12 +459,15 @@ async function changeEmail() {
             </div>
           </template>
 
-          <div v-else class="card__actions">
-            <button class="btn btn--danger btn--full" @click="showDeleteForm = true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              {{ t('profile.deleteAccount') }}
-            </button>
-          </div>
+          <template v-else>
+            <p class="card__desc">{{ t('profile.deleteAccountDesc') }}</p>
+            <div class="card__actions">
+              <button class="btn btn--danger btn--full" @click="showDeleteForm = true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                {{ t('profile.deleteAccount') }}
+              </button>
+            </div>
+          </template>
         </div>
       </div>
     </div>
