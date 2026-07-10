@@ -367,16 +367,18 @@ async function changeEmail() {
 
           <template v-if="showEmailForm">
             <div class="fields">
-              <!-- Verify old email -->
-              <div v-if="auth.user?.email" class="field">
-                <label class="field__label">{{ t('profile.currentEmail') }}: {{ auth.user?.email }}</label>
-                <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }} <span class="field__required">*</span></p>
-                <div style="display:flex;gap:var(--spacing-sm)">
-                  <input v-model="emailForm.oldCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
-                  <button class="btn btn--outline" :disabled="sendingOldCode || oldCodeCountdown > 0" @click="sendOldCode" type="button">
-                    {{ oldCodeCountdown > 0 ? oldCodeCountdown + 's' : (sendingOldCode ? '...' : t('auth.sendCode')) }}
-                  </button>
-                </div>
+              <!-- Current email -->
+              <div class="field">
+                <label class="field__label">{{ t('profile.currentEmail') }}: {{ auth.user?.email || t('common.notSet') }}</label>
+                <template v-if="auth.user?.email">
+                  <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }} <span class="field__required">*</span></p>
+                  <div style="display:flex;gap:var(--spacing-sm)">
+                    <input v-model="emailForm.oldCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
+                    <button class="btn btn--outline" :disabled="sendingOldCode || oldCodeCountdown > 0" @click="sendOldCode" type="button">
+                      {{ oldCodeCountdown > 0 ? oldCodeCountdown + 's' : (sendingOldCode ? '...' : t('auth.sendCode')) }}
+                    </button>
+                  </div>
+                </template>
               </div>
 
               <hr class="email-divider" />
