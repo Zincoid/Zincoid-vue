@@ -5,6 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { fileAPI, userAPI, authAPI } from '@/api'
 import AvatarCropper from '@/components/AvatarCropper.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -47,6 +48,9 @@ let oldCodeTimer = null
 let newCodeTimer = null
 const showEmailForm = ref(false)
 
+const loading = ref(true)
+const loadingDone = ref(false)
+
 onMounted(async () => {
   try {
     await auth.fetchMe()
@@ -64,6 +68,8 @@ onMounted(async () => {
     skillsInput.value = (u.skills || []).join(', ')
   } catch (e) {
     error.value = t('profile.loadFailed')
+  } finally {
+    loading.value = false
   }
 })
 
@@ -251,7 +257,9 @@ async function changeEmail() {
       <p class="page-header__subtitle">{{ t('profile.subtitle') }}</p>
     </div>
 
-    <div class="profile-layout">
+    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+    <template v-if="loadingDone">
+      <div class="profile-layout">
       <!-- Left: Avatar -->
       <div class="profile-sidebar">
         <label class="avatar-upload">
@@ -443,6 +451,7 @@ async function changeEmail() {
       @crop="handleCrop"
       @close="cropVisible = false"
     />
+    </template>
   </div>
 </template>
 
