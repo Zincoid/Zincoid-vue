@@ -19,9 +19,27 @@ const CROP_RADIUS = 150
 
 const offset = reactive({ x: 0, y: 0 })
 const zoom = ref(1)
+const zoomMin = ref(0.1)
 const dragging = ref(false)
 const dragStart = reactive({ x: 0, y: 0 })
 const offsetStart = reactive({ x: 0, y: 0 })
+
+function clampOffset() {
+  const displayW = imgNatural.value.w * zoom.value
+  const displayH = imgNatural.value.h * zoom.value
+  const ws = workspaceRef.value
+  if (!ws) return
+  const wsW = ws.clientWidth
+  const wsH = ws.clientHeight
+
+  const minX = wsW / 2 - displayW + CROP_RADIUS
+  const maxX = wsW / 2 - CROP_RADIUS
+  const minY = wsH / 2 - displayH + CROP_RADIUS
+  const maxY = wsH / 2 - CROP_RADIUS
+
+  offset.x = Math.max(minX, Math.min(maxX, offset.x))
+  offset.y = Math.max(minY, Math.min(maxY, offset.y))
+}
 
 async function initImage() {
   await nextTick()
@@ -42,8 +60,11 @@ function onImageLoad() {
   if (!ws) return
   const wsW = ws.clientWidth
   const wsH = ws.clientHeight
-  const fitScale = Math.min(wsW / img.naturalWidth, wsH / img.naturalHeight, 1)
-  zoom.value = Math.max(fitScale, 0.1)
+
+  // Minimum zoom: the crop circle must be tangent to (fit within) the image
+  zoomMin.value = (2 * CROP_RADIUS) / Math.min(img.naturalWidth, img.naturalHeight)
+  zoom.value = zoomMin.value
+
   const displayW = img.naturalWidth * zoom.value
   const displayH = img.naturalHeight * zoom.value
   offset.x = (wsW - displayW) / 2
@@ -96,6 +117,7 @@ function onMouseMove(e) {
   if (!dragging.value) return
   offset.x = offsetStart.x + (e.clientX - dragStart.x)
   offset.y = offsetStart.y + (e.clientY - dragStart.y)
+  clampOffset()
 }
 
 function stopDrag() {
@@ -112,7 +134,7 @@ function onWheel(e) {
 
   const oldZoom = zoom.value
   const delta = e.deltaY > 0 ? -0.1 : 0.1
-  const newZoom = Math.max(0.1, Math.min(3, oldZoom + delta))
+  const newZoom = Math.max(zoomMin.value, Math.min(3, oldZoom + delta))
 
   // Zoom toward mouse position
   const ratio = newZoom / oldZoom
@@ -120,6 +142,7 @@ function onWheel(e) {
   offset.y = my - ratio * (my - offset.y)
 
   zoom.value = newZoom
+  clampOffset()
 }
 
 function onZoomInput(e) {
@@ -132,6 +155,7 @@ function onZoomInput(e) {
   offset.x = cx - ratio * (cx - offset.x)
   offset.y = cy - ratio * (cy - offset.y)
   zoom.value = newZoom
+  clampOffset()
 }
 
 function getCropRect() {
@@ -223,7 +247,7 @@ watch(dragging, (v) => {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
             type="range"
-            min="0.1"
+            :min="zoomMin"
             max="3"
             step="0.01"
             :value="zoom"
