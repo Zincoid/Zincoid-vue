@@ -15,7 +15,7 @@ const workspaceRef = ref(null)
 const imgEl = ref(null)
 const imgNatural = ref({ w: 0, h: 0 })
 
-const CROP_RADIUS = 150
+const cropRadius = ref(150)
 
 const offset = reactive({ x: 0, y: 0 })
 const zoom = ref(1)
@@ -32,10 +32,10 @@ function clampOffset() {
   const wsW = ws.clientWidth
   const wsH = ws.clientHeight
 
-  const minX = wsW / 2 - displayW + CROP_RADIUS
-  const maxX = wsW / 2 - CROP_RADIUS
-  const minY = wsH / 2 - displayH + CROP_RADIUS
-  const maxY = wsH / 2 - CROP_RADIUS
+  const minX = wsW / 2 - displayW + cropRadius.value
+  const maxX = wsW / 2 - cropRadius.value
+  const minY = wsH / 2 - displayH + cropRadius.value
+  const maxY = wsH / 2 - cropRadius.value
 
   offset.x = Math.max(minX, Math.min(maxX, offset.x))
   offset.y = Math.max(minY, Math.min(maxY, offset.y))
@@ -61,8 +61,11 @@ function onImageLoad() {
   const wsW = ws.clientWidth
   const wsH = ws.clientHeight
 
+  // Responsive crop circle size
+  cropRadius.value = Math.min(150, Math.min(wsW, wsH) * 0.42)
+
   // Minimum zoom: the crop circle must be tangent to (fit within) the image
-  zoomMin.value = (2 * CROP_RADIUS) / Math.min(img.naturalWidth, img.naturalHeight)
+  zoomMin.value = (2 * cropRadius.value) / Math.min(img.naturalWidth, img.naturalHeight)
   zoom.value = zoomMin.value
 
   const displayW = img.naturalWidth * zoom.value
@@ -93,8 +96,8 @@ const imageStyle = computed(() => ({
 }))
 
 const maskStyle = computed(() => ({
-  width: (CROP_RADIUS * 2) + 'px',
-  height: (CROP_RADIUS * 2) + 'px',
+  width: (cropRadius.value * 2) + 'px',
+  height: (cropRadius.value * 2) + 'px',
   borderRadius: '50%',
   boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.55)',
   position: 'absolute',
@@ -104,19 +107,27 @@ const maskStyle = computed(() => ({
   pointerEvents: 'none'
 }))
 
+function getPos(e) {
+  if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  return { x: e.clientX, y: e.clientY }
+}
+
 function startDrag(e) {
   e.preventDefault()
   dragging.value = true
-  dragStart.x = e.clientX
-  dragStart.y = e.clientY
+  const pos = getPos(e)
+  dragStart.x = pos.x
+  dragStart.y = pos.y
   offsetStart.x = offset.x
   offsetStart.y = offset.y
 }
 
-function onMouseMove(e) {
+function onMove(e) {
   if (!dragging.value) return
-  offset.x = offsetStart.x + (e.clientX - dragStart.x)
-  offset.y = offsetStart.y + (e.clientY - dragStart.y)
+  e.preventDefault()
+  const pos = getPos(e)
+  offset.x = offsetStart.x + (pos.x - dragStart.x)
+  offset.y = offsetStart.y + (pos.y - dragStart.y)
   clampOffset()
 }
 
@@ -129,14 +140,15 @@ function onWheel(e) {
   const ws = workspaceRef.value
   if (!ws) return
   const rect = ws.getBoundingClientRect()
-  const mx = e.clientX - rect.left
-  const my = e.clientY - rect.top
+  const pos = getPos(e)
+  const mx = pos.x - rect.left
+  const my = pos.y - rect.top
 
   const oldZoom = zoom.value
   const delta = e.deltaY > 0 ? -0.1 : 0.1
   const newZoom = Math.max(zoomMin.value, Math.min(3, oldZoom + delta))
 
-  // Zoom toward mouse position
+  // Zoom toward pointer position
   const ratio = newZoom / oldZoom
   offset.x = mx - ratio * (mx - offset.x)
   offset.y = my - ratio * (my - offset.y)
@@ -175,7 +187,7 @@ function getCropRect() {
 
   const cx = centerDisplayX * scaleX
   const cy = centerDisplayY * scaleY
-  const r = CROP_RADIUS * scaleX
+  const r = cropRadius.value * scaleX
   const size = Math.round(r * 2)
 
   return {
@@ -207,14 +219,18 @@ function close() {
   emit('close')
 }
 
-// Global mouse listeners
+// Global mouse/touch listeners
 watch(dragging, (v) => {
   if (v) {
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', stopDrag)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend', stopDrag)
   } else {
-    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mousemove', onMove)
     window.removeEventListener('mouseup', stopDrag)
+    window.removeEventListener('touchmove', onMove)
+    window.removeEventListener('touchend', stopDrag)
   }
 })
 </script>
@@ -229,6 +245,7 @@ watch(dragging, (v) => {
           ref="workspaceRef"
           class="cropper-workspace"
           @mousedown="startDrag"
+          @touchstart.prevent="startDrag"
           @wheel.prevent="onWheel"
         >
           <img
@@ -345,5 +362,15 @@ watch(dragging, (v) => {
 @keyframes cropper-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .cropper-modal {
+    padding: var(--spacing-lg);
+    gap: var(--spacing-md);
+  }
+  .cropper-workspace {
+    max-height: 300px;
+  }
 }
 </style>
