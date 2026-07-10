@@ -397,6 +397,8 @@ th {
   flex: 1;
   padding-top: var(--navbar-height);
   padding-bottom: var(--spacing-4xl);
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Scrollbar ── */

@@ -26,6 +26,9 @@ const { t } = useI18n()
   border-top: 1px solid var(--color-border);
   padding: var(--spacing-md) var(--spacing-xl);
   margin-top: auto;
+  position: relative;
+  z-index: 1;
+  background: var(--color-bg);
 }
 
 .footer__inner {

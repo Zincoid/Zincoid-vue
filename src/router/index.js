@@ -39,7 +39,7 @@ const routes = [
   },
   {
     path: '/members',
-    name: 'MemberList',
+    name: 'Members',
     component: () => import('@/views/MembersPage.vue'),
     meta: { title: 'Members' }
   },
