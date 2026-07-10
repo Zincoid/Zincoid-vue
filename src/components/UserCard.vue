@@ -97,7 +97,7 @@ async function handleDelete() {
 }
 .user-card:hover {
   border-color: #f9a8d4;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg), 0 0 0 0.5px #f9a8d4;
   transform: translateY(-5px);
 }
 

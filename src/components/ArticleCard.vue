@@ -57,6 +57,7 @@ function goDetail(id) {
 .article-card:hover {
   border-color: #f9a8d4;
   transform: scale(1.02);
+  box-shadow: 0 0 0 0.5px #f9a8d4;
 }
 
 .article-card__cover {
