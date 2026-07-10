@@ -140,8 +140,7 @@ function goUser(e) {
 }
 .moment-card:hover {
   border-color: #f9a8d4;
-  box-shadow: var(--shadow-md);
-  transform: scale(1.01);
+  transform: scale(1.02);
 }
 
 .moment-card__header {
