@@ -248,7 +248,7 @@ export default {
     'Invalid username or password': '用户名或密码错误',
     'Account is disabled': '账号已被禁用',
     'Account not found': '账号不存在',
-    'Old password is incorrect': '原密码错误',
+    'Old password is incorrect': '旧密码错误',
     'User not found': '用户不存在',
     'Moment not found': '动态不存在',
     'Article not found': '文章不存在',
