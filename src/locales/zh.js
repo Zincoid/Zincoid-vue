@@ -143,11 +143,12 @@ export default {
     currentEmail: '当前绑定邮箱',
     emailChanged: '邮箱修改成功！',
     emailUpdateFailed: '邮箱修改失败',
-    oldCodeRequired: '请先验证当前邮箱',
+    oldCodeRequired: '请验证当前邮箱',
     oldEmailHint: '需验证当前绑定邮箱',
     oldCodePlaceholder: '旧邮箱验证码',
     newEmailCode: '验证码',
-    newCodePlaceholder: '新邮箱验证码'
+    newCodePlaceholder: '新邮箱验证码',
+    newCodeRequired: '请验证新邮箱'
   },
   auth: {
     login: '登录',

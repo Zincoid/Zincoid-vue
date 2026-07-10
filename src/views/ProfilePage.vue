@@ -226,7 +226,7 @@ async function changeEmail() {
     return
   }
   if (!emailForm.value.newCode.trim()) {
-    emailError.value = t('auth.codeRequired')
+    emailError.value = t('profile.newCodeRequired')
     return
   }
   try {
