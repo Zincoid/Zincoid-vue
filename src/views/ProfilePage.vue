@@ -317,7 +317,7 @@ async function changeEmail() {
             </div>
             <div class="field">
               <label class="field__label">{{ t('profile.contacts') }}</label>
-              <textarea v-model="profile.contacts" class="field__input field__textarea" rows="2" placeholder='{"website":"...","email":"...","github":"...","bilibili":"...","x":"..."}'></textarea>
+              <textarea v-model="profile.contacts" class="field__input field__textarea" rows="3" placeholder='{"website":"...","email":"...","github":"...","bilibili":"...","x":"..."}'></textarea>
               <span class="field__hint">{{ t('profile.contactsHint') }}</span>
             </div>
           </div>
