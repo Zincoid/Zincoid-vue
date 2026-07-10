@@ -36,12 +36,15 @@ const pwdError = ref('')
 const showPwdForm = ref(false)
 
 // Email
-const emailForm = ref({ email: '', code: '' })
+const emailForm = ref({ newEmail: '', oldCode: '', newCode: '' })
 const emailMessage = ref('')
 const emailError = ref('')
-const sendingEmail = ref(false)
-const emailCountdown = ref(0)
-let emailTimer = null
+const sendingOldCode = ref(false)
+const sendingNewCode = ref(false)
+const oldCodeCountdown = ref(0)
+const newCodeCountdown = ref(0)
+let oldCodeTimer = null
+let newCodeTimer = null
 const showEmailForm = ref(false)
 
 onMounted(async () => {
@@ -165,50 +168,75 @@ async function deleteAccount() {
   }
 }
 
-async function handleSendEmailCode() {
-  if (!emailForm.value.email) {
-    emailError.value = t('auth.emailRequired')
-    return
-  }
-  if (!/\S+@\S+\.\S+/.test(emailForm.value.email)) {
-    emailError.value = t('auth.invalidEmailFormat')
-    return
-  }
-  sendingEmail.value = true
+async function sendOldCode() {
   emailError.value = ''
+  sendingOldCode.value = true
   try {
-    await authAPI.sendChangeCode(emailForm.value.email)
-    emailCountdown.value = 60
-    emailTimer = setInterval(() => {
-      emailCountdown.value--
-      if (emailCountdown.value <= 0) clearInterval(emailTimer)
+    await authAPI.sendOldCode()
+    oldCodeCountdown.value = 60
+    oldCodeTimer = setInterval(() => {
+      oldCodeCountdown.value--
+      if (oldCodeCountdown.value <= 0) clearInterval(oldCodeTimer)
     }, 1000)
   } catch (err) {
     emailError.value = getMessage(err, 'Failed to send code')
   } finally {
-    sendingEmail.value = false
+    sendingOldCode.value = false
+  }
+}
+
+async function sendNewCode() {
+  if (!emailForm.value.newEmail) {
+    emailError.value = t('auth.emailRequired')
+    return
+  }
+  if (!/\S+@\S+\.\S+/.test(emailForm.value.newEmail)) {
+    emailError.value = t('auth.invalidEmailFormat')
+    return
+  }
+  emailError.value = ''
+  sendingNewCode.value = true
+  try {
+    await authAPI.sendNewCode(emailForm.value.newEmail)
+    newCodeCountdown.value = 60
+    newCodeTimer = setInterval(() => {
+      newCodeCountdown.value--
+      if (newCodeCountdown.value <= 0) clearInterval(newCodeTimer)
+    }, 1000)
+  } catch (err) {
+    emailError.value = getMessage(err, 'Failed to send code')
+  } finally {
+    sendingNewCode.value = false
   }
 }
 
 async function changeEmail() {
   emailMessage.value = ''
   emailError.value = ''
-  if (!emailForm.value.email) {
+  if (auth.user?.email && !emailForm.value.oldCode.trim()) {
+    emailError.value = t('profile.oldCodeRequired')
+    return
+  }
+  if (!emailForm.value.newEmail) {
     emailError.value = t('auth.emailRequired')
     return
   }
-  if (!/\S+@\S+\.\S+/.test(emailForm.value.email)) {
+  if (!/\S+@\S+\.\S+/.test(emailForm.value.newEmail)) {
     emailError.value = t('auth.invalidEmailFormat')
     return
   }
-  if (!emailForm.value.code.trim()) {
+  if (!emailForm.value.newCode.trim()) {
     emailError.value = t('auth.codeRequired')
     return
   }
   try {
-    await authAPI.change(emailForm.value)
+    await authAPI.change({
+      email: emailForm.value.newEmail,
+      newCode: emailForm.value.newCode,
+      oldCode: emailForm.value.oldCode
+    })
     emailMessage.value = t('profile.emailChanged')
-    emailForm.value = { email: '', code: '' }
+    emailForm.value = { newEmail: '', oldCode: '', newCode: '' }
     await auth.fetchMe()
   } catch (err) {
     emailError.value = getMessage(err, 'profile.emailUpdateFailed')
@@ -339,18 +367,33 @@ async function changeEmail() {
 
           <template v-if="showEmailForm">
             <div class="fields">
-              <div class="field">
-                <label class="field__label">{{ t('profile.newEmail') }} <span class="field__required">*</span></label>
+              <!-- Verify old email -->
+              <div v-if="auth.user?.email" class="field">
+                <label class="field__label">{{ t('profile.currentEmail') }}: {{ auth.user?.email }}</label>
+                <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }}</p>
                 <div style="display:flex;gap:var(--spacing-sm)">
-                  <input v-model="emailForm.email" class="field__input" style="flex:1" type="email" :placeholder="t('profile.newEmailPlaceholder')" />
-                  <button class="btn btn--outline" :disabled="sendingEmail || emailCountdown > 0" @click="handleSendEmailCode" type="button">
-                    {{ emailCountdown > 0 ? emailCountdown + 's' : (sendingEmail ? '...' : t('auth.sendCode')) }}
+                  <input v-model="emailForm.oldCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
+                  <button class="btn btn--outline" :disabled="sendingOldCode || oldCodeCountdown > 0" @click="sendOldCode" type="button">
+                    {{ oldCodeCountdown > 0 ? oldCodeCountdown + 's' : (sendingOldCode ? '...' : t('auth.sendCode')) }}
                   </button>
                 </div>
               </div>
+
+              <!-- Enter new email -->
               <div class="field">
-                <label class="field__label">{{ t('auth.code') }} <span class="field__required">*</span></label>
-                <input v-model="emailForm.code" class="field__input" type="text" maxlength="6" :placeholder="t('auth.codePlaceholder')" />
+                <label class="field__label">{{ t('profile.newEmail') }} <span class="field__required">*</span></label>
+                <input v-model="emailForm.newEmail" class="field__input" type="email" :placeholder="t('profile.newEmailPlaceholder')" />
+              </div>
+
+              <!-- Verify new email -->
+              <div class="field">
+                <label class="field__label">{{ t('profile.newEmailCode') }} <span class="field__required">*</span></label>
+                <div style="display:flex;gap:var(--spacing-sm)">
+                  <input v-model="emailForm.newCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.newCodePlaceholder')" />
+                  <button class="btn btn--outline" :disabled="sendingNewCode || newCodeCountdown > 0" @click="sendNewCode" type="button">
+                    {{ newCodeCountdown > 0 ? newCodeCountdown + 's' : (sendingNewCode ? '...' : t('auth.sendCode')) }}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -358,7 +401,7 @@ async function changeEmail() {
             <p v-if="emailError" class="msg msg--error">{{ emailError }}</p>
 
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
-              <button class="btn btn--outline btn--full" @click="showEmailForm = false; emailForm = { email: '', code: '' }; emailError = ''; emailMessage = ''; clearInterval(emailTimer); emailCountdown = 0">{{ t('common.cancel') }}</button>
+              <button class="btn btn--outline btn--full" @click="showEmailForm = false; emailForm = { newEmail: '', oldCode: '', newCode: '' }; emailError = ''; emailMessage = ''; clearInterval(oldCodeTimer); clearInterval(newCodeTimer); oldCodeCountdown = 0; newCodeCountdown = 0">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary btn--full" @click="changeEmail">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 {{ t('common.confirm') }}

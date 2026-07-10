@@ -139,10 +139,15 @@ export default {
     deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone.',
     changeEmail: 'Change Email',
     newEmail: 'New Email',
-    newEmailPlaceholder: 'Enter new email',
+    newEmailPlaceholder: 'Enter your new email',
     currentEmail: 'Current email',
     emailChanged: 'Email changed!',
-    emailUpdateFailed: 'Failed to change email'
+    emailUpdateFailed: 'Failed to change email',
+    oldCodeRequired: 'Please verify your current email first',
+    oldEmailHint: 'Verify your current email',
+    oldCodePlaceholder: 'Old email verification code',
+    newEmailCode: 'Verification Code',
+    newCodePlaceholder: 'New email verification code'
   },
   auth: {
     login: 'Login',
@@ -264,7 +269,10 @@ export default {
     'Please wait before requesting a new code': 'Verification code already requested. Please wait',
     'Verification code already requested, please wait': 'Verification code already requested, please wait',
     'New email is the same as current email': 'New email is the same as current email',
-    'Email not registered': 'Email not registered'
+    'Email not registered': 'Email not registered',
+    'Invalid or expired old email verification code': 'Invalid or expired old email verification code',
+    'Invalid or expired new email verification code': 'Invalid or expired new email verification code',
+    'No email set': 'No email set'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',

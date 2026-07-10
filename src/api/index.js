@@ -42,7 +42,8 @@ export const authAPI = {
   change: (data) => api.put('/auth/change-email', data),
   sendRegisterCode: (email) => api.post('/auth/register/send-code', { email }),
   sendResetCode: (email) => api.post('/auth/reset-password/send-code', { email }),
-  sendChangeCode: (email) => api.post('/auth/change-email/send-code', { email })
+  sendNewCode: (email) => api.post('/auth/change-email/send-new-code', { email }),
+  sendOldCode: () => api.post('/auth/change-email/send-old-code')
 }
 
 // ── Users ──

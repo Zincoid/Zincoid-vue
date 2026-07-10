@@ -142,7 +142,12 @@ export default {
     newEmailPlaceholder: '请输入新邮箱',
     currentEmail: '当前绑定邮箱',
     emailChanged: '邮箱修改成功！',
-    emailUpdateFailed: '邮箱修改失败'
+    emailUpdateFailed: '邮箱修改失败',
+    oldCodeRequired: '请先验证当前邮箱',
+    oldEmailHint: '需验证当前绑定邮箱',
+    oldCodePlaceholder: '旧邮箱验证码',
+    newEmailCode: '验证码',
+    newCodePlaceholder: '新邮箱验证码'
   },
   auth: {
     login: '登录',
@@ -264,7 +269,10 @@ export default {
     'Please wait before requesting a new code': '验证码已请求，请稍后再试',
     'Verification code already requested, please wait': '验证码已请求，请稍后再试',
     'New email is the same as current email': '新邮箱与当前邮箱相同',
-    'Email not registered': '该邮箱未注册'
+    'Email not registered': '该邮箱未注册',
+    'Invalid or expired old email verification code': '旧邮箱验证码错误或已过期',
+    'Invalid or expired new email verification code': '新邮箱验证码错误或已过期',
+    'No email set': '未绑定邮箱'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
