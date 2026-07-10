@@ -107,7 +107,7 @@ export default {
     uploadFailed: 'Upload failed',
     pwdUpdateFailed: 'Failed to change password',
     deleteFailed: 'Failed to delete account',
-    avatarHint: 'Click to update avatar',
+    avatarHint: 'Click to upload avatar',
     username: 'Username',
     nickname: 'Nickname',
     gender: 'Gender',

@@ -107,7 +107,7 @@ export default {
     uploadFailed: '上传失败',
     pwdUpdateFailed: '密码修改失败',
     deleteFailed: '注销账号失败',
-    avatarHint: '点击更换头像',
+    avatarHint: '点击上传头像',
     username: '用户名',
     nickname: '昵称',
     gender: '性别',
