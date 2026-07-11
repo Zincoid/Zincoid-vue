@@ -119,6 +119,12 @@ const routes = [
     meta: { title: 'Repos' }
   },
   {
+    path: '/repos/:id',
+    name: 'RepoDetail',
+    component: () => import('@/views/RepoDetailPage.vue'),
+    meta: { title: 'Repo' }
+  },
+  {
     path: '/chats',
     name: 'Chats',
     component: () => import('@/views/ChatsPage.vue'),

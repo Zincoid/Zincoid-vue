@@ -139,6 +139,18 @@ export const healthAPI = {
   cleanupRecords: () => api.post('/health/cleanup')
 }
 
+// ── Repos ──
+export const repoAPI = {
+  create: (data) => api.post('/repos', data),
+  update: (id, data) => api.put(`/repos/${id}`, data),
+  delete: (id) => api.delete(`/repos/${id}`),
+  getList: (page = 1, size = 10, type, userId, keyword) => api.get('/repos/public', { params: { page, size, type, userId, keyword } }),
+  getDetail: (id) => api.get(`/repos/public/${id}`),
+  addItem: (repoId, data) => api.post(`/repos/${repoId}/items`, data),
+  deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
+  sortItems: (repoId, itemIds) => api.put(`/repos/${repoId}/items/sort`, itemIds)
+}
+
 // ── Notifications ──
 export const notificationAPI = {
   getList: (page = 1, size = 5) => api.get('/notifications', { params: { page, size } }),

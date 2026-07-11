@@ -168,7 +168,22 @@ export default {
   },
   repo: {
     pageTitle: 'Repos',
-    placeholder: 'Repository is coming soon...'
+    placeholder: 'Code repos, media & file collections',
+    all: 'All',
+    code: 'Code',
+    media: 'Media',
+    file: 'File',
+    empty: 'No repos yet.',
+    emptyItems: 'No items yet.',
+    new: 'New',
+    name: 'Name',
+    type: 'Type',
+    url: 'URL',
+    description: 'Description',
+    urlHint: 'e.g. GitHub repository URL',
+    tags: 'Tags',
+    tagsHint: 'Separate with commas',
+    searchPlaceholder: 'Search repos...'
   },
   data: {
     pageTitle: 'Data',
@@ -202,6 +217,8 @@ export default {
     like: 'Likes',
     comment: 'Comments',
     notification: 'Notifications',
+    repo: 'Repos',
+    repoItem: 'Repo Items',
     resetPassword: 'Force password reset',
     resetPasswordDesc: 'Enter username and new password to overwrite',
     resetPasswordPlaceholder: 'Username',

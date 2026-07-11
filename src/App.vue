@@ -10,7 +10,7 @@ const auth = useAuthStore()
 const route = useRoute()
 
 const showFlow = computed(() => {
-  const pages = ['Home', 'Moments', 'Articles', 'Chats', 'Members', 'Manage']
+  const pages = ['Home', 'Moments', 'Articles', 'Repos', 'Chats', 'Members']
   return pages.includes(route.name)
 })
 </script>

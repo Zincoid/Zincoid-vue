@@ -174,7 +174,22 @@ export default {
   },
   repo: {
     pageTitle: '仓库',
-    placeholder: '仓库功能即将上线...'
+    placeholder: '代码仓库、媒体集与文件集',
+    all: '全部',
+    code: '代码',
+    media: '媒体',
+    file: '文件',
+    empty: '暂无仓库。',
+    emptyItems: '暂无内容。',
+    new: '新建',
+    name: '名称',
+    type: '类型',
+    url: '链接',
+    description: '描述',
+    urlHint: 'GitHub 仓库地址',
+    tags: '标签',
+    tagsHint: '用逗号分隔',
+    searchPlaceholder: '搜索仓库...'
   },
   system: {
     subtitle: '站点配置与工具',
@@ -202,6 +217,8 @@ export default {
     like: '点赞',
     comment: '评论',
     notification: '通知',
+    repo: '仓库',
+    repoItem: '仓库条目',
     resetPassword: '强制更新密码',
     resetPasswordDesc: '输入用户名和新密码，直接覆盖旧密码',
     resetPasswordPlaceholder: '用户名',
