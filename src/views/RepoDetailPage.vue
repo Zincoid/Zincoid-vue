@@ -158,7 +158,7 @@ async function saveEdit() {
 
 <template>
   <div class="repo-detail">
-    <div v-if="loadingDone && repo && repo.coverImage && repo.type !== 0" class="repo-cover-banner" :style="{ backgroundImage: `url(${repo.coverImage})` }">
+    <div v-if="loadingDone && repo && repo.coverImage" class="repo-cover-banner" :style="{ backgroundImage: `url(${repo.coverImage})` }">
       <div class="repo-cover-banner__overlay"></div>
     </div>
     <div class="container">

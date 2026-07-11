@@ -347,7 +347,7 @@ async function createRepo() {
   padding: 2px var(--spacing-sm);
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: var(--rounded-full);
 }
 

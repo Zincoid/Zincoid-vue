@@ -368,8 +368,8 @@ function typeLabel(type) {
 .repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
 .repo-card__badges { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: 4px; }
-.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: var(--color-surface); border-radius: var(--rounded-full); }
-.repo-card__visibility { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-surface); padding: 2px var(--spacing-sm); border-radius: var(--rounded-full); }
+.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255, 255, 255, 0.9); border-radius: var(--rounded-full); }
+.repo-card__visibility { font-size: var(--text-xs); color: var(--color-text-secondary); background: rgba(255, 255, 255, 0.9); padding: 2px var(--spacing-sm); border-radius: var(--rounded-full); }
 .repo-card__body { padding: var(--spacing-lg); }
 .repo-card__user { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-sm); }
 .repo-card__user-left { display: flex; align-items: center; gap: var(--spacing-xs); }
