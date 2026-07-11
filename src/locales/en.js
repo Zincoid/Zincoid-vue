@@ -175,6 +175,7 @@ export default {
     file: 'File',
     empty: 'No repos yet.',
     emptyItems: 'No items yet.',
+    itemName: 'Name',
     new: 'New',
     name: 'Name',
     type: 'Type',

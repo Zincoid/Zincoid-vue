@@ -40,6 +40,32 @@ async function deleteRepo() {
   } catch { /* ignore */ }
 }
 
+// ── Items upload ──
+const uploading = ref(false)
+
+async function handleItemFiles(e) {
+  const files = e.target.files
+  if (!files.length) return
+  uploading.value = true
+  try {
+    for (const file of files) {
+      const { data: fileData } = await fileAPI.upload(file)
+      const { data: itemData } = await repoAPI.addItem(repo.value.id, { fileId: fileData.data.id, name: file.name })
+      repo.value.items = [...(repo.value.items || []), itemData.data]
+    }
+  } catch { /* ignore */ } finally {
+    uploading.value = false
+    e.target.value = ''
+  }
+}
+
+async function deleteItem(itemId) {
+  try {
+    await repoAPI.deleteItem(repo.value.id, itemId)
+    repo.value.items = repo.value.items.filter(i => i.id !== itemId)
+  } catch { /* ignore */ }
+}
+
 // ── Edit modal ──
 const showEdit = ref(false)
 const editForm = ref({ name: '', description: '', type: 0, url: '', tags: '', coverImage: '' })
@@ -167,6 +193,9 @@ async function saveEdit() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
             <span class="item-card__name">{{ item.name }}</span>
+            <button v-if="isOwner()" class="item-card__delete" @click.stop="deleteItem(item.id)">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
         </div>
       </template>
@@ -239,6 +268,11 @@ async function saveEdit() {
       </Transition>
     </Teleport>
 
+    <label v-if="isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <input type="file" accept="image/*,video/*,audio/*" multiple class="hidden-input" @change="handleItemFiles" />
+    </label>
+
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
     </button>
@@ -283,7 +317,39 @@ async function saveEdit() {
   gap: var(--spacing-md);
 }
 
+.upload-fab {
+  position: fixed;
+  right: var(--spacing-4xl);
+  bottom: 140px;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+.upload-fab:hover {
+  color: #16a34a;
+  border-color: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  opacity: 1;
+}
+@media (max-width: 768px) {
+  .upload-fab { bottom: 200px; }
+}
+.hidden-input { display: none; }
+
 .item-card {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-md);
@@ -292,10 +358,14 @@ async function saveEdit() {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .item-card:hover { border-color: #f9a8d4; transform: scale(1.02); box-shadow: 0 0 0 0.5px #f9a8d4; }
+.item-card:hover .item-card__delete { opacity: 1; }
 
 .item-card__thumb { width: 100%; height: 120px; object-fit: cover; display: block; }
 .item-card__file-icon { height: 120px; display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); background: var(--color-bg-alt); }
 .item-card__name { display: block; padding: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.item-card__delete { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
+.item-card__delete:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
 
 /* ── Modal ── */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
