@@ -485,6 +485,7 @@ th {
   opacity: 0.6;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-md);
+  cursor: pointer;
 }
 .back-fab:hover {
   border-color: var(--color-primary);

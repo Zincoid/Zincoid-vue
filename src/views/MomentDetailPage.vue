@@ -425,9 +425,9 @@ watch(likeLiked, (liked) => {
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
-  <router-link to="/moments" class="back-fab" :title="t('common.backToList')">
+  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-  </router-link>
+  </button>
   <div v-if="!editing" class="like-fab">
     <LikeButton
       :target-type="0"

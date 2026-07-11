@@ -305,9 +305,9 @@ watch(likeLiked, (liked) => {
   </div>
   <p v-if="loadingDone && !article" class="empty-state">{{ notFoundMessage || t('article.notFound') }}</p>
 
-  <router-link to="/articles" class="back-fab" :title="t('common.backToList')">
+  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-  </router-link>
+  </button>
   <div class="like-fab">
     <LikeButton
       :target-type="1"

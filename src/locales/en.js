@@ -354,7 +354,7 @@ export default {
     posting: 'Posting...',
     saving: 'Saving...',
     cleaning: 'Cleaning...',
-    backToList: 'Back to list',
+    goBack: 'Back',
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete: 'Delete',

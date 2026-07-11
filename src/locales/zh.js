@@ -352,7 +352,7 @@ export default {
     posting: '发布中...',
     saving: '保存中...',
     cleaning: '清理中...',
-    backToList: '返回列表',
+    goBack: '返回',
     confirm: '确定',
     cancel: '取消',
     delete: '删除',

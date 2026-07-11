@@ -140,9 +140,9 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
       <path v-else d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v3.76z"/>
     </svg>
   </button>
-  <router-link to="/members" class="back-fab" :title="t('common.backToList')">
+  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-  </router-link>
+  </button>
 </template>
 
 <style scoped>
