@@ -115,7 +115,7 @@ export default {
   profile: {
     pageTitle: '基本',
     subtitle: '管理个人信息和账户设置',
-    information: '基本信息',
+    information: '个人信息',
     loadFailed: '加载个人信息失败',
     avatarUpdated: '头像更新成功！',
     uploadFailed: '上传失败',
