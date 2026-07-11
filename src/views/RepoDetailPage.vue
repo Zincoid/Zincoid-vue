@@ -43,6 +43,15 @@ function previewItem(url) {
   viewerVisible.value = true
 }
 
+function formatSize(bytes) {
+  if (!bytes) return ''
+  const units = ['B', 'KB', 'MB', 'GB']
+  let i = 0
+  let size = bytes
+  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++ }
+  return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i]
+}
+
 function mediaType(url) {
   if (!url) return 'other'
   const ext = url.split('.').pop().toLowerCase()
@@ -79,11 +88,17 @@ async function handleItemFiles(e) {
   }
 }
 
+const itemError = ref('')
+
 async function deleteItem(itemId) {
+  itemError.value = ''
   try {
     await repoAPI.deleteItem(repo.value.id, itemId)
     repo.value.items = repo.value.items.filter(i => i.id !== itemId)
-  } catch { /* ignore */ }
+  } catch (err) {
+    itemError.value = getMessage(err, 'common.failed')
+    setTimeout(() => itemError.value = '', 4000)
+  }
 }
 
 // ── Edit modal ──
@@ -101,7 +116,7 @@ function openEdit() {
     type: repo.value.type ?? 0,
     url: repo.value.url || '',
     tags: repo.value.tags?.join(', ') || '',
-    coverImage: repo.value.coverImage || '',
+    coverImage: repo.value.isDefaultCover ? '' : (repo.value.coverImage || ''),
     visibility: repo.value.visibility ?? 0
   }
   editCoverFile.value = null
@@ -205,8 +220,9 @@ async function saveEdit() {
         </a>
       </template>
 
-      <!-- MEDIA / FILE → items grid -->
-      <template v-else>
+      <!-- MEDIA → grid -->
+      <template v-else-if="repo.type === 1">
+        <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid">
           <div v-for="item in repo.items" :key="item.id" class="item-card">
@@ -220,12 +236,34 @@ async function saveEdit() {
             <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </div>
-            <div v-else class="item-card__file-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
             <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- FILE → list -->
+      <template v-else>
+        <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
+        <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
+        <div v-else class="items-list">
+          <div v-for="item in repo.items" :key="item.id" class="item-row">
+            <div class="item-row__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="item-row__info">
+              <span class="item-row__name">{{ item.name }}</span>
+              <span class="item-row__size" v-if="item.fileSize">{{ formatSize(item.fileSize) }}</span>
+            </div>
+            <div class="item-row__actions">
+              <a v-if="item.url" :href="item.url" class="item-row__download" :download="item.name" :title="t('common.download')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </a>
+              <button v-if="canEdit()" class="item-row__delete" @click="deleteItem(item.id)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </template>
@@ -251,7 +289,7 @@ async function saveEdit() {
                     <input type="file" accept="image/*" class="hidden-input" @change="handleEditCover" />
                   </label>
                 </div>
-                <div v-if="editCoverPreview || editForm.coverImage" class="cover-preview-wrap">
+                <div v-if="editCoverPreview || (editForm.coverImage && !repo.isDefaultCover)" class="cover-preview-wrap">
                   <img :src="editCoverPreview || editForm.coverImage" class="cover-preview" />
                   <button class="cover-preview-remove" @click="removeEditCover">&times;</button>
                 </div>
@@ -302,7 +340,7 @@ async function saveEdit() {
 
     <label v-if="repo && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <input type="file" accept="image/*,video/*,audio/*" multiple class="hidden-input" @change="handleItemFiles" />
+      <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
     </label>
 
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
@@ -407,6 +445,19 @@ async function saveEdit() {
 
 .item-card__delete { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
 .item-card__delete:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+
+/* ── File list ── */
+.items-list { display: flex; flex-direction: column; }
+.item-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-lg); border-bottom: 1px solid var(--color-border); transition: background var(--transition-fast); }
+.item-row:hover { background: var(--color-bg-alt); }
+.item-row__icon { flex-shrink: 0; color: var(--color-text-tertiary); display: flex; }
+.item-row__info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.item-row__name { font-size: var(--text-sm); color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-row__size { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.item-row__actions { display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0; }
+.item-row__download, .item-row__delete { display: flex; align-items: center; color: var(--color-text-secondary); padding: var(--spacing-xs); border-radius: var(--rounded-md); transition: all var(--transition-fast); }
+.item-row__download:hover { color: var(--color-primary); background: var(--color-primary-light); }
+.item-row__delete:hover { color: var(--color-danger); background: rgba(229,83,75,0.08); }
 
 /* ── Modal ── */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
