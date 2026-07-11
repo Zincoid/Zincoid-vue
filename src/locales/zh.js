@@ -391,6 +391,7 @@ export default {
       '嵌入中', '分词中', '训练中', '推理中', '反向传播中'
     ],
     posting: '发布中...',
+    creating: '创建中...',
     saving: '保存中...',
     cleaning: '清理中...',
     goBack: '返回',

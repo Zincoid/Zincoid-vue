@@ -393,6 +393,7 @@ export default {
       'Embedding', 'Tokenising', 'Training', 'Inferring', 'Backpropping'
     ],
     posting: 'Posting...',
+    creating: 'Creating...',
     saving: 'Saving...',
     cleaning: 'Cleaning...',
     goBack: 'Back',

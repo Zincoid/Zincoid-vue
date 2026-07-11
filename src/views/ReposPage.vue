@@ -269,7 +269,7 @@ async function createRepo() {
             <div class="modal__actions">
               <button class="btn btn--outline btn--full" @click="showCreate = false">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary btn--full" :disabled="creating" @click="createRepo">
-                {{ creating ? t('common.posting') : t('common.confirm') }}
+                {{ creating ? t('common.creating') : t('common.confirm') }}
               </button>
             </div>
           </div>
