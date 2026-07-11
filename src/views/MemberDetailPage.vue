@@ -38,7 +38,8 @@ const loading = ref(true)
 const loadingDone = ref(false)
 const notFound = ref(false)
 const banned = ref(false)
-const pinnedFirst = ref(false)
+const pinnedMoments = ref(false)
+const pinnedArticles = ref(false)
 const tabLoading = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
@@ -69,7 +70,7 @@ onMounted(async () => {
 
 async function fetchMoments() {
   tabLoading.value = true
-  const { data } = await momentAPI.getByUser(userId.value, mPage.value, pageSize.value, pinnedFirst.value)
+  const { data } = await momentAPI.getByUser(userId.value, mPage.value, pageSize.value, pinnedMoments.value)
   moments.value = data.data.records || []
   mPages.value = data.data.pages || 1
   mTotal.value = data.data.total || 0
@@ -78,7 +79,7 @@ async function fetchMoments() {
 
 async function fetchArticles() {
   tabLoading.value = true
-  const { data } = await articleAPI.getByUser(userId.value, aPage.value, pageSize.value, pinnedFirst.value)
+  const { data } = await articleAPI.getByUser(userId.value, aPage.value, pageSize.value, pinnedArticles.value)
   articles.value = data.data.records || []
   aPages.value = data.data.pages || 1
   aTotal.value = data.data.total || 0
@@ -105,12 +106,15 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
 function onRPage(p) { rPage.value = p; fetchRepos() }
 
 function togglePinned() {
-  pinnedFirst.value = !pinnedFirst.value
-  mPage.value = 1
-  aPage.value = 1
-  if (tab.value === 'moments') fetchMoments()
-  else if (tab.value === 'articles') fetchArticles()
-  else fetchRepos()
+  if (tab.value === 'moments') {
+    pinnedMoments.value = !pinnedMoments.value
+    mPage.value = 1
+    fetchMoments()
+  } else if (tab.value === 'articles') {
+    pinnedArticles.value = !pinnedArticles.value
+    aPage.value = 1
+    fetchArticles()
+  }
 }
 
 const typeColors = { null: '#6b7280', 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
@@ -218,8 +222,9 @@ function typeLabel(type) {
   </div>
 
   <button
+    v-if="tab !== 'repos'"
     class="pin-fab"
-    :class="{ 'pin-fab--active': pinnedFirst }"
+    :class="{ 'pin-fab--active': (tab === 'moments' && pinnedMoments) || (tab === 'articles' && pinnedArticles) }"
     @click="togglePinned">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 17v5"/>
