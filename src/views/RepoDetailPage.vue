@@ -101,7 +101,7 @@ function openEdit() {
     type: repo.value.type ?? 0,
     url: repo.value.url || '',
     tags: repo.value.tags?.join(', ') || '',
-    coverImage: repo.value.coverImage || '',
+    coverImage: repo.value.isDefaultCover ? '' : (repo.value.coverImage || ''),
     visibility: repo.value.visibility ?? 0
   }
   editCoverFile.value = null
@@ -251,7 +251,7 @@ async function saveEdit() {
                     <input type="file" accept="image/*" class="hidden-input" @change="handleEditCover" />
                   </label>
                 </div>
-                <div v-if="editCoverPreview || editForm.coverImage" class="cover-preview-wrap">
+                <div v-if="editCoverPreview || (editForm.coverImage && !repo.isDefaultCover)" class="cover-preview-wrap">
                   <img :src="editCoverPreview || editForm.coverImage" class="cover-preview" />
                   <button class="cover-preview-remove" @click="removeEditCover">&times;</button>
                 </div>
