@@ -447,7 +447,7 @@ async function saveEdit() {
 .item-card__delete:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
 
 /* ── File list ── */
-.items-list { display: flex; flex-direction: column; }
+.items-list { display: flex; flex-direction: column; border-top: 1px solid var(--color-border); }
 .item-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-lg); border-bottom: 1px solid var(--color-border); transition: background var(--transition-fast); }
 .item-row:hover { background: var(--color-bg-alt); }
 .item-row__icon { flex-shrink: 0; color: var(--color-text-tertiary); display: flex; }
