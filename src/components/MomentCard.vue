@@ -67,7 +67,10 @@ function goUser(e) {
           <span class="moment-card__time">{{ formatDate(moment.createdAt) }}</span>
         </div>
       </div>
-      <span v-if="moment.isPinned" class="moment-card__pin">{{ t('moment.pinned') }}</span>
+      <div class="moment-card__badges">
+        <span v-if="moment.isPinned" class="moment-card__pin">{{ t('moment.pinned') }}</span>
+        <span v-if="moment.visibility === 1" class="moment-card__visibility">{{ t('visibility.private') }}</span>
+      </div>
     </div>
 
     <p v-if="moment.content" class="moment-card__content">
@@ -197,10 +200,24 @@ function goUser(e) {
   font-family: var(--font-mono);
 }
 
+.moment-card__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
 .moment-card__pin {
   font-size: var(--text-xs);
   color: var(--color-primary);
   background: var(--color-primary-light);
+  padding: 2px 8px;
+  border-radius: var(--rounded-full);
+  font-weight: var(--weight-medium);
+}
+.moment-card__visibility {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
   padding: 2px 8px;
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);

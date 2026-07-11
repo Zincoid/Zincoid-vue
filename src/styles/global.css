@@ -272,7 +272,6 @@ th {
 .btn--sm {
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: var(--text-xs);
-  border-radius: var(--rounded-sm);
 }
 .btn--lg {
   padding: var(--spacing-md) var(--spacing-xl);

@@ -36,6 +36,10 @@ export default {
     updateFailed: 'Failed to update',
     pinnedFirst: 'Pinned'
   },
+  visibility: {
+    public: 'Public',
+    private: 'Private'
+  },
   article: {
     title: 'Articles',
     subtitle: 'Long-form thoughts and tutorials',
@@ -61,7 +65,8 @@ export default {
     saveFailed: 'Save failed',
     deleteError: 'Failed to delete',
     toc: 'On this page',
-    pinnedFirst: 'Pinned'
+    pinnedFirst: 'Pinned',
+    visibility: 'Visibility'
   },
   user: {
     title: 'Members',

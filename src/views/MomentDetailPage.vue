@@ -40,6 +40,7 @@ const likeLiked = ref(false)
 const likeCount = ref(0)
 const editing = ref(false)
 const editContent = ref('')
+const editVisibility = ref(0)
 const editKeepImages = ref([])
 const editNewFiles = ref([])
 const editNewPreviews = ref([])
@@ -64,6 +65,7 @@ function onEditInput(e) {
 
 function startEdit() {
   editContent.value = moment.value.content || ''
+  editVisibility.value = moment.value.visibility != null ? moment.value.visibility : 0
   editKeepImages.value = moment.value.images ? [...moment.value.images] : []
   editNewFiles.value = []
   editNewPreviews.value = []
@@ -105,10 +107,12 @@ async function saveEdit() {
     }
     await momentAPI.update(route.params.id, {
       content: editContent.value.trim(),
-      images: [...editKeepImages.value, ...newUrls]
+      images: [...editKeepImages.value, ...newUrls],
+      visibility: editVisibility.value
     })
     moment.value.content = editContent.value.trim()
     moment.value.images = [...editKeepImages.value, ...newUrls]
+    moment.value.visibility = editVisibility.value
     editing.value = false
   } catch (err) {
     if (err?.response?.status !== 401) alert(getMessage(err, 'moment.updateFailed'))
@@ -231,6 +235,8 @@ watch(likeLiked, (liked) => {
         <span class="detail__nickname">{{ moment.userNickname }}</span>
       </router-link>
       <div class="detail__meta">
+        <span v-if="moment.isPinned" class="detail__pin-badge">{{ t('moment.pinned') }}</span>
+        <span v-if="moment.visibility === 1" class="detail__visibility-badge">{{ t('visibility.private') }}</span>
         <span class="detail__time">{{ formatDate(moment.createdAt) }}</span>
         <span class="detail__views">{{ moment.viewCount || 0 }} {{ t('moment.views') }}</span>
         <div v-if="auth.isAdmin || auth.user?.id === moment.userId" class="detail__actions">
@@ -272,6 +278,27 @@ watch(likeLiked, (liked) => {
           :pos="mention.mentionPos"
           @select="(username) => mention.insert(editTextarea, username)"
         />
+
+        <div class="visibility-toggle">
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': editVisibility === 0 }"
+            @click="editVisibility = 0"
+            type="button"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            {{ t('visibility.public') }}
+          </button>
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': editVisibility === 1 }"
+            @click="editVisibility = 1"
+            type="button"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            {{ t('visibility.private') }}
+          </button>
+        </div>
 
         <div v-if="editKeepImages.length || editNewPreviews.length" class="edit-media-grid">
           <div v-for="(img, i) in editKeepImages" :key="'keep'+i" class="edit-media-item">
@@ -418,6 +445,8 @@ watch(likeLiked, (liked) => {
 .detail__nickname { font-weight: var(--weight-medium); color: var(--color-text-heading); }
 .detail__meta { display: flex; align-items: center; gap: var(--spacing-md); }
 .detail__time { font-size: var(--text-sm); color: var(--color-text-secondary); font-family: var(--font-mono); }
+.detail__pin-badge { font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-light); padding: 1px 8px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); }
+.detail__visibility-badge { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 1px 8px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); }
 .detail__views { font-size: var(--text-sm); color: var(--color-text-secondary); }
 .detail__actions { display: flex; gap: var(--spacing-sm); align-items: center; flex-shrink: 0; }
 .detail__content { font-size: var(--text-base); line-height: var(--leading-relaxed); white-space: pre-wrap; margin-bottom: var(--spacing-xl); }
@@ -461,4 +490,9 @@ watch(likeLiked, (liked) => {
 .mention-link:hover {
   text-decoration: underline;
 }
+
+.visibility-toggle { display: flex; gap: var(--spacing-sm); }
+.visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }
+.visibility-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.visibility-btn--active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
 </style>

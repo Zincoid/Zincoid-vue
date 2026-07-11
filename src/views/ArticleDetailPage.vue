@@ -223,6 +223,7 @@ watch(likeLiked, (liked) => {
     </nav>
     <div class="article-header">
       <span v-if="article.isPinned" class="pin-badge">{{ t('article.pinned') }}</span>
+      <span v-if="article.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
       <h1 class="article-title">{{ article.title }}</h1>
 
       <div class="article-meta">
@@ -319,7 +320,8 @@ watch(likeLiked, (liked) => {
 .article-detail { padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-4xl); }
 
 .article-header { margin-bottom: var(--spacing-2xl); }
-.pin-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-light); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
+.pin-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-light); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); margin-right: var(--spacing-sm); }
+.visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
 .article-title { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); line-height: 1.3; }
 
 .article-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); font-size: var(--text-sm); color: var(--color-text-secondary); flex-wrap: wrap; }

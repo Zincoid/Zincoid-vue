@@ -31,6 +31,7 @@ const showEditor = ref(false)
 const newContent = ref('')
 const newImageFiles = ref([])
 const newImagePreviews = ref([])
+const newVisibility = ref(0)
 const posting = ref(false)
 const momentTextarea = ref(null)
 
@@ -91,11 +92,13 @@ async function submitMoment() {
     }
     await momentAPI.create({
       content: newContent.value.trim(),
-      images: urls
+      images: urls,
+      visibility: newVisibility.value
     })
     newContent.value = ''
     newImageFiles.value = []
     newImagePreviews.value = []
+    newVisibility.value = 0
     showEditor.value = false
     page.value = 1
     await fetchMoments()
@@ -137,6 +140,27 @@ async function submitMoment() {
         :pos="mention.mentionPos"
         @select="(username) => mention.insert(momentTextarea, username)"
       />
+
+      <div class="visibility-toggle">
+        <button
+          class="visibility-btn"
+          :class="{ 'visibility-btn--active': newVisibility === 0 }"
+          @click="newVisibility = 0"
+          type="button"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+          {{ t('visibility.public') }}
+        </button>
+        <button
+          class="visibility-btn"
+          :class="{ 'visibility-btn--active': newVisibility === 1 }"
+          @click="newVisibility = 1"
+          type="button"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          {{ t('visibility.private') }}
+        </button>
+      </div>
 
       <div v-if="newImagePreviews.length" class="editor__images">
         <div v-for="(item, i) in newImagePreviews" :key="i" class="editor__image-wrap">
@@ -223,4 +247,9 @@ async function submitMoment() {
 .hidden-input { display: none; }
 
 .timeline-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.visibility-toggle { display: flex; gap: var(--spacing-sm); }
+.visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }
+.visibility-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.visibility-btn--active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
 </style>

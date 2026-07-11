@@ -36,6 +36,10 @@ export default {
     updateFailed: '更新失败',
     pinnedFirst: '置顶'
   },
+  visibility: {
+    public: '所有人可见',
+    private: '仅自己可见'
+  },
   article: {
     title: '文章',
     subtitle: '长文和教程',
@@ -61,7 +65,8 @@ export default {
     saveFailed: '保存失败',
     deleteError: '删除失败',
     toc: '目录',
-    pinnedFirst: '置顶'
+    pinnedFirst: '置顶',
+    visibility: '可见性'
   },
   user: {
     title: '成员',

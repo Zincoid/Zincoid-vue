@@ -22,7 +22,10 @@ function goDetail(id) {
     </div>
     <div class="article-card__body">
       <div class="article-card__header">
-        <span v-if="article.isPinned" class="article-card__pin">{{ t('article.pinned') }}</span>
+        <div class="article-card__badges">
+          <span v-if="article.isPinned" class="article-card__pin">{{ t('article.pinned') }}</span>
+          <span v-if="article.visibility === 1" class="article-card__visibility">{{ t('visibility.private') }}</span>
+        </div>
         <h3 class="article-card__title">{{ article.title }}</h3>
       </div>
       <p v-if="article.summary" class="article-card__summary">{{ article.summary }}</p>
@@ -92,6 +95,12 @@ function goDetail(id) {
   gap: var(--spacing-sm);
 }
 
+.article-card__badges {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
 .article-card__pin {
   font-size: var(--text-xs);
   color: var(--color-primary);
@@ -99,7 +108,14 @@ function goDetail(id) {
   padding: 1px 8px;
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);
-  flex-shrink: 0;
+}
+.article-card__visibility {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-alt);
+  padding: 1px 8px;
+  border-radius: var(--rounded-full);
+  font-weight: var(--weight-medium);
 }
 
 .article-card__title {

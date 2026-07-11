@@ -18,7 +18,7 @@ const form = ref({
   contentMd: '',
   summary: '',
   coverImage: '',
-  status: 1
+  visibility: 0
 })
 
 const mdEditor = ref(null)
@@ -38,7 +38,7 @@ onMounted(async () => {
         contentMd: a.contentMd || '',
         summary: a.summary || '',
         coverImage: a.coverImage || '',
-        status: 1
+        visibility: a.visibility != null ? a.visibility : 0
       }
     } catch (e) {
       error.value = t('article.loadFailed')
@@ -124,6 +124,32 @@ async function save() {
       </div>
 
       <div class="field">
+        <div class="cover-label-row">
+          <label class="field__label">{{ t('article.visibility') }}</label>
+        </div>
+        <div class="visibility-toggle">
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': form.visibility === 0 }"
+            @click="form.visibility = 0"
+            type="button"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            {{ t('visibility.public') }}
+          </button>
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': form.visibility === 1 }"
+            @click="form.visibility = 1"
+            type="button"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            {{ t('visibility.private') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
         <label>{{ t('article.content') }}</label>
         <MarkdownEditor ref="mdEditor" v-model="form.contentMd" />
       </div>
@@ -161,4 +187,9 @@ h1 { margin-bottom: var(--spacing-2xl); }
 
 .actions { display: flex; gap: var(--spacing-md); justify-content: flex-end; }
 .actions .btn { flex: 1; }
+
+.visibility-toggle { display: flex; gap: var(--spacing-sm); }
+.visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }
+.visibility-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.visibility-btn--active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
 </style>
