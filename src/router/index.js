@@ -113,6 +113,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'Edit Article' }
   },
   {
+    path: '/repos',
+    name: 'Repos',
+    component: () => import('@/views/ReposPage.vue'),
+    meta: { title: 'Repos' }
+  },
+  {
     path: '/chats',
     name: 'Chats',
     component: () => import('@/views/ChatsPage.vue'),

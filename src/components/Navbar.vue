@@ -137,6 +137,7 @@ const navLinks = computed(() => {
   const links = [
     { to: '/moments', label: t('nav.moments'), icon: 'moments' },
     { to: '/articles', label: t('nav.articles'), icon: 'articles' },
+    { to: '/repos', label: t('nav.repos'), icon: 'repos' },
     { to: '/chats', label: t('nav.chats'), icon: 'chats' },
     { to: '/members', label: t('nav.members'), icon: 'members' }
   ]
@@ -193,14 +194,14 @@ function closeMenu() {
                 'navbar__item--articles': link.icon === 'articles',
                 'navbar__item--chats': link.icon === 'chats',
                 'navbar__item--members': link.icon === 'members',
-                'navbar__item--admin': link.icon === 'admin'
+                'navbar__item--repos': link.icon === 'repos'
               }"
             >
               <svg v-if="link.icon === 'moments'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               <svg v-else-if="link.icon === 'articles'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               <svg v-else-if="link.icon === 'chats'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <svg v-else-if="link.icon === 'members'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <svg v-else-if="link.icon === 'admin'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <svg v-else-if="link.icon === 'repos'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
               <span class="navbar__label">{{ link.label }}</span>
             </router-link>
           </li>
@@ -496,7 +497,7 @@ function closeMenu() {
 .navbar__item--articles { border-bottom: 2px solid rgba(22, 163, 74, 0.25); }
 .navbar__item--chats { border-bottom: 2px solid rgba(245, 158, 11, 0.25); }
 .navbar__item--members { border-bottom: 2px solid rgba(37, 99, 235, 0.25); }
-.navbar__item--admin { border-bottom: 2px solid rgba(107, 33, 168, 0.25); }
+.navbar__item--repos { border-bottom: 2px solid rgba(107, 33, 168, 0.25); }
 .navbar__item--moments.navbar__item--active {
   color: #db2777;
   background: rgba(219, 39, 119, 0.12);
@@ -517,7 +518,7 @@ function closeMenu() {
   background: rgba(37, 99, 235, 0.12);
   border-bottom: 4px solid #2563eb;
 }
-.navbar__item--admin.navbar__item--active {
+.navbar__item--repos.navbar__item--active {
   color: #6b21a8;
   background: rgba(107, 33, 168, 0.12);
   border-bottom: 4px solid #6b21a8;
@@ -965,7 +966,7 @@ function closeMenu() {
   .navbar__item--articles.navbar__item--active { border-bottom: none; border-left: 4px solid #16a34a; }
   .navbar__item--chats.navbar__item--active { border-bottom: none; border-left: 4px solid #f59e0b; }
   .navbar__item--members.navbar__item--active { border-bottom: none; border-left: 4px solid #2563eb; }
-  .navbar__item--admin.navbar__item--active { border-bottom: none; border-left: 4px solid #6b21a8; }
+  .navbar__item--repos.navbar__item--active { border-bottom: none; border-left: 4px solid #6b21a8; }
   .navbar__item--logout {
     display: none;
   }

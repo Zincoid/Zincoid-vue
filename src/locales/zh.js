@@ -4,7 +4,7 @@ export default {
     articles: '文章',
     chats: '聊天',
     members: '成员',
-    manage: '管理',
+    repos: '仓库',
     signIn: '登录',
     logout: '登出',
     profile: '个人中心',
@@ -171,6 +171,10 @@ export default {
     subtitle: '管理文章、动态等数据',
     desc: '请前往个人详情页管理你的内容...',
     viewMe: '查看主页'
+  },
+  repo: {
+    pageTitle: '仓库',
+    placeholder: '仓库功能即将上线...'
   },
   system: {
     subtitle: '站点配置与工具',

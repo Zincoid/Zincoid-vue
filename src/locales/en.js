@@ -4,7 +4,7 @@ export default {
     articles: 'Articles',
     chats: 'Chats',
     members: 'Members',
-    manage: 'Manage',
+    repos: 'Repos',
     signIn: 'Sign In',
     logout: 'Logout',
     profile: 'Profile',
@@ -165,6 +165,10 @@ export default {
     newCodeRequired: 'Please verify your new email',
     newEmailCode: 'Verification Code',
     newCodePlaceholder: 'New email verification code'
+  },
+  repo: {
+    pageTitle: 'Repos',
+    placeholder: 'Repository is coming soon...'
   },
   data: {
     pageTitle: 'Data',
