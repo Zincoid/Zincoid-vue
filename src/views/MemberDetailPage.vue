@@ -115,7 +115,7 @@ function togglePinned() {
 
 const typeColors = { null: '#6b7280', 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 function typeLabel(type) {
-  const map = { 0: 'Code', 1: 'Media', 2: 'File' }
+  const map = { 0: t('repo.code'), 1: t('repo.media'), 2: t('repo.file') }
   return map[type] || ''
 }
 </script>

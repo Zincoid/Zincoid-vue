@@ -9,6 +9,7 @@ const { t } = useI18n()
       <span class="footer__logo">Zincoid<span class="footer__logo--light">'s</span></span>
       <router-link to="/moments">{{ t('footer.moments') }}</router-link>
       <router-link to="/articles">{{ t('footer.articles') }}</router-link>
+      <router-link to="/repos">{{ t('footer.repos') }}</router-link>
       <router-link to="/chats">{{ t('footer.chats') }}</router-link>
       <router-link to="/members">{{ t('footer.members') }}</router-link>
       <span class="footer__copy">&copy; {{ new Date().getFullYear() }} Zincoid</span>

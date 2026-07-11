@@ -330,6 +330,7 @@ export default {
   footer: {
     moments: 'Moments',
     articles: 'Articles',
+    repos: 'Repos',
     chats: 'Chats',
     members: 'Members'
   },

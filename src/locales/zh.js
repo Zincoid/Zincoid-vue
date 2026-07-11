@@ -330,6 +330,7 @@ export default {
   footer: {
     moments: '动态',
     articles: '文章',
+    repos: '仓库',
     chats: '聊天',
     members: '成员'
   },
