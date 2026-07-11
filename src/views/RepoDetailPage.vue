@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { useAuthStore } from '@/stores/auth'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
@@ -11,6 +12,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const { getMessage } = useError()
 const auth = useAuthStore()
 const repo = ref(null)
 const loading = ref(true)
@@ -146,7 +148,9 @@ async function saveEdit() {
     })
     repo.value = res.data.data
     showEdit.value = false
-  } catch { /* ignore */ } finally {
+  } catch (err) {
+    editError.value = getMessage(err, 'common.failed')
+  } finally {
     saving.value = false
   }
 }

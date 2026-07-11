@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 
 const typeTabs = [
   { key: 'all', value: null, color: '#6b7280' },
@@ -121,7 +123,9 @@ async function createRepo() {
     coverFile.value = null
     coverPreview.value = ''
     await fetchRepos()
-  } catch { /* ignore */ } finally {
+  } catch (err) {
+    createError.value = getMessage(err, 'common.failed')
+  } finally {
     creating.value = false
   }
 }

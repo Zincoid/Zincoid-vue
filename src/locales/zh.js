@@ -319,7 +319,12 @@ export default {
     'Email not registered': '该邮箱未注册',
     'Invalid or expired old email verification code': '旧邮箱验证码错误或已过期',
     'Invalid or expired new email verification code': '新邮箱验证码错误或已过期',
-    'No email set': '未绑定邮箱'
+    'No email set': '未绑定邮箱',
+    'Repo not found': '仓库不存在',
+    'Repo is private': '仓库为私有',
+    'You can only edit your own repos': '只能编辑自己的仓库',
+    'No permission to delete this repo': '无权删除此仓库',
+    'Invalid Item Sort': '无效的条目排序',
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',

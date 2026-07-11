@@ -319,7 +319,12 @@ export default {
     'Email not registered': 'Email not registered',
     'Invalid or expired old email verification code': 'Invalid or expired old email verification code',
     'Invalid or expired new email verification code': 'Invalid or expired new email verification code',
-    'No email set': 'No email set'
+    'No email set': 'No email set',
+    'Repo not found': 'Repo not found',
+    'Repo is private': 'Repo is private',
+    'You can only edit your own repos': 'You can only edit your own repos',
+    'No permission to delete this repo': 'No permission to delete this repo',
+    'Invalid Item Sort': 'Invalid Item Sort',
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
