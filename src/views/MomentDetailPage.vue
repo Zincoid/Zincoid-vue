@@ -25,6 +25,7 @@ const auth = useAuthStore()
 const mention = useMention()
 const editTextarea = ref(null)
 const moment = ref(null)
+const notFoundMessage = ref('')
 const parsedContent = computed(() => parseMentions(moment.value?.content))
 
 const comments = ref([])
@@ -138,6 +139,7 @@ async function fetchDetail() {
     likeLiked.value = lRes.data.data.liked
     likeCount.value = lRes.data.data.count
   } catch (e) {
+    notFoundMessage.value = getMessage(e, 'moment.notFound')
     console.error(e)
   } finally {
     loading.value = false
@@ -417,7 +419,7 @@ watch(likeLiked, (liked) => {
     />
     <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
   </div>
-  <p v-if="loadingDone && !moment" class="empty-state">{{ t('moment.notFound') }}</p>
+  <p v-if="loadingDone && !moment" class="empty-state">{{ notFoundMessage || t('moment.notFound') }}</p>
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
