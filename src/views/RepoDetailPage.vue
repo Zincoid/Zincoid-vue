@@ -157,7 +157,11 @@ async function saveEdit() {
 </script>
 
 <template>
-  <div class="repo-detail container">
+  <div class="repo-detail">
+    <div v-if="loadingDone && repo && repo.coverImage && repo.type !== 0" class="repo-cover-banner" :style="{ backgroundImage: `url(${repo.coverImage})` }">
+      <div class="repo-cover-banner__overlay"></div>
+    </div>
+    <div class="container">
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <template v-if="loadingDone && repo">
       <div class="repo-header">
@@ -185,10 +189,6 @@ async function saveEdit() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div v-if="repo.coverImage" class="repo-cover">
-        <img :src="repo.coverImage" alt="" />
       </div>
 
       <div v-if="repo.description" class="repo-desc">{{ repo.description }}</div>
@@ -308,6 +308,7 @@ async function saveEdit() {
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
     </button>
+    </div>
   </div>
 </template>
 
@@ -332,8 +333,8 @@ async function saveEdit() {
 
 .repo-actions { display: flex; gap: var(--spacing-sm); align-items: center; }
 
-.repo-cover { margin-bottom: var(--spacing-2xl); border-radius: var(--rounded-lg); overflow: hidden; }
-.repo-cover img { width: 100%; }
+.repo-cover-banner { height: 300px; background-size: cover; background-position: center; position: relative; }
+.repo-cover-banner__overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0) 30%, var(--color-bg) 100%); }
 
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); }
 

@@ -283,6 +283,8 @@ async function createRepo() {
 .repos { padding-bottom: var(--spacing-4xl); }
 
 .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-lg); }
+.header .page-header { flex: 1; min-width: 0; }
+.header .btn { flex-shrink: 0; }
 
 .repo-search { margin-bottom: var(--spacing-xl); }
 .repo-search__input { width: 100%; }
