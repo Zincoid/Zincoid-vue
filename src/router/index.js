@@ -32,10 +32,31 @@ const routes = [
     meta: { guest: true, title: 'Forgot Password' }
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: () => import('@/views/ProfilePage.vue'),
-    meta: { requiresAuth: true, title: 'Profile' }
+    path: '/personal',
+    name: 'Personal',
+    component: () => import('@/views/PersonalCenterPage.vue'),
+    redirect: '/personal/profile',
+    meta: { requiresAuth: true, title: 'Personal' },
+    children: [
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/ProfilePage.vue'),
+        meta: { requiresAuth: true, title: 'Profile' }
+      },
+      {
+        path: 'data',
+        name: 'DataManagement',
+        component: () => import('@/views/DataPage.vue'),
+        meta: { requiresAuth: true, title: 'Data Management' }
+      },
+      {
+        path: 'system',
+        name: 'System',
+        component: () => import('@/views/ManagePage.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true, title: 'System' }
+      }
+    ]
   },
   {
     path: '/members',
@@ -96,12 +117,6 @@ const routes = [
     name: 'Chats',
     component: () => import('@/views/ChatsPage.vue'),
     meta: { title: 'Chats' }
-  },
-  {
-    path: '/manage',
-    name: 'Manage',
-    component: () => import('@/views/ManagePage.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true, title: 'Manage' }
   },
   {
     path: '/:pathMatch(.*)*',

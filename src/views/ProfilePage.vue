@@ -258,9 +258,9 @@ async function changeEmail() {
 </script>
 
 <template>
-  <div class="profile container">
+  <div class="profile">
     <div class="page-header">
-      <h1 class="page-header__title"># {{ t('profile.pageTitle') }}<span class="cursor">_</span></h1>
+      <h2 class="page-header__title">## {{ t('profile.pageTitle') }}<span class="cursor">_</span></h2>
       <p class="page-header__subtitle">{{ t('profile.subtitle') }}</p>
     </div>
 
@@ -388,7 +388,7 @@ async function changeEmail() {
                 <template v-if="auth.user?.email">
                   <p class="field__hint" style="margin-bottom:var(--spacing-sm)">{{ t('profile.oldEmailHint') }} <span class="field__required">*</span></p>
                   <div style="display:flex;gap:var(--spacing-sm)">
-                    <input v-model="emailForm.oldCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
+                    <input v-model="emailForm.oldCode" class="field__input" style="flex:1;min-width:0" type="text" maxlength="6" :placeholder="t('profile.oldCodePlaceholder')" />
                     <button class="btn btn--outline" :disabled="sendingOldCode || oldCodeCountdown > 0" @click="sendOldCode" type="button">
                       {{ oldCodeCountdown > 0 ? oldCodeCountdown + 's' : (sendingOldCode ? '...' : t('auth.sendCode')) }}
                     </button>
@@ -408,7 +408,7 @@ async function changeEmail() {
               <div class="field">
                 <label class="field__label">{{ t('profile.newEmailCode') }} <span class="field__required">*</span></label>
                 <div style="display:flex;gap:var(--spacing-sm)">
-                  <input v-model="emailForm.newCode" class="field__input" style="flex:1" type="text" maxlength="6" :placeholder="t('profile.newCodePlaceholder')" />
+                  <input v-model="emailForm.newCode" class="field__input" style="flex:1;min-width:0" type="text" maxlength="6" :placeholder="t('profile.newCodePlaceholder')" />
                   <button class="btn btn--outline" :disabled="sendingNewCode || newCodeCountdown > 0" @click="sendNewCode" type="button">
                     {{ newCodeCountdown > 0 ? newCodeCountdown + 's' : (sendingNewCode ? '...' : t('auth.sendCode')) }}
                   </button>
@@ -485,6 +485,15 @@ async function changeEmail() {
 <style scoped>
 .profile {
   padding-bottom: var(--spacing-4xl);
+}
+
+.profile .page-header__subtitle {
+  font-size: var(--text-sm);
+}
+
+.profile .page-header {
+  padding-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
 }
 
 .profile-layout {

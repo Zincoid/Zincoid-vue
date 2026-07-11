@@ -105,6 +105,16 @@ export default {
     postFailed: 'Failed to comment',
     deleteFailed: 'Failed to delete comment'
   },
+  personal: {
+    pageTitle: 'Personal Center',
+    subtitle: 'Manage your profile, data and account settings',
+    profileTab: 'Profile',
+    dataTab: 'Data',
+    systemTab: 'System',
+    dataPlaceholder: 'Manage your articles, moments and other data here...',
+    dataDesc: 'Visit your profile page to manage your content...',
+    viewMe: 'View Me'
+  },
   profile: {
     pageTitle: 'Profile',
     subtitle: 'Manage your personal information and account settings',

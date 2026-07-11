@@ -105,8 +105,18 @@ export default {
     postFailed: '评论失败',
     deleteFailed: '删除评论失败'
   },
+  personal: {
+    pageTitle: '个人中心',
+    subtitle: '管理个人信息、数据和账户设置',
+    profileTab: '基本',
+    dataTab: '数据',
+    systemTab: '系统',
+    dataPlaceholder: '在这里你可以管理自己的文章、动态等数据。',
+    dataDesc: '请前往个人详情页管理你的内容...',
+    viewMe: '查看主页'
+  },
   profile: {
-    pageTitle: '个人设置',
+    pageTitle: '基本',
     subtitle: '管理个人信息和账户设置',
     information: '基本信息',
     loadFailed: '加载个人信息失败',

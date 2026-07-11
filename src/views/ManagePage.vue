@@ -135,14 +135,14 @@ async function handleReset() {
 </script>
 
 <template>
-  <div class="admin container">
+  <div class="admin">
     <div class="page-header">
-      <h1 class="page-header__title"># {{ t('admin.title') }}<span class="cursor">_</span></h1>
+      <h2 class="page-header__title">## {{ t('admin.title') }}<span class="cursor">_</span></h2>
       <p class="page-header__subtitle">{{ t('admin.subtitle') }}</p>
     </div>
 
     <section class="section">
-      <h2>{{ t('admin.config') }}</h2>
+      <h3>{{ t('admin.config') }}</h3>
       <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
       <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
@@ -165,7 +165,7 @@ async function handleReset() {
     </section>
 
     <section class="section">
-      <h2>{{ t('admin.tools') }}</h2>
+      <h3>{{ t('admin.tools') }}</h3>
       <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
       <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
       <div class="tool-item" :class="{ 'tool-item--open': broadcastOpen }">
@@ -248,9 +248,11 @@ async function handleReset() {
 </template>
 
 <style scoped>
+.admin .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
+.admin .page-header__subtitle { font-size: var(--text-sm); }
 .admin { padding-bottom: var(--spacing-4xl); }
 .section { margin-bottom: var(--spacing-3xl); }
-h2 { margin-bottom: var(--spacing-lg); }
+h2, h3 { margin-bottom: var(--spacing-lg); }
 
 .config-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .config-item { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }

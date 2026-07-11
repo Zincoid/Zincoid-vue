@@ -235,7 +235,7 @@ function onAPage(p) { aPage.value = p; fetchArticles() }
 
 .tabs {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 0;
   border-bottom: 2px solid var(--color-border);
   margin-bottom: var(--spacing-xl);
 }

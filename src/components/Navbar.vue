@@ -140,9 +140,6 @@ const navLinks = computed(() => {
     { to: '/chats', label: t('nav.chats'), icon: 'chats' },
     { to: '/members', label: t('nav.members'), icon: 'members' }
   ]
-  if (auth.isAdmin) {
-    links.push({ to: '/manage', label: t('nav.manage'), icon: 'admin' })
-  }
   return links
 })
 
@@ -221,7 +218,7 @@ function closeMenu() {
                 <span v-if="unreadCount > 0" class="navbar__notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
               </button>
             </div>
-            <router-link to="/profile" class="navbar__item navbar__item--profile" :class="{ 'navbar__item--active': isActive('/profile') }">
+            <router-link to="/personal/profile" class="navbar__item navbar__item--profile" :class="{ 'navbar__item--active': isActive('/personal') }">
               <img
                 v-if="auth.user?.avatar"
                 :src="auth.user.avatar"
