@@ -380,7 +380,7 @@ async function saveEdit() {
   opacity: 1;
 }
 @media (max-width: 768px) {
-  .upload-fab { bottom: 200px; }
+  .upload-fab { bottom: 140px; }
 }
 .hidden-input { display: none; }
 
