@@ -111,7 +111,7 @@ export default {
     profileTab: 'Profile',
     dataTab: 'Data',
     systemTab: 'System',
-    dataPlaceholder: 'Manage your articles, moments and other data here...',
+    dataPlaceholder: 'Manage your articles, moments and other data',
     dataDesc: 'Visit your profile page to manage your content...',
     viewMe: 'View Me'
   },

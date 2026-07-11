@@ -107,11 +107,11 @@ export default {
   },
   personal: {
     pageTitle: '个人中心',
-    subtitle: '管理个人信息、数据和账户设置',
+    subtitle: '管理基本信息、数据和账户设置',
     profileTab: '基本',
     dataTab: '数据',
     systemTab: '系统',
-    dataPlaceholder: '在这里你可以管理自己的文章、动态等数据。',
+    dataPlaceholder: '管理文章、动态等数据',
     dataDesc: '请前往个人详情页管理你的内容...',
     viewMe: '查看主页'
   },
