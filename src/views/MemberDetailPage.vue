@@ -87,7 +87,7 @@ async function fetchArticles() {
 
 async function fetchRepos() {
   tabLoading.value = true
-  const { data } = await repoAPI.getList(rPage.value, pageSize.value, repoType.value, userId.value)
+  const { data } = await repoAPI.getByUser(userId.value, rPage.value, pageSize.value, repoType.value)
   repos.value = data.data.records || []
   rPages.value = data.data.pages || 1
   rTotal.value = data.data.total || 0
@@ -190,10 +190,20 @@ function typeLabel(type) {
             <div v-else class="repo-card__cover-placeholder">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             </div>
-            <span class="repo-card__type-badge" :style="{ color: typeColors[repo.type] }">{{ typeLabel(repo.type) }}</span>
+            <div class="repo-card__badges">
+              <span v-if="repo.visibility === 1" class="repo-card__visibility">{{ t('visibility.private') }}</span>
+              <span class="repo-card__type-badge" :style="{ color: typeColors[repo.type] }">{{ typeLabel(repo.type) }}</span>
+            </div>
           </div>
           <div class="repo-card__body">
-            <span class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
+            <div class="repo-card__user">
+              <div class="repo-card__user-left">
+                <img v-if="repo.userAvatar" :src="repo.userAvatar" class="repo-card__avatar" />
+                <span v-else class="repo-card__avatar-placeholder">{{ (repo.userNickname || 'U')[0] }}</span>
+                <span class="repo-card__nickname">{{ repo.userNickname }}</span>
+              </div>
+              <span class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
+            </div>
             <h3 class="repo-card__name">{{ repo.name }}</h3>
             <p v-if="repo.description" class="repo-card__desc">{{ repo.description }}</p>
             <div v-if="repo.tags?.length" class="repo-card__tags">
@@ -352,8 +362,15 @@ function typeLabel(type) {
 .repo-card__cover { position: relative; height: 120px; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); }
 .repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
-.repo-card__type-badge { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: var(--color-surface); border-radius: var(--rounded-full); }
+.repo-card__badges { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: 4px; }
+.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: var(--color-surface); border-radius: var(--rounded-full); }
+.repo-card__visibility { font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-surface); padding: 2px var(--spacing-sm); border-radius: var(--rounded-full); }
 .repo-card__body { padding: var(--spacing-lg); }
+.repo-card__user { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-sm); }
+.repo-card__user-left { display: flex; align-items: center; gap: var(--spacing-xs); }
+.repo-card__avatar { width: 20px; height: 20px; border-radius: var(--rounded-full); object-fit: cover; }
+.repo-card__avatar-placeholder { width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.repo-card__nickname { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .repo-card__date { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-mono); }
 .repo-card__name { font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: var(--spacing-sm); }
 .repo-card__desc { font-size: var(--text-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: var(--spacing-sm); }

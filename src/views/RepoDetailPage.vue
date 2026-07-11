@@ -97,7 +97,7 @@ async function saveEdit() {
       description: editForm.value.description.trim(),
       url: editForm.value.url.trim() || null,
       tags: tags.length > 0 ? tags : null,
-      coverImage: editForm.value.coverImage || null,
+      coverImage: editForm.value.coverImage,
       visibility: editForm.value.visibility
     })
     repo.value = res.data.data

@@ -33,7 +33,7 @@ async function fetchRepos() {
   loadingDone.value = false
   try {
     const kw = keyword.value.trim() || null
-    const res = await repoAPI.getList(page.value, size.value, activeType.value, null, kw)
+    const res = await repoAPI.getList(page.value, size.value, activeType.value, kw)
     const data = res.data.data
     repos.value = data.records ?? []
     pages.value = data.pages ?? 1
@@ -113,7 +113,7 @@ async function createRepo() {
       type: createForm.value.type,
       url: createForm.value.url.trim() || null,
       tags: tags.length > 0 ? tags : null,
-      coverImage: createForm.value.coverImage.trim() || null,
+      coverImage: createForm.value.coverImage.trim(),
       visibility: createForm.value.visibility
     })
     showCreate.value = false
