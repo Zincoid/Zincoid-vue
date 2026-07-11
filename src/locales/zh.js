@@ -34,7 +34,8 @@ export default {
     deleteError: '删除失败',
     placeholder: '在想什么？@ 提及用户...',
     updateFailed: '更新失败',
-    pinnedFirst: '置顶'
+    pinnedFirst: '置顶',
+    private: '动态为私有。'
   },
   visibility: {
     public: '所有人可见',
@@ -66,7 +67,8 @@ export default {
     deleteError: '删除失败',
     toc: '目录',
     pinnedFirst: '置顶',
-    visibility: '可见性'
+    visibility: '可见性',
+    private: '文章为私有。'
   },
   user: {
     title: '成员',

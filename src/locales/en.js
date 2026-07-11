@@ -34,7 +34,8 @@ export default {
     deleteError: 'Failed to delete',
     placeholder: "What's on your mind? @ to mention...",
     updateFailed: 'Failed to update',
-    pinnedFirst: 'Pinned'
+    pinnedFirst: 'Pinned',
+    private: 'Moment is private.'
   },
   visibility: {
     public: 'Public',
@@ -66,7 +67,8 @@ export default {
     deleteError: 'Failed to delete',
     toc: 'On this page',
     pinnedFirst: 'Pinned',
-    visibility: 'Visibility'
+    visibility: 'Visibility',
+    private: 'Article is private.'
   },
   user: {
     title: 'Members',

@@ -139,7 +139,9 @@ async function fetchDetail() {
     likeLiked.value = lRes.data.data.liked
     likeCount.value = lRes.data.data.count
   } catch (e) {
-    notFoundMessage.value = getMessage(e, 'moment.notFound')
+    notFoundMessage.value = e?.response?.data?.message === 'Moment is private'
+      ? t('moment.private')
+      : t('moment.notFound')
     console.error(e)
   } finally {
     loading.value = false

@@ -106,7 +106,9 @@ async function fetchDetail() {
 
     buildToc()
   } catch (e) {
-    notFoundMessage.value = getMessage(e, 'article.notFound')
+    notFoundMessage.value = e?.response?.data?.message === 'Article is private'
+      ? t('article.private')
+      : t('article.notFound')
     console.error(e)
   } finally {
     loading.value = false
