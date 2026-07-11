@@ -37,15 +37,15 @@ function cancelBroadcast() {
 
 async function handleBroadcast() {
   if (!broadcastContent.value.trim()) return
-  if (!confirm(t('admin.broadcastConfirmTitle'))) return
+  if (!confirm(t('system.broadcastConfirmTitle'))) return
   broadcasting.value = true
   try {
     await notificationAPI.broadcast(broadcastContent.value.trim())
-    toolMessage.value = t('admin.broadcastSuccess')
+    toolMessage.value = t('system.broadcastSuccess')
     broadcastOpen.value = false
     setTimeout(() => toolMessage.value = '', 2000)
   } catch (err) {
-    toolError.value = getMessage(err, 'admin.broadcastFailed')
+    toolError.value = getMessage(err, 'system.broadcastFailed')
   } finally {
     broadcasting.value = false
   }
@@ -66,7 +66,7 @@ onMounted(async () => {
     const { data } = await configAPI.listAll()
     configs.value = data.data || []
   } catch (e) {
-    if (e?.response?.status !== 401) configError.value = getMessage(e, 'admin.loadFailed')
+    if (e?.response?.status !== 401) configError.value = getMessage(e, 'system.loadFailed')
   } finally {
     configLoading.value = false
   }
@@ -75,25 +75,25 @@ onMounted(async () => {
 async function saveConfig(config) {
   try {
     await configAPI.update(config.configKey, config.configValue)
-    configMessage.value = t('admin.saved', { key: config.configKey })
+    configMessage.value = t('system.saved', { key: config.configKey })
     setTimeout(() => configMessage.value = '', 2000)
   } catch (err) {
-    configError.value = getMessage(err, 'admin.saveFailed')
+    configError.value = getMessage(err, 'system.saveFailed')
   }
 }
 
 async function runCleanup() {
-  const confirmMsg = logicCleanup.value ? t('admin.deepCleanupConfirm') : t('admin.cleanupConfirm')
+  const confirmMsg = logicCleanup.value ? t('system.deepCleanupConfirm') : t('system.cleanupConfirm')
   if (!confirm(confirmMsg)) return
   cleaning.value = true
   try {
     const res = await healthAPI.cleanupFiles(logicCleanup.value)
     const counts = res.data?.data ?? {}
-    const parts = Object.entries(counts).map(([k, v]) => `${t(`admin.cleanupFile_${k}`)} ${v}`).join(', ')
-    toolMessage.value = `${t('admin.cleanupSuccess')}：${parts || t('admin.cleanupNone')}`
+    const parts = Object.entries(counts).map(([k, v]) => `${t(`system.cleanupFile_${k}`)} ${v}`).join(', ')
+    toolMessage.value = `${t('system.cleanupSuccess')}：${parts || t('system.cleanupNone')}`
     setTimeout(() => toolMessage.value = '', 4000)
   } catch (err) {
-    toolError.value = getMessage(err, 'admin.cleanupFailed')
+    toolError.value = getMessage(err, 'system.cleanupFailed')
   } finally {
     cleaning.value = false
   }
@@ -102,16 +102,16 @@ async function runCleanup() {
 const recordsCleaning = ref(false)
 
 async function runRecordsCleanup() {
-  if (!confirm(t('admin.cleanupRecordsConfirm'))) return
+  if (!confirm(t('system.cleanupRecordsConfirm'))) return
   recordsCleaning.value = true
   try {
     const res = await healthAPI.cleanupRecords()
     const counts = res.data?.data ?? {}
-    const parts = Object.entries(counts).map(([k, v]) => `${t(`admin.${k}`)} ${v}`).join(', ')
-    toolMessage.value = `${t('admin.cleanupSuccess')}：${parts || t('admin.cleanupNone')}`
+    const parts = Object.entries(counts).map(([k, v]) => `${t(`system.${k}`)} ${v}`).join(', ')
+    toolMessage.value = `${t('system.cleanupSuccess')}：${parts || t('system.cleanupNone')}`
     setTimeout(() => toolMessage.value = '', 4000)
   } catch (err) {
-    toolError.value = getMessage(err, 'admin.cleanupFailed')
+    toolError.value = getMessage(err, 'system.cleanupFailed')
   } finally {
     recordsCleaning.value = false
   }
@@ -119,15 +119,15 @@ async function runRecordsCleanup() {
 
 async function handleReset() {
   if (!resetUsername.value.trim() || !resetPassword.value.trim()) return
-  if (!confirm(`${t('admin.resetPassword')}：${resetUsername.value.trim()}`)) return
+  if (!confirm(`${t('system.resetPassword')}：${resetUsername.value.trim()}`)) return
   resetting.value = true
   try {
     await userAPI.changePasswordByForce(resetUsername.value.trim(), resetPassword.value)
-    toolMessage.value = t('admin.resetSuccess')
+    toolMessage.value = t('system.resetSuccess')
     resetOpen.value = false
     setTimeout(() => toolMessage.value = '', 2000)
   } catch (err) {
-    toolError.value = getMessage(err, 'admin.resetFailed')
+    toolError.value = getMessage(err, 'system.resetFailed')
   } finally {
     resetting.value = false
   }
@@ -137,12 +137,12 @@ async function handleReset() {
 <template>
   <div class="admin">
     <div class="page-header">
-      <h2 class="page-header__title">## {{ t('admin.title') }}<span class="cursor">_</span></h2>
-      <p class="page-header__subtitle">{{ t('admin.subtitle') }}</p>
+      <h2 class="page-header__title">## {{ t('personal.systemTab') }}<span class="cursor">_</span></h2>
+      <p class="page-header__subtitle">{{ t('system.subtitle') }}</p>
     </div>
 
     <section class="section">
-      <h3>{{ t('admin.config') }}</h3>
+      <h3>{{ t('system.config') }}</h3>
       <p v-if="configMessage" class="msg msg--success">{{ configMessage }}</p>
       <p v-if="configError" class="msg msg--error">{{ configError }}</p>
 
@@ -165,42 +165,42 @@ async function handleReset() {
     </section>
 
     <section class="section">
-      <h3>{{ t('admin.tools') }}</h3>
+      <h3>{{ t('system.tools') }}</h3>
       <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
       <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
       <div class="tool-item" :class="{ 'tool-item--open': broadcastOpen }">
         <div class="tool-info">
-          <span class="tool-label">{{ t('admin.broadcast') }}</span>
-          <span class="tool-desc">{{ t('admin.broadcastDesc') }}</span>
+          <span class="tool-label">{{ t('system.broadcast') }}</span>
+          <span class="tool-desc">{{ t('system.broadcastDesc') }}</span>
           <div v-if="broadcastOpen" class="config-value-row reset-row">
             <input
               v-model="broadcastContent"
               class="field__input"
-              :placeholder="t('admin.broadcastPlaceholder')"
+              :placeholder="t('system.broadcastPlaceholder')"
               style="flex: 1; min-width: 0;"
             />
             <div class="reset-actions">
               <button class="btn btn--ghost" @click="cancelBroadcast">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary" :disabled="broadcasting || !broadcastContent.trim()" @click="handleBroadcast">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                {{ broadcasting ? t('common.posting') : t('admin.broadcastConfirm') }}
+                {{ broadcasting ? t('common.posting') : t('system.broadcastConfirm') }}
               </button>
             </div>
           </div>
         </div>
         <button v-if="!broadcastOpen" class="btn btn--primary-outline" @click="openBroadcast">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          {{ t('admin.broadcastSend') }}
+          {{ t('system.broadcastSend') }}
         </button>
       </div>
       <div class="tool-item" :class="{ 'tool-item--open': resetOpen }">
         <div class="tool-info">
-          <span class="tool-label">{{ t('admin.resetPassword') }}</span>
-          <span class="tool-desc">{{ t('admin.resetPasswordDesc') }}</span>
+          <span class="tool-label">{{ t('system.resetPassword') }}</span>
+          <span class="tool-desc">{{ t('system.resetPasswordDesc') }}</span>
           <div v-if="resetOpen" class="config-value-row reset-row">
             <div class="reset-inputs" style="flex: 1; min-width: 0;">
-              <input v-model="resetUsername" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('admin.resetPasswordPlaceholder')" />
-              <input v-model="resetPassword" type="password" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('admin.newPasswordPlaceholder')" />
+              <input v-model="resetUsername" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('system.resetPasswordPlaceholder')" />
+              <input v-model="resetPassword" type="password" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('system.newPasswordPlaceholder')" />
             </div>
             <div class="reset-actions">
               <button class="btn btn--ghost" @click="cancelReset">{{ t('common.cancel') }}</button>
@@ -213,34 +213,34 @@ async function handleReset() {
         </div>
         <button v-if="!resetOpen" class="btn btn--warning" @click="openReset">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          {{ t('admin.reset') }}
+          {{ t('system.reset') }}
         </button>
       </div>
       <div class="tool-item">
         <div class="tool-info">
-          <span class="tool-label">{{ t('admin.cleanupFiles') }}</span>
-          <span class="tool-desc">{{ t('admin.cleanupFilesDesc') }}</span>
+          <span class="tool-label">{{ t('system.cleanupFiles') }}</span>
+          <span class="tool-desc">{{ t('system.cleanupFilesDesc') }}</span>
         </div>
         <div class="toggle">
           <label class="toggle__switch">
             <input type="checkbox" v-model="logicCleanup" />
             <span class="toggle__slider"></span>
           </label>
-          <span class="toggle__label">{{ t('admin.logicCleanup') }}</span>
+          <span class="toggle__label">{{ t('system.logicCleanup') }}</span>
         </div>
         <button class="btn btn--danger" :disabled="cleaning" @click="runCleanup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          {{ cleaning ? t('common.cleaning') : t('admin.cleanup') }}
+          {{ cleaning ? t('common.cleaning') : t('system.cleanup') }}
         </button>
       </div>
       <div class="tool-item">
         <div class="tool-info">
-          <span class="tool-label">{{ t('admin.cleanupRecords') }}</span>
-          <span class="tool-desc">{{ t('admin.cleanupRecordsDesc') }}</span>
+          <span class="tool-label">{{ t('system.cleanupRecords') }}</span>
+          <span class="tool-desc">{{ t('system.cleanupRecordsDesc') }}</span>
         </div>
         <button class="btn btn--danger" :disabled="recordsCleaning" @click="runRecordsCleanup">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-          {{ recordsCleaning ? t('common.cleaning') : t('admin.cleanup') }}
+          {{ recordsCleaning ? t('common.cleaning') : t('system.cleanup') }}
         </button>
       </div>
     </section>
