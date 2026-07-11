@@ -181,6 +181,7 @@ export default {
     file: '文件',
     empty: '暂无仓库。',
     emptyItems: '暂无内容。',
+    deleteConfirm: '确定删除这个仓库？',
     itemName: '名称',
     new: '新建',
     name: '名称',

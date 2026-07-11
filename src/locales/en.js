@@ -175,6 +175,7 @@ export default {
     file: 'File',
     empty: 'No repos yet.',
     emptyItems: 'No items yet.',
+    deleteConfirm: 'Delete this repo?',
     itemName: 'Name',
     new: 'New',
     name: 'Name',

@@ -5,6 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useAuthStore } from '@/stores/auth'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
+import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const route = useRoute()
@@ -31,9 +32,25 @@ function typeLabel(type) {
 
 const isOwner = () => auth.user?.id === repo.value?.userId
 
+// ── Media viewer ──
+const viewerSrc = ref('')
+const viewerVisible = ref(false)
+function previewItem(url) {
+  viewerSrc.value = url
+  viewerVisible.value = true
+}
+
+function mediaType(url) {
+  if (!url) return 'other'
+  const ext = url.split('.').pop().toLowerCase()
+  if (['mp4', 'webm', 'ogg', 'mov', 'avi'].includes(ext)) return 'video'
+  if (['mp3', 'wav', 'aac', 'flac'].includes(ext)) return 'audio'
+  return 'image'
+}
+
 // ── Delete ──
 async function deleteRepo() {
-  if (!confirm(t('common.delete') + '?')) return
+  if (!confirm(t('repo.deleteConfirm'))) return
   try {
     await repoAPI.delete(repo.value.id)
     router.push('/repos')
@@ -188,11 +205,19 @@ async function saveEdit() {
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid">
           <div v-for="item in repo.items" :key="item.id" class="item-card">
-            <img v-if="item.url" :src="item.url" :alt="item.name" class="item-card__thumb" />
+            <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" @click="previewItem(item.url)" />
+            <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
+              <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+              <div class="item-card__play-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+            </div>
+            <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
             <div v-else class="item-card__file-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
-            <span class="item-card__name">{{ item.name }}</span>
             <button v-if="isOwner()" class="item-card__delete" @click.stop="deleteItem(item.id)">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -268,6 +293,8 @@ async function saveEdit() {
       </Transition>
     </Teleport>
 
+    <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
+
     <label v-if="isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       <input type="file" accept="image/*,video/*,audio/*" multiple class="hidden-input" @change="handleItemFiles" />
@@ -312,9 +339,12 @@ async function saveEdit() {
 .repo-url:hover { text-decoration: underline; }
 
 .items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  columns: 4 200px;
   gap: var(--spacing-md);
+}
+.items-grid > * {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-md);
 }
 
 .upload-fab {
@@ -360,9 +390,14 @@ async function saveEdit() {
 .item-card:hover { border-color: #f9a8d4; transform: scale(1.02); box-shadow: 0 0 0 0.5px #f9a8d4; }
 .item-card:hover .item-card__delete { opacity: 1; }
 
-.item-card__thumb { width: 100%; height: 120px; object-fit: cover; display: block; }
-.item-card__file-icon { height: 120px; display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); background: var(--color-bg-alt); }
-.item-card__name { display: block; padding: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-card__thumb { width: 100%; height: auto; display: block; }
+.item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
+.item-card__video video { width: 100%; height: auto; display: block; opacity: 0.7; }
+.item-card__play-icon { position: absolute; width: 40px; height: 40px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: white; }
+.item-card__play-icon svg { margin-left: 3px; }
+.item-card__audio { min-height: 120px; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); }
+.item-card__file-icon { min-height: 120px; display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); background: var(--color-bg-alt); }
+.item-card__name { display: none; }
 
 .item-card__delete { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
 .item-card__delete:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
