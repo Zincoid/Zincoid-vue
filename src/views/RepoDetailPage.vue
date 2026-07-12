@@ -261,7 +261,27 @@ async function saveEdit() {
             <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>{{ repo.github.stars || 0 }}</span>
             <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>{{ repo.github.forks || 0 }}</span>
           </div>
+          <div v-if="repo.github?.description" class="github-desc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>{{ repo.github.description }}</span>
+          </div>
         </a>
+        <div v-if="repo.github?.commits?.length" class="commits-timeline">
+          <div v-for="(c, i) in repo.github.commits" :key="c.sha" class="commit-item">
+            <div class="commit-dot-line">
+              <div class="commit-dot"></div>
+              <div v-if="i < repo.github.commits.length - 1" class="commit-line"></div>
+            </div>
+            <div class="commit-body">
+              <span class="commit-msg">{{ c.message }}</span>
+              <div class="commit-meta">
+                <img v-if="c.authorAvatar" :src="c.authorAvatar" class="commit-avatar" />
+                <span class="commit-author">{{ c.author }}</span>
+                <span class="commit-sha">{{ c.sha }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
 
       <!-- MEDIA → grid -->
@@ -440,13 +460,30 @@ async function saveEdit() {
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
 
-.repo-url { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); }
+.repo-url { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); }
 .repo-url:hover { border-color: var(--color-primary); }
 .repo-url__left { display: flex; align-items: center; gap: var(--spacing-sm); color: var(--color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .repo-url__left span { overflow: hidden; text-overflow: ellipsis; }
-.repo-url__stats { display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0; }
+.repo-url__stats { display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0; margin-left: auto; }
+.repo-url__left + .repo-url__stats { margin-top: var(--spacing-xs); }
 .github-lang { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .github-stat { display: flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--color-text-secondary); }
+.github-desc { width: 100%; font-size: var(--text-xs); color: var(--color-text-secondary); line-height: var(--leading-normal); margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--color-border-light); display: flex; align-items: center; gap: var(--spacing-md); }
+.github-desc svg { flex-shrink: 0; }
+.github-desc span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.commits-timeline { margin-top: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); }
+.commit-item { display: flex; gap: var(--spacing-md); }
+.commit-item + .commit-item { margin-top: var(--spacing-sm); }
+.commit-dot-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 12px; }
+.commit-dot { width: 10px; height: 10px; border-radius: var(--rounded-full); background: var(--color-primary); flex-shrink: 0; margin-top: 4px; }
+.commit-line { width: 2px; flex: 1; background: var(--color-border); min-height: 16px; margin-top: 4px; }
+.commit-body { flex: 1; min-width: 0; }
+.commit-msg { font-size: var(--text-sm); color: var(--color-text); }
+.commit-meta { display: flex; align-items: center; gap: var(--spacing-xs); margin-top: 2px; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.commit-avatar { width: 14px; height: 14px; border-radius: var(--rounded-full); }
+.commit-author { font-weight: var(--weight-medium); }
+.commit-sha { font-family: var(--font-mono); }
 
 .items-grid {
   columns: 4 200px;
