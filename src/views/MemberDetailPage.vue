@@ -6,6 +6,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
+import RepoCard from '@/components/RepoCard.vue'
 import { formatDate } from '@/utils/format'
 import ContactButtons from '@/components/ContactButtons.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -188,32 +189,8 @@ function typeLabel(type) {
     <div class="tab-content" v-show="tab === 'repos'">
       <LoadingSpinner :visible="tabLoading" />
       <div class="repo-grid">
-        <div v-for="repo in repos" :key="repo.id" class="repo-card" @click="router.push(`/repos/${repo.id}`)">
-          <div class="repo-card__cover">
-            <img v-if="repo.coverImage" :src="repo.coverImage" alt="" />
-            <div v-else class="repo-card__cover-placeholder">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="repo-card__badges">
-              <span v-if="repo.visibility === 1" class="repo-card__visibility">{{ t('visibility.private') }}</span>
-              <span class="repo-card__type-badge" :style="{ color: typeColors[repo.type] }">{{ typeLabel(repo.type) }}</span>
-            </div>
-          </div>
-          <div class="repo-card__body">
-            <div class="repo-card__user">
-              <div class="repo-card__user-left">
-                <img v-if="repo.userAvatar" :src="repo.userAvatar" class="repo-card__avatar" />
-                <span v-else class="repo-card__avatar-placeholder">{{ (repo.userNickname || 'U')[0] }}</span>
-                <span class="repo-card__nickname">{{ repo.userNickname }}</span>
-              </div>
-              <span class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
-            </div>
-            <h3 class="repo-card__name">{{ repo.name }}</h3>
-            <p v-if="repo.description" class="repo-card__desc">{{ repo.description }}</p>
-            <div v-if="repo.tags?.length" class="repo-card__tags">
-              <span v-for="tag in repo.tags" :key="tag" class="repo-card__tag">{{ tag }}</span>
-            </div>
-          </div>
+        <div v-for="repo in repos" :key="repo.id" @click="router.push(`/repos/${repo.id}`)">
+          <RepoCard :repo="repo" :show-user="false" />
         </div>
       </div>
       <p v-if="!tabLoading && !repos.length" class="empty-state">{{ t('repo.empty') }}</p>
@@ -361,26 +338,8 @@ function typeLabel(type) {
 
 .tab-content { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 
-.repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--spacing-md); }
-.repo-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); overflow: hidden; cursor: pointer; transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast); }
-.repo-card:hover { border-color: #f9a8d4; transform: scale(1.02); box-shadow: 0 0 0 0.5px #f9a8d4; }
-.repo-card__cover { position: relative; height: 120px; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); }
-.repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
-.repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
-.repo-card__badges { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: 4px; }
-.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255, 255, 255, 0.9); border-radius: var(--rounded-full); }
-.repo-card__visibility { font-size: var(--text-xs); color: var(--color-text-secondary); background: rgba(255, 255, 255, 0.9); padding: 2px var(--spacing-sm); border-radius: var(--rounded-full); }
-.repo-card__body { padding: var(--spacing-lg); }
-.repo-card__user { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-sm); }
-.repo-card__user-left { display: flex; align-items: center; gap: var(--spacing-xs); }
-.repo-card__avatar { width: 20px; height: 20px; border-radius: var(--rounded-full); object-fit: cover; }
-.repo-card__avatar-placeholder { width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.repo-card__nickname { font-size: var(--text-xs); color: var(--color-text-secondary); }
-.repo-card__date { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-mono); }
-.repo-card__name { font-size: var(--text-base); font-weight: var(--weight-semibold); margin-bottom: var(--spacing-sm); }
-.repo-card__desc { font-size: var(--text-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: var(--spacing-sm); }
-.repo-card__tags { display: flex; flex-wrap: wrap; gap: 4px; }
-.repo-card__tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
+.repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--spacing-md); }
+.repo-grid > * { cursor: pointer; }
 
 @media (max-width: 600px) {
   .profile-header {

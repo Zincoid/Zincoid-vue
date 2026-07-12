@@ -69,6 +69,17 @@ async function deleteRepo() {
   } catch { /* ignore */ }
 }
 
+// ── Access request ──
+async function requestAccess() {
+  if (!confirm(t('repo.requestAccessConfirm'))) return
+  try {
+    await repoAPI.requestAccess(repo.value.id)
+    alert(t('repo.requestAccessSent'))
+  } catch (err) {
+    alert(getMessage(err, 'common.failed'))
+  }
+}
+
 // ── Items upload ──
 const uploading = ref(false)
 
@@ -210,7 +221,7 @@ async function saveEdit() {
 
 <template>
   <div class="repo-detail">
-    <div v-if="loadingDone && repo && repo.coverImage" class="repo-cover-banner" :style="{ backgroundImage: `url(${repo.coverImage})` }">
+    <div v-if="loadingDone && repo && !repo.restricted && repo.coverImage" class="repo-cover-banner" :style="{ backgroundImage: `url(${repo.coverImage})` }">
       <div class="repo-cover-banner__overlay"></div>
     </div>
     <div class="container">
@@ -219,6 +230,7 @@ async function saveEdit() {
       <div class="repo-header">
         <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
         <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
+        <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ t('visibility.restricted') }}</span>
         <h1 class="repo-title">{{ repo.name }}</h1>
 
         <div class="repo-meta">
@@ -243,14 +255,24 @@ async function saveEdit() {
         </div>
       </div>
 
-      <div v-if="repo.description" class="repo-desc">{{ repo.description }}</div>
+      <div v-if="repo.restricted" class="repo-access-bar">
+        <p class="repo-access-bar__msg">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          {{ t('repo.restrictedHint') }}
+        </p>
+        <button v-if="auth.isLoggedIn && !isOwner()" class="btn btn--restricted" @click="requestAccess">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          {{ t('repo.requestAccess') }}
+        </button>
+      </div>
+      <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
 
-      <div v-if="repo.tags?.length" class="repo-tags">
+      <div v-if="!repo.restricted && repo.tags?.length" class="repo-tags">
         <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
       </div>
 
       <!-- CODE type → external link + GitHub info -->
-      <template v-if="repo.type === 0">
+      <template v-if="!repo.restricted && repo.type === 0">
         <a v-if="repo.url" :href="repo.url" target="_blank" rel="noopener" class="repo-url">
           <div class="repo-url__left">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
@@ -286,7 +308,7 @@ async function saveEdit() {
       </template>
 
       <!-- MEDIA → grid -->
-      <template v-else-if="repo.type === 1">
+      <template v-else-if="!repo.restricted && repo.type === 1">
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid">
@@ -318,7 +340,7 @@ async function saveEdit() {
       </template>
 
       <!-- FILE → list -->
-      <template v-else>
+      <template v-else-if="!repo.restricted">
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-list">
@@ -394,12 +416,15 @@ async function saveEdit() {
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.visibility') }}</label>
                   <div class="visibility-slide">
-                    <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : 'calc(50% + 3px)' }"></div>
+                    <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>{{ t('visibility.public') }}
                     </button>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>{{ t('visibility.private') }}
+                    </button>
+                    <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>{{ t('visibility.restricted') }}
                     </button>
                   </div>
                 </div>
@@ -419,7 +444,7 @@ async function saveEdit() {
 
     <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
-    <label v-if="repo && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
+    <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
     </label>
@@ -440,6 +465,7 @@ async function saveEdit() {
 .type-badge--media { color: #db2777; background: rgba(219, 39, 119, 0.1); }
 .type-badge--file { color: #2563eb; background: rgba(37, 99, 235, 0.1); }
 .visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
+.visibility-badge--restricted { color: #d97706; background: rgba(217,119,6,0.1); }
 .repo-title { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); line-height: 1.3; }
 
 .repo-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); font-size: var(--text-sm); color: var(--color-text-secondary); flex-wrap: wrap; }
@@ -455,6 +481,11 @@ async function saveEdit() {
 .repo-cover-banner { height: 300px; background-size: cover; background-position: center; position: relative; }
 .repo-cover-banner__overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0) 30%, var(--color-bg) 100%); }
 
+.repo-access-bar { margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.25); border-radius: var(--rounded-lg); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
+.repo-access-bar__msg { font-size: var(--text-sm); color: #d97706; display: flex; align-items: center; gap: var(--spacing-sm); }
+.repo-access-bar__msg svg { flex-shrink: 0; }
+.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #fff; background: #d97706; border: none; border-radius: var(--rounded-md); cursor: pointer; transition: opacity var(--transition-fast); }
+.btn--restricted:hover { opacity: 0.85; }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); }
 
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
@@ -579,10 +610,11 @@ async function saveEdit() {
 .modal .field__hint { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; }
 .modal .msg { margin-top: var(--spacing-lg); }
 .modal__actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border-light); }
-.visibility-slide { display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
-.visibility-slide__indicator { position: absolute; top: 3px; width: calc(50% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1; }
+.visibility-slide { display: flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
+.visibility-slide__indicator { position: absolute; top: 3px; width: calc(33.33% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
+.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; }
 .visibility-slide-btn--active { color: var(--color-primary); }
+.visibility-slide-btn--restricted.visibility-slide-btn--active { color: #d97706; }
 .modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
 .modal .cover-preview { max-width: 200px; max-height: 120px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }

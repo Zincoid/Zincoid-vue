@@ -5,6 +5,7 @@ import { useError } from '@/composables/useError'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import RepoCard from '@/components/RepoCard.vue'
 import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
@@ -169,34 +170,8 @@ async function createRepo() {
     <template v-if="loadingDone">
       <p v-if="repos.length === 0" class="empty-state">{{ t('repo.empty') }}</p>
       <div v-else class="repo-grid">
-        <router-link
-          v-for="repo in repos"
-          :key="repo.id"
-          :to="`/repos/${repo.id}`"
-          class="repo-card"
-        >
-          <div class="repo-card__cover">
-            <img v-if="repo.coverImage" :src="repo.coverImage" alt="" />
-            <div v-else class="repo-card__cover-placeholder">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <span class="repo-card__type-badge" :style="{ color: typeTabs.find(t => t.value === repo.type)?.color }">{{ typeLabel(repo.type) }}</span>
-          </div>
-          <div class="repo-card__body">
-            <div class="repo-card__user" v-if="repo.userNickname">
-              <div class="repo-card__user-left">
-                <img v-if="repo.userAvatar" :src="repo.userAvatar" class="repo-card__avatar" />
-                <span v-else class="repo-card__avatar-placeholder">{{ repo.userNickname[0] }}</span>
-                <span class="repo-card__nickname">{{ repo.userNickname }}</span>
-              </div>
-              <span class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
-            </div>
-            <h3 class="repo-card__name">{{ repo.name }}</h3>
-            <p v-if="repo.description" class="repo-card__desc">{{ repo.description }}</p>
-            <div v-if="repo.tags?.length" class="repo-card__tags">
-              <span v-for="tag in repo.tags" :key="tag" class="repo-card__tag">{{ tag }}</span>
-            </div>
-          </div>
+        <router-link v-for="repo in repos" :key="repo.id" :to="`/repos/${repo.id}`">
+          <RepoCard :repo="repo" />
         </router-link>
       </div>
       <Pagination :page="page" :pages="pages" :total="total" :size="size" @change="onPageChange" />
@@ -253,12 +228,15 @@ async function createRepo() {
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.visibility') }}</label>
                   <div class="visibility-slide">
-                    <div class="visibility-slide__indicator" :style="{ left: createForm.visibility === 0 ? '3px' : 'calc(50% + 3px)' }"></div>
+                    <div class="visibility-slide__indicator" :style="{ left: createForm.visibility === 0 ? '3px' : createForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 0 }" @click="createForm.visibility = 0" type="button">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>{{ t('visibility.public') }}
                     </button>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 1 }" @click="createForm.visibility = 1" type="button">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>{{ t('visibility.private') }}
+                    </button>
+                    <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': createForm.visibility === 2 }" @click="createForm.visibility = 2" type="button">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>{{ t('visibility.restricted') }}
                     </button>
                   </div>
                 </div>
@@ -339,16 +317,10 @@ async function createRepo() {
 .repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
 
-.repo-card__type-badge {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  padding: 2px var(--spacing-sm);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--rounded-full);
-}
+.repo-card__badges { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: 4px; }
+.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255, 255, 255, 0.9); border-radius: var(--rounded-full); }
+.repo-card__visibility-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: rgba(255, 255, 255, 0.9); border-radius: var(--rounded-full); }
+.repo-card__visibility-badge--restricted { color: #d97706; }
 
 .repo-card__body { padding: var(--spacing-lg); }
 
@@ -396,10 +368,11 @@ async function createRepo() {
 .modal .radio-group { display: flex; gap: var(--spacing-sm) var(--spacing-lg); padding-top: var(--spacing-xs); }
 .modal .radio { display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: var(--text-sm); }
 .modal .radio input { accent-color: var(--color-primary); }
-.visibility-slide { display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
-.visibility-slide__indicator { position: absolute; top: 3px; width: calc(50% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1; }
+.visibility-slide { display: flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
+.visibility-slide__indicator { position: absolute; top: 3px; width: calc(33.33% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
+.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; }
 .visibility-slide-btn--active { color: var(--color-primary); }
+.visibility-slide-btn--restricted.visibility-slide-btn--active { color: #d97706; }
 .modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
 .modal .cover-preview { max-width: 200px; max-height: 120px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }

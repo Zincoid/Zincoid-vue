@@ -39,7 +39,8 @@ export default {
   },
   visibility: {
     public: '所有人可见',
-    private: '仅自己可见'
+    private: '仅自己可见',
+    restricted: '需访问授权'
   },
   article: {
     title: '文章',
@@ -110,7 +111,8 @@ export default {
     subtitle: '管理基本信息、数据和账户设置',
     profileTab: '基本',
     dataTab: '数据',
-    systemTab: '系统'
+    systemTab: '系统',
+    accessTab: '授权'
   },
   profile: {
     pageTitle: '基本',
@@ -191,7 +193,28 @@ export default {
     urlHint: 'GitHub 仓库地址',
     tags: '标签',
     tagsHint: '用逗号分隔',
-    searchPlaceholder: '搜索仓库...'
+    searchPlaceholder: '搜索仓库...',
+    requestAccess: '请求访问',
+    requestAccessConfirm: '确定要请求访问此仓库？',
+    requestAccessSent: '请求已发送',
+    restrictedHint: '访问此仓库需要授权'
+  },
+  access: {
+    desc: '管理仓库访问请求与授权',
+    received: '接收',
+    sent: '发送',
+    pending: '待处理',
+    approved: '已通过',
+    rejected: '已拒绝',
+    reject: '拒绝',
+    allow: '允许',
+    remove: '移除',
+    pendingRequests: '待处理的请求',
+    resolvedRequests: '已处理的请求',
+    pendingSent: '待批准的请求',
+    resolvedSent: '已处理的请求',
+    noPending: '暂无待处理请求',
+    noResolved: '暂无已处理请求'
   },
   system: {
     subtitle: '站点配置与工具',
@@ -325,6 +348,9 @@ export default {
     'You can only edit your own repos': '只能编辑自己的仓库',
     'No permission to delete this repo': '无权删除此仓库',
     'Invalid Item Sort': '无效的条目排序',
+    'Access already requested': '已请求过访问',
+    'Access already approved': '访问已被批准',
+    'Access already rejected': '访问已被拒绝'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
@@ -362,6 +388,9 @@ export default {
     likedMoment: '点赞了你的动态',
     likedArticle: '点赞了你的文章',
     registered: '注册了新账号',
+    accessRequest: '请求访问你的仓库',
+    accessGranted: '通过了你的访问请求',
+    accessRejected: '拒绝了你的访问请求',
     system: '系统公告',
     markRead: '全部已读',
     deleteAll: '清除全部'

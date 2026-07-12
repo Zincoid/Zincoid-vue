@@ -39,7 +39,8 @@ export default {
   },
   visibility: {
     public: 'Public',
-    private: 'Private'
+    private: 'Private',
+    restricted: 'Restricted'
   },
   article: {
     title: 'Articles',
@@ -110,7 +111,8 @@ export default {
     subtitle: 'Manage your profile, data and account settings',
     profileTab: 'Profile',
     dataTab: 'Data',
-    systemTab: 'System'
+    systemTab: 'System',
+    accessTab: 'Access'
   },
   profile: {
     pageTitle: 'Profile',
@@ -185,13 +187,34 @@ export default {
     urlHint: 'GitHub repository URL',
     tags: 'Tags',
     tagsHint: 'Separate with commas',
-    searchPlaceholder: 'Search repos...'
+    searchPlaceholder: 'Search repos...',
+    requestAccess: 'Request Access',
+    requestAccessConfirm: 'Request access to this repo?',
+    requestAccessSent: 'Request sent',
+    restrictedHint: 'Authorization required to access this repo'
   },
   data: {
     pageTitle: 'Data',
     subtitle: 'Manage your articles, moments and other data',
     desc: 'Visit your detail page to manage your content...',
     viewMe: 'View Me'
+  },
+  access: {
+    desc: 'Manage repo access requests & authorizations',
+    received: 'Received',
+    sent: 'Sent',
+    pending: 'Pending',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    reject: 'Reject',
+    allow: 'Allow',
+    remove: 'Remove',
+    pendingRequests: 'Pending Requests',
+    resolvedRequests: 'Resolved Requests',
+    pendingSent: 'Pending Approvals',
+    resolvedSent: 'Resolved Approvals',
+    noPending: 'No pending requests',
+    noResolved: 'No resolved requests'
   },
   system: {
     subtitle: 'Configuration & tools',
@@ -325,6 +348,9 @@ export default {
     'You can only edit your own repos': 'You can only edit your own repos',
     'No permission to delete this repo': 'No permission to delete this repo',
     'Invalid Item Sort': 'Invalid Item Sort',
+    'Access already requested': 'Access already requested',
+    'Access already approved': 'Access already approved',
+    'Access already rejected': 'Access already rejected'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
@@ -362,6 +388,9 @@ export default {
     likedMoment: 'liked your moment',
     likedArticle: 'liked your article',
     registered: 'registered a new account',
+    accessRequest: 'requested access to your repo',
+    accessGranted: 'approved your access request',
+    accessRejected: 'rejected your access request',
     system: 'System broadcast',
     markRead: 'Mark all read',
     deleteAll: 'Clear all'

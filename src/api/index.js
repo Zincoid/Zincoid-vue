@@ -149,7 +149,11 @@ export const repoAPI = {
   getDetail: (id) => api.get(`/repos/public/${id}`),
   addItem: (repoId, data) => api.post(`/repos/${repoId}/items`, data),
   deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
-  sortItems: (repoId, itemIds) => api.put(`/repos/${repoId}/items/sort`, itemIds)
+  sortItems: (repoId, itemIds) => api.put(`/repos/${repoId}/items/sort`, itemIds),
+  requestAccess: (repoId) => api.post(`/repos/${repoId}/access`),
+  _get: (path) => api.get(`/repos${path}`),
+  _put: (path) => api.put(`/repos${path}`),
+  _delete: (path) => api.delete(`/repos${path}`)
 }
 
 // ── Notifications ──
