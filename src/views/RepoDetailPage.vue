@@ -101,6 +101,43 @@ async function deleteItem(itemId) {
   }
 }
 
+// ── Drag sort ──
+let dragIndex = null
+
+function onDragStart(index, e) {
+  dragIndex = index
+  e.dataTransfer.effectAllowed = 'move'
+  const el = e.target
+  const clone = el.cloneNode(true)
+  clone.style.position = 'absolute'
+  clone.style.top = '-9999px'
+  clone.style.opacity = '0.85'
+  document.body.appendChild(clone)
+  e.dataTransfer.setDragImage(clone, 0, 0)
+  requestAnimationFrame(() => document.body.removeChild(clone))
+}
+
+function onDragOver(index, e) {
+  e.preventDefault()
+  e.dataTransfer.dropEffect = 'move'
+}
+
+async function onDrop(index, e) {
+  e.preventDefault()
+  if (dragIndex === null || dragIndex === index) return
+  const items = [...repo.value.items]
+  const dragged = items.splice(dragIndex, 1)[0]
+  items.splice(index, 0, dragged)
+  const oldItems = repo.value.items
+  repo.value.items = items
+  try {
+    await repoAPI.sortItems(repo.value.id, items.map(i => i.id))
+  } catch {
+    repo.value.items = oldItems
+  }
+  dragIndex = null
+}
+
 // ── Edit modal ──
 const showEdit = ref(false)
 const editForm = ref({ name: '', description: '', type: 0, url: '', tags: '', coverImage: '' })
@@ -225,7 +262,15 @@ async function saveEdit() {
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid">
-          <div v-for="item in repo.items" :key="item.id" class="item-card">
+          <div v-for="(item, index) in repo.items" :key="item.id" class="item-card"
+            :draggable="canEdit()"
+            @dragstart="canEdit() && onDragStart(index, $event)"
+            @dragover="canEdit() && onDragOver(index, $event)"
+            @drop="canEdit() && onDrop(index, $event)">
+            <div class="item-card__handle">
+              <svg v-if="canEdit()" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg>
+              <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
             <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" @click="previewItem(item.url)" />
             <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
               <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
@@ -236,6 +281,7 @@ async function saveEdit() {
             <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </div>
+            <span class="item-card__name">{{ item.name }}</span>
             <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -248,7 +294,15 @@ async function saveEdit() {
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-list">
-          <div v-for="item in repo.items" :key="item.id" class="item-row">
+          <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
+            :draggable="canEdit()"
+            @dragstart="canEdit() && onDragStart(index, $event)"
+            @dragover="canEdit() && onDragOver(index, $event)"
+            @drop="canEdit() && onDrop(index, $event)">
+            <div class="item-row__handle">
+              <svg v-if="canEdit()" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg>
+              <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
             <div class="item-row__icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             </div>
@@ -432,7 +486,10 @@ async function saveEdit() {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .item-card:hover { border-color: #f9a8d4; transform: scale(1.02); box-shadow: 0 0 0 0.5px #f9a8d4; }
-.item-card:hover .item-card__delete { opacity: 1; }
+.item-card[draggable="true"] { cursor: grab; }
+.item-card[draggable="true"]:active { cursor: grabbing; }
+.item-card:hover .item-card__handle, .item-card:hover .item-card__delete { opacity: 1; }
+.item-card__handle { position: absolute; top: 6px; left: 6px; z-index: 2; color: #fff; display: flex; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
 .item-card__thumb { width: 100%; height: auto; display: block; }
 .item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
@@ -441,16 +498,20 @@ async function saveEdit() {
 .item-card__play-icon svg { margin-left: 3px; }
 .item-card__audio { min-height: 120px; background: var(--color-bg-alt); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); }
 .item-card__file-icon { min-height: 120px; display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); background: var(--color-bg-alt); }
-.item-card__name { display: none; }
+.item-card__name { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-size: 11px; color: #fff; padding: 0 6px; max-width: calc(100% - 60px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 0; transition: opacity var(--transition-fast); z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.item-card:hover .item-card__name { opacity: 1; }
 
-.item-card__delete { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
-.item-card__delete:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+.item-card__delete { position: absolute; top: 6px; right: 6px; width: 20px; height: 20px; border-radius: var(--rounded-full); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast), background var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.item-card__delete:hover { background: rgba(231, 76, 60, 0.7); }
 
 /* ── File list ── */
 .items-list { display: flex; flex-direction: column; border-top: 1px solid var(--color-border); }
-.item-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-lg); border-bottom: 1px solid var(--color-border); transition: background var(--transition-fast); }
-.item-row:hover { background: var(--color-bg-alt); }
+.item-row { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-lg); padding-left: var(--spacing-lg); border-bottom: 1px solid var(--color-border); transition: background var(--transition-fast), padding-left var(--transition-fast); position: relative; }
+.item-row:hover { background: var(--color-bg-alt); padding-left: calc(var(--spacing-lg) + 20px); }
+.item-row[draggable="true"] { cursor: grab; }
 .item-row__icon { flex-shrink: 0; color: var(--color-text-tertiary); display: flex; }
+.item-row__handle { position: absolute; left: var(--spacing-md); color: var(--color-text-tertiary); display: flex; opacity: 0; transition: opacity var(--transition-fast); }
+.item-row:hover .item-row__handle { opacity: 0.6; }
 .item-row__info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .item-row__name { font-size: var(--text-sm); color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-row__size { font-size: var(--text-xs); color: var(--color-text-tertiary); }

@@ -1,5 +1,5 @@
 <script setup>
-import { watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 
 const { t } = useI18n()
@@ -10,6 +10,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close'])
+const videoRef = ref(null)
 
 const mediaType = computed(() => {
   const ext = props.src.split('.').pop().toLowerCase()
@@ -18,9 +19,11 @@ const mediaType = computed(() => {
   return 'image'
 })
 
-watch(() => props.visible, (v) => {
+watch(() => props.visible, async (v) => {
   if (v) {
     document.body.style.overflow = 'hidden'
+    await nextTick()
+    if (videoRef.value) videoRef.value.volume = 0.25
   } else {
     document.body.style.overflow = ''
   }
@@ -43,7 +46,7 @@ function onClose() {
         </button>
       </div>
       <img v-if="mediaType === 'image'" :src="src" class="viewer-content viewer-image" alt="" @click.stop />
-      <video v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay @click.stop></video>
+      <video ref="videoRef" v-else-if="mediaType === 'video'" :src="src" class="viewer-content viewer-video" controls autoplay @click.stop></video>
       <audio v-else :src="src" class="viewer-audio" controls autoplay @click.stop></audio>
     </div>
   </Teleport>
