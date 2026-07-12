@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -18,14 +18,19 @@ const repo = ref(null)
 const loading = ref(true)
 const loadingDone = ref(false)
 
-onMounted(async () => {
+async function fetchRepo() {
+  loading.value = true
+  loadingDone.value = false
   try {
     const res = await repoAPI.getDetail(route.params.id)
     repo.value = res.data.data
   } catch { /* ignore */ } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(fetchRepo)
+watch(() => route.params.id, fetchRepo)
 
 function typeLabel(type) {
   const map = { 0: t('repo.code'), 1: t('repo.media'), 2: t('repo.file') }
@@ -465,7 +470,6 @@ async function saveEdit() {
 .type-badge--media { color: #db2777; background: rgba(219, 39, 119, 0.1); }
 .type-badge--file { color: #2563eb; background: rgba(37, 99, 235, 0.1); }
 .visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
-.visibility-badge--restricted { color: #d97706; background: rgba(217,119,6,0.1); }
 .repo-title { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); line-height: 1.3; }
 
 .repo-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); font-size: var(--text-sm); color: var(--color-text-secondary); flex-wrap: wrap; }
@@ -484,8 +488,8 @@ async function saveEdit() {
 .repo-access-bar { margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.25); border-radius: var(--rounded-lg); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
 .repo-access-bar__msg { font-size: var(--text-sm); color: #d97706; display: flex; align-items: center; gap: var(--spacing-sm); }
 .repo-access-bar__msg svg { flex-shrink: 0; }
-.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #fff; background: #d97706; border: none; border-radius: var(--rounded-md); cursor: pointer; transition: opacity var(--transition-fast); }
-.btn--restricted:hover { opacity: 0.85; }
+.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #d97706; background: transparent; border: 1px solid #d97706; border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
+.btn--restricted:hover { color: #fff; background: #d97706; }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); }
 
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }

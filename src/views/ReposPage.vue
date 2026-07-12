@@ -291,6 +291,8 @@ async function createRepo() {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--spacing-xl);
 }
+.repo-grid > * { display: flex; }
+.repo-grid > * > * { flex: 1; }
 
 .repo-card {
   background: var(--color-surface);

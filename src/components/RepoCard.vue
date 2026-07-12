@@ -37,9 +37,12 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
       </div>
       <span v-else class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
       <h3 class="repo-card__name">{{ repo.name }}</h3>
-      <p v-if="repo.description" class="repo-card__desc">{{ repo.description }}</p>
-      <div v-if="repo.tags?.length" class="repo-card__tags">
-        <span v-for="tag in repo.tags" :key="tag" class="repo-card__tag">{{ tag }}</span>
+      <p class="repo-card__desc">{{ repo.description || t('repo.noDesc') }}</p>
+      <div class="repo-card__tags">
+        <template v-if="repo.tags?.length">
+          <span v-for="tag in repo.tags" :key="tag" class="repo-card__tag">{{ tag }}</span>
+        </template>
+        <span v-else class="repo-card__tag--empty">{{ t('repo.noTags') }}</span>
       </div>
     </div>
   </div>
@@ -71,10 +74,9 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
 
-.repo-card__badges { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: 4px; }
+.repo-card__badges { position: absolute; top: var(--spacing-lg); right: var(--spacing-md); display: flex; gap: var(--spacing-sm); }
 .repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255,255,255,0.9); border-radius: var(--rounded-full); }
 .repo-card__visibility-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: rgba(255,255,255,0.9); border-radius: var(--rounded-full); }
-.repo-card__visibility-badge--restricted { color: #d97706; }
 
 .repo-card__body { padding: var(--spacing-lg); }
 
@@ -89,4 +91,5 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__desc { font-size: var(--text-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: var(--spacing-sm); }
 .repo-card__tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .repo-card__tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
+.repo-card__tag--empty { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 </style>

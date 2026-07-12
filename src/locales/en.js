@@ -191,7 +191,9 @@ export default {
     requestAccess: 'Request Access',
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',
-    restrictedHint: 'Authorization required to access this repo'
+    restrictedHint: 'Authorization required to access this repo',
+    noDesc: 'No description',
+    noTags: 'No tags'
   },
   data: {
     pageTitle: 'Data',
@@ -213,8 +215,7 @@ export default {
     resolvedRequests: 'Resolved Requests',
     pendingSent: 'Pending Approvals',
     resolvedSent: 'Resolved Approvals',
-    noPending: 'No pending requests',
-    noResolved: 'No resolved requests'
+    noRequests: 'No requests.'
   },
   system: {
     subtitle: 'Configuration & tools',

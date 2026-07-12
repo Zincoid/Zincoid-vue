@@ -197,24 +197,25 @@ export default {
     requestAccess: '请求访问',
     requestAccessConfirm: '确定要请求访问此仓库？',
     requestAccessSent: '请求已发送',
-    restrictedHint: '访问此仓库需要授权'
+    restrictedHint: '访问此仓库需要授权',
+    noDesc: '暂无简介',
+    noTags: '暂无标签'
   },
   access: {
     desc: '管理仓库访问请求与授权',
     received: '接收',
     sent: '发送',
     pending: '待处理',
-    approved: '已通过',
+    approved: '已授权',
     rejected: '已拒绝',
     reject: '拒绝',
     allow: '允许',
     remove: '移除',
     pendingRequests: '待处理的请求',
     resolvedRequests: '已处理的请求',
-    pendingSent: '待批准的请求',
+    pendingSent: '待处理的请求',
     resolvedSent: '已处理的请求',
-    noPending: '暂无待处理请求',
-    noResolved: '暂无已处理请求'
+    noRequests: '暂无请求。'
   },
   system: {
     subtitle: '站点配置与工具',
