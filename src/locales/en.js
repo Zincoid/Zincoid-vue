@@ -182,7 +182,7 @@ export default {
     type: 'Type',
     url: 'URL',
     description: 'Description',
-    urlHint: 'e.g. GitHub repository URL',
+    urlHint: 'GitHub repository URL',
     tags: 'Tags',
     tagsHint: 'Separate with commas',
     searchPlaceholder: 'Search repos...'

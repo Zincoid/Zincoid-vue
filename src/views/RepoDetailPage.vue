@@ -393,16 +393,15 @@ async function saveEdit() {
               <div class="field">
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.visibility') }}</label>
-                  <div class="visibility-toggle">
-                  <button class="visibility-btn" :class="{ 'visibility-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
-                    {{ t('visibility.public') }}
-                  </button>
-                  <button class="visibility-btn" :class="{ 'visibility-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    {{ t('visibility.private') }}
-                  </button>
-                </div>
+                  <div class="visibility-slide">
+                    <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : 'calc(50% + 3px)' }"></div>
+                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>{{ t('visibility.public') }}
+                    </button>
+                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>{{ t('visibility.private') }}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -580,10 +579,10 @@ async function saveEdit() {
 .modal .field__hint { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; }
 .modal .msg { margin-top: var(--spacing-lg); }
 .modal__actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border-light); }
-.modal .visibility-toggle { display: flex; gap: var(--spacing-sm); }
-.modal .visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }
-.modal .visibility-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
-.modal .visibility-btn--active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
+.visibility-slide { display: inline-flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
+.visibility-slide__indicator { position: absolute; top: 3px; width: calc(50% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
+.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1; }
+.visibility-slide-btn--active { color: var(--color-primary); }
 .modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
 .modal .cover-preview { max-width: 200px; max-height: 120px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }
