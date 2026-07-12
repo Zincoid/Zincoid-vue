@@ -7,6 +7,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -169,11 +170,8 @@ function closeMenu() {
 
       <div class="navbar__mobile-actions">
         <button v-if="auth.isLoggedIn" class="navbar__notif-mobile-bell" @click.stop="toggleNotif">
-          <svg v-if="notifOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
-          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
+          <SvgIcon v-if="notifOpen" name="chevron-up" :size="20" />
+          <SvgIcon v-else name="bell" :size="20" />
           <span v-if="unreadCount > 0" class="navbar__notif-mobile-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
         </button>
 
@@ -199,11 +197,11 @@ function closeMenu() {
                 'navbar__item--repos': link.icon === 'repos'
               }"
             >
-              <svg v-if="link.icon === 'moments'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <svg v-else-if="link.icon === 'articles'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <svg v-else-if="link.icon === 'chats'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="8" y2="10" stroke-width="3"/><line x1="12" y1="10" x2="12" y2="10" stroke-width="3"/><line x1="16" y1="10" x2="16" y2="10" stroke-width="3"/></svg>
-              <svg v-else-if="link.icon === 'members'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              <svg v-else-if="link.icon === 'repos'" class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+              <SvgIcon v-if="link.icon === 'moments'" name="image" />
+              <SvgIcon v-else-if="link.icon === 'articles'" name="article" />
+              <SvgIcon v-else-if="link.icon === 'chats'" name="chat" />
+              <SvgIcon v-else-if="link.icon === 'members'" name="members" />
+              <SvgIcon v-else-if="link.icon === 'repos'" name="fork" />
               <span class="navbar__label">{{ link.label }}</span>
             </router-link>
           </li>
@@ -213,11 +211,8 @@ function closeMenu() {
           <template v-if="auth.isLoggedIn">
             <div class="navbar__notif">
               <button class="navbar__notif-bell" @click.stop="toggleNotif">
-                <svg v-if="notifOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
-                <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
+                <SvgIcon v-if="notifOpen" name="chevron-up" :size="16" />
+                <SvgIcon v-else name="bell" :size="16" />
                 <span v-if="unreadCount > 0" class="navbar__notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
               </button>
             </div>
@@ -232,26 +227,26 @@ function closeMenu() {
               <span class="navbar__nickname">{{ auth.user?.nickname }}</span>
             </router-link>
             <button class="navbar__item navbar__item--logout" @click="auth.logout(); closeMenu()">
-              <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <SvgIcon name="logout" />
               {{ t('nav.logout') }}
             </button>
           </template>
           <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') || isActive('/register') }">
-            <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <SvgIcon name="login" />
             {{ t('nav.signIn') }}
           </router-link>
           <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="locale.toggleLocale()">
-            <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <SvgIcon name="lang" />
             {{ t('nav.lang') }}
           </button>
         </div>
         <div class="navbar__footer">
           <button class="navbar__item" @click="locale.toggleLocale()">
-            <svg class="navbar__nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <SvgIcon name="lang" />
             {{ t('nav.lang') }}
           </button>
           <button v-if="auth.isLoggedIn" class="navbar__item navbar__item--logout-mobile" @click="auth.logout(); closeMenu()">
-            <svg class="navbar__signin-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <SvgIcon name="logout" />
             {{ t('nav.logout') }}
           </button>
         </div>
@@ -261,7 +256,7 @@ function closeMenu() {
       <div v-if="notifOpen" class="navbar__notif-dropdown">
       <div class="navbar__notif-dropdown-header">
         <span class="navbar__notif-dropdown-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <SvgIcon name="bell" />
           {{ t('notification.title') }}
         </span>
         <div class="navbar__notif-header-actions">
@@ -316,7 +311,7 @@ function closeMenu() {
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>
             </div>
             <button class="navbar__notif-item-delete" @click.stop="deleteOne(n)" :title="t('common.delete')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <SvgIcon name="trash" :size="12" />
             </button>
           </div>
         </div>
@@ -340,10 +335,10 @@ function closeMenu() {
         <div class="broadcast-modal">
           <div class="broadcast-modal__bar"></div>
           <button class="broadcast-modal__close" @click="broadcastMessage = null">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <SvgIcon name="close" :size="16" />
           </button>
           <div class="broadcast-modal__icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <SvgIcon name="bell" :size="28" />
           </div>
           <h3 class="broadcast-modal__title">{{ t('notification.system') }}</h3>
           <p class="broadcast-modal__sender" v-if="broadcastSender">{{ broadcastSender }}</p>

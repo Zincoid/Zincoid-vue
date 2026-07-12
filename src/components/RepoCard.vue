@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from '@/composables/useI18n'
 import { formatDate } from '@/utils/format'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 
@@ -18,7 +19,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
     <div class="repo-card__cover">
       <img v-if="repo.coverImage" :src="repo.coverImage" alt="" />
       <div v-else class="repo-card__cover-placeholder">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <SvgIcon name="folder" :size="32" />
       </div>
       <div class="repo-card__badges">
         <span v-if="repo.visibility === 1" class="repo-card__visibility-badge">{{ t('visibility.private') }}</span>

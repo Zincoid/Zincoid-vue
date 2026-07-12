@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { fileAPI } from '@/api'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { marked } from 'marked'
 
 const { t } = useI18n()
@@ -118,7 +119,7 @@ defineExpose({ resolveImages })
         </button>
       </div>
       <label class="md-editor__upload-btn" :title="t('common.addImage')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <SvgIcon name="image" :size="18" />
         <input type="file" accept="image/*" class="hidden-input" @change="handleUploadImage" />
       </label>
     </div>
@@ -143,7 +144,7 @@ defineExpose({ resolveImages })
       <div v-for="(preview, i) in pendingPreviews" :key="i" class="md-editor__thumb-item">
         <img :src="preview" alt="" />
         <button class="md-editor__thumb-remove" @click="removePending(i)" title="Remove">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <SvgIcon name="close" :size="10" />
         </button>
       </div>
     </div>

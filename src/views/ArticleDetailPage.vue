@@ -10,6 +10,7 @@ import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 import 'highlight.js/styles/github-dark.css'
 
@@ -252,11 +253,11 @@ watch(likeLiked, (liked) => {
               {{ article.isPinned ? t('common.unpin') : t('common.pin') }}
             </button>
             <router-link :to="`/articles/${article.id}/edit`" class="link-muted">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <SvgIcon name="edit" />
               {{ t('common.edit') }}
             </router-link>
             <button class="link-danger" @click="handleDelete">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <SvgIcon name="trash" />
               {{ t('article.delete') }}
             </button>
           </div>
@@ -306,7 +307,7 @@ watch(likeLiked, (liked) => {
   <p v-if="loadingDone && !article" class="empty-state">{{ notFoundReason === 'private' ? t('article.private') : t('article.notFound') }}</p>
 
   <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    <SvgIcon name="back-arrow" :size="20" />
   </button>
   <div class="like-fab">
     <LikeButton

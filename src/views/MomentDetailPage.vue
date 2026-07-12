@@ -14,6 +14,7 @@ import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -256,11 +257,11 @@ watch(likeLiked, (liked) => {
             {{ moment.isPinned ? t('common.unpin') : t('common.pin') }}
           </button>
           <button v-if="!editing" class="link-muted" @click="startEdit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <SvgIcon name="edit" />
             {{ t('common.edit') }}
           </button>
           <button class="link-danger" @click="handleDelete">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <SvgIcon name="trash" />
             {{ t('moment.delete') }}
           </button>
         </div>
@@ -290,7 +291,7 @@ watch(likeLiked, (liked) => {
             @click="editVisibility = 0"
             type="button"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            <SvgIcon name="world" :size="14" />
             {{ t('visibility.public') }}
           </button>
           <button
@@ -299,7 +300,7 @@ watch(likeLiked, (liked) => {
             @click="editVisibility = 1"
             type="button"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <SvgIcon name="lock" :size="14" />
             {{ t('visibility.private') }}
           </button>
         </div>
@@ -309,33 +310,33 @@ watch(likeLiked, (liked) => {
             <img v-if="mediaType(img) === 'image'" :src="img" alt="" />
             <div v-else-if="mediaType(img) === 'video'" class="edit-video-thumb">
               <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
-              <div class="edit-play-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+              <div class="edit-play-icon"><SvgIcon name="play" :size="16" /></div>
             </div>
             <div v-else class="edit-audio-thumb">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <SvgIcon name="audio" :size="18" />
             </div>
             <button class="edit-media-remove" @click="removeKeepImage(i)" title="Remove">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <SvgIcon name="close" :size="10" />
           </button>
           </div>
           <div v-for="(p, i) in editNewPreviews" :key="'new'+i" class="edit-media-item">
             <img v-if="p.type === 'image'" :src="p.url" alt="" />
             <div v-else-if="p.type === 'video'" class="edit-video-thumb">
               <video :src="p.url" muted></video>
-              <div class="edit-play-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+              <div class="edit-play-icon"><SvgIcon name="play" :size="16" /></div>
             </div>
             <div v-else class="edit-audio-thumb">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <SvgIcon name="audio" :size="18" />
             </div>
             <button class="edit-media-remove" @click="removeNewImage(i)" title="Remove">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <SvgIcon name="close" :size="10" />
           </button>
           </div>
         </div>
 
         <div class="edit-actions">
           <label class="btn btn--outline edit-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            <SvgIcon name="attach" />
             {{ t('moment.attach') }}
             <input type="file" accept="image/*,video/*,audio/*" class="hidden-input" @change="handleEditUpload" />
           </label>
@@ -371,7 +372,7 @@ watch(likeLiked, (liked) => {
           >
             <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
             <div class="detail__play-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <SvgIcon name="play" :size="40" />
             </div>
           </div>
           <div
@@ -380,7 +381,7 @@ watch(likeLiked, (liked) => {
             @click="previewImage(img)"
           >
             <div class="detail__audio-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <SvgIcon name="audio" :size="36" />
             </div>
           </div>
         </template>
@@ -426,7 +427,7 @@ watch(likeLiked, (liked) => {
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
   <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    <SvgIcon name="back-arrow" :size="20" />
   </button>
   <div v-if="!editing" class="like-fab">
     <LikeButton

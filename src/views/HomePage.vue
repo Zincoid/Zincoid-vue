@@ -7,6 +7,7 @@ import { momentAPI, articleAPI, userAPI, configAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -391,7 +392,7 @@ onUnmounted(() => {
           <h2 class="featured__title"># {{ t('home.random') }}<span class="cursor">_</span></h2>
           <button class="featured__refresh" @click="refreshFeatured">
             {{ t('home.shuffle') }}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <SvgIcon name="refresh" :size="12" />
           </button>
         </div>
         <MomentCard v-if="featured._type === 'moment'" :moment="featured" />
@@ -417,7 +418,7 @@ onUnmounted(() => {
               <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
               <div class="section__header-actions">
                 <button class="section__collapse-btn" @click="collapsed = 'moments'" title="Collapse">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  <SvgIcon name="chevron-right" :size="14" />
                 </button>
                 <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
               </div>
@@ -444,7 +445,7 @@ onUnmounted(() => {
               <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
               <div class="section__header-actions">
                 <button class="section__collapse-btn" @click="collapsed = 'articles'" title="Collapse">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  <SvgIcon name="chevron-right" :size="14" />
                 </button>
                 <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
               </div>
@@ -459,7 +460,7 @@ onUnmounted(() => {
       <template v-else>
         <div class="collapsed-sidebar" @click="collapsed = null">
           <span class="collapsed-sidebar__label"># {{ t('home.recentArticles') }}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <SvgIcon name="chevron-right" :size="16" />
         </div>
       </template>
     </div>

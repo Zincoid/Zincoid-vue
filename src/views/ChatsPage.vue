@@ -10,6 +10,7 @@ import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -229,11 +230,11 @@ function openPreview(src) {
                 class="chat-msg__audio"
                 @click="openPreview(msg.file)"
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                <SvgIcon name="audio" :size="32" />
                 <span>Audio</span>
               </div>
               <a v-else :href="msg.file" target="_blank" class="chat-msg__file-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                <SvgIcon name="file" />
                 {{ t('common.download') }}
               </a>
             </div>
@@ -244,7 +245,7 @@ function openPreview(src) {
 
     <div v-if="auth.isLoggedIn" class="chat-input-area" :style="{ transform: `translate(-50%, ${inputOffset}px)` }">
       <div v-if="uploadFile" class="chat-input__file-tag">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        <SvgIcon name="attach" :size="12" />
         {{ uploadFile.name }}
         <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
       </div>
@@ -253,7 +254,7 @@ function openPreview(src) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </button>
         <label class="chat-input__file-btn" :class="{ 'chat-input__file-btn--disabled': uploading }">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <SvgIcon name="attach" :size="18" />
           <input type="file" @change="onFileChange" accept="image/*,video/*" />
         </label>
         <textarea
@@ -272,10 +273,10 @@ function openPreview(src) {
           @select="(username) => mention.insert(chatTextarea, username)"
         />
         <button class="chat-scroll-bottom-btn" @click="scrollBottom" title="Scroll to bottom">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          <SvgIcon name="chevron-down" :size="16" />
         </button>
         <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <SvgIcon name="send" :size="16" />
         </button>
       </div>
     </div>

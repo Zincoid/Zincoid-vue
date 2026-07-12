@@ -11,6 +11,7 @@ import { formatDate } from '@/utils/format'
 import ContactButtons from '@/components/ContactButtons.vue'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
@@ -210,7 +211,7 @@ function typeLabel(type) {
     </svg>
   </button>
   <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    <SvgIcon name="back-arrow" :size="20" />
   </button>
 </template>
 

@@ -5,6 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { articleAPI, fileAPI } from '@/api'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -112,7 +113,7 @@ async function save() {
         <div class="cover-label-row">
           <label class="field__label">{{ t('article.cover') }}</label>
           <label class="btn btn--outline btn--sm">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <SvgIcon name="upload" />
             {{ t('article.upload') }}
             <input type="file" accept="image/*" class="hidden-input" @change="handleCoverUpload" />
           </label>
@@ -134,7 +135,7 @@ async function save() {
             @click="form.visibility = 0"
             type="button"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            <SvgIcon name="world" :size="14" />
             {{ t('visibility.public') }}
           </button>
           <button
@@ -143,7 +144,7 @@ async function save() {
             @click="form.visibility = 1"
             type="button"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <SvgIcon name="lock" :size="14" />
             {{ t('visibility.private') }}
           </button>
         </div>
@@ -159,11 +160,11 @@ async function save() {
 
     <div class="actions">
       <router-link to="/articles" class="btn btn--outline">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <SvgIcon name="close" :size="16" />
         {{ t('common.cancel') }}
       </router-link>
       <button class="btn btn--primary" :disabled="publishing" @click="save">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <SvgIcon name="save" :size="16" />
         {{ publishing ? t('article.publishing') : (isEdit ? t('common.update') : t('article.publish')) }}
       </button>
     </div>

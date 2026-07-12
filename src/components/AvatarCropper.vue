@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, computed, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 
@@ -261,7 +262,7 @@ watch(dragging, (v) => {
         </div>
 
         <div class="cropper-controls">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <SvgIcon name="search" />
           <input
             type="range"
             :min="zoomMin"
@@ -276,7 +277,7 @@ watch(dragging, (v) => {
         <div class="cropper-actions">
           <button class="btn btn--outline btn--lg" style="flex:1" @click="close">{{ t('common.cancel') }}</button>
           <button class="btn btn--primary btn--lg" style="flex:1" @click="confirm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <SvgIcon name="save" :size="16" />
             {{ t('common.confirm') }}
           </button>
         </div>

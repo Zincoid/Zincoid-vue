@@ -7,6 +7,7 @@ import { parseMentions } from '@/composables/useMentionLink'
 import { momentAPI } from '@/api'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -97,7 +98,7 @@ function goUser(e) {
         >
           <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
           <div class="moment-card__play-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <SvgIcon name="play" :size="32" />
           </div>
         </div>
         <div
@@ -106,7 +107,7 @@ function goUser(e) {
           @click.stop="previewImage(img)"
         >
           <div class="moment-card__audio-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <SvgIcon name="audio" :size="28" />
           </div>
         </div>
       </template>
@@ -115,7 +116,7 @@ function goUser(e) {
     <div class="moment-card__footer">
       <span class="moment-card__stats">
         <span class="stat stat--views">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <SvgIcon name="eye" />
           {{ viewCount }} {{ t('moment.views') }}
         </span>
         <span class="stat">· {{ moment.commentCount || 0 }} {{ t('moment.comments') }}</span>

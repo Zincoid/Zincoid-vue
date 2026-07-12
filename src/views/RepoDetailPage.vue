@@ -8,6 +8,7 @@ import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -248,11 +249,11 @@ async function saveEdit() {
             <span class="repo-date">{{ formatDate(repo.createdAt) }}</span>
             <div v-if="canEdit()" class="repo-actions">
               <button class="link-muted" @click="openEdit">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <SvgIcon name="edit" />
                 {{ t('common.edit') }}
               </button>
               <button class="link-danger" @click="deleteRepo">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <SvgIcon name="trash" />
                 {{ t('common.delete') }}
               </button>
             </div>
@@ -262,12 +263,10 @@ async function saveEdit() {
 
       <div v-if="repo.restricted" class="repo-access-bar">
         <p class="repo-access-bar__msg">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          {{ t('repo.restrictedHint') }}
+          <SvgIcon name="lock" /> {{ t('repo.restrictedHint') }}
         </p>
         <button v-if="auth.isLoggedIn && !isOwner()" class="btn btn--restricted" @click="requestAccess">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-          {{ t('repo.requestAccess') }}
+          <SvgIcon name="key" /> {{ t('repo.requestAccess') }}
         </button>
       </div>
       <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
@@ -280,16 +279,16 @@ async function saveEdit() {
       <template v-if="!repo.restricted && repo.type === 0">
         <a v-if="repo.url" :href="repo.url" target="_blank" rel="noopener" class="repo-url">
           <div class="repo-url__left">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            <SvgIcon name="fork" :size="16" />
             <span>{{ repo.url }}</span>
           </div>
           <div v-if="repo.github" class="repo-url__stats">
             <span v-if="repo.github.language" class="github-lang">{{ repo.github.language }}</span>
-            <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>{{ repo.github.stars || 0 }}</span>
-            <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>{{ repo.github.forks || 0 }}</span>
+            <span class="github-stat"><SvgIcon name="star" />{{ repo.github.stars || 0 }}</span>
+            <span class="github-stat"><SvgIcon name="fork" />{{ repo.github.forks || 0 }}</span>
           </div>
           <div v-if="repo.github?.description" class="github-desc">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <SvgIcon name="chevron-right" :size="12" />
             <span>{{ repo.github.description }}</span>
           </div>
         </a>
@@ -323,22 +322,22 @@ async function saveEdit() {
             @dragover="canEdit() && onDragOver(index, $event)"
             @drop="canEdit() && onDrop(index, $event)">
             <div class="item-card__handle">
-              <svg v-if="canEdit()" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg>
-              <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <SvgIcon v-if="canEdit()" name="drag" />
+              <SvgIcon v-else name="chevron-right" />
             </div>
             <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" loading="lazy" @click="previewItem(item.url)" />
             <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
               <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
               <div class="item-card__play-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <SvgIcon name="play" :size="24" />
               </div>
             </div>
             <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <SvgIcon name="audio" :size="24" />
             </div>
             <span class="item-card__name">{{ item.name }}</span>
             <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <SvgIcon name="close" :size="10" />
             </button>
           </div>
         </div>
@@ -355,11 +354,11 @@ async function saveEdit() {
             @dragover="canEdit() && onDragOver(index, $event)"
             @drop="canEdit() && onDrop(index, $event)">
             <div class="item-row__handle">
-              <svg v-if="canEdit()" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg>
-              <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <SvgIcon v-if="canEdit()" name="drag" />
+              <SvgIcon v-else name="chevron-right" />
             </div>
             <div class="item-row__icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <SvgIcon name="package" :size="20" />
             </div>
             <div class="item-row__info">
               <span class="item-row__name">{{ item.name }}</span>
@@ -367,10 +366,10 @@ async function saveEdit() {
             </div>
             <div class="item-row__actions">
               <a v-if="item.url" :href="item.url" class="item-row__download" :download="item.name" :title="t('common.download')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <SvgIcon name="download" :size="16" />
               </a>
               <button v-if="canEdit()" class="item-row__delete" @click="deleteItem(item.id)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <SvgIcon name="trash" />
               </button>
             </div>
           </div>
@@ -393,7 +392,7 @@ async function saveEdit() {
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.cover') }}</label>
                   <label class="btn btn--outline btn--sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <SvgIcon name="upload" />
                     {{ t('article.upload') }}
                     <input type="file" accept="image/*" class="hidden-input" @change="handleEditCover" />
                   </label>
@@ -423,13 +422,13 @@ async function saveEdit() {
                   <div class="visibility-slide">
                     <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>{{ t('visibility.public') }}
+                      <SvgIcon name="world" :size="12" />{{ t('visibility.public') }}
                     </button>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>{{ t('visibility.private') }}
+                      <SvgIcon name="lock" :size="12" />{{ t('visibility.private') }}
                     </button>
                     <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>{{ t('visibility.restricted') }}
+                      <SvgIcon name="key" :size="12" />{{ t('visibility.restricted') }}
                     </button>
                   </div>
                 </div>
@@ -450,12 +449,12 @@ async function saveEdit() {
     <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
     <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <SvgIcon name="upload" :size="20" />
       <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
     </label>
 
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      <SvgIcon name="back-arrow" :size="20" />
     </button>
     </div>
   </div>

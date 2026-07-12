@@ -8,6 +8,7 @@ import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import RepoCard from '@/components/RepoCard.vue'
 import Pagination from '@/components/Pagination.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -146,7 +147,7 @@ async function createRepo() {
         <p class="page-header__subtitle">{{ t('repo.placeholder') }}</p>
       </div>
       <button class="btn btn--primary" @click="showCreate = true">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <SvgIcon name="plus" />
         {{ t('repo.new') }}
       </button>
     </div>
@@ -206,7 +207,7 @@ async function createRepo() {
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.cover') }}</label>
                   <label class="btn btn--outline btn--sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <SvgIcon name="upload" />
                     {{ t('article.upload') }}
                     <input type="file" accept="image/*" class="hidden-input" @change="handleCoverUpload" />
                   </label>
@@ -236,13 +237,13 @@ async function createRepo() {
                   <div class="visibility-slide">
                     <div class="visibility-slide__indicator" :style="{ left: createForm.visibility === 0 ? '3px' : createForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 0 }" @click="createForm.visibility = 0" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>{{ t('visibility.public') }}
+                      <SvgIcon name="world" :size="12" />{{ t('visibility.public') }}
                     </button>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 1 }" @click="createForm.visibility = 1" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>{{ t('visibility.private') }}
+                      <SvgIcon name="lock" :size="12" />{{ t('visibility.private') }}
                     </button>
                     <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': createForm.visibility === 2 }" @click="createForm.visibility = 2" type="button">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>{{ t('visibility.restricted') }}
+                      <SvgIcon name="key" :size="12" />{{ t('visibility.restricted') }}
                     </button>
                   </div>
                 </div>
@@ -252,6 +253,7 @@ async function createRepo() {
             <div class="modal__actions">
               <button class="btn btn--outline btn--full" @click="showCreate = false">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary btn--full" :disabled="creating" @click="createRepo">
+                <SvgIcon name="save" />
                 {{ creating ? t('common.creating') : t('common.confirm') }}
               </button>
             </div>

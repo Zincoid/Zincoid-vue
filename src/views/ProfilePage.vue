@@ -6,6 +6,7 @@ import { useError } from '@/composables/useError'
 import { fileAPI, userAPI, authAPI } from '@/api'
 import AvatarCropper from '@/components/AvatarCropper.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -334,7 +335,7 @@ async function changeEmail() {
 
           <div class="card__actions">
             <button class="btn btn--primary btn--full" @click="saveProfile">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <SvgIcon name="save" :size="16" />
               {{ t('profile.save') }}
             </button>
           </div>
@@ -365,14 +366,14 @@ async function changeEmail() {
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
               <button class="btn btn--outline btn--full" @click="showPwdForm = false">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary btn--full" @click="changePassword">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <SvgIcon name="lock" :size="16" />
                 {{ t('common.confirm') }}
               </button>
             </div>
           </template>
 
           <button v-else class="btn btn--outline btn--full" @click="showPwdForm = true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            <SvgIcon name="key" :size="16" />
             {{ t('profile.changePassword') }}
           </button>
         </div>
@@ -422,7 +423,7 @@ async function changeEmail() {
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
               <button class="btn btn--outline btn--full" @click="showEmailForm = false; emailForm = { newEmail: '', oldCode: '', newCode: '' }; emailError = ''; emailMessage = ''; clearInterval(oldCodeTimer); clearInterval(newCodeTimer); oldCodeCountdown = 0; newCodeCountdown = 0">{{ t('common.cancel') }}</button>
               <button class="btn btn--primary btn--full" @click="changeEmail">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <SvgIcon name="lock" :size="16" />
                 {{ t('common.confirm') }}
               </button>
             </div>
@@ -432,7 +433,7 @@ async function changeEmail() {
             <p class="card__desc">{{ t('profile.currentEmail') }}: {{ auth.user?.email || t('common.notSet') }}</p>
             <div class="card__actions">
               <button class="btn btn--outline btn--full" @click="showEmailForm = true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <SvgIcon name="mail" :size="16" />
                 {{ t('profile.changeEmail') }}
               </button>
             </div>
@@ -453,7 +454,7 @@ async function changeEmail() {
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
               <button class="btn btn--outline btn--full" @click="showDeleteForm = false; deleteConfirmInput = ''">{{ t('common.cancel') }}</button>
               <button class="btn btn--danger btn--full" :disabled="deleteConfirmInput !== auth.user?.username" @click="deleteAccount">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <SvgIcon name="trash" :size="16" />
                 {{ t('common.confirm') }}
               </button>
             </div>
@@ -463,7 +464,7 @@ async function changeEmail() {
             <p class="card__desc">{{ t('profile.deleteAccountDesc') }}</p>
             <div class="card__actions">
               <button class="btn btn--danger btn--full" @click="showDeleteForm = true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <SvgIcon name="trash" :size="16" />
                 {{ t('profile.deleteAccount') }}
               </button>
             </div>
