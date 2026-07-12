@@ -277,6 +277,7 @@ async function saveEdit() {
               <div class="commit-meta">
                 <img v-if="c.authorAvatar" :src="c.authorAvatar" class="commit-avatar" />
                 <span class="commit-author">{{ c.author }}</span>
+                <span class="commit-date">{{ formatDate(c.date) }}</span>
                 <span class="commit-sha">{{ c.sha }}</span>
               </div>
             </div>
@@ -477,13 +478,14 @@ async function saveEdit() {
 .commit-item + .commit-item { margin-top: var(--spacing-sm); }
 .commit-dot-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 12px; }
 .commit-dot { width: 10px; height: 10px; border-radius: var(--rounded-full); background: var(--color-primary); flex-shrink: 0; margin-top: 4px; }
-.commit-line { width: 2px; flex: 1; background: var(--color-border); min-height: 16px; margin-top: 4px; }
+.commit-line { width: 2px; flex: 1; background: var(--color-border); min-height: 16px; margin-top: var(--spacing-md); }
 .commit-body { flex: 1; min-width: 0; }
-.commit-msg { font-size: var(--text-sm); color: var(--color-text); }
-.commit-meta { display: flex; align-items: center; gap: var(--spacing-xs); margin-top: 2px; font-size: var(--text-xs); color: var(--color-text-tertiary); }
+.commit-msg { font-size: var(--text-sm); color: var(--color-text); display: block; margin-bottom: var(--spacing-xs); }
+.commit-meta { display: flex; align-items: center; gap: var(--spacing-sm); margin-top: 2px; font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .commit-avatar { width: 14px; height: 14px; border-radius: var(--rounded-full); }
 .commit-author { font-weight: var(--weight-medium); }
-.commit-sha { font-family: var(--font-mono); }
+.commit-date { color: var(--color-text-tertiary); }
+.commit-sha { font-family: var(--font-mono); margin-left: auto; }
 
 .items-grid {
   columns: 4 200px;
