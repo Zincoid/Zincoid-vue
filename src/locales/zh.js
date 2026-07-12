@@ -194,15 +194,15 @@ export default {
     tags: '标签',
     tagsHint: '用逗号分隔',
     searchPlaceholder: '搜索仓库...',
-    requestAccess: '请求访问',
-    requestAccessConfirm: '确定要请求访问此仓库？',
-    requestAccessSent: '请求已发送',
+    requestAccess: '申请访问',
+    requestAccessConfirm: '确定要申请访问此仓库？',
+    requestAccessSent: '申请已发送',
     restrictedHint: '访问此仓库需要授权',
     noDesc: '暂无简介',
     noTags: '暂无标签'
   },
   access: {
-    desc: '管理仓库访问请求与授权',
+    desc: '管理仓库访问申请与授权',
     received: '接收',
     sent: '发送',
     pending: '待处理',
@@ -211,11 +211,11 @@ export default {
     reject: '拒绝',
     allow: '允许',
     remove: '移除',
-    pendingRequests: '待处理的请求',
-    resolvedRequests: '已处理的请求',
-    pendingSent: '待处理的请求',
-    resolvedSent: '已处理的请求',
-    noRequests: '暂无请求。'
+    pendingRequests: '待处理的申请',
+    resolvedRequests: '已处理的申请',
+    pendingSent: '待处理的申请',
+    resolvedSent: '已处理的申请',
+    noRequests: '暂无申请。'
   },
   system: {
     subtitle: '站点配置与工具',

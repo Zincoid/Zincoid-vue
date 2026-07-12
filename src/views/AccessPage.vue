@@ -204,4 +204,5 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
 .access-card__btn--remove:hover { color: #dc2626; border-color: #dc2626; background: rgba(220,38,38,0.04); }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
+.section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>

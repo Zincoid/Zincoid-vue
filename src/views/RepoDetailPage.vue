@@ -488,7 +488,7 @@ async function saveEdit() {
 .repo-access-bar { margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.25); border-radius: var(--rounded-lg); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
 .repo-access-bar__msg { font-size: var(--text-sm); color: #d97706; display: flex; align-items: center; gap: var(--spacing-sm); }
 .repo-access-bar__msg svg { flex-shrink: 0; }
-.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #d97706; background: transparent; border: 1px solid #d97706; border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
+.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #d97706; background: transparent; border: 1px solid #d97706; border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
 .btn--restricted:hover { color: #fff; background: #d97706; }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); }
 
