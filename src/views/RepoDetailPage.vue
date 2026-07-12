@@ -299,7 +299,7 @@ async function saveEdit() {
               <svg v-if="canEdit()" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="9" cy="18" r="2"/><circle cx="15" cy="18" r="2"/></svg>
               <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
-            <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" @click="previewItem(item.url)" />
+            <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" loading="lazy" @click="previewItem(item.url)" />
             <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
               <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
               <div class="item-card__play-icon">
