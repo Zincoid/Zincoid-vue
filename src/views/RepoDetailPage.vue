@@ -107,13 +107,13 @@ let dragIndex = null
 function onDragStart(index, e) {
   dragIndex = index
   e.dataTransfer.effectAllowed = 'move'
-  const el = e.target
+  const el = e.currentTarget
+  const rect = el.getBoundingClientRect()
   const clone = el.cloneNode(true)
-  clone.style.position = 'absolute'
-  clone.style.top = '-9999px'
-  clone.style.opacity = '0.85'
+  clone.style.cssText = `position:absolute;top:-9999px;width:${rect.width}px;opacity:0.85;border-radius:6px;overflow:hidden;`
+  clone.querySelectorAll('.item-card__handle, .item-card__delete, .item-card__name, .item-row__handle, .item-row__delete').forEach(c => c.remove())
   document.body.appendChild(clone)
-  e.dataTransfer.setDragImage(clone, 0, 0)
+  e.dataTransfer.setDragImage(clone, 20, 20)
   requestAnimationFrame(() => document.body.removeChild(clone))
 }
 
