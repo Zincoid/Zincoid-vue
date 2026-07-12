@@ -379,8 +379,8 @@ async function saveEdit() {
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
 
-.repo-url { display: inline-flex; align-items: center; gap: var(--spacing-sm); font-size: var(--text-base); color: var(--color-primary); word-break: break-all; }
-.repo-url:hover { text-decoration: underline; }
+.repo-url { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); color: var(--color-primary); word-break: break-all; }
+.repo-url:hover { border-color: var(--color-primary); }
 
 .items-grid {
   columns: 4 200px;
