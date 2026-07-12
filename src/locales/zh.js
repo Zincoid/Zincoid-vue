@@ -40,7 +40,10 @@ export default {
   visibility: {
     public: '所有人可见',
     private: '仅自己可见',
-    restricted: '需访问授权'
+    restricted: '需访问授权',
+    pub: '公开',
+    pvt: '私有',
+    restr: '授权'
   },
   article: {
     title: '文章',

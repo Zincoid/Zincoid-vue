@@ -422,13 +422,13 @@ async function saveEdit() {
                   <div class="visibility-slide">
                     <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
-                      <SvgIcon name="world" :size="12" />{{ t('visibility.public') }}
+                      <SvgIcon name="world" :size="12" />{{ t('visibility.pub') }}
                     </button>
                     <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
-                      <SvgIcon name="lock" :size="12" />{{ t('visibility.private') }}
+                      <SvgIcon name="lock" :size="12" />{{ t('visibility.pvt') }}
                     </button>
                     <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
-                      <SvgIcon name="key" :size="12" />{{ t('visibility.restricted') }}
+                      <SvgIcon name="key" :size="12" />{{ t('visibility.restr') }}
                     </button>
                   </div>
                 </div>
