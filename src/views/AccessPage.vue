@@ -3,55 +3,70 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { repoAPI, userAPI } from '@/api'
+import { useConfig } from '@/composables/useConfig'
+import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 const { t } = useI18n()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const activeTab = ref('received')
 const loading = ref(true)
 const loadingDone = ref(false)
 
-const sentPending = ref([])
-const sentResolved = ref([])
-const receivedPending = ref([])
-const receivedResolved = ref([])
+const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
+const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
+const rpData = ref({ records: [], pages: 1, total: 0, page: 1 })
+const rrData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const repoMap = ref({})
 const userMap = ref({})
+let pageSize = 10
 
-onMounted(fetchAll)
+onMounted(async () => {
+  await loadConfig()
+  pageSize = parseInt(getConfig('page_size', '10'))
+  fetchAll()
+})
 
 async function fetchAll() {
   loading.value = true; loadingDone.value = false
   try {
-    const [sp, sr, rp, rr] = await Promise.all([
-      api('/access/sent/pending'), api('/access/sent/resolved'),
-      api('/access/received/pending'), api('/access/received/resolved')
-    ])
-    sentPending.value = sp; sentResolved.value = sr
-    receivedPending.value = rp; receivedResolved.value = rr
-    const allRepoIds = [...new Set([...sp, ...sr, ...rp, ...rr].map(a => a.repoId))]
-    const allUserIds = [...new Set([...rp, ...rr].map(a => a.userId))]
-    const rMap = {}
-    for (const id of allRepoIds) {
-      try { const { data } = await repoAPI.getDetail(id); rMap[id] = data.data?.name || `#${id}` } catch { rMap[id] = `#${id}` }
-    }
-    repoMap.value = rMap
-    const uMap = {}
-    for (const id of allUserIds) {
-      try { const { data } = await userAPI.getDetail(id); uMap[id] = data.data } catch { uMap[id] = null }
-    }
-    userMap.value = uMap
+    await Promise.all([fetchSP(), fetchSR(), fetchRP(), fetchRR()])
   } catch { /* ignore */ } finally {
     loading.value = false
   }
 }
 
-async function api(path) { const { data } = await repoAPI._get(path); return data.data || [] }
+async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/pending', p, pageSize); spData.value = data.data; await loadRepoMaps(data.data.records) }
+async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/resolved', p, pageSize); srData.value = data.data; await loadRepoMaps(data.data.records) }
+async function fetchRP(p = 1) { const r = await repoAPI.getAccessList('/access/received/pending', p, pageSize); rpData.value = r.data.data; await loadMaps(rpData.value.records) }
+async function fetchRR(p = 1) { const r = await repoAPI.getAccessList('/access/received/resolved', p, pageSize); rrData.value = r.data.data; await loadMaps(rrData.value.records) }
 
-async function approve(id) { await repoAPI._put(`/access/${id}/approve`); fetchAll() }
-async function rejectAccess(id) { await repoAPI._put(`/access/${id}/reject`); fetchAll() }
-async function remove(id) { await repoAPI._delete(`/access/${id}`); fetchAll() }
+async function loadRepoMaps(records) {
+  if (!records?.length) return
+  for (const a of records) {
+    if (!repoMap.value[a.repoId]) {
+      try { const { data } = await repoAPI.getDetail(a.repoId); repoMap.value[a.repoId] = data.data?.name || `#${a.repoId}` } catch { repoMap.value[a.repoId] = `#${a.repoId}` }
+    }
+  }
+}
+
+async function loadMaps(records) {
+  if (!records?.length) return
+  for (const a of records) {
+    if (!repoMap.value[a.repoId]) {
+      try { const { data } = await repoAPI.getDetail(a.repoId); repoMap.value[a.repoId] = data.data?.name || `#${a.repoId}` } catch { repoMap.value[a.repoId] = `#${a.repoId}` }
+    }
+    if (!userMap.value[a.userId]) {
+      try { const { data } = await userAPI.getDetail(a.userId); userMap.value[a.userId] = data.data } catch { userMap.value[a.userId] = null }
+    }
+  }
+}
+
+async function approve(id) { await repoAPI._put(`/access/${id}/approve`); fetchRP(); fetchRR() }
+async function rejectAccess(id) { await repoAPI._put(`/access/${id}/reject`); fetchRP(); fetchRR() }
+async function remove(id) { await repoAPI._delete(`/access/${id}`); fetchRR() }
 
 function statusLabel(s) {
   if (s === 0) return t('access.pending')
@@ -78,14 +93,14 @@ function statusLabel(s) {
 
       <!-- Received -->
       <div v-show="activeTab === 'received'">
-        <template v-if="!receivedPending.length && !receivedResolved.length">
+        <template v-if="!rpData.records.length && !rrData.records.length">
           <p class="empty">{{ t('access.noRequests') }}</p>
         </template>
         <template v-else>
-          <div v-if="receivedPending.length" class="section">
+          <div v-if="rpData.records.length" class="section">
             <h3>{{ t('access.pendingRequests') }}</h3>
             <div class="access-list">
-              <div v-for="a in receivedPending" :key="a.id" class="access-card">
+              <div v-for="a in rpData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
                   <img v-if="userMap[a.userId]?.avatar" :src="userMap[a.userId].avatar" class="access-card__avatar" />
                   <span v-else class="access-card__avatar-placeholder">{{ (userMap[a.userId]?.nickname || '?')[0] }}</span>
@@ -101,11 +116,12 @@ function statusLabel(s) {
                 </div>
               </div>
             </div>
+            <Pagination :page="rpData.pages > 0 ? (rpData.page || 1) : 1" :pages="rpData.pages" :total="rpData.total" :size="pageSize" @change="p => fetchRP(p)" />
           </div>
-          <div v-if="receivedResolved.length" class="section">
+          <div v-if="rrData.records.length" class="section">
             <h3>{{ t('access.resolvedRequests') }}</h3>
             <div class="access-list">
-              <div v-for="a in receivedResolved" :key="a.id" class="access-card">
+              <div v-for="a in rrData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
                   <img v-if="userMap[a.userId]?.avatar" :src="userMap[a.userId].avatar" class="access-card__avatar" />
                   <span v-else class="access-card__avatar-placeholder">{{ (userMap[a.userId]?.nickname || '?')[0] }}</span>
@@ -118,33 +134,36 @@ function statusLabel(s) {
                 <button class="access-card__btn access-card__btn--remove" @click="remove(a.id)">{{ t('access.remove') }}</button>
               </div>
             </div>
+            <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
           </div>
         </template>
       </div>
 
       <!-- Sent -->
       <div v-show="activeTab === 'sent'">
-        <template v-if="!sentPending.length && !sentResolved.length">
+        <template v-if="!spData.records.length && !srData.records.length">
           <p class="empty">{{ t('access.noRequests') }}</p>
         </template>
         <template v-else>
-          <div v-if="sentPending.length" class="section">
+          <div v-if="spData.records.length" class="section">
             <h3>{{ t('access.pendingSent') }}</h3>
             <div class="access-list">
-              <div v-for="a in sentPending" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
+              <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
+            <Pagination :page="spData.pages > 0 ? (spData.page || 1) : 1" :pages="spData.pages" :total="spData.total" :size="pageSize" @change="p => fetchSP(p)" />
           </div>
-          <div v-if="sentResolved.length" class="section">
+          <div v-if="srData.records.length" class="section">
             <h3>{{ t('access.resolvedSent') }}</h3>
             <div class="access-list">
-              <div v-for="a in sentResolved" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
+              <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
+            <Pagination :page="srData.pages > 0 ? (srData.page || 1) : 1" :pages="srData.pages" :total="srData.total" :size="pageSize" @change="p => fetchSR(p)" />
           </div>
         </template>
       </div>

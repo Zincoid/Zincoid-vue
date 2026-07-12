@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useConfig } from '@/composables/useConfig'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -10,6 +11,7 @@ import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const typeTabs = [
   { key: 'all', value: null, color: '#6b7280' },
@@ -25,18 +27,22 @@ const repos = ref([])
 const page = ref(1)
 const pages = ref(1)
 const total = ref(0)
-const size = ref(10)
+const pageSize = ref(10)
 const loading = ref(true)
 const loadingDone = ref(false)
 
-onMounted(() => fetchRepos())
+onMounted(async () => {
+  await loadConfig()
+  pageSize.value = parseInt(getConfig('page_size', '10'))
+  fetchRepos()
+})
 
 async function fetchRepos() {
   loading.value = true
   loadingDone.value = false
   try {
     const kw = keyword.value.trim() || null
-    const res = await repoAPI.getList(page.value, size.value, activeType.value, kw)
+    const res = await repoAPI.getList(page.value, pageSize.value, activeType.value, kw)
     const data = res.data.data
     repos.value = data.records ?? []
     pages.value = data.pages ?? 1
@@ -174,7 +180,7 @@ async function createRepo() {
           <RepoCard :repo="repo" />
         </router-link>
       </div>
-      <Pagination :page="page" :pages="pages" :total="total" :size="size" @change="onPageChange" />
+      <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />
     </template>
 
     <!-- Create modal -->

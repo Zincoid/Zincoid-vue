@@ -151,6 +151,7 @@ export const repoAPI = {
   deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
   sortItems: (repoId, itemIds) => api.put(`/repos/${repoId}/items/sort`, itemIds),
   requestAccess: (repoId) => api.post(`/repos/${repoId}/access`),
+  getAccessList: (path, page = 1, size = 10) => api.get(`/repos${path}`, { params: { page, size } }),
   _get: (path) => api.get(`/repos${path}`),
   _put: (path) => api.put(`/repos${path}`),
   _delete: (path) => api.delete(`/repos${path}`)
