@@ -249,11 +249,18 @@ async function saveEdit() {
         <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
       </div>
 
-      <!-- CODE type → external link -->
+      <!-- CODE type → external link + GitHub info -->
       <template v-if="repo.type === 0">
         <a v-if="repo.url" :href="repo.url" target="_blank" rel="noopener" class="repo-url">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-          {{ repo.url }}
+          <div class="repo-url__left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            <span>{{ repo.url }}</span>
+          </div>
+          <div v-if="repo.github" class="repo-url__stats">
+            <span v-if="repo.github.language" class="github-lang">{{ repo.github.language }}</span>
+            <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>{{ repo.github.stars || 0 }}</span>
+            <span class="github-stat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>{{ repo.github.forks || 0 }}</span>
+          </div>
         </a>
       </template>
 
@@ -433,8 +440,13 @@ async function saveEdit() {
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
 
-.repo-url { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); color: var(--color-primary); word-break: break-all; }
+.repo-url { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); }
 .repo-url:hover { border-color: var(--color-primary); }
+.repo-url__left { display: flex; align-items: center; gap: var(--spacing-sm); color: var(--color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.repo-url__left span { overflow: hidden; text-overflow: ellipsis; }
+.repo-url__stats { display: flex; align-items: center; gap: var(--spacing-md); flex-shrink: 0; }
+.github-lang { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.github-stat { display: flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--color-text-secondary); }
 
 .items-grid {
   columns: 4 200px;
