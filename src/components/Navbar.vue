@@ -197,11 +197,11 @@ function closeMenu() {
                 'navbar__item--repos': link.icon === 'repos'
               }"
             >
-              <SvgIcon v-if="link.icon === 'moments'" name="image" />
-              <SvgIcon v-else-if="link.icon === 'articles'" name="article" />
-              <SvgIcon v-else-if="link.icon === 'chats'" name="chat" />
-              <SvgIcon v-else-if="link.icon === 'members'" name="members" />
-              <SvgIcon v-else-if="link.icon === 'repos'" name="fork" />
+              <SvgIcon v-if="link.icon === 'moments'" name="image" class="navbar__nav-icon" />
+              <SvgIcon v-else-if="link.icon === 'articles'" name="article" class="navbar__nav-icon" />
+              <SvgIcon v-else-if="link.icon === 'chats'" name="chat" class="navbar__nav-icon" />
+              <SvgIcon v-else-if="link.icon === 'members'" name="members" class="navbar__nav-icon" />
+              <SvgIcon v-else-if="link.icon === 'repos'" name="fork" class="navbar__nav-icon" />
               <span class="navbar__label">{{ link.label }}</span>
             </router-link>
           </li>
@@ -227,26 +227,26 @@ function closeMenu() {
               <span class="navbar__nickname">{{ auth.user?.nickname }}</span>
             </router-link>
             <button class="navbar__item navbar__item--logout" @click="auth.logout(); closeMenu()">
-              <SvgIcon name="logout" />
+              <SvgIcon name="logout" class="navbar__signin-icon" />
               {{ t('nav.logout') }}
             </button>
           </template>
           <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') || isActive('/register') }">
-            <SvgIcon name="login" />
+            <SvgIcon name="login" class="navbar__signin-icon" />
             {{ t('nav.signIn') }}
           </router-link>
           <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="locale.toggleLocale()">
-            <SvgIcon name="lang" />
+            <SvgIcon name="lang" class="navbar__signin-icon" />
             {{ t('nav.lang') }}
           </button>
         </div>
         <div class="navbar__footer">
           <button class="navbar__item" @click="locale.toggleLocale()">
-            <SvgIcon name="lang" />
+            <SvgIcon name="lang" class="navbar__nav-icon" />
             {{ t('nav.lang') }}
           </button>
           <button v-if="auth.isLoggedIn" class="navbar__item navbar__item--logout-mobile" @click="auth.logout(); closeMenu()">
-            <SvgIcon name="logout" />
+            <SvgIcon name="logout" class="navbar__signin-icon" />
             {{ t('nav.logout') }}
           </button>
         </div>
