@@ -378,12 +378,13 @@ async function createRepo() {
 .modal .radio-group { display: flex; gap: var(--spacing-sm) var(--spacing-lg); padding-top: var(--spacing-xs); }
 .modal .radio { display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: var(--text-sm); }
 .modal .radio input { accent-color: var(--color-primary); }
-.visibility-slide { display: flex; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
+.visibility-slide { display: flex; flex: 1; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
 .visibility-slide__indicator { position: absolute; top: 3px; width: calc(33.33% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; min-width: 0; }
+.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 3px; padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; }
 .visibility-slide-btn--active { color: var(--color-primary); }
 .visibility-slide-btn--restricted.visibility-slide-btn--active { color: #d97706; }
-.modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; }
+.modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-2xl); }
+.modal .cover-label-row .field__label { flex-shrink: 0; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
 .modal .cover-preview { max-width: 200px; max-height: 120px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }
 .modal .cover-preview-remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }

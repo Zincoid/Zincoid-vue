@@ -38,9 +38,9 @@ export default {
     private: 'Moment is private.'
   },
   visibility: {
-    public: 'Public',
-    private: 'Private',
-    restricted: 'Restricted'
+    public: 'Pub.',
+    private: 'Pvt.',
+    restricted: 'Restr.'
   },
   article: {
     title: 'Articles',
