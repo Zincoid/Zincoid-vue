@@ -32,9 +32,11 @@ const { t } = useI18n()
   border: none;
   text-align: left;
   display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
 }
 h1 { font-size: 4rem; color: var(--color-danger); margin-bottom: var(--spacing-sm); }
-p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); }
+p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); padding: 0 var(--spacing-md); }
 .btn { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--rounded-md); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer; transition: all var(--transition-fast); text-decoration: none; }
 .btn--outline { border: 1px solid var(--color-border); color: var(--color-text); background: transparent; }
 .btn--outline:hover { border-color: var(--color-primary); color: var(--color-primary); }
