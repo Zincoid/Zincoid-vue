@@ -304,7 +304,7 @@ async function saveEdit() {
                 <img v-if="c.authorAvatar" :src="c.authorAvatar" class="commit-avatar" />
                 <span class="commit-author">{{ c.author }}</span>
                 <span class="commit-date">{{ formatDate(c.date) }}</span>
-                <span class="commit-sha">{{ c.sha }}</span>
+                <span class="commit-sha"><SvgIcon name="git-commit" :size="12" /> {{ c.sha }}</span>
               </div>
             </div>
           </div>
@@ -518,7 +518,8 @@ async function saveEdit() {
 .commit-avatar { width: 14px; height: 14px; border-radius: var(--rounded-full); }
 .commit-author { font-weight: var(--weight-medium); }
 .commit-date { color: var(--color-text-tertiary); }
-.commit-sha { font-family: var(--font-mono); margin-left: auto; }
+.commit-sha { font-family: var(--font-mono); margin-left: auto; display: inline-flex; align-items: baseline; gap: 8px; }
+.commit-sha svg { transform: translateY(2px); }
 
 .items-grid {
   columns: 4 200px;
