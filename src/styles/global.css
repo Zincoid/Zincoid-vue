@@ -266,8 +266,26 @@ th {
   text-decoration: none;
 }
 .link-muted:hover {
+  color: var(--color-primary);
   text-decoration: underline;
   opacity: 0.8;
+}
+.link-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--text-xs);
+  line-height: 1;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  text-decoration: none;
+}
+.link-pin:hover {
+  color: #d97706;
+  text-decoration: underline;
 }
 .btn--sm {
   padding: var(--spacing-xs) var(--spacing-md);
