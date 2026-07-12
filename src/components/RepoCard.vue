@@ -75,8 +75,8 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
 
 .repo-card__badges { position: absolute; top: var(--spacing-md); right: var(--spacing-md); display: flex; gap: var(--spacing-sm); }
-.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255,255,255,0.9); border-radius: var(--rounded-full); }
-.repo-card__visibility-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: rgba(255,255,255,0.9); border-radius: var(--rounded-full); }
+.repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
+.repo-card__visibility-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
 
 .repo-card__body { padding: var(--spacing-lg); }
 
