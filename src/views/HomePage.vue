@@ -3,7 +3,7 @@ import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
-import { momentAPI, articleAPI, userAPI, configAPI } from '@/api'
+import { momentAPI, articleAPI, userAPI, configAPI, repoAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -227,11 +227,12 @@ function startHeroAnimation() {
 }
 
 // Terminal prompt typing/deleting cycle
-const counts = ref({ moments: 0, articles: 0, members: 0 })
+const counts = ref({ moments: 0, articles: 0, members: 0, repos: 0 })
 
 const terminalCommands = computed(() => [
   { cmd: 'ls -la ~/moments/', output: `${counts.value.moments} moments` },
   { cmd: 'ls -la ~/articles/', output: `${counts.value.articles} articles` },
+  { cmd: 'ls -la ~/repos/', output: `${counts.value.repos} repos` },
   { cmd: 'ls -la ~/members/', output: `${counts.value.members} members` },
   { cmd: 'cat /etc/motd', output: 'Welcome!' },
   { cmd: 'echo $USER', output: auth.user?.nickname || 'visitor' }
@@ -284,13 +285,14 @@ watch(() => locale.locale, () => {
 onMounted(async () => {
   try {
     const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
-    const [mRes, aRes, mtRes, atRes, uRes, rRes, cfgRes] = await Promise.all([
+    const [mRes, aRes, mtRes, atRes, uRes, rRes, rpRes, cfgRes] = await Promise.all([
       momentAPI.getHomeFeed(5),
       articleAPI.getHomeFeed(5),
       momentAPI.getTimeline(1, 1),
       articleAPI.getList(1, 1),
       userAPI.getList(1, 1),
       randomAPI,
+      repoAPI.getList(1, 1),
       configAPI.get()
     ])
     moments.value = mRes.data.data || []
@@ -298,6 +300,7 @@ onMounted(async () => {
     counts.value.moments = mtRes.data.data.total || 0
     counts.value.articles = atRes.data.data.total || 0
     counts.value.members = uRes.data.data.total || 0
+    counts.value.repos = rpRes.data.data.total || 0
     if (rRes.data.data) {
       const type = rRes.config.url.includes('moments') ? 'moment' : 'article'
       featured.value = { ...rRes.data.data, _type: type }
