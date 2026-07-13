@@ -8,6 +8,7 @@ import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import LikeButton from '@/components/LikeButton.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const route = useRoute()
@@ -18,6 +19,8 @@ const auth = useAuthStore()
 const repo = ref(null)
 const loading = ref(true)
 const loadingDone = ref(false)
+const likeLiked = ref(false)
+const likeCount = ref(0)
 
 async function fetchRepo() {
   loading.value = true
@@ -25,6 +28,8 @@ async function fetchRepo() {
   try {
     const res = await repoAPI.getDetail(route.params.id)
     repo.value = res.data.data
+    likeLiked.value = repo.value.isLiked || false
+    likeCount.value = repo.value.likeCount || 0
   } catch { /* ignore */ } finally {
     loading.value = false
   }
@@ -32,6 +37,24 @@ async function fetchRepo() {
 
 onMounted(fetchRepo)
 watch(() => route.params.id, fetchRepo)
+
+watch(likeLiked, (liked) => {
+  if (!repo.value || !auth.user) return
+  if (!repo.value.recentLikers) repo.value.recentLikers = []
+  const likers = repo.value.recentLikers
+  if (liked) {
+    if (!likers.some(l => l.userId === auth.user.id)) {
+      likers.unshift({
+        userId: auth.user.id,
+        avatar: auth.user.avatar,
+        nickname: auth.user.nickname
+      })
+    }
+  } else {
+    const idx = likers.findIndex(l => l.userId === auth.user.id)
+    if (idx !== -1) likers.splice(idx, 1)
+  }
+})
 
 function typeLabel(type) {
   const map = { 0: t('repo.code'), 1: t('repo.media'), 2: t('repo.file') }
@@ -246,8 +269,11 @@ async function saveEdit() {
             <span class="author-nickname">{{ repo.userNickname }}</span>
           </router-link>
           <div class="repo-meta__right">
-            <span class="repo-date">{{ formatDate(repo.createdAt) }}</span>
-            <div v-if="canEdit()" class="repo-actions">
+              <span class="repo-date">{{ formatDate(repo.createdAt) }}</span>
+              <span class="repo-views">
+                {{ repo.viewCount || 0 }} {{ t('repo.views') }}
+              </span>
+              <div v-if="canEdit()" class="repo-actions">
               <button class="link-muted" @click="openEdit">
                 <SvgIcon name="edit" />
                 {{ t('common.edit') }}
@@ -375,6 +401,28 @@ async function saveEdit() {
           </div>
         </div>
       </template>
+
+    <div class="detail__actions-bar">
+      <LikeButton
+        :targetType="4"
+        :targetId="repo.id"
+        :liked="likeLiked"
+        :count="likeCount"
+        @update:liked="likeLiked = $event"
+        @update:count="likeCount = $event"
+      />
+      <div v-if="repo.recentLikers?.length" class="recent-likers">
+        <router-link
+          v-for="liker in repo.recentLikers"
+          :key="liker.userId"
+          :to="`/members/${liker.userId}`"
+          class="recent-liker-link"
+        >
+          <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
+          <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
+        </router-link>
+      </div>
+    </div>
     </template>
 
     <!-- Edit modal -->
@@ -448,16 +496,28 @@ async function saveEdit() {
 
     <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
-    <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
-      <SvgIcon name="upload" :size="20" />
-      <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
-    </label>
-
-    <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-      <SvgIcon name="back-arrow" :size="20" />
-    </button>
     </div>
   </div>
+
+  <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
+    <SvgIcon name="upload" :size="20" />
+    <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
+  </label>
+
+  <div class="like-fab">
+    <LikeButton
+      :targetType="4"
+      :targetId="Number(route.params.id)"
+      :liked="likeLiked"
+      :count="likeCount"
+      @update:liked="likeLiked = $event"
+      @update:count="likeCount = $event"
+    />
+  </div>
+
+  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
+    <SvgIcon name="back-arrow" :size="20" />
+  </button>
 </template>
 
 <style scoped>
@@ -487,9 +547,40 @@ async function saveEdit() {
 .repo-access-bar { margin-bottom: var(--spacing-xl); padding: var(--spacing-lg); background: rgba(217,119,6,0.08); border: 1px solid rgba(217,119,6,0.25); border-radius: var(--rounded-lg); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); }
 .repo-access-bar__msg { font-size: var(--text-sm); color: #d97706; display: flex; align-items: center; gap: var(--spacing-sm); }
 .repo-access-bar__msg svg { flex-shrink: 0; }
-.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #d97706; background: transparent; border: 1px solid #d97706; border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
+.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-sm); font-weight: normal; color: #d97706; background: transparent; border: 1px solid #d97706; border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
 .btn--restricted:hover { color: #fff; background: #d97706; }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); }
+
+
+.detail__actions-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+}
+.recent-likers { display: flex; align-items: center; }
+.recent-liker-link { display: flex; line-height: 0; }
+.recent-liker-link + .recent-liker-link { margin-left: -8px; }
+.recent-liker-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rounded-full);
+  object-fit: cover;
+  border: 2px solid var(--color-surface);
+  cursor: pointer;
+}
+.recent-liker-avatar:hover { border-color: var(--color-primary-light); }
+.recent-liker-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--weight-medium);
+  object-fit: unset;
+}
 
 .repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
@@ -533,7 +624,7 @@ async function saveEdit() {
 .upload-fab {
   position: fixed;
   right: var(--spacing-4xl);
-  bottom: 140px;
+  bottom: 195px;
   width: 48px;
   height: 48px;
   border-radius: var(--rounded-full);
@@ -557,9 +648,15 @@ async function saveEdit() {
   opacity: 1;
 }
 @media (max-width: 768px) {
-  .upload-fab { bottom: 140px; }
+  .upload-fab { bottom: 195px; }
 }
 .hidden-input { display: none; }
+
+.like-fab {
+  opacity: 0.85;
+  transition: all var(--transition-fast);
+}
+.like-fab:hover { opacity: 1; }
 
 .item-card {
   position: relative;
