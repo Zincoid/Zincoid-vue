@@ -4,11 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useAuthStore } from '@/stores/auth'
-import { repoAPI, fileAPI } from '@/api'
+import { repoAPI, fileAPI, commentAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import CommentSection from '@/components/CommentSection.vue'
+import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const route = useRoute()
@@ -22,6 +24,12 @@ const loadingDone = ref(false)
 const likeLiked = ref(false)
 const likeCount = ref(0)
 
+const comments = ref([])
+const commentPage = ref(1)
+const commentPages = ref(1)
+const commentTotal = ref(0)
+const commentSize = ref(10)
+
 async function fetchRepo() {
   loading.value = true
   loadingDone.value = false
@@ -30,6 +38,10 @@ async function fetchRepo() {
     repo.value = res.data.data
     likeLiked.value = repo.value.isLiked || false
     likeCount.value = repo.value.likeCount || 0
+    const cRes = await commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value)
+    comments.value = cRes.data.data.records || []
+    commentPages.value = cRes.data.data.pages || 1
+    commentTotal.value = cRes.data.data.total || 0
   } catch { /* ignore */ } finally {
     loading.value = false
   }
@@ -96,6 +108,37 @@ async function deleteRepo() {
     await repoAPI.delete(repo.value.id)
     router.push('/repos')
   } catch { /* ignore */ }
+}
+
+async function handleComment({ content, parentId }) {
+  try {
+    await commentAPI.addRepo(route.params.id, { content, parentId })
+    await fetchComments()
+  } catch (err) {
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
+  }
+}
+
+async function handleDeleteComment(commentId) {
+  if (!confirm(t('comment.deleteConfirm'))) return
+  try {
+    await commentAPI.delete(commentId)
+    await fetchComments()
+  } catch (err) {
+    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
+  }
+}
+
+async function fetchComments() {
+  const { data } = await commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value)
+  comments.value = data.data.records || []
+  commentPages.value = data.data.pages || 1
+  commentTotal.value = data.data.total || 0
+}
+
+function onCommentPageChange(p) {
+  commentPage.value = p
+  fetchComments()
 }
 
 // ── Access request ──
@@ -423,6 +466,15 @@ async function saveEdit() {
         </router-link>
       </div>
     </div>
+    <CommentSection
+      :comments="comments"
+      :target-id="route.params.id"
+      target-type="repo"
+      :total="commentTotal"
+      @submit="handleComment"
+      @delete="handleDeleteComment"
+    />
+    <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
     </template>
 
     <!-- Edit modal -->

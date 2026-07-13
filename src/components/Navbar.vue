@@ -300,12 +300,12 @@ function closeMenu() {
                     : n.relatedType === 2
                       ? t('notification.mentionedMoment')
                       : n.relatedType === 3
-                        ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : t('notification.mentionedCommentArticle'))
+                        ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : n.targetType === 4 ? t('notification.mentionedCommentRepo') : t('notification.mentionedCommentArticle'))
                         : n.relatedType === 4
                           ? t('notification.mentionedChat')
                           : n.relatedType === 1
-                            ? (n.targetType === 0 ? t('notification.repliedMoment') : t('notification.repliedArticle'))
-                            : (n.targetType === 0 ? t('notification.commentedMoment') : t('notification.commentedArticle')) }}
+                            ? (n.targetType === 0 ? t('notification.repliedMoment') : n.targetType === 4 ? t('notification.repliedRepo') : t('notification.repliedArticle'))
+                            : (n.targetType === 0 ? t('notification.commentedMoment') : n.targetType === 4 ? t('notification.commentedRepo') : t('notification.commentedArticle')) }}
               </div>
               <div class="navbar__notif-item-snippet" v-if="n.snippet">{{ n.snippet }}</div>
               <div class="navbar__notif-item-time">{{ formatTime(n.createdAt) }}</div>

@@ -93,10 +93,12 @@ export const articleAPI = {
 // ── Comments ──
 export const commentAPI = {
   addMoment: (momentId, data) => api.post(`/comments/moment/${momentId}`, data),
-  addArticle: (articleId, data) => api.post(`/comments/article/${articleId}`, data),
-  getMoment: (momentId, page = 1, size = 10) => api.get(`/comments/public/moment/${momentId}`, { params: { page, size } }),
-  getArticle: (articleId, page = 1, size = 10) => api.get(`/comments/public/article/${articleId}`, { params: { page, size } }),
-  getReplies: (parentId) => api.get(`/comments/public/replies/${parentId}`),
+    addArticle: (articleId, data) => api.post(`/comments/article/${articleId}`, data),
+    addRepo: (repoId, data) => api.post(`/comments/repo/${repoId}`, data),
+    getMoment: (momentId, page = 1, size = 10) => api.get(`/comments/public/moment/${momentId}`, { params: { page, size } }),
+    getArticle: (articleId, page = 1, size = 10) => api.get(`/comments/public/article/${articleId}`, { params: { page, size } }),
+    getRepo: (repoId, page = 1, size = 10) => api.get(`/comments/public/repo/${repoId}`, { params: { page, size } }),
+    getReplies: (parentId) => api.get(`/comments/public/replies/${parentId}`),
   delete: (commentId) => api.delete(`/comments/${commentId}`)
 }
 
