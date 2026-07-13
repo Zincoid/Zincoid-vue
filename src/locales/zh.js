@@ -197,12 +197,14 @@ export default {
     tags: '标签',
     tagsHint: '用逗号分隔',
     searchPlaceholder: '搜索仓库...',
-    requestAccess: '申请访问',
+    requestAccess: '访问申请',
     requestAccessConfirm: '确定要申请访问此仓库？',
     requestAccessSent: '申请已发送',
     restrictedHint: '访问此仓库需要授权',
     noDesc: '暂无简介',
-    noTags: '暂无标签'
+    noTags: '暂无标签',
+    views: '次浏览',
+    likes: '次赞'
   },
   access: {
     desc: '管理仓库访问申请与授权',
@@ -391,6 +393,7 @@ export default {
     mentionedChat: '在聊天中@了你',
     likedMoment: '点赞了你的动态',
     likedArticle: '点赞了你的文章',
+    likedRepo: '点赞了你的仓库',
     registered: '注册了新账号',
     accessRequest: '请求访问你的仓库',
     accessGranted: '通过了你的访问请求',

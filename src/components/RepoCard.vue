@@ -44,9 +44,19 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
           <span v-for="tag in repo.tags" :key="tag" class="repo-card__tag">{{ tag }}</span>
         </template>
         <span v-else class="repo-card__tag--empty">{{ t('repo.noTags') }}</span>
-      </div>
     </div>
   </div>
+    <div class="repo-card__footer">
+      <span class="repo-card__views">
+        <SvgIcon name="eye" :size="14" />
+        {{ repo.viewCount || 0 }}
+      </span>
+      <span class="repo-card__likes" :class="{ 'repo-card__likes--active': repo.isLiked }">
+        <SvgIcon :name="repo.isLiked ? 'heart-filled' : 'heart'" :size="14" />
+        {{ repo.likeCount || 0 }}
+      </span>
+    </div>
+</div>
 </template>
 
 <style scoped>
@@ -95,4 +105,33 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; padding-top: var(--spacing-sm); }
 .repo-card__tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
 .repo-card__tag--empty { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+
+.repo-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-border-light);
+}
+.repo-card__views {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.repo-card__likes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+.repo-card__likes--active {
+  color: var(--color-danger);
+}
 </style>

@@ -97,7 +97,7 @@ function goNotification(n) {
     router.push('/chats')
     return
   }
-  const name = n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
+  const name = n.targetType === 4 ? 'RepoDetail' : n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
   if (n.targetId == null) return
   router.push({ name, params: { id: n.targetId } })
 }
@@ -296,7 +296,7 @@ function closeMenu() {
                         : n.relatedType === 10
                           ? t('notification.accessRejected')
                           : n.relatedType === 6
-                            ? (n.targetType === 0 ? t('notification.likedMoment') : t('notification.likedArticle'))
+                            ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : t('notification.likedArticle'))
                     : n.relatedType === 2
                       ? t('notification.mentionedMoment')
                       : n.relatedType === 3

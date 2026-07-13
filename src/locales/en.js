@@ -191,12 +191,14 @@ export default {
     tags: 'Tags',
     tagsHint: 'Separate with commas',
     searchPlaceholder: 'Search repos...',
-    requestAccess: 'Request Access',
+    requestAccess: 'Authorize',
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',
     restrictedHint: 'Authorization required to access this repo',
     noDesc: 'No description',
-    noTags: 'No tags'
+    noTags: 'No tags',
+    views: 'views',
+    likes: 'likes'
   },
   data: {
     pageTitle: 'Data',
@@ -391,6 +393,7 @@ export default {
     mentionedChat: 'mentioned you in chat',
     likedMoment: 'liked your moment',
     likedArticle: 'liked your article',
+    likedRepo: 'liked your repo',
     registered: 'registered a new account',
     accessRequest: 'requested access to your repo',
     accessGranted: 'approved your access request',
