@@ -51,10 +51,16 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
         <SvgIcon name="eye" :size="14" />
         {{ repo.viewCount || 0 }}
       </span>
+      <div class="repo-card__right">
+      <span class="repo-card__stat">
+        <SvgIcon name="chat" :size="14" />
+        {{ repo.commentCount || 0 }}
+      </span>
       <span class="repo-card__likes" :class="{ 'repo-card__likes--active': repo.isLiked }">
         <SvgIcon :name="repo.isLiked ? 'heart-filled' : 'heart'" :size="14" />
         {{ repo.likeCount || 0 }}
       </span>
+      </div>
     </div>
 </div>
 </template>
@@ -114,13 +120,19 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
   padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
   border-top: 1px solid var(--color-border-light);
 }
-.repo-card__views {
+.repo-card__views, .repo-card__stat {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   line-height: 1;
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
+}
+
+.repo-card__right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .repo-card__likes {
