@@ -700,7 +700,7 @@ async function saveEdit() {
   opacity: 1;
 }
 @media (max-width: 768px) {
-  .upload-fab { bottom: 195px; }
+  .upload-fab { bottom: 200px; }
 }
 .hidden-input { display: none; }
 
