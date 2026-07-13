@@ -304,6 +304,9 @@ const visibleComments = computed(() => {
   font-size: var(--text-xs);
   margin-top: 2px;
 }
+.comment__avatar:has(img) {
+  background: transparent;
+}
 .comment__avatar a {
   display: flex;
   width: 100%;
