@@ -199,7 +199,7 @@ function closeMenu() {
             >
               <SvgIcon v-if="link.icon === 'moments'" name="image" class="navbar__nav-icon" />
               <SvgIcon v-else-if="link.icon === 'articles'" name="article" class="navbar__nav-icon" />
-              <SvgIcon v-else-if="link.icon === 'chats'" name="chat" class="navbar__nav-icon" />
+              <SvgIcon v-else-if="link.icon === 'chats'" name="chat-dots" class="navbar__nav-icon" />
               <SvgIcon v-else-if="link.icon === 'members'" name="members" class="navbar__nav-icon" />
               <SvgIcon v-else-if="link.icon === 'repos'" name="fork" class="navbar__nav-icon" />
               <span class="navbar__label">{{ link.label }}</span>
