@@ -302,7 +302,7 @@ async function saveEdit() {
       <div class="repo-header">
         <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
         <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
-        <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ t('visibility.restricted') }}</span>
+        <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t('visibility.authorized')}` }}</span>
         <h1 class="repo-title">{{ repo.name }}</h1>
 
         <div class="repo-meta">

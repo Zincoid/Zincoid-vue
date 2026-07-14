@@ -41,6 +41,8 @@ export default {
     public: '所有人可见',
     private: '仅自己可见',
     restricted: '需访问授权',
+    authorized: '已授权',
+    unauthorized: '未授权',
     pub: '公开',
     pvt: '私有',
     restr: '授权'

@@ -41,6 +41,8 @@ export default {
     public: 'Public',
     private: 'Private',
     restricted: 'Restricted',
+    authorized: 'Authorized',
+    unauthorized: 'Unauthorized',
     pub: 'Pub.',
     pvt: 'Pvt.',
     restr: 'Restr.'
