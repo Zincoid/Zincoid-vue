@@ -1,9 +1,11 @@
 <script setup>
 import { useI18n } from '@/composables/useI18n'
+import { useAuthStore } from '@/stores/auth'
 import { formatDate } from '@/utils/format'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
+const auth = useAuthStore()
 
 defineProps({
   repo: { type: Object, required: true },
@@ -23,7 +25,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
       </div>
       <div class="repo-card__badges">
         <span v-if="repo.visibility === 1" class="repo-card__visibility-badge">{{ t('visibility.private') }}</span>
-        <span v-if="repo.visibility === 2" class="repo-card__visibility-badge repo-card__visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t('visibility.authorized')}` }}</span>
+        <span v-if="repo.visibility === 2" class="repo-card__visibility-badge repo-card__visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
         <span class="repo-card__type-badge" :style="{ color: typeColors[repo.type] }">{{ t(typeLabels[repo.type]) }}</span>
       </div>
     </div>

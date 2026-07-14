@@ -43,6 +43,7 @@ export default {
     restricted: 'Restricted',
     authorized: 'Authorized',
     unauthorized: 'Unauthorized',
+    admin: 'Admin',
     pub: 'Pub.',
     pvt: 'Pvt.',
     restr: 'Restr.'

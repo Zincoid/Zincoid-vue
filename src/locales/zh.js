@@ -43,6 +43,7 @@ export default {
     restricted: '需访问授权',
     authorized: '已授权',
     unauthorized: '未授权',
+    admin: '管理员',
     pub: '公开',
     pvt: '私有',
     restr: '授权'
