@@ -359,6 +359,9 @@ function openPreview(src) {
   height: 100%;
   object-fit: cover;
 }
+.chat-msg__avatar:has(img) {
+  background: transparent;
+}
 
 .chat-msg__body {
   background: var(--color-surface);
