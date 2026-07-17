@@ -341,7 +341,7 @@ watch(likeLiked, (liked) => {
 .article-cover img { width: 100%; }
 
 /* Rendered markdown body */
-.article-body { font-family: 'JetBrains Mono', 'Noto Sans SC', sans-serif; }
+.article-body { font-family: var(--font-article); }
 .article-body :deep(h1) { font-size: var(--text-3xl); margin: var(--spacing-2xl) 0 var(--spacing-lg); scroll-margin-top: calc(var(--navbar-height) + var(--spacing-md)); }
 .article-body :deep(h2) { font-size: var(--text-2xl); margin: var(--spacing-xl) 0 var(--spacing-md); border-bottom: 1px solid var(--color-border); padding-bottom: var(--spacing-sm); scroll-margin-top: calc(var(--navbar-height) + var(--spacing-md)); }
 .article-body :deep(h3) { font-size: var(--text-xl); margin: var(--spacing-lg) 0 var(--spacing-sm); scroll-margin-top: calc(var(--navbar-height) + var(--spacing-md)); }

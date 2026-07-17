@@ -34,9 +34,8 @@
 
   /* ── Typography ── */
   --font-body: 'JetBrains Mono', 'Zen Kaku Gothic New', sans-serif;
-  --font-sans: 'Google Sans Flex', 'Zen Kaku Gothic New', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Google Sans Code', ui-monospace, Consolas, 'Zen Kaku Gothic New', sans-serif, monospace;
-  --font-hand: 'Homemade Apple', cursive;
+  --font-mono: 'JetBrains Mono', 'Zen Kaku Gothic New', monospace;
+  --font-article: 'JetBrains Mono', 'Noto Sans SC', sans-serif;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
