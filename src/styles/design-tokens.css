@@ -34,7 +34,7 @@
 
   /* ── Typography ── */
   --font-body: 'JetBrains Mono', 'Zen Kaku Gothic New', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Zen Kaku Gothic New', monospace;
+  --font-mono: 'JetBrains Mono', 'Consolas', sans-serif, monospace;
   --font-article: 'JetBrains Mono', 'Noto Sans SC', sans-serif;
 
   --text-xs: 0.75rem;
