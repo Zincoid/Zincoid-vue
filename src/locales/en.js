@@ -117,8 +117,9 @@ export default {
     subtitle: 'Manage your profile, data and account settings',
     profileTab: 'Profile',
     dataTab: 'Data',
+    accessTab: 'Access',
     systemTab: 'System',
-    accessTab: 'Access'
+    adminTab: 'Admin'
   },
   profile: {
     pageTitle: 'Profile',

@@ -117,8 +117,9 @@ export default {
     subtitle: '管理基本信息、数据和账户设置',
     profileTab: '基本',
     dataTab: '数据',
+    accessTab: '授权',
     systemTab: '系统',
-    accessTab: '授权'
+    adminTab: '管理'
   },
   profile: {
     pageTitle: '基本',

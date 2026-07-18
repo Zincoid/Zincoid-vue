@@ -138,7 +138,7 @@ async function handleReset() {
 <template>
   <div class="admin">
     <div class="page-header">
-      <h2 class="page-header__title">## {{ t('personal.systemTab') }}<span class="cursor">_</span></h2>
+      <h2 class="page-header__title">## {{ t('personal.adminTab') }}<span class="cursor">_</span></h2>
       <p class="page-header__subtitle">{{ t('system.subtitle') }}</p>
     </div>
 
