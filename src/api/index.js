@@ -58,7 +58,9 @@ export const userAPI = {
   changePasswordByForce: (username, password) => api.put('/users/password/force', { username, password }),
   deleteMe: () => api.delete('/users'),
   updateStatus: (id, status) => api.put(`/users/${id}/status`, null, { params: { status } }),
-  deleteUser: (id) => api.delete(`/users/${id}`)
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  getUserConfig: () => api.get('/users/config'),
+  updateUserConfig: (data) => api.put('/users/config', data)
 }
 
 // ── Moments ──

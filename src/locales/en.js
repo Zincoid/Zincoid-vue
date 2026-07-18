@@ -276,7 +276,11 @@ export default {
   },
   system: {
     pageTitle: 'System',
-    subtitle: 'No features available yet...'
+    subtitle: 'Customise your preferences',
+    receiveEmail: 'Receive email notifications',
+    receiveEmailDesc: 'Receive push notifications via your bound email',
+    loadFailed: 'Failed to load settings',
+    saveFailed: 'Failed to save settings'
   },
   auth: {
     login: 'Login',
