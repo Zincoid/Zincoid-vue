@@ -169,5 +169,6 @@ export const notificationAPI = {
   markOne: (id) => api.put(`/notifications/${id}/read`),
   delete: (id) => api.delete(`/notifications/${id}`),
   deleteAll: () => api.delete('/notifications'),
-  broadcast: (content) => api.post('/notifications/broadcast', { content })
+  broadcast: (content) => api.post('/notifications/broadcast', { content }),
+  emailBroadcast: (subject, content, force) => api.post('/notifications/broadcast/email', { subject, content, force })
 }

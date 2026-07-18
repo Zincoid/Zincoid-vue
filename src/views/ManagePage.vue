@@ -52,6 +52,43 @@ async function handleBroadcast() {
   }
 }
 
+const emailSubject = ref('')
+const emailContent = ref('')
+const emailForce = ref(false)
+const emailBroadcasting = ref(false)
+const emailOpen = ref(false)
+
+function openEmailBroadcast() {
+  emailOpen.value = true
+  emailSubject.value = ''
+  emailContent.value = ''
+  emailForce.value = false
+}
+
+function cancelEmailBroadcast() {
+  emailOpen.value = false
+}
+
+async function handleEmailBroadcast() {
+  if (!emailSubject.value.trim() || !emailContent.value.trim()) return
+  if (!confirm(t('manage.emailBroadcastConfirm'))) return
+  emailBroadcasting.value = true
+  try {
+    await notificationAPI.emailBroadcast(
+      emailSubject.value.trim(),
+      emailContent.value.trim(),
+      emailForce.value
+    )
+    toolMessage.value = t('manage.emailBroadcastSuccess')
+    emailOpen.value = false
+    setTimeout(() => toolMessage.value = '', 2000)
+  } catch (err) {
+    toolError.value = getMessage(err, 'manage.emailBroadcastFailed')
+  } finally {
+    emailBroadcasting.value = false
+  }
+}
+
 function openReset() {
   resetOpen.value = true
   resetUsername.value = ''
@@ -194,6 +231,45 @@ async function handleReset() {
           {{ t('manage.broadcastSend') }}
         </button>
       </div>
+      <div class="tool-item" :class="{ 'tool-item--open': emailOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.emailBroadcast') }}</span>
+          <span class="tool-desc">{{ t('manage.emailBroadcastDesc') }}</span>
+          <div v-if="emailOpen" class="email-broadcast-form">
+            <input
+              v-model="emailSubject"
+              class="field__input"
+              :placeholder="t('manage.emailBroadcastSubject')"
+            />
+            <textarea
+              v-model="emailContent"
+              class="field__input"
+              :placeholder="t('manage.emailBroadcastContent')"
+              rows="4"
+            ></textarea>
+            <div class="email-broadcast-row">
+              <div class="toggle">
+                <label class="toggle__switch">
+                  <input type="checkbox" v-model="emailForce" />
+                  <span class="toggle__slider"></span>
+                </label>
+                <span class="toggle__label">{{ t('manage.emailBroadcastForce') }}</span>
+              </div>
+              <div class="reset-actions">
+                <button class="btn btn--ghost" @click="cancelEmailBroadcast">{{ t('common.cancel') }}</button>
+                <button class="btn btn--primary" :disabled="emailBroadcasting || !emailSubject.trim() || !emailContent.trim()" @click="handleEmailBroadcast">
+                  <SvgIcon name="mail" />
+                  {{ emailBroadcasting ? t('common.posting') : t('manage.broadcastConfirm') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button v-if="!emailOpen" class="btn btn--primary-outline" @click="openEmailBroadcast">
+          <SvgIcon name="mail" />
+          {{ t('manage.broadcastSend') }}
+        </button>
+      </div>
       <div class="tool-item" :class="{ 'tool-item--open': resetOpen }">
         <div class="tool-info">
           <span class="tool-label">{{ t('manage.resetPassword') }}</span>
@@ -293,4 +369,21 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 }
 .config-info { flex: 1; min-width: 0; }
 
+.email-broadcast-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-top: var(--spacing-sm);
+}
+
+.email-broadcast-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.email-broadcast-form .field__input {
+  width: 100%;
+}
 </style>
