@@ -11,10 +11,10 @@ const tabs = computed(() => {
   const items = [
     { to: '/personal/profile', key: 'profileTab', icon: 'profile' },
     { to: '/personal/data', key: 'dataTab', icon: 'data' },
-    { to: '/personal/access', key: 'accessTab', icon: 'auth' }
+    { to: '/personal/access', key: 'accessTab', icon: 'auth' },
+    { to: '/personal/system', key: 'systemTab', icon: 'admin' }
   ]
   if (auth.isAdmin) {
-    items.push({ to: '/personal/system', key: 'systemTab', icon: 'admin' })
     items.push({ to: '/personal/manage', key: 'manageTab', icon: 'lock' })
   }
   return items
