@@ -15,7 +15,7 @@ const tabs = computed(() => {
   ]
   if (auth.isAdmin) {
     items.push({ to: '/personal/system', key: 'systemTab', icon: 'admin' })
-    items.push({ to: '/personal/admin', key: 'adminTab', icon: 'lock' })
+    items.push({ to: '/personal/manage', key: 'manageTab', icon: 'lock' })
   }
   return items
 })

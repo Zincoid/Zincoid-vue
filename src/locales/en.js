@@ -119,7 +119,7 @@ export default {
     dataTab: 'Data',
     accessTab: 'Access',
     systemTab: 'System',
-    adminTab: 'Admin'
+    manageTab: 'Manage'
   },
   profile: {
     pageTitle: 'Profile',
@@ -226,7 +226,7 @@ export default {
     resolvedSent: 'Resolved Approvals',
     noRequests: 'No requests.'
   },
-  system: {
+  manage: {
     subtitle: 'Configuration & tools',
     config: 'Configuration',
     loadFailed: 'Failed to load configs',

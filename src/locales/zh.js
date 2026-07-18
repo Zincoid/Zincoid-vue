@@ -119,7 +119,7 @@ export default {
     dataTab: '数据',
     accessTab: '授权',
     systemTab: '系统',
-    adminTab: '管理'
+    manageTab: '管理'
   },
   profile: {
     pageTitle: '基本',
@@ -226,7 +226,7 @@ export default {
     resolvedSent: '已处理的申请',
     noRequests: '暂无申请。'
   },
-  system: {
+  manage: {
     subtitle: '站点配置与工具',
     config: '站点配置',
     loadFailed: '加载配置失败',

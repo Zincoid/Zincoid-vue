@@ -62,10 +62,10 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: true, title: 'System' }
       },
       {
-        path: 'admin',
-        name: 'Admin',
+        path: 'manage',
+        name: 'Manage',
         component: () => import('@/views/ManagePage.vue'),
-        meta: { requiresAuth: true, requiresAdmin: true, title: 'Admin' }
+        meta: { requiresAuth: true, requiresAdmin: true, title: 'Manage' }
       }
     ]
   },
