@@ -274,6 +274,10 @@ export default {
     cleanupFile_unlinked: '未关联',
     cleanupFile_invalidRef: '无效引用'
   },
+  system: {
+    pageTitle: '系统',
+    subtitle: '暂无功能...'
+  },
   auth: {
     login: '登录',
     register: '注册',

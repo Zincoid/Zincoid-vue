@@ -274,6 +274,10 @@ export default {
     cleanupFile_unlinked: 'Unlinked',
     cleanupFile_invalidRef: 'Invalid refs'
   },
+  system: {
+    pageTitle: 'System',
+    subtitle: 'No features available yet...'
+  },
   auth: {
     login: 'Login',
     register: 'Register',
