@@ -553,12 +553,12 @@ function switchTo(path) {
     text-align: left;
   }
   .auth-brand__ascii {
-    font-size: clamp(0.35rem, 0.8vw, 0.5rem);
+    font-size: clamp(0.3rem, 0.75vw, 0.45rem);
     margin: 0;
     flex-shrink: 0;
   }
   .auth-terminal__text {
-    font-size: var(--text-xs);
+    font-size: clamp(0.6rem, 2vw, 0.75rem);
   }
   .auth-split__right {
     padding: var(--spacing-xl);
