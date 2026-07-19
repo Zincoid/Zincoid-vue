@@ -474,6 +474,7 @@ export default {
     next: '下一页',
     preview: '预览',
     uploading: '上传中...',
+    uploadFailed: '上传失败: 文件大小可能超出限制',
     addImage: '添加图片',
     mdPlaceholder: '用 Markdown 编写...',
     website: '网站',

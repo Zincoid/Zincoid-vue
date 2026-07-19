@@ -18,11 +18,11 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (!error.response || [502, 503, 504].includes(error.response.status)) {
+    if (error.response && [502, 503, 504].includes(error.response.status)) {
       router.push('/maintenance').catch(() => {})
       return Promise.reject(error)
     }
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       window.location.href = '/login?expired=true'
@@ -113,6 +113,7 @@ export const fileAPI = {
     if (relatedId != null) form.append('relatedId', relatedId)
     return api.post('/files/upload', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 600000,
       onUploadProgress: onProgress
     })
   },

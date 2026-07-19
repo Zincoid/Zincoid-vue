@@ -84,25 +84,37 @@ async function save() {
     if (coverRemoved.value) {
       form.value.coverImage = ''
     } else if (coverFile.value) {
-      const { data } = await fileAPI.upload(coverFile.value, null, null, (e) => {
-        if (e.total) {
-          uploadState.value.currentFile = 1
-          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
-        }
-      })
-      form.value.coverImage = data.data.url
+      let uploadData
+      try {
+        const { data } = await fileAPI.upload(coverFile.value, null, null, (e) => {
+          if (e.total) {
+            uploadState.value.currentFile = 1
+            uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+          }
+        })
+        uploadData = data
+      } catch (err) {
+        error.value = getMessage(err, 'common.uploadFailed')
+        return
+      }
+      form.value.coverImage = uploadData.data.url
       uploadState.value.uploaded = 1
     }
     if (mdEditor.value?.pendingFiles?.length) {
       const coverOffset = coverFile.value ? 1 : 0
-      contentMd = await mdEditor.value.resolveImages(form.value.contentMd, (fileIndex, e) => {
-        if (e === null) {
-          uploadState.value.uploaded = coverOffset + fileIndex + 1
-        } else if (e.total) {
-          uploadState.value.currentFile = coverOffset + fileIndex + 1
-          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
-        }
-      })
+      try {
+        contentMd = await mdEditor.value.resolveImages(form.value.contentMd, (fileIndex, e) => {
+          if (e === null) {
+            uploadState.value.uploaded = coverOffset + fileIndex + 1
+          } else if (e.total) {
+            uploadState.value.currentFile = coverOffset + fileIndex + 1
+            uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+          }
+        })
+      } catch (err) {
+        error.value = getMessage(err, 'common.uploadFailed')
+        return
+      }
     }
     const payload = { ...form.value, contentMd }
     if (isEdit.value) {
@@ -219,7 +231,7 @@ h1 { margin-bottom: var(--spacing-2xl); }
 .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
 .cover-preview { max-width: 200px; max-height: 200px; object-fit: contain; border-radius: var(--rounded-md); border: 1px solid var(--color-border); background: var(--color-bg-alt); display: block; }
 .cover-preview-remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: var(--rounded-full); background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: 14px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.cover-preview-remove:hover { background: var(--color-red, #e74c3c); color: #fff; border-color: var(--color-red, #e74c3c); }
+.cover-preview-remove:hover { background: var(--color-red); color: #fff; border-color: var(--color-red); }
 .hidden-input { display: none; }
 
 .error-msg { margin-bottom: var(--spacing-lg); }

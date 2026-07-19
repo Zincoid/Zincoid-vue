@@ -179,7 +179,10 @@ async function handleItemFiles(e) {
       repo.value.items = [...(repo.value.items || []), itemData.data]
       uploadState.value.uploaded = i + 1
     }
-  } catch { /* ignore */ } finally {
+  } catch (err) {
+    itemError.value = getMessage(err, 'common.uploadFailed')
+    setTimeout(() => itemError.value = '', 4000)
+  } finally {
     uploading.value = false
     e.target.value = ''
     uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }

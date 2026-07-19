@@ -100,12 +100,19 @@ async function submitMoment() {
       uploadState.value.currentFile = i + 1
       uploadState.value.currentProgress = 0
       const file = newImageFiles.value[i]
-      const { data } = await fileAPI.upload(file, null, null, (e) => {
-        if (e.total) {
-          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
-        }
-      })
-      urls.push(data.data.url)
+      let uploadData
+      try {
+        const { data } = await fileAPI.upload(file, null, null, (e) => {
+          if (e.total) {
+            uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+          }
+        })
+        uploadData = data
+      } catch (err) {
+        if (err?.response?.status !== 401) alert(getMessage(err, 'common.uploadFailed'))
+        return
+      }
+      urls.push(uploadData.data.url)
       uploadState.value.uploaded = i + 1
     }
     await momentAPI.create({
