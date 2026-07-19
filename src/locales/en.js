@@ -476,7 +476,7 @@ export default {
     next: 'Next',
     preview: 'Preview',
     uploading: 'Uploading...',
-    uploadFailed: 'Upload failed: file may exceed size limit',
+    uploadFailed: 'Upload failed: File may exceed size limit',
     addImage: 'Add Image',
     mdPlaceholder: 'Write in Markdown...',
     website: 'Website',

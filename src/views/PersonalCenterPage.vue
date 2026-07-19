@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useAuthStore } from '@/stores/auth'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -19,6 +19,23 @@ const tabs = computed(() => {
   }
   return items
 })
+
+const sidebarRef = ref(null)
+const scrollable = ref(false)
+
+function checkScrollable() {
+  if (!sidebarRef.value) return
+  scrollable.value = sidebarRef.value.scrollWidth > sidebarRef.value.clientWidth
+}
+
+onMounted(() => {
+  checkScrollable()
+  window.addEventListener('resize', checkScrollable)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScrollable)
+})
 </script>
 
 <template>
@@ -29,7 +46,7 @@ const tabs = computed(() => {
     </div>
 
     <div class="personal-layout">
-      <nav class="personal-sidebar">
+      <nav ref="sidebarRef" class="personal-sidebar" :class="{ 'personal-sidebar--scrollable': scrollable }">
         <router-link
           v-for="tab in tabs"
           :key="tab.to"
@@ -113,11 +130,24 @@ const tabs = computed(() => {
     flex-direction: row;
     gap: var(--spacing-xs);
     padding-top: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .personal-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .personal-sidebar--scrollable {
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
   }
 
   .personal-sidebar__item {
-    flex: 1;
+    flex: 1 0 auto;
     justify-content: center;
+    white-space: nowrap;
   }
 }
 </style>
