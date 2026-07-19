@@ -35,7 +35,9 @@ export default {
     placeholder: "What's on your mind? @ to mention...",
     updateFailed: 'Failed to update',
     pinnedFirst: 'Pinned',
-    private: 'Moment is private.'
+    private: 'Moment is private.',
+    filesProgress: 'Files',
+    fileProgress: 'Current'
   },
   visibility: {
     public: 'Public',

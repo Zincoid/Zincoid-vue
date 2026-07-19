@@ -11,6 +11,7 @@ import Pagination from '@/components/Pagination.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import UploadProgress from '@/components/UploadProgress.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -34,6 +35,12 @@ const newImageFiles = ref([])
 const newImagePreviews = ref([])
 const newVisibility = ref(0)
 const posting = ref(false)
+const uploadState = ref({
+  total: 0,
+  uploaded: 0,
+  currentFile: 0,
+  currentProgress: 0
+})
 const momentTextarea = ref(null)
 
 onMounted(async () => {
@@ -85,11 +92,21 @@ function removeImage(i) {
 async function submitMoment() {
   if (!newContent.value.trim() && !newImageFiles.value.length) return
   posting.value = true
+  const totalFiles = newImageFiles.value.length
+  uploadState.value = { total: totalFiles, uploaded: 0, currentFile: 0, currentProgress: 0 }
   try {
     const urls = []
-    for (const file of newImageFiles.value) {
-      const { data } = await fileAPI.upload(file)
+    for (let i = 0; i < newImageFiles.value.length; i++) {
+      uploadState.value.currentFile = i + 1
+      uploadState.value.currentProgress = 0
+      const file = newImageFiles.value[i]
+      const { data } = await fileAPI.upload(file, null, null, (e) => {
+        if (e.total) {
+          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+        }
+      })
       urls.push(data.data.url)
+      uploadState.value.uploaded = i + 1
     }
     await momentAPI.create({
       content: newContent.value.trim(),
@@ -107,6 +124,7 @@ async function submitMoment() {
     if (err?.response?.status !== 401) alert(getMessage(err, 'moment.postFailed'))
   } finally {
     posting.value = false
+    uploadState.value = { total: 0, uploaded: 0, currentFile: 0, currentProgress: 0 }
   }
 }
 </script>
@@ -142,25 +160,34 @@ async function submitMoment() {
         @select="(username) => mention.insert(momentTextarea, username)"
       />
 
-      <div class="visibility-toggle">
-        <button
-          class="visibility-btn"
-          :class="{ 'visibility-btn--active': newVisibility === 0 }"
-          @click="newVisibility = 0"
-          type="button"
-        >
-          <SvgIcon name="world" :size="14" />
-          {{ t('visibility.public') }}
-        </button>
-        <button
-          class="visibility-btn"
-          :class="{ 'visibility-btn--active': newVisibility === 1 }"
-          @click="newVisibility = 1"
-          type="button"
-        >
-          <SvgIcon name="lock" :size="14" />
-          {{ t('visibility.private') }}
-        </button>
+      <div class="editor__meta-row">
+        <div class="visibility-toggle">
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': newVisibility === 0 }"
+            @click="newVisibility = 0"
+            type="button"
+          >
+            <SvgIcon name="world" :size="14" />
+            {{ t('visibility.public') }}
+          </button>
+          <button
+            class="visibility-btn"
+            :class="{ 'visibility-btn--active': newVisibility === 1 }"
+            @click="newVisibility = 1"
+            type="button"
+          >
+            <SvgIcon name="lock" :size="14" />
+            {{ t('visibility.private') }}
+          </button>
+        </div>
+
+        <UploadProgress
+          v-if="uploadState.total > 0"
+          :total="uploadState.total"
+          :uploaded="uploadState.uploaded"
+          :current-progress="uploadState.currentProgress"
+        />
       </div>
 
       <div v-if="newImagePreviews.length" class="editor__images">
@@ -250,6 +277,8 @@ async function submitMoment() {
 .hidden-input { display: none; }
 
 .timeline-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+
+.editor__meta-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; }
 
 .visibility-toggle { display: flex; gap: var(--spacing-sm); }
 .visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }

@@ -35,7 +35,9 @@ export default {
     placeholder: '在想什么？@ 提及用户...',
     updateFailed: '更新失败',
     pinnedFirst: '置顶',
-    private: '动态为私有。'
+    private: '动态为私有。',
+    filesProgress: '文件',
+    fileProgress: '当前'
   },
   visibility: {
     public: '所有人可见',

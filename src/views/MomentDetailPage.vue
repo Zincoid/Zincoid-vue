@@ -15,6 +15,7 @@ import LikeButton from '@/components/LikeButton.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import UploadProgress from '@/components/UploadProgress.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -47,6 +48,11 @@ const editKeepImages = ref([])
 const editNewFiles = ref([])
 const editNewPreviews = ref([])
 const saving = ref(false)
+const uploadState = ref({
+  total: 0,
+  uploaded: 0,
+  currentProgress: 0
+})
 
 function previewImage(src) {
   viewerSrc.value = src
@@ -101,11 +107,21 @@ function removeNewImage(i) {
 async function saveEdit() {
   if (!editContent.value.trim() && !editKeepImages.value.length && !editNewFiles.value.length) return
   saving.value = true
+  const totalFiles = editNewFiles.value.length
+  uploadState.value = { total: totalFiles, uploaded: 0, currentProgress: 0 }
   try {
     const newUrls = []
-    for (const file of editNewFiles.value) {
-      const { data } = await fileAPI.upload(file)
+    for (let i = 0; i < editNewFiles.value.length; i++) {
+      uploadState.value.currentFile = i + 1
+      uploadState.value.currentProgress = 0
+      const file = editNewFiles.value[i]
+      const { data } = await fileAPI.upload(file, null, null, (e) => {
+        if (e.total) {
+          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+        }
+      })
       newUrls.push(data.data.url)
+      uploadState.value.uploaded = i + 1
     }
     await momentAPI.update(route.params.id, {
       content: editContent.value.trim(),
@@ -120,6 +136,7 @@ async function saveEdit() {
     if (err?.response?.status !== 401) alert(getMessage(err, 'moment.updateFailed'))
   } finally {
     saving.value = false
+    uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
   }
 }
 
@@ -284,25 +301,34 @@ watch(likeLiked, (liked) => {
           @select="(username) => mention.insert(editTextarea, username)"
         />
 
-        <div class="visibility-toggle">
-          <button
-            class="visibility-btn"
-            :class="{ 'visibility-btn--active': editVisibility === 0 }"
-            @click="editVisibility = 0"
-            type="button"
-          >
-            <SvgIcon name="world" :size="14" />
-            {{ t('visibility.public') }}
-          </button>
-          <button
-            class="visibility-btn"
-            :class="{ 'visibility-btn--active': editVisibility === 1 }"
-            @click="editVisibility = 1"
-            type="button"
-          >
-            <SvgIcon name="lock" :size="14" />
-            {{ t('visibility.private') }}
-          </button>
+        <div class="edit-meta-row">
+          <div class="visibility-toggle">
+            <button
+              class="visibility-btn"
+              :class="{ 'visibility-btn--active': editVisibility === 0 }"
+              @click="editVisibility = 0"
+              type="button"
+            >
+              <SvgIcon name="world" :size="14" />
+              {{ t('visibility.public') }}
+            </button>
+            <button
+              class="visibility-btn"
+              :class="{ 'visibility-btn--active': editVisibility === 1 }"
+              @click="editVisibility = 1"
+              type="button"
+            >
+              <SvgIcon name="lock" :size="14" />
+              {{ t('visibility.private') }}
+            </button>
+          </div>
+
+          <UploadProgress
+            v-if="uploadState.total > 0"
+            :total="uploadState.total"
+            :uploaded="uploadState.uploaded"
+            :current-progress="uploadState.currentProgress"
+          />
         </div>
 
         <div v-if="editKeepImages.length || editNewPreviews.length" class="edit-media-grid">
@@ -500,4 +526,6 @@ watch(likeLiked, (liked) => {
 .visibility-btn { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: var(--color-surface); color: var(--color-text-secondary); font-size: var(--text-xs); cursor: pointer; transition: all var(--transition-fast); }
 .visibility-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
 .visibility-btn--active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
+
+.edit-meta-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); flex-wrap: wrap; }
 </style>

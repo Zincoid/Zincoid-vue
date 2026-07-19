@@ -12,6 +12,7 @@ import LikeButton from '@/components/LikeButton.vue'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import UploadProgress from '@/components/UploadProgress.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -154,20 +155,34 @@ async function requestAccess() {
 
 // ── Items upload ──
 const uploading = ref(false)
+const uploadState = ref({
+  total: 0,
+  uploaded: 0,
+  currentProgress: 0
+})
 
 async function handleItemFiles(e) {
   const files = e.target.files
   if (!files.length) return
   uploading.value = true
+  uploadState.value = { total: files.length, uploaded: 0, currentProgress: 0 }
   try {
-    for (const file of files) {
-      const { data: fileData } = await fileAPI.upload(file)
-      const { data: itemData } = await repoAPI.addItem(repo.value.id, { fileId: fileData.data.id, name: file.name })
+    for (let i = 0; i < files.length; i++) {
+      uploadState.value.currentFile = i + 1
+      uploadState.value.currentProgress = 0
+      const { data: fileData } = await fileAPI.upload(files[i], null, null, (e) => {
+        if (e.total) {
+          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+        }
+      })
+      const { data: itemData } = await repoAPI.addItem(repo.value.id, { fileId: fileData.data.id, name: files[i].name })
       repo.value.items = [...(repo.value.items || []), itemData.data]
+      uploadState.value.uploaded = i + 1
     }
   } catch { /* ignore */ } finally {
     uploading.value = false
     e.target.value = ''
+    uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
   }
 }
 
@@ -446,25 +461,33 @@ async function saveEdit() {
       </template>
 
     <div class="detail__actions-bar">
-      <LikeButton
-        :targetType="4"
-        :targetId="repo.id"
-        :liked="likeLiked"
-        :count="likeCount"
-        @update:liked="likeLiked = $event"
-        @update:count="likeCount = $event"
-      />
-      <div v-if="repo.recentLikers?.length" class="recent-likers">
-        <router-link
-          v-for="liker in repo.recentLikers"
-          :key="liker.userId"
-          :to="`/members/${liker.userId}`"
-          class="recent-liker-link"
-        >
-          <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
-          <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
-        </router-link>
+      <div class="detail__actions-left">
+        <LikeButton
+          :targetType="4"
+          :targetId="repo.id"
+          :liked="likeLiked"
+          :count="likeCount"
+          @update:liked="likeLiked = $event"
+          @update:count="likeCount = $event"
+        />
+        <div v-if="repo.recentLikers?.length" class="recent-likers">
+          <router-link
+            v-for="liker in repo.recentLikers"
+            :key="liker.userId"
+            :to="`/members/${liker.userId}`"
+            class="recent-liker-link"
+          >
+            <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
+            <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
+          </router-link>
+        </div>
       </div>
+      <UploadProgress
+        v-if="uploadState.total > 0"
+        :total="uploadState.total"
+        :uploaded="uploadState.uploaded"
+        :current-progress="uploadState.currentProgress"
+      />
     </div>
     <CommentSection
       :comments="comments"
@@ -607,10 +630,13 @@ async function saveEdit() {
 .detail__actions-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-md);
   margin-top: var(--spacing-2xl);
   margin-bottom: var(--spacing-2xl);
+  flex-wrap: wrap;
 }
+.detail__actions-left { display: flex; align-items: center; gap: var(--spacing-md); }
 .recent-likers { display: flex; align-items: center; }
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }

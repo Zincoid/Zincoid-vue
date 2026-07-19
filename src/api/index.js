@@ -106,13 +106,14 @@ export const commentAPI = {
 
 // ── Files ──
 export const fileAPI = {
-  upload: (file, relatedType, relatedId) => {
+  upload: (file, relatedType, relatedId, onProgress) => {
     const form = new FormData()
     form.append('file', file)
     if (relatedType != null) form.append('relatedType', relatedType)
     if (relatedId != null) form.append('relatedId', relatedId)
     return api.post('/files/upload', form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: onProgress
     })
   },
 }

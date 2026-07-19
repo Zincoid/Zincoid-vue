@@ -5,6 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { articleAPI, fileAPI } from '@/api'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
+import UploadProgress from '@/components/UploadProgress.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
@@ -28,6 +29,11 @@ const publishing = ref(false)
 const coverFile = ref(null)
 const coverPreview = ref('')
 const coverRemoved = ref(false)
+const uploadState = ref({
+  total: 0,
+  uploaded: 0,
+  currentProgress: 0
+})
 
 onMounted(async () => {
   if (isEdit.value) {
@@ -69,13 +75,34 @@ async function save() {
   }
   publishing.value = true
   error.value = ''
+  const totalFiles = (coverFile.value ? 1 : 0) + (mdEditor.value?.pendingFiles?.length || 0)
+  if (totalFiles > 0) {
+    uploadState.value = { total: totalFiles, uploaded: 0, currentProgress: 0 }
+  }
   try {
-    const contentMd = await mdEditor.value.resolveImages(form.value.contentMd)
+    let contentMd = form.value.contentMd
     if (coverRemoved.value) {
       form.value.coverImage = ''
     } else if (coverFile.value) {
-      const { data } = await fileAPI.upload(coverFile.value)
+      const { data } = await fileAPI.upload(coverFile.value, null, null, (e) => {
+        if (e.total) {
+          uploadState.value.currentFile = 1
+          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+        }
+      })
       form.value.coverImage = data.data.url
+      uploadState.value.uploaded = 1
+    }
+    if (mdEditor.value?.pendingFiles?.length) {
+      const coverOffset = coverFile.value ? 1 : 0
+      contentMd = await mdEditor.value.resolveImages(form.value.contentMd, (fileIndex, e) => {
+        if (e === null) {
+          uploadState.value.uploaded = coverOffset + fileIndex + 1
+        } else if (e.total) {
+          uploadState.value.currentFile = coverOffset + fileIndex + 1
+          uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
+        }
+      })
     }
     const payload = { ...form.value, contentMd }
     if (isEdit.value) {
@@ -90,13 +117,22 @@ async function save() {
     error.value = getMessage(err, 'article.saveFailed')
   } finally {
     publishing.value = false
+    uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
   }
 }
 </script>
 
 <template>
   <div class="editor-page container">
-    <h1># {{ isEdit ? t('article.editorTitle') : t('article.newTitle') }}<span class="cursor">_</span></h1>
+    <div class="editor-page__title-row">
+      <h1># {{ isEdit ? t('article.editorTitle') : t('article.newTitle') }}<span class="cursor">_</span></h1>
+      <UploadProgress
+        v-if="uploadState.total > 0"
+        :total="uploadState.total"
+        :uploaded="uploadState.uploaded"
+        :current-progress="uploadState.currentProgress"
+      />
+    </div>
 
     <div class="fields">
       <div class="field">
@@ -173,6 +209,8 @@ async function save() {
 
 <style scoped>
 .editor-page { padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-4xl); }
+.editor-page__title-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-2xl); flex-wrap: wrap; }
+.editor-page__title-row h1 { margin-bottom: 0; }
 h1 { margin-bottom: var(--spacing-2xl); }
 .fields { display: flex; flex-direction: column; gap: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
 .field { display: flex; flex-direction: column; gap: var(--spacing-sm); }

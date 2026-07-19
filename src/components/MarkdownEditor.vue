@@ -83,12 +83,13 @@ watch(() => props.modelValue, () => {
   }
 })
 
-async function resolveImages(content) {
+async function resolveImages(content, onProgress) {
   if (!pendingFiles.value.length) return content
   let resolved = content
   for (let i = 0; i < pendingFiles.value.length; i++) {
-    const { data } = await fileAPI.upload(pendingFiles.value[i])
+    const { data } = await fileAPI.upload(pendingFiles.value[i], null, null, onProgress ? (e) => onProgress(i, e) : undefined)
     resolved = resolved.replace(pendingPreviews.value[i], data.data.url)
+    if (onProgress) onProgress(i, null)
   }
   pendingPreviews.value.forEach(p => URL.revokeObjectURL(p))
   pendingFiles.value = []
@@ -96,7 +97,7 @@ async function resolveImages(content) {
   return resolved
 }
 
-defineExpose({ resolveImages })
+defineExpose({ resolveImages, pendingFiles })
 </script>
 
 <template>
