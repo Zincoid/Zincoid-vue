@@ -1,11 +1,13 @@
 <script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useAuthStore } from '@/stores/auth'
+import { useLocaleStore } from '@/stores/locale'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
+const localeStore = useLocaleStore()
 
 const tabs = computed(() => {
   const items = [
@@ -22,19 +24,26 @@ const tabs = computed(() => {
 
 const sidebarRef = ref(null)
 const scrollable = ref(false)
+const scrollAtStart = ref(true)
+const scrollAtEnd = ref(true)
 
-function checkScrollable() {
+function checkScroll() {
   if (!sidebarRef.value) return
-  scrollable.value = sidebarRef.value.scrollWidth > sidebarRef.value.clientWidth
+  const el = sidebarRef.value
+  scrollable.value = el.scrollWidth > el.clientWidth
+  scrollAtStart.value = el.scrollLeft <= 0
+  scrollAtEnd.value = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1
 }
 
 onMounted(() => {
-  checkScrollable()
-  window.addEventListener('resize', checkScrollable)
+  checkScroll()
+  window.addEventListener('resize', checkScroll)
 })
 
+watch([tabs, () => localeStore.locale], () => nextTick(checkScroll))
+
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', checkScrollable)
+  window.removeEventListener('resize', checkScroll)
 })
 </script>
 
@@ -46,7 +55,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="personal-layout">
-      <nav ref="sidebarRef" class="personal-sidebar" :class="{ 'personal-sidebar--scrollable': scrollable }">
+      <nav ref="sidebarRef" class="personal-sidebar" :class="{ 'personal-sidebar--scrollable': scrollable, 'personal-sidebar--start': scrollAtStart, 'personal-sidebar--end': scrollAtEnd }" @scroll="checkScroll">
         <router-link
           v-for="tab in tabs"
           :key="tab.to"
@@ -142,6 +151,21 @@ onBeforeUnmount(() => {
   .personal-sidebar--scrollable {
     mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+
+  .personal-sidebar--scrollable.personal-sidebar--start {
+    mask-image: linear-gradient(to right, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 92%, transparent 100%);
+  }
+
+  .personal-sidebar--scrollable.personal-sidebar--end {
+    mask-image: linear-gradient(to right, transparent 0%, black 8%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%);
+  }
+
+  .personal-sidebar--scrollable.personal-sidebar--start.personal-sidebar--end {
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 
   .personal-sidebar__item {
