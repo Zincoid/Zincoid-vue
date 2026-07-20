@@ -288,7 +288,7 @@ export default {
     pageTitle: 'System',
     subtitle: 'Customise your preferences',
     receiveEmail: 'Receive email notifications',
-    receiveEmailDesc: 'Receive push notifications via your bound email',
+    receiveEmailDesc: 'Receive push notifications via your bound email, including administrator announcements and authorization notifications',
     loadFailed: 'Failed to load settings',
     saveFailed: 'Failed to save settings'
   },

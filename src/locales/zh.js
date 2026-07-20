@@ -288,7 +288,7 @@ export default {
     pageTitle: '系统',
     subtitle: '自定义偏好设置',
     receiveEmail: '接收邮件通知',
-    receiveEmailDesc: '是否通过绑定邮箱接收邮件推送',
+    receiveEmailDesc: '是否通过绑定邮箱接收邮件推送，包括管理公告和授权通知',
     loadFailed: '加载设置失败',
     saveFailed: '保存设置失败'
   },
