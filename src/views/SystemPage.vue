@@ -107,7 +107,8 @@ async function saveConfig(partial) {
 .system .page-header__subtitle { font-size: var(--text-sm); }
 .system { padding-bottom: var(--spacing-4xl); }
 .system__list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
-.system__sub { display: flex; flex-direction: column; gap: var(--spacing-lg); padding-left: var(--spacing-xl); border-left: 2px solid var(--color-border); }
+.system__sub { display: flex; flex-direction: column; gap: var(--spacing-lg); padding-left: var(--spacing-xl); position: relative; }
+.system__sub::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; background: var(--color-border); }
 .system__item { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
 .system__info { display: flex; flex-direction: column; gap: 2px; }
 .system__label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
