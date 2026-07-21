@@ -288,7 +288,11 @@ export default {
     pageTitle: 'System',
     subtitle: 'Customise your preferences',
     receiveEmail: 'Receive email notifications',
-    receiveEmailDesc: 'Receive push notifications via your bound email, including administrator announcements and authorization notifications',
+    receiveEmailDesc: 'Receive push notifications via your bound email, no email notifications will be sent when disabled',
+    receiveEmailSys: 'System',
+    receiveEmailSysDesc: 'Receive system emails, including administrator announcements',
+    receiveEmailRepoAccess: 'Repo access',
+    receiveEmailRepoAccessDesc: 'Receive notification emails when repo access requests are approved',
     loadFailed: 'Failed to load settings',
     saveFailed: 'Failed to save settings'
   },
