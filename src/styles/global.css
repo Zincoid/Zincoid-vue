@@ -455,11 +455,11 @@ th {
 /* ── Responsive ── */
 @media (max-width: 768px) {
   html {
-    zoom: 0.75;
+    zoom: 0.6;
   }
 
   body, #app {
-    min-height: 133.33vh;
+    min-height: 166.67vh;
   }
 
   :root {
