@@ -291,7 +291,7 @@ export default {
     pageTitle: '系统',
     subtitle: '自定义偏好设置',
     receiveEmail: '接收邮件通知',
-    receiveEmailDesc: '通过绑定邮箱接收邮件推送，关闭后不再接收任何邮件推送',
+    receiveEmailDesc: '通过绑定邮箱接收推送，关闭后不再接收任何邮件推送',
     receiveEmailSys: '系统相关',
     receiveEmailSysDesc: '接收系统邮件，包括管理公告',
     receiveEmailRepoAccess: '仓库授权',
