@@ -10,6 +10,7 @@ import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import ShareButton from '@/components/ShareButton.vue'
+import FabContainer from '@/components/FabContainer.vue'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -587,25 +588,27 @@ async function saveEdit() {
     </div>
   </div>
 
-  <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
-    <SvgIcon name="upload" :size="20" />
-    <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
-  </label>
+  <FabContainer>
+    <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
+      <SvgIcon name="upload" :size="20" />
+      <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
+    </label>
 
-  <div class="like-fab">
-    <LikeButton
-      :targetType="4"
-      :targetId="Number(route.params.id)"
-      :liked="likeLiked"
-      :count="likeCount"
-      @update:liked="likeLiked = $event"
-      @update:count="likeCount = $event"
-    />
-  </div>
+    <div class="like-fab">
+      <LikeButton
+        :targetType="4"
+        :targetId="Number(route.params.id)"
+        :liked="likeLiked"
+        :count="likeCount"
+        @update:liked="likeLiked = $event"
+        @update:count="likeCount = $event"
+      />
+    </div>
 
-  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <SvgIcon name="back-arrow" :size="20" />
-  </button>
+    <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
+      <SvgIcon name="back-arrow" :size="20" />
+    </button>
+  </FabContainer>
 </template>
 
 <style scoped>
@@ -714,9 +717,6 @@ async function saveEdit() {
 }
 
 .upload-fab {
-  position: fixed;
-  right: var(--spacing-4xl);
-  bottom: 195px;
   width: 48px;
   height: 48px;
   border-radius: var(--rounded-full);
@@ -726,7 +726,6 @@ async function saveEdit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
   opacity: 0.6;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-md);
@@ -738,9 +737,6 @@ async function saveEdit() {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
   opacity: 1;
-}
-@media (max-width: 768px) {
-  .upload-fab { bottom: 200px; }
 }
 .hidden-input { display: none; }
 

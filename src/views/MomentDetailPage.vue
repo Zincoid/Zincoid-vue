@@ -13,6 +13,7 @@ import Pagination from '@/components/Pagination.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import ShareButton from '@/components/ShareButton.vue'
+import FabContainer from '@/components/FabContainer.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -469,19 +470,21 @@ watch(likeLiked, (liked) => {
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
-  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <SvgIcon name="back-arrow" :size="20" />
-  </button>
-  <div v-if="!editing" class="like-fab">
-    <LikeButton
-      :target-type="0"
-      :target-id="Number(route.params.id)"
-      :liked="likeLiked"
-      :count="likeCount"
-      @update:liked="likeLiked = $event"
-      @update:count="likeCount = $event"
-    />
-  </div>
+  <FabContainer>
+    <div v-if="!editing" class="like-fab">
+      <LikeButton
+        :target-type="0"
+        :target-id="Number(route.params.id)"
+        :liked="likeLiked"
+        :count="likeCount"
+        @update:liked="likeLiked = $event"
+        @update:count="likeCount = $event"
+      />
+    </div>
+    <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
+      <SvgIcon name="back-arrow" :size="20" />
+    </button>
+  </FabContainer>
 </template>
 
 <style scoped>

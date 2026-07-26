@@ -10,6 +10,7 @@ import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
 import ShareButton from '@/components/ShareButton.vue'
+import FabContainer from '@/components/FabContainer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
@@ -316,19 +317,21 @@ watch(likeLiked, (liked) => {
   </div>
   <p v-if="loadingDone && !article" class="empty-state">{{ notFoundReason === 'private' ? t('article.private') : t('article.notFound') }}</p>
 
-  <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
-    <SvgIcon name="back-arrow" :size="20" />
-  </button>
-  <div class="like-fab">
-    <LikeButton
-      :target-type="1"
-      :target-id="Number(route.params.id)"
-      :liked="likeLiked"
-      :count="likeCount"
-      @update:liked="likeLiked = $event"
-      @update:count="likeCount = $event"
-    />
-  </div>
+  <FabContainer>
+    <div class="like-fab">
+      <LikeButton
+        :target-type="1"
+        :target-id="Number(route.params.id)"
+        :liked="likeLiked"
+        :count="likeCount"
+        @update:liked="likeLiked = $event"
+        @update:count="likeCount = $event"
+      />
+    </div>
+    <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
+      <SvgIcon name="back-arrow" :size="20" />
+    </button>
+  </FabContainer>
 </template>
 
 <style scoped>

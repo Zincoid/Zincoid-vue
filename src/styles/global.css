@@ -487,9 +487,6 @@ th {
 
 /* Fixed back-to-list FAB */
 .back-fab {
-  position: fixed;
-  right: var(--spacing-4xl);
-  bottom: 75px;
   width: 48px;
   height: 48px;
   border-radius: var(--rounded-full);
@@ -499,7 +496,6 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
   opacity: 0.6;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-md);
@@ -514,9 +510,6 @@ th {
 }
 
 .pin-fab {
-  position: fixed;
-  right: var(--spacing-4xl);
-  bottom: 135px;
   width: 48px;
   height: 48px;
   border-radius: var(--rounded-full);
@@ -526,7 +519,6 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
   cursor: pointer;
   opacity: 0.6;
   transition: all var(--transition-fast);
@@ -545,10 +537,6 @@ th {
 }
 
 .like-fab {
-  position: fixed;
-  right: var(--spacing-4xl);
-  bottom: 135px;
-  z-index: 50;
 }
 .like-fab .like-btn {
   width: 48px;
@@ -587,14 +575,4 @@ th {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .back-fab {
-    bottom: 80px;
-  }
-  .like-fab {
-    bottom: 140px;
-  }
-  .pin-fab {
-    bottom: 150px;
-  }
-}
+
