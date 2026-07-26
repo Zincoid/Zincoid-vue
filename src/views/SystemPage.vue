@@ -56,11 +56,11 @@ async function resetConfig() {
   saving.value = true
   try {
     await userAPI.updateUserConfig({
-      receiveEmail: false,
+      receiveEmail: true,
       receiveEmailSys: false,
       receiveEmailRepoAccess: true
     })
-    receiveEmail.value = false
+    receiveEmail.value = true
     receiveEmailSys.value = false
     receiveEmailRepoAccess.value = true
   } catch (e) {
