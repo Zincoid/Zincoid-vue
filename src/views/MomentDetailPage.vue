@@ -6,6 +6,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
 import { useMention } from '@/composables/useMention'
+import { useConfirm } from '@/composables/useConfirm'
 import { parseMentions } from '@/composables/useMentionLink'
 import { momentAPI, commentAPI, likeAPI, fileAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
@@ -22,6 +23,7 @@ import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
 const router = useRouter()
@@ -197,7 +199,7 @@ async function handleComment({ content, parentId }) {
 }
 
 async function handleDeleteComment(commentId) {
-  if (!confirm(t('comment.deleteConfirm'))) return
+  if (!await confirm(t('comment.deleteConfirm'))) return
   try {
     await commentAPI.delete(commentId)
     await fetchComments()
@@ -229,7 +231,7 @@ async function togglePin() {
 }
 
 async function handleDelete() {
-  if (!confirm(t('moment.deleteConfirm'))) return
+  if (!await confirm(t('moment.deleteConfirm'))) return
   try {
     await momentAPI.delete(route.params.id)
     router.push('/moments')

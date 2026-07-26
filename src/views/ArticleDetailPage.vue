@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useConfirm } from '@/composables/useConfirm'
 import { useConfig } from '@/composables/useConfig'
 import { articleAPI, commentAPI, likeAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
@@ -18,6 +19,7 @@ import 'highlight.js/styles/github-dark.css'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
 const auth = useAuthStore()
@@ -153,7 +155,7 @@ async function handleComment({ content, parentId }) {
 }
 
 async function handleDeleteComment(commentId) {
-  if (!confirm(t('comment.deleteConfirm'))) return
+  if (!await confirm(t('comment.deleteConfirm'))) return
   try {
     await commentAPI.delete(commentId)
     await fetchComments()
@@ -185,7 +187,7 @@ async function togglePin() {
 }
 
 async function handleDelete() {
-  if (!confirm(t('article.deleteConfirm'))) return
+  if (!await confirm(t('article.deleteConfirm'))) return
   try {
     await articleAPI.delete(route.params.id)
     window.location.href = '/#/articles'

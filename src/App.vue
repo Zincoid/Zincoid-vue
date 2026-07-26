@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import DigitalFlow from '@/components/DigitalFlow.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -22,4 +23,5 @@ const showFlow = computed(() => {
     <router-view />
   </main>
   <Footer />
+  <ConfirmDialog />
 </template>

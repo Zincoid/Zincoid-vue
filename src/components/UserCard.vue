@@ -2,12 +2,14 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { formatActiveTime } from '@/utils/format'
 import { userAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 const auth = useAuthStore()
 
 const props = defineProps({
@@ -33,7 +35,7 @@ async function toggleStatus() {
 }
 
 async function handleDelete() {
-  if (!confirm(t('profile.deleteAccountConfirm'))) return
+  if (!await confirm(t('profile.deleteAccountConfirm'))) return
   try {
     await userAPI.deleteUser(props.user.id)
     emit('delete:user', props.user.id)

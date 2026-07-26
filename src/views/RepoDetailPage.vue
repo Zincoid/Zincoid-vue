@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useAuthStore } from '@/stores/auth'
+import { useConfirm } from '@/composables/useConfirm'
 import { repoAPI, fileAPI, commentAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
@@ -20,6 +21,7 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 const auth = useAuthStore()
 const origin = location.origin
 const repo = ref(null)
@@ -108,7 +110,7 @@ function mediaType(url) {
 
 // ── Delete ──
 async function deleteRepo() {
-  if (!confirm(t('repo.deleteConfirm'))) return
+  if (!await confirm(t('repo.deleteConfirm'))) return
   try {
     await repoAPI.delete(repo.value.id)
     router.push('/repos')
@@ -125,7 +127,7 @@ async function handleComment({ content, parentId }) {
 }
 
 async function handleDeleteComment(commentId) {
-  if (!confirm(t('comment.deleteConfirm'))) return
+  if (!await confirm(t('comment.deleteConfirm'))) return
   try {
     await commentAPI.delete(commentId)
     await fetchComments()
@@ -148,7 +150,7 @@ function onCommentPageChange(p) {
 
 // ── Access request ──
 async function requestAccess() {
-  if (!confirm(t('repo.requestAccessConfirm'))) return
+  if (!await confirm(t('repo.requestAccessConfirm'))) return
   try {
     await repoAPI.requestAccess(repo.value.id)
     alert(t('repo.requestAccessSent'))

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { userAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -9,6 +10,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { handle } = useError()
+const { confirm } = useConfirm()
 
 const loading = ref(true)
 const loadingDone = ref(false)
@@ -53,7 +55,7 @@ async function saveConfig(partial) {
 }
 
 async function resetConfig() {
-  if (!confirm(t('system.resetConfigConfirm'))) return
+  if (!await confirm(t('system.resetConfigConfirm'))) return
   saving.value = true
   try {
     await userAPI.updateUserConfig({

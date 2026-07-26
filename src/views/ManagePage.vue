@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { configAPI, userAPI, healthAPI, notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -8,6 +9,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 
 const configs = ref([])
 const configMessage = ref('')
@@ -38,7 +40,7 @@ function cancelBroadcast() {
 
 async function handleBroadcast() {
   if (!broadcastContent.value.trim()) return
-  if (!confirm(t('manage.broadcastConfirmTitle'))) return
+  if (!await confirm(t('manage.broadcastConfirmTitle'))) return
   broadcasting.value = true
   try {
     await notificationAPI.broadcast(broadcastContent.value.trim())
@@ -71,7 +73,7 @@ function cancelEmailBroadcast() {
 
 async function handleEmailBroadcast() {
   if (!emailSubject.value.trim() || !emailContent.value.trim()) return
-  if (!confirm(t('manage.emailBroadcastConfirm'))) return
+  if (!await confirm(t('manage.emailBroadcastConfirm'))) return
   emailBroadcasting.value = true
   try {
     await notificationAPI.emailBroadcast(
@@ -122,7 +124,7 @@ async function saveConfig(config) {
 
 async function runCleanup() {
   const confirmMsg = logicCleanup.value ? t('manage.deepCleanupConfirm') : t('manage.cleanupConfirm')
-  if (!confirm(confirmMsg)) return
+  if (!await confirm(confirmMsg)) return
   cleaning.value = true
   try {
     const res = await healthAPI.cleanupFiles(logicCleanup.value)
@@ -140,7 +142,7 @@ async function runCleanup() {
 const recordsCleaning = ref(false)
 
 async function runRecordsCleanup() {
-  if (!confirm(t('manage.cleanupRecordsConfirm'))) return
+  if (!await confirm(t('manage.cleanupRecordsConfirm'))) return
   recordsCleaning.value = true
   try {
     const res = await healthAPI.cleanupRecords()
@@ -157,7 +159,7 @@ async function runRecordsCleanup() {
 
 async function handleReset() {
   if (!resetUsername.value.trim() || !resetPassword.value.trim()) return
-  if (!confirm(`${t('manage.resetPassword')}：${resetUsername.value.trim()}`)) return
+  if (!await confirm(`${t('manage.resetPassword')}：${resetUsername.value.trim()}`)) return
   resetting.value = true
   try {
     await userAPI.changePasswordByForce(resetUsername.value.trim(), resetPassword.value)

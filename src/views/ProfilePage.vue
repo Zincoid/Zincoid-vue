@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { fileAPI, userAPI, authAPI } from '@/api'
 import AvatarCropper from '@/components/AvatarCropper.vue'
@@ -10,6 +11,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 const auth = useAuthStore()
 
 const profile = ref({
@@ -173,7 +175,7 @@ async function deleteAccount() {
     error.value = t('profile.deleteConfirmMismatch')
     return
   }
-  if (!confirm(t('profile.deleteAccountConfirm'))) return
+  if (!await confirm(t('profile.deleteAccountConfirm'))) return
   try {
     await userAPI.deleteMe()
     auth.logout()

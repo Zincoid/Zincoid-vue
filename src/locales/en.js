@@ -163,7 +163,7 @@ export default {
     confirm: 'Confirm',
     deleteAccount: 'Delete Account',
     deleteAccountDesc: 'Permanently delete your account and all associated data. This cannot be undone.',
-    deleteAccountConfirm: 'Are you sure you want to delete your account? This action cannot be undone.',
+    deleteAccountConfirm: 'Are you sure you want to delete this account? This action cannot be undone.',
     deleteConfirmHint: 'Type "{username}" to confirm',
     deleteConfirmMismatch: 'Username does not match',
     changeEmail: 'Change Email',

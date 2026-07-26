@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { useMention } from '@/composables/useMention'
 import { parseMentions } from '@/composables/useMentionLink'
@@ -16,6 +17,7 @@ const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
 const mention = useMention()
+const { confirm } = useConfirm()
 
 const messages = ref([])
 const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedContent: parseMentions(m.content) })))
@@ -163,7 +165,7 @@ function canDelete(msg) {
 }
 
 async function handleDelete(msg) {
-  if (!confirm(t('chat.deleteConfirm'))) return
+  if (!await confirm(t('chat.deleteConfirm'))) return
   try {
     await chatAPI.delete(msg.id)
     messages.value = messages.value.filter(m => m.id !== msg.id)
