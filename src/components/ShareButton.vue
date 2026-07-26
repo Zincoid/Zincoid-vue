@@ -5,7 +5,8 @@ import { useI18n } from '@/composables/useI18n'
 const props = defineProps({
   title: { type: String, default: '' },
   text: { type: String, default: '' },
-  url: { type: String, required: true }
+  url: { type: String, required: true },
+  image: { type: String, default: '' }
 })
 
 const { t } = useI18n()
@@ -14,6 +15,12 @@ const copied = ref(false)
 const wechatCopied = ref(false)
 let copyTimer = null
 let wechatCopyTimer = null
+
+function fullImageUrl(img) {
+  if (!img) return ''
+  if (img.startsWith('http')) return img
+  return `${location.origin}${img}`
+}
 
 function onDocClick(e) {
   if (open.value && !e.target.closest('.share-wrap')) {
@@ -32,7 +39,7 @@ onBeforeUnmount(() => {
 })
 
 function shareToQQ() {
-  const shareUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}`
+  const shareUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}&pics=${encodeURIComponent(fullImageUrl(props.image))}`
   window.open(shareUrl, '_blank', 'width=600,height=500')
   open.value = false
 }
@@ -44,7 +51,7 @@ function shareToX() {
 }
 
 function shareToQQZone() {
-  const shareUrl = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}`
+  const shareUrl = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}&pics=${encodeURIComponent(fullImageUrl(props.image))}`
   window.open(shareUrl, '_blank', 'width=600,height=500')
   open.value = false
 }

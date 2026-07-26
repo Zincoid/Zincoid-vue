@@ -491,9 +491,10 @@ async function saveEdit() {
       </div>
       <div class="detail__actions-right">
         <ShareButton
-          :title="repo.name"
+          :title="`${t('repo.pageTitle')} | ${repo.name} | ${repo.userNickname}`"
           :text="repo.description || ''"
           :url="shareUrl"
+          :image="repo.coverImage || ''"
         />
         <UploadProgress
           v-if="uploadState.total > 0"

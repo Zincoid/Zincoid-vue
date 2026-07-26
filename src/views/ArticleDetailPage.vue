@@ -299,9 +299,10 @@ watch(likeLiked, (liked) => {
       </div>
       </div>
       <ShareButton
-        :title="article.title"
+        :title="`${t('article.title')} | ${article.title} | ${article.userNickname}`"
         :text="article.summary || ''"
         :url="shareUrl"
+        :image="article.coverImage || ''"
       />
     </div>
 
