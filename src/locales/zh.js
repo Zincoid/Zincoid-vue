@@ -297,7 +297,10 @@ export default {
     receiveEmailRepoAccess: '仓库授权',
     receiveEmailRepoAccessDesc: '接收仓库访问申请被批准时通知',
     loadFailed: '加载设置失败',
-    saveFailed: '保存设置失败'
+    saveFailed: '保存设置失败',
+    resetConfig: '重置个人设置',
+    resetConfigDesc: '将所有个人设置恢复为默认值',
+    reset: '重置'
   },
   auth: {
     login: '登录',

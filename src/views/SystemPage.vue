@@ -5,6 +5,7 @@ import { useError } from '@/composables/useError'
 import { userAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { handle } = useError()
@@ -44,6 +45,24 @@ async function saveConfig(partial) {
     receiveEmail.value = payload.receiveEmail
     receiveEmailSys.value = payload.receiveEmailSys
     receiveEmailRepoAccess.value = payload.receiveEmailRepoAccess
+  } catch (e) {
+    handle(e, 'system.saveFailed')
+  } finally {
+    saving.value = false
+  }
+}
+
+async function resetConfig() {
+  saving.value = true
+  try {
+    await userAPI.updateUserConfig({
+      receiveEmail: false,
+      receiveEmailSys: false,
+      receiveEmailRepoAccess: true
+    })
+    receiveEmail.value = false
+    receiveEmailSys.value = false
+    receiveEmailRepoAccess.value = true
   } catch (e) {
     handle(e, 'system.saveFailed')
   } finally {
@@ -97,6 +116,19 @@ async function saveConfig(partial) {
             />
           </div>
         </div>
+      <div class="system__item">
+        <div class="system__info">
+          <span class="system__label">{{ t('system.resetConfig') }}</span>
+          <span class="system__desc">{{ t('system.resetConfigDesc') }}</span>
+        </div>
+        <button
+          class="btn btn--warning"
+          :disabled="saving"
+          @click="resetConfig"
+        >
+          <SvgIcon name="reset" />
+          {{ t('system.reset') }}</button>
+      </div>
       </div>
     </template>
   </div>
@@ -113,4 +145,6 @@ async function saveConfig(partial) {
 .system__info { display: flex; flex-direction: column; gap: 2px; }
 .system__label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
 .system__desc { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.btn--warning { border-color: #d97706; color: #d97706; background: transparent; }
+.btn--warning:hover { background: #d97706; color: white; }
 </style>

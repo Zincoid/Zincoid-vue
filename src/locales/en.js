@@ -297,7 +297,10 @@ export default {
     receiveEmailRepoAccess: 'Repo access',
     receiveEmailRepoAccessDesc: 'Receive notification emails when repo access requests are approved',
     loadFailed: 'Failed to load settings',
-    saveFailed: 'Failed to save settings'
+    saveFailed: 'Failed to save settings',
+    resetConfig: 'Reset Config',
+    resetConfigDesc: 'Restore all personal settings to defaults',
+    reset: 'Reset'
   },
   auth: {
     login: 'Login',
