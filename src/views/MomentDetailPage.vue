@@ -30,6 +30,7 @@ const origin = location.origin
 const editTextarea = ref(null)
 const moment = ref(null)
 const notFoundReason = ref(null)
+const parsedContent = computed(() => parseMentions(moment.value?.content))
 const shareUrl = computed(() => moment.value ? `${origin}${route.path}` : '')
 
 const comments = ref([])
