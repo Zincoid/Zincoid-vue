@@ -177,31 +177,31 @@ function toggleDrop() {
   top: calc(100% + 6px);
   right: 0;
   min-width: 180px;
-  padding: var(--spacing-xs);
+  padding: 4px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--rounded-md);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border-radius: var(--rounded-lg);
+  box-shadow: inset 0 0 0 1px var(--color-border);
   z-index: 100;
 }
 
 .share-drop__item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--spacing-sm) var(--spacing-sm);
   border: none;
   border-radius: var(--rounded-sm);
   background: transparent;
   color: var(--color-text);
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background .12s ease;
   text-align: left;
 }
 .share-drop__item:hover {
-  background: var(--color-bg-alt);
+  background: var(--color-primary-light);
 }
 
 .drop-enter-active,
