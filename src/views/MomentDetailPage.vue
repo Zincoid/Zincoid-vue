@@ -12,6 +12,7 @@ import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import ShareButton from '@/components/ShareButton.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -25,10 +26,11 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const mention = useMention()
+const origin = location.origin
 const editTextarea = ref(null)
 const moment = ref(null)
 const notFoundReason = ref(null)
-const parsedContent = computed(() => parseMentions(moment.value?.content))
+const shareUrl = computed(() => moment.value ? `${origin}${route.path}` : '')
 
 const comments = ref([])
 const commentPage = ref(1)
@@ -422,26 +424,33 @@ watch(likeLiked, (liked) => {
     </template>
 
     <div v-if="!editing" class="detail__actions-bar">
-      <LikeButton
-        :target-type="0"
-        :target-id="Number(route.params.id)"
-        :liked="likeLiked"
-        :count="likeCount"
-        @update:liked="likeLiked = $event"
-        @update:count="likeCount = $event"
-      />
-      <div v-if="moment.recentLikers?.length" class="recent-likers">
-        <router-link
-          v-for="liker in moment.recentLikers"
-          :key="liker.userId"
-          :to="`/members/${liker.userId}`"
-          class="recent-liker-link"
-          :title="liker.nickname"
-        >
-          <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
-          <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
-        </router-link>
+      <div class="detail__actions-left">
+        <LikeButton
+          :target-type="0"
+          :target-id="Number(route.params.id)"
+          :liked="likeLiked"
+          :count="likeCount"
+          @update:liked="likeLiked = $event"
+          @update:count="likeCount = $event"
+        />
+        <div v-if="moment.recentLikers?.length" class="recent-likers">
+          <router-link
+            v-for="liker in moment.recentLikers"
+            :key="liker.userId"
+            :to="`/members/${liker.userId}`"
+            class="recent-liker-link"
+            :title="liker.nickname"
+          >
+            <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
+            <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
+          </router-link>
+        </div>
       </div>
+      <ShareButton
+        :title="`${moment.userNickname} ${t('nav.moments')}`"
+        :text="(moment.content || '').slice(0, 100)"
+        :url="shareUrl"
+      />
     </div>
 
     <!-- Comments -->
@@ -498,7 +507,8 @@ watch(likeLiked, (liked) => {
 .detail__play-icon svg { margin-left: 4px; }
 .detail__audio-thumb { background: var(--color-bg-alt); color: var(--color-text-secondary); transition: background var(--transition-fast); }
 .detail__audio-thumb:hover { background: var(--color-border); }
-.detail__actions-bar { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.detail__actions-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
+.detail__actions-left { display: flex; align-items: center; gap: var(--spacing-md); }
 .recent-likers { display: flex; align-items: center; }
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }

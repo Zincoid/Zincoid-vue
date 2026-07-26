@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import ShareButton from '@/components/ShareButton.vue'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -19,7 +20,9 @@ const router = useRouter()
 const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
+const origin = location.origin
 const repo = ref(null)
+const shareUrl = computed(() => repo.value ? `${origin}${route.path}` : '')
 const loading = ref(true)
 const loadingDone = ref(false)
 const likeLiked = ref(false)
@@ -485,12 +488,19 @@ async function saveEdit() {
           </router-link>
         </div>
       </div>
-      <UploadProgress
-        v-if="uploadState.total > 0"
-        :total="uploadState.total"
-        :uploaded="uploadState.uploaded"
-        :current-progress="uploadState.currentProgress"
-      />
+      <div class="detail__actions-right">
+        <ShareButton
+          :title="repo.name"
+          :text="repo.description || ''"
+          :url="shareUrl"
+        />
+        <UploadProgress
+          v-if="uploadState.total > 0"
+          :total="uploadState.total"
+          :uploaded="uploadState.uploaded"
+          :current-progress="uploadState.currentProgress"
+        />
+      </div>
     </div>
     <CommentSection
       :comments="comments"
@@ -640,6 +650,7 @@ async function saveEdit() {
   flex-wrap: wrap;
 }
 .detail__actions-left { display: flex; align-items: center; gap: var(--spacing-md); }
+.detail__actions-right { display: flex; align-items: center; gap: var(--spacing-md); }
 .recent-likers { display: flex; align-items: center; }
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }

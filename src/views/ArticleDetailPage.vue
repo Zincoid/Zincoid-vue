@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
@@ -9,6 +9,7 @@ import { articleAPI, commentAPI, likeAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import LikeButton from '@/components/LikeButton.vue'
+import ShareButton from '@/components/ShareButton.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
@@ -19,8 +20,10 @@ const { getMessage } = useError()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
 const auth = useAuthStore()
+const origin = location.origin
 const article = ref(null)
 const notFoundReason = ref(null)
+const shareUrl = computed(() => article.value ? `${origin}${route.path}` : '')
 const comments = ref([])
 const commentPage = ref(1)
 const commentPages = ref(1)
@@ -272,15 +275,16 @@ watch(likeLiked, (liked) => {
     <div class="article-body markdown-body" v-html="article.contentHtml || ''"></div>
 
     <div class="detail__actions-bar">
-      <LikeButton
-        :target-type="1"
-        :target-id="Number(route.params.id)"
-        :liked="likeLiked"
-        :count="likeCount"
-        @update:liked="likeLiked = $event"
-        @update:count="likeCount = $event"
-      />
-      <div v-if="article.recentLikers?.length" class="recent-likers">
+      <div class="detail__actions-left">
+        <LikeButton
+          :target-type="1"
+          :target-id="Number(route.params.id)"
+          :liked="likeLiked"
+          :count="likeCount"
+          @update:liked="likeLiked = $event"
+          @update:count="likeCount = $event"
+        />
+        <div v-if="article.recentLikers?.length" class="recent-likers">
         <router-link
           v-for="liker in article.recentLikers"
           :key="liker.userId"
@@ -292,6 +296,12 @@ watch(likeLiked, (liked) => {
           <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
         </router-link>
       </div>
+      </div>
+      <ShareButton
+        :title="article.title"
+        :text="article.summary || ''"
+        :url="shareUrl"
+      />
     </div>
 
     <CommentSection
@@ -352,7 +362,8 @@ watch(likeLiked, (liked) => {
 .article-body :deep(pre) { margin: var(--spacing-lg) 0; }
 
 .article-actions { display: flex; gap: var(--spacing-sm); align-items: center; }
-.detail__actions-bar { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-2xl); }
+.detail__actions-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-2xl); }
+.detail__actions-left { display: flex; align-items: center; gap: var(--spacing-md); }
 .recent-likers { display: flex; align-items: center; }
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }

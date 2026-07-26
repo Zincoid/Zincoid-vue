@@ -431,6 +431,15 @@ export default {
     markRead: 'Mark all read',
     deleteAll: 'Clear all'
   },
+  share: {
+    forward: 'Forward',
+    qq: 'QQ',
+    qqZone: 'QZone',
+    weibo: 'Weibo',
+    wechat: 'WeChat',
+    copyLink: 'Copy Link',
+    copied: 'Copied'
+  },
   common: {
     loading: 'Loading...',
     loadMore: 'Load more...',

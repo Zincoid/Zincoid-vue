@@ -431,6 +431,15 @@ export default {
     markRead: '全部已读',
     deleteAll: '清除全部'
   },
+  share: {
+    forward: '转发',
+    qq: 'QQ',
+    qqZone: 'QQ空间',
+    weibo: '微博',
+    wechat: '微信',
+    copyLink: '复制链接',
+    copied: '已复制'
+  },
   common: {
     loading: '加载中...',
     loadMore: '加载更多...',
