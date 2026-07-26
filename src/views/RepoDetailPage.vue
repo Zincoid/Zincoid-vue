@@ -491,7 +491,7 @@ async function saveEdit() {
       </div>
       <div class="detail__actions-right">
         <ShareButton
-          :title="`${t('repo.pageTitle')} | ${repo.name} | ${repo.userNickname}`"
+          :title="`${t('repo.pageTitleSingle')} | ${repo.name} | ${repo.userNickname}`"
           :text="repo.description || ''"
           :url="shareUrl"
           :image="repo.coverImage || ''"

@@ -19,6 +19,7 @@ export default {
   },
   moment: {
     title: '动态',
+    titleSingle: '动态',
     subtitle: '社区最新动态',
     empty: '暂无动态。',
     notFound: '动态不存在。',
@@ -52,6 +53,7 @@ export default {
   },
   article: {
     title: '文章',
+    titleSingle: '文章',
     subtitle: '长文和教程',
     empty: '暂无文章。',
     notFound: '文章不存在。',
@@ -185,6 +187,7 @@ export default {
   },
   repo: {
     pageTitle: '仓库',
+    pageTitleSingle: '仓库',
     placeholder: '代码仓库、媒体集与文件集',
     all: '全部',
     code: '代码',

@@ -19,6 +19,7 @@ export default {
   },
   moment: {
     title: 'Moments',
+    titleSingle: 'Moment',
     subtitle: 'Latest community updates',
     empty: 'No moments yet.',
     notFound: 'Moment not found.',
@@ -52,6 +53,7 @@ export default {
   },
   article: {
     title: 'Articles',
+    titleSingle: 'Article',
     subtitle: 'Long-form thoughts and tutorials',
     empty: 'No articles yet.',
     notFound: 'Article not found.',
@@ -179,6 +181,7 @@ export default {
   },
   repo: {
     pageTitle: 'Repos',
+    pageTitleSingle: 'Repo',
     placeholder: 'Code repos, media & file collections',
     all: 'All',
     code: 'Code',

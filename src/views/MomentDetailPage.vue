@@ -449,7 +449,7 @@ watch(likeLiked, (liked) => {
         </div>
       </div>
       <ShareButton
-        :title="`${t('nav.moments')} | ${moment.userNickname}`"
+        :title="`${t('moment.titleSingle')} | ${moment.userNickname}`"
         :text="(moment.content || '').slice(0, 100)"
         :url="shareUrl"
         :image="moment.images?.[0] || ''"
