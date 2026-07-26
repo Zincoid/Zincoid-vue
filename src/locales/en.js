@@ -437,6 +437,7 @@ export default {
     qqZone: 'QZone',
     weibo: 'Weibo',
     wechat: 'WeChat',
+    x: 'X',
     copyLink: 'Copy Link',
     copied: 'Copied'
   },

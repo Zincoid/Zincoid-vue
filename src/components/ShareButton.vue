@@ -37,6 +37,12 @@ function shareToQQ() {
   open.value = false
 }
 
+function shareToX() {
+  const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(props.url)}&text=${encodeURIComponent(props.title)}`
+  window.open(shareUrl, '_blank', 'width=600,height=400')
+  open.value = false
+}
+
 function shareToQQZone() {
   const shareUrl = `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}`
   window.open(shareUrl, '_blank', 'width=600,height=500')
@@ -108,6 +114,14 @@ function toggleDrop() {
             <circle cx="12" cy="12" r="4"/>
           </svg>
           <span>{{ t('share.weibo') }}</span>
+        </button>
+        <button class="share-drop__item" @click="shareToX">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4l11.73 16h4.27L8.27 4H4z"/>
+            <path d="M4 20l6.5-8"/>
+            <path d="M18 4l-6.5 8"/>
+          </svg>
+          <span>{{ t('share.x') }}</span>
         </button>
         <button class="share-drop__item" @click="copyLink">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

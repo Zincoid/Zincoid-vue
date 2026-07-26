@@ -437,6 +437,7 @@ export default {
     qqZone: 'QQ空间',
     weibo: '微博',
     wechat: '微信',
+    x: 'X',
     copyLink: '复制链接',
     copied: '已复制'
   },
