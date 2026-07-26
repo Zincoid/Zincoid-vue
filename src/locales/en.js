@@ -300,6 +300,7 @@ export default {
     saveFailed: 'Failed to save settings',
     resetConfig: 'Reset Config',
     resetConfigDesc: 'Restore all personal settings to defaults',
+    resetConfigConfirm: 'Reset all personal settings to defaults?',
     reset: 'Reset'
   },
   auth: {

@@ -300,6 +300,7 @@ export default {
     saveFailed: '保存设置失败',
     resetConfig: '重置个人设置',
     resetConfigDesc: '将所有个人设置恢复为默认值',
+    resetConfigConfirm: '确定要重置所有个人设置为默认值吗？',
     reset: '重置'
   },
   auth: {

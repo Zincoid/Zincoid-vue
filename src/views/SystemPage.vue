@@ -53,6 +53,7 @@ async function saveConfig(partial) {
 }
 
 async function resetConfig() {
+  if (!confirm(t('system.resetConfigConfirm'))) return
   saving.value = true
   try {
     await userAPI.updateUserConfig({
