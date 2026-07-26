@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 
 const props = defineProps({
@@ -15,8 +15,6 @@ const wechatCopied = ref(false)
 let copyTimer = null
 let wechatCopyTimer = null
 
-const isMobile = ref(false)
-
 function onDocClick(e) {
   if (open.value && !e.target.closest('.share-wrap')) {
     open.value = false
@@ -24,7 +22,6 @@ function onDocClick(e) {
 }
 
 onMounted(() => {
-  isMobile.value = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent)
   document.addEventListener('click', onDocClick)
 })
 
@@ -33,20 +30,6 @@ onBeforeUnmount(() => {
   if (wechatCopyTimer) clearTimeout(wechatCopyTimer)
   document.removeEventListener('click', onDocClick)
 })
-
-const supportsWebShare = computed(() => {
-  return isMobile.value && typeof navigator !== 'undefined' && !!navigator.share
-})
-
-async function doWebShare() {
-  try {
-    await navigator.share({
-      title: props.title,
-      text: props.text,
-      url: props.url
-    })
-  } catch {}
-}
 
 function shareToQQ() {
   const shareUrl = `https://connect.qq.com/widget/shareqq/index.html?url=${encodeURIComponent(props.url)}&title=${encodeURIComponent(props.title)}&summary=${encodeURIComponent(props.text)}`
@@ -90,7 +73,7 @@ function toggleDrop() {
 </script>
 
 <template>
-  <div class="share-wrap" v-if="!supportsWebShare" @click.stop>
+  <div class="share-wrap" @click.stop>
     <button class="share-btn" :class="{ 'share-btn--open': open }" @click="toggleDrop" :title="t('share.forward')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -136,13 +119,6 @@ function toggleDrop() {
       </div>
     </Transition>
   </div>
-  <button v-else class="share-btn" @click.stop="doWebShare" :title="t('share.forward')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-    </svg>
-  </button>
 </template>
 
 <style scoped>
