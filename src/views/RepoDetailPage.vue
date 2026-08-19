@@ -86,6 +86,10 @@ const canEdit = () => isOwner() || auth.isAdmin
 // ── Media viewer ──
 const viewerSrc = ref('')
 const viewerVisible = ref(false)
+const mediaLoaded = ref({})
+function onMediaLoad(id) {
+  mediaLoaded.value[id] = true
+}
 function previewItem(url) {
   viewerSrc.value = url
   viewerVisible.value = true
@@ -410,6 +414,7 @@ async function saveEdit() {
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid">
           <div v-for="(item, index) in repo.items" :key="item.id" class="item-card"
+            :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
             :draggable="canEdit()"
             @dragstart="canEdit() && onDragStart(index, $event)"
             @dragover="canEdit() && onDragOver(index, $event)"
@@ -418,7 +423,8 @@ async function saveEdit() {
               <SvgIcon v-if="canEdit()" name="drag" />
               <SvgIcon v-else name="chevron-right" />
             </div>
-            <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy" @click="previewItem(item.url)" />
+            <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
+              @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
             <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
               <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
               <div class="item-card__play-icon">
@@ -765,6 +771,7 @@ async function saveEdit() {
 .item-card__handle { position: absolute; top: 6px; left: 6px; z-index: 2; color: #fff; display: flex; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
 .item-card__thumb { width: 100%; height: auto; display: block; }
+.item-card--pending { display: none; }
 .item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
 .item-card__video video { width: 100%; height: auto; display: block; opacity: 0.7; }
 .item-card__play-icon { position: absolute; width: 40px; height: 40px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: white; }
