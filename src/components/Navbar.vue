@@ -28,6 +28,8 @@ const notifPage = ref(1)
 const notifPages = ref(1)
 const notifTotal = ref(0)
 const notifLoadingMore = ref(false)
+const notifSize = parseInt(getConfig('page_size', '5'))
+let notifVersion = 0
 
 function fetchUnreadCount() {
   if (!auth.isLoggedIn) return
@@ -41,8 +43,8 @@ function fetchNotifications() {
   notifLoading.value = true
   notifLoadingDone.value = false
   notifPage.value = 1
-  const size = parseInt(getConfig('page_size', '5'))
-  notificationAPI.getList(1, size).then(res => {
+  notifVersion++
+  notificationAPI.getList(1, notifSize).then(res => {
     const data = res.data?.data
     notifications.value = data?.records ?? []
     notifPages.value = data?.pages ?? 1
@@ -55,9 +57,10 @@ function fetchNotifications() {
 function loadMore() {
   if (notifLoadingMore.value || notifPage.value >= notifPages.value) return
   notifLoadingMore.value = true
+  const version = ++notifVersion
   const nextPage = notifPage.value + 1
-  const size = parseInt(getConfig('page_size', '5'))
-  notificationAPI.getList(nextPage, size).then(res => {
+  notificationAPI.getList(nextPage, notifSize).then(res => {
+    if (version !== notifVersion) return
     const data = res.data?.data
     notifications.value.push(...(data?.records ?? []))
     notifPage.value = nextPage
@@ -66,6 +69,21 @@ function loadMore() {
   }).catch(() => {}).finally(() => {
     notifLoadingMore.value = false
   })
+}
+
+function alignNotificationsTail() {
+  const page = Math.min(notifPage.value, Math.max(notifPages.value, 1))
+  if (page <= 0) return
+  const version = ++notifVersion
+  notificationAPI.getList(page, notifSize).then(res => {
+    if (version !== notifVersion) return
+    const data = res.data?.data
+    notifPage.value = data?.page || page
+    notifPages.value = data?.pages ?? 1
+    notifTotal.value = data?.total ?? 0
+    const prefix = (page - 1) * notifSize
+    notifications.value = [...notifications.value.slice(0, prefix), ...(data?.records ?? [])]
+  }).catch(() => {})
 }
 
 watch(() => auth.isLoggedIn, (val) => {
@@ -106,6 +124,9 @@ function deleteOne(n) {
   notificationAPI.delete(n.id).then(() => {
     notifications.value = notifications.value.filter(x => x.id !== n.id)
     if (!n.isRead) unreadCount.value = Math.max(0, unreadCount.value - 1)
+    notifTotal.value = Math.max(0, notifTotal.value - 1)
+    notifPages.value = Math.max(1, Math.ceil(notifTotal.value / notifSize))
+    alignNotificationsTail()
   }).catch(() => {})
 }
 
@@ -121,6 +142,10 @@ function deleteAll() {
   notificationAPI.deleteAll().then(() => {
     notifications.value = []
     unreadCount.value = 0
+    notifPage.value = 1
+    notifPages.value = 1
+    notifTotal.value = 0
+    notifVersion++
   }).catch(() => {})
 }
 
