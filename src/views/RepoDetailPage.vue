@@ -771,7 +771,8 @@ async function saveEdit() {
 .item-card__handle { position: absolute; top: 6px; left: 6px; z-index: 2; color: #fff; display: flex; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
 .item-card__thumb { width: 100%; height: auto; display: block; }
-.item-card--pending { display: none; }
+.item-card--pending { opacity: 0; min-height: 200px; }
+.item-card--pending .item-card__thumb { visibility: hidden; }
 .item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
 .item-card__video video { width: 100%; height: auto; display: block; opacity: 0.7; }
 .item-card__play-icon { position: absolute; width: 40px; height: 40px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: white; }
