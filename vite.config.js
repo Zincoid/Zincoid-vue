@@ -19,6 +19,10 @@ export default defineConfig({
       '/uploads': {
         target: 'http://localhost:8081',
         changeOrigin: true
+      },
+      '/thumbnails': {
+        target: 'http://localhost:8081',
+        changeOrigin: true
       }
     }
   }
