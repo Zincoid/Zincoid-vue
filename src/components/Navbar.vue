@@ -28,7 +28,6 @@ const notifPage = ref(1)
 const notifPages = ref(1)
 const notifTotal = ref(0)
 const notifLoadingMore = ref(false)
-const notifSize = parseInt(getConfig('page_size', '5'))
 let notifVersion = 0
 
 function fetchUnreadCount() {
@@ -44,7 +43,7 @@ function fetchNotifications() {
   notifLoadingDone.value = false
   notifPage.value = 1
   notifVersion++
-  notificationAPI.getList(1, notifSize).then(res => {
+  notificationAPI.getList(1, parseInt(getConfig('page_size', '5'))).then(res => {
     const data = res.data?.data
     notifications.value = data?.records ?? []
     notifPages.value = data?.pages ?? 1
@@ -59,7 +58,7 @@ function loadMore() {
   notifLoadingMore.value = true
   const version = ++notifVersion
   const nextPage = notifPage.value + 1
-  notificationAPI.getList(nextPage, notifSize).then(res => {
+  notificationAPI.getList(nextPage, parseInt(getConfig('page_size', '5'))).then(res => {
     if (version !== notifVersion) return
     const data = res.data?.data
     notifications.value.push(...(data?.records ?? []))
@@ -75,13 +74,13 @@ function alignNotificationsTail() {
   const page = Math.min(notifPage.value, Math.max(notifPages.value, 1))
   if (page <= 0) return
   const version = ++notifVersion
-  notificationAPI.getList(page, notifSize).then(res => {
+  notificationAPI.getList(page, parseInt(getConfig('page_size', '5'))).then(res => {
     if (version !== notifVersion) return
     const data = res.data?.data
     notifPage.value = data?.page || page
     notifPages.value = data?.pages ?? 1
     notifTotal.value = data?.total ?? 0
-    const prefix = (page - 1) * notifSize
+    const prefix = (page - 1) * parseInt(getConfig('page_size', '5'))
     notifications.value = [...notifications.value.slice(0, prefix), ...(data?.records ?? [])]
   }).catch(() => {})
 }
@@ -125,7 +124,7 @@ function deleteOne(n) {
     notifications.value = notifications.value.filter(x => x.id !== n.id)
     if (!n.isRead) unreadCount.value = Math.max(0, unreadCount.value - 1)
     notifTotal.value = Math.max(0, notifTotal.value - 1)
-    notifPages.value = Math.max(1, Math.ceil(notifTotal.value / notifSize))
+    notifPages.value = Math.max(1, Math.ceil(notifTotal.value / Math.max(1, parseInt(getConfig('page_size', '5')))))
     alignNotificationsTail()
   }).catch(() => {})
 }
