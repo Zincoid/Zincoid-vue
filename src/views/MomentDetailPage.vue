@@ -60,7 +60,7 @@ const uploadState = ref({
   currentProgress: 0
 })
 
-function previewImage(src) {
+function previewMedia(src) {
   viewerSrc.value = src
   viewerVisible.value = true
 }
@@ -80,7 +80,7 @@ function onEditInput(e) {
 function startEdit() {
   editContent.value = moment.value.content || ''
   editVisibility.value = moment.value.visibility != null ? moment.value.visibility : 0
-  editKeepImages.value = moment.value.images ? [...moment.value.images] : []
+  editKeepImages.value = moment.value.urls ? [...moment.value.urls] : []
   editNewFiles.value = []
   editNewPreviews.value = []
   editing.value = true
@@ -138,11 +138,11 @@ async function saveEdit() {
     }
     await momentAPI.update(route.params.id, {
       content: editContent.value.trim(),
-      images: [...editKeepImages.value, ...newUrls],
+      urls: [...editKeepImages.value, ...newUrls],
       visibility: editVisibility.value
     })
     moment.value.content = editContent.value.trim()
-    moment.value.images = [...editKeepImages.value, ...newUrls]
+    moment.value.urls = [...editKeepImages.value, ...newUrls]
     moment.value.visibility = editVisibility.value
     editing.value = false
   } catch (err) {
@@ -396,20 +396,20 @@ watch(likeLiked, (liked) => {
         </template>
       </p>
 
-      <div v-if="moment.images?.length" class="detail__medias">
-        <template v-for="(img, i) in moment.images" :key="i">
+      <div v-if="moment.urls?.length" class="detail__medias">
+        <template v-for="(url, i) in moment.urls" :key="i">
           <img
-            v-if="mediaType(img) === 'image'"
-            :src="img"
+            v-if="mediaType(url) === 'image'"
+            :src="moment.thumbs?.[i]"
             alt=""
-            @click="previewImage(img)"
+            @click="previewMedia(url)"
           />
           <div
-            v-else-if="mediaType(img) === 'video'"
+            v-else-if="mediaType(url) === 'video'"
             class="detail__media-thumb"
-            @click="previewImage(img)"
+            @click="previewMedia(url)"
           >
-            <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+            <video :src="url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
             <div class="detail__play-icon">
               <SvgIcon name="play" :size="40" />
             </div>
@@ -417,7 +417,7 @@ watch(likeLiked, (liked) => {
           <div
             v-else
             class="detail__media-thumb detail__audio-thumb"
-            @click="previewImage(img)"
+            @click="previewMedia(url)"
           >
             <div class="detail__audio-icon">
               <SvgIcon name="audio" :size="36" />
@@ -454,7 +454,7 @@ watch(likeLiked, (liked) => {
         :title="`${t('moment.titleSingle')} | ${moment.userNickname}`"
         :text="(moment.content || '').slice(0, 100)"
         :url="shareUrl"
-        :image="moment.images?.[0] || ''"
+        :image="moment.urls?.[0] || ''"
       />
     </div>
 

@@ -418,7 +418,7 @@ async function saveEdit() {
               <SvgIcon v-if="canEdit()" name="drag" />
               <SvgIcon v-else name="chevron-right" />
             </div>
-            <img v-if="mediaType(item.url) === 'image'" :src="item.url" class="item-card__thumb" loading="lazy" @click="previewItem(item.url)" />
+            <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy" @click="previewItem(item.url)" />
             <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
               <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
               <div class="item-card__play-icon">

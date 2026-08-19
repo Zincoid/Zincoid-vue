@@ -19,7 +19,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 <template>
   <div class="repo-card">
     <div class="repo-card__cover">
-      <img v-if="repo.coverImage" :src="repo.coverImage" alt="" />
+      <img v-if="repo.coverThumb" :src="repo.coverThumb" alt="" loading="lazy" />
       <div v-else class="repo-card__cover-placeholder">
         <SvgIcon name="folder" :size="32" />
       </div>

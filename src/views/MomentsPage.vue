@@ -118,7 +118,7 @@ async function submitMoment() {
     }
     await momentAPI.create({
       content: newContent.value.trim(),
-      images: urls,
+      urls: urls,
       visibility: newVisibility.value
     })
     newContent.value = ''

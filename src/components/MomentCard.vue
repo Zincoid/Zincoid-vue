@@ -19,16 +19,21 @@ const viewerSrc = ref('')
 const viewerVisible = ref(false)
 const viewCount = ref(props.moment.viewCount || 0)
 
-async function previewImage(src) {
+async function previewMedia(src) {
   viewerSrc.value = src
   viewerVisible.value = true
   viewCount.value++
   momentAPI.addView(props.moment.id).catch(() => {})
 }
 
-const images = computed(() => {
-  if (!props.moment.images) return []
-  return props.moment.images
+const urls = computed(() => {
+  if (!props.moment.urls) return []
+  return props.moment.urls
+})
+
+const thumbs = computed(() => {
+  if (!props.moment.thumbs) return []
+  return props.moment.thumbs
 })
 
 const parsedContent = computed(() => parseMentions(props.moment.content))
@@ -81,22 +86,22 @@ function goUser(e) {
       </template>
     </p>
 
-    <div v-if="images.length" class="moment-card__medias">
-      <template v-for="(img, i) in images" :key="i">
+    <div v-if="urls.length" class="moment-card__medias">
+      <template v-for="(url, i) in urls" :key="i">
         <img
-          v-if="mediaType(img) === 'image'"
-          :src="img"
+          v-if="mediaType(url) === 'image'"
+          :src="thumbs[i]"
           class="moment-card__media"
           loading="lazy"
           alt=""
-          @click.stop="previewImage(img)"
+          @click.stop="previewMedia(url)"
         />
         <div
-          v-else-if="mediaType(img) === 'video'"
+          v-else-if="mediaType(url) === 'video'"
           class="moment-card__media moment-card__video-thumb"
-          @click.stop="previewImage(img)"
+          @click.stop="previewMedia(url)"
         >
-          <video :src="img" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+          <video :src="url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
           <div class="moment-card__play-icon">
             <SvgIcon name="play" :size="32" />
           </div>
@@ -104,7 +109,7 @@ function goUser(e) {
         <div
           v-else
           class="moment-card__media moment-card__audio-thumb"
-          @click.stop="previewImage(img)"
+          @click.stop="previewMedia(url)"
         >
           <div class="moment-card__audio-icon">
             <SvgIcon name="audio" :size="28" />

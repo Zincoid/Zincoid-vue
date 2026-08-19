@@ -17,8 +17,8 @@ function goDetail(id) {
 
 <template>
   <article class="article-card" @click="goDetail(article.id)">
-    <div v-if="article.coverImage" class="article-card__cover">
-      <img :src="article.coverImage" alt="" loading="lazy" />
+    <div v-if="article.coverThumb" class="article-card__cover">
+      <img :src="article.coverThumb" alt="" loading="lazy" />
     </div>
     <div class="article-card__body">
       <div class="article-card__header">
