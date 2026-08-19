@@ -558,14 +558,14 @@ async function saveEdit() {
               </button>
             </div>
           </div>
+          <button v-if="itemsPage < itemsPages" class="item-row item-row--load-more" @click="loadMoreItems" :disabled="itemsLoadingMore">
+            <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+            <template v-else>
+              <SvgIcon name="chevron-down" :size="16" />
+              <span>{{ t('common.loadMore') }}</span>
+            </template>
+          </button>
         </div>
-        <button v-if="itemsPage < itemsPages" class="load-more-row" @click="loadMoreItems" :disabled="itemsLoadingMore">
-          <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
-          <template v-else>
-            <SvgIcon name="chevron-down" :size="16" />
-            <span>{{ t('common.loadMore') }}</span>
-          </template>
-        </button>
       </template>
 
     <div class="detail__actions-bar">
@@ -919,31 +919,18 @@ async function saveEdit() {
   animation: item-card-spin 0.8s linear infinite;
 }
 
-.load-more-row {
-  display: flex;
-  align-items: center;
+.item-row--load-more {
   justify-content: center;
   gap: var(--spacing-sm);
-  width: 100%;
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--color-surface);
-  border: 1px dashed var(--color-border);
-  border-radius: var(--rounded-md);
+  min-height: 40px;
   color: var(--color-text-secondary);
   font-size: var(--text-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
   font-family: inherit;
+  cursor: pointer;
 }
-.load-more-row:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  border-style: solid;
-  background: var(--color-primary-light);
-}
-.load-more-row:disabled { cursor: default; opacity: 0.7; }
-.load-more-row .load-more-cube__spinner { width: 18px; height: 18px; }
+.item-row--load-more:hover { padding-left: var(--spacing-lg); color: var(--color-primary); }
+.item-row--load-more:disabled { cursor: default; opacity: 0.7; }
+.item-row--load-more .load-more-cube__spinner { width: 18px; height: 18px; }
 .item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
 .item-card__video video { width: 100%; height: auto; display: block; opacity: 0.7; }
 .item-card__play-icon { position: absolute; width: 40px; height: 40px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: white; }
