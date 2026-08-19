@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useAuthStore } from '@/stores/auth'
+import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
 import { repoAPI, fileAPI, commentAPI } from '@/api'
 import { formatDate } from '@/utils/format'
@@ -23,6 +24,7 @@ const { t } = useI18n()
 const { getMessage } = useError()
 const { confirm } = useConfirm()
 const auth = useAuthStore()
+const { load: loadConfig, get: getConfig } = useConfig()
 const origin = location.origin
 const repo = ref(null)
 const shareUrl = computed(() => repo.value ? `${origin}${route.path}` : '')
@@ -37,6 +39,36 @@ const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
 
+// ── Items pagination (load more pattern) ──
+const itemsPage = ref(1)
+const itemsPages = ref(1)
+const itemsTotal = ref(0)
+const itemsLoadingMore = ref(false)
+const itemsSize = parseInt(getConfig('page_size', '10'))
+
+async function fetchItems(page) {
+  const res = await repoAPI.getItems(route.params.id, page, itemsSize)
+  const data = res.data.data
+  if (page === 1) {
+    repo.value.items = data.records || []
+  } else {
+    repo.value.items = [...(repo.value.items || []), ...(data.records || [])]
+  }
+  itemsPage.value = data.page || page
+  itemsPages.value = data.pages || 1
+  itemsTotal.value = data.total || 0
+}
+
+async function loadMoreItems() {
+  if (itemsLoadingMore.value || itemsPage.value >= itemsPages.value) return
+  itemsLoadingMore.value = true
+  try {
+    await fetchItems(itemsPage.value + 1)
+  } catch { /* ignore */ } finally {
+    itemsLoadingMore.value = false
+  }
+}
+
 async function fetchRepo() {
   loading.value = true
   loadingDone.value = false
@@ -45,7 +77,19 @@ async function fetchRepo() {
     repo.value = res.data.data
     likeLiked.value = repo.value.isLiked || false
     likeCount.value = repo.value.likeCount || 0
-    const cRes = await commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value)
+const [cRes, iRes] = await Promise.all([
+      commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value),
+      !repo.value.restricted && repo.value.type !== 0 ? repoAPI.getItems(route.params.id, 1, itemsSize) : Promise.resolve(null)
+    ])
+    if (iRes) {
+      const data = iRes.data.data
+      repo.value.items = data.records || []
+      itemsPage.value = data.page || 1
+      itemsPages.value = data.pages || 1
+      itemsTotal.value = data.total || 0
+    } else {
+      repo.value.items = []
+    }
     comments.value = cRes.data.data.records || []
     commentPages.value = cRes.data.data.pages || 1
     commentTotal.value = cRes.data.data.total || 0
@@ -236,13 +280,15 @@ function onDragOver(index, e) {
 async function onDrop(index, e) {
   e.preventDefault()
   if (dragIndex === null || dragIndex === index) return
+  const dragged = repo.value.items[dragIndex]
+  const target = repo.value.items[index]
   const items = [...repo.value.items]
-  const dragged = items.splice(dragIndex, 1)[0]
-  items.splice(index, 0, dragged)
+  items[dragIndex] = target
+  items[index] = dragged
   const oldItems = repo.value.items
   repo.value.items = items
   try {
-    await repoAPI.sortItems(repo.value.id, items.map(i => i.id))
+    await repoAPI.swapItems(repo.value.id, dragged.id, target.id)
   } catch {
     repo.value.items = oldItems
   }
@@ -310,6 +356,9 @@ async function saveEdit() {
       visibility: editForm.value.visibility
     })
     repo.value = res.data.data
+    if (!repo.value.restricted && repo.value.type !== 0) {
+      await fetchItems(1)
+    }
     showEdit.value = false
   } catch (err) {
     editError.value = getMessage(err, 'common.failed')
@@ -439,6 +488,13 @@ async function saveEdit() {
               <SvgIcon name="close" :size="10" />
             </button>
           </div>
+          <button v-if="itemsPage < itemsPages" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
+            <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+            <template v-else>
+              <SvgIcon name="chevron-down" :size="20" />
+              <span>{{ t('common.loadMore') }}</span>
+            </template>
+          </button>
         </div>
       </template>
 
@@ -473,6 +529,13 @@ async function saveEdit() {
             </div>
           </div>
         </div>
+        <button v-if="itemsPage < itemsPages" class="load-more-row" @click="loadMoreItems" :disabled="itemsLoadingMore">
+          <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+          <template v-else>
+            <SvgIcon name="chevron-down" :size="16" />
+            <span>{{ t('common.loadMore') }}</span>
+          </template>
+        </button>
       </template>
 
     <div class="detail__actions-bar">
@@ -771,8 +834,83 @@ async function saveEdit() {
 .item-card__handle { position: absolute; top: 6px; left: 6px; z-index: 2; color: #fff; display: flex; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
 .item-card__thumb { width: 100%; height: auto; display: block; }
-.item-card--pending { opacity: 0; min-height: 200px; }
+.item-card--pending { background: var(--color-bg-alt); min-height: 200px; }
 .item-card--pending .item-card__thumb { visibility: hidden; }
+.item-card--pending::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: item-card-spin 0.8s linear infinite;
+}
+@keyframes item-card-spin { to { transform: rotate(360deg); } }
+
+.load-more-cube {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  min-height: 200px;
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--rounded-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+.load-more-cube:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-style: solid;
+  background: var(--color-primary-light);
+  transform: scale(1.02);
+}
+.load-more-cube:disabled { cursor: default; opacity: 0.7; }
+.load-more-cube__spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: item-card-spin 0.8s linear infinite;
+}
+
+.load-more-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--rounded-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+.load-more-row:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-style: solid;
+  background: var(--color-primary-light);
+}
+.load-more-row:disabled { cursor: default; opacity: 0.7; }
+.load-more-row .load-more-cube__spinner { width: 18px; height: 18px; }
 .item-card__video { position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; }
 .item-card__video video { width: 100%; height: auto; display: block; opacity: 0.7; }
 .item-card__play-icon { position: absolute; width: 40px; height: 40px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; color: white; }
