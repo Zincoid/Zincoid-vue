@@ -40,6 +40,7 @@ const commentTotal = ref(0)
 const commentSize = ref(10)
 
 // ── Items pagination (load more pattern) ──
+let itemsVersion = 0
 const itemsPage = ref(1)
 const itemsPages = ref(1)
 const itemsTotal = ref(0)
@@ -47,7 +48,9 @@ const itemsLoadingMore = ref(false)
 const itemsSize = parseInt(getConfig('page_size', '10'))
 
 async function fetchItems(page) {
+  const version = ++itemsVersion
   const res = await repoAPI.getItems(route.params.id, page, itemsSize)
+  if (version !== itemsVersion) return
   const data = res.data.data
   if (page === 1) {
     repo.value.items = data.records || []
@@ -70,6 +73,7 @@ async function loadMoreItems() {
 }
 
 async function fetchRepo() {
+  itemsVersion++
   loading.value = true
   loadingDone.value = false
   try {
@@ -241,6 +245,7 @@ async function handleItemFiles(e) {
     itemError.value = getMessage(err, 'common.uploadFailed')
     setTimeout(() => itemError.value = '', 4000)
   } finally {
+    try { await alignItemsTail() } catch { /* ignore */ }
     uploading.value = false
     e.target.value = ''
     uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
@@ -253,13 +258,30 @@ async function deleteItem(itemId) {
   itemError.value = ''
   try {
     await repoAPI.deleteItem(repo.value.id, itemId)
+    itemsVersion++
     repo.value.items = repo.value.items.filter(i => i.id !== itemId)
     itemsTotal.value = Math.max(0, itemsTotal.value - 1)
     itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
+    await alignItemsTail()
   } catch (err) {
     itemError.value = getMessage(err, 'common.failed')
     setTimeout(() => itemError.value = '', 4000)
   }
+}
+
+async function alignItemsTail() {
+  const items = repo.value.items || []
+  const page = Math.min(itemsPage.value, Math.max(itemsPages.value, 1))
+  if (page <= 0) return
+  const version = ++itemsVersion
+  const res = await repoAPI.getItems(route.params.id, page, itemsSize)
+  if (version !== itemsVersion) return
+  const data = res.data.data
+  itemsPage.value = data.page || page
+  itemsPages.value = data.pages || 1
+  itemsTotal.value = data.total || 0
+  const prefix = (page - 1) * itemsSize
+  repo.value.items = [...items.slice(0, prefix), ...(data.records || [])]
 }
 
 // ── Drag sort ──
