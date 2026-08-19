@@ -230,7 +230,11 @@ async function handleItemFiles(e) {
         }
       })
       const { data: itemData } = await repoAPI.addItem(repo.value.id, { fileId: fileData.data.id, name: files[i].name })
-      repo.value.items = [...(repo.value.items || []), itemData.data]
+      itemsTotal.value += 1
+      itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
+      if (itemsPage.value * itemsSize >= itemsTotal.value) {
+        repo.value.items = [...(repo.value.items || []), itemData.data]
+      }
       uploadState.value.uploaded = i + 1
     }
   } catch (err) {
@@ -250,6 +254,8 @@ async function deleteItem(itemId) {
   try {
     await repoAPI.deleteItem(repo.value.id, itemId)
     repo.value.items = repo.value.items.filter(i => i.id !== itemId)
+    itemsTotal.value = Math.max(0, itemsTotal.value - 1)
+    itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
   } catch (err) {
     itemError.value = getMessage(err, 'common.failed')
     setTimeout(() => itemError.value = '', 4000)
