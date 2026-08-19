@@ -488,13 +488,15 @@ async function saveEdit() {
               <SvgIcon name="close" :size="10" />
             </button>
           </div>
-          <button v-if="itemsPage < itemsPages" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
-            <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
-            <template v-else>
-              <SvgIcon name="chevron-down" :size="20" />
-              <span>{{ t('common.loadMore') }}</span>
-            </template>
-          </button>
+          <div v-if="itemsPage < itemsPages" class="load-more-cube-wrap">
+            <button class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
+              <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+              <template v-else>
+                <SvgIcon name="chevron-down" :size="20" />
+                <span>{{ t('common.loadMore') }}</span>
+              </template>
+            </button>
+          </div>
         </div>
       </template>
 
@@ -851,12 +853,15 @@ async function saveEdit() {
 }
 @keyframes item-card-spin { to { transform: rotate(360deg); } }
 
+.load-more-cube-wrap { break-inside: avoid; margin-bottom: var(--spacing-md); }
+
 .load-more-cube {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  width: 100%;
   min-height: 200px;
   padding: var(--spacing-lg);
   background: var(--color-surface);
