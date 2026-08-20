@@ -25,8 +25,8 @@ const reasonText = computed(() => {
 |_|  |_/_/ \_\___|_|\_| |_|
     </pre>
     <h1>503</h1>
-    <p>{{ t('maintenance.message') }}</p>
     <p v-if="reasonText" class="maintenance__reason">{{ t('maintenance.reason') }}{{ reasonText }}</p>
+    <p>{{ t('maintenance.message') }}</p>
     <router-link to="/" class="btn btn--outline">{{ t('maintenance.retry') }}</router-link>
   </div>
 </template>
