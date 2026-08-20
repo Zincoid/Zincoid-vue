@@ -2,12 +2,19 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useError } from '@/composables/useError'
 const { t } = useI18n()
+const { getMessage } = useError()
 const route = useRoute()
 const isOffline = computed(() => route.query.reason === 'offline')
 const reason = computed(() => {
   const r = route.query.reason
   return Array.isArray(r) ? r[0] : r
+})
+const reasonText = computed(() => {
+  if (isOffline.value) return t('maintenance.offline')
+  if (reason.value) return getMessage({ response: { data: { message: reason.value } } })
+  return ''
 })
 </script>
 
@@ -20,9 +27,8 @@ const reason = computed(() => {
 |_|  |_/_/ \_\___|_|\_| |_|
     </pre>
     <h1>503</h1>
-    <p v-if="isOffline" class="maintenance__reason">{{ t('maintenance.offline') }}</p>
-    <p v-else-if="reason" class="maintenance__reason">{{ reason }}</p>
     <p>{{ t('maintenance.message') }}</p>
+    <p v-if="reasonText" class="maintenance__reason">{{ t('maintenance.reason') }}{{ reasonText }}</p>
     <router-link to="/" class="btn btn--outline">{{ t('maintenance.retry') }}</router-link>
   </div>
 </template>
