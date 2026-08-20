@@ -392,7 +392,7 @@ export default {
     'Access already requested': '已请求过访问',
     'Access already approved': '访问已被批准',
     'Access already rejected': '访问已被拒绝',
-    'Server is under maintenance': '服务器维护中（定时维护：UTC+8 00:00-00:10，管理员也可手动开启）'
+    'Server is under maintenance': '服务器维护中（计划：UTC+8 00:00-00:10）'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
