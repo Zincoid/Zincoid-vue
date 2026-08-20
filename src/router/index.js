@@ -163,7 +163,13 @@ router.beforeEach(async (to, from, next) => {
 
   try {
     const res = await fetch('/api/health')
-    if (!res.ok) return next('/maintenance?reason=offline')
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+      const reason = body?.message?.trim()
+      return reason
+          ? next({ path: '/maintenance', query: { reason } })
+          : next('/maintenance?reason=offline')
+    }
   } catch {
     return next('/maintenance?reason=offline')
   }
