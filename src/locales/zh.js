@@ -511,8 +511,8 @@ export default {
     perPage: '每页 {size} 条',
     currentPage: '第 {page} 页',
     notSet: '未设置',
-    created: '创建成功',
-    updated: '更新成功',
-    deleted: '删除成功'
+    created: '已创建',
+    updated: '已更新',
+    deleted: '已删除'
   }
 }
