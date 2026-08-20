@@ -589,7 +589,7 @@ async function saveEdit() {
         <template v-else-if="!repo.restricted && repo.type === 1">
           <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
           <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
-          <div v-else ref="gridEl" class="items-grid" :style="{ '--grid-cols': gridCols }">
+          <div v-else ref="gridEl" class="items-grid" :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }">
             <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
               <template v-for="(item, index) in column" :key="item.__loadMore ? '__load-more' : item.id">
                 <button v-if="item.__loadMore" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
@@ -913,7 +913,6 @@ async function saveEdit() {
 
 .items-grid {
   display: grid;
-  grid-template-columns: repeat(var(--grid-cols, 4), 1fr);
   gap: var(--spacing-md);
 }
 .items-grid__col {
