@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { articleAPI, fileAPI } from '@/api'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'
 import UploadProgress from '@/components/UploadProgress.vue'
@@ -10,6 +11,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 
 const route = useRoute()
 const router = useRouter()
@@ -119,8 +121,10 @@ async function save() {
     const payload = { ...form.value, contentMd }
     if (isEdit.value) {
       await articleAPI.update(route.params.id, payload)
+      toast(t('common.updated'), 'success')
     } else {
       const { data } = await articleAPI.create(payload)
+      toast(t('common.created'), 'success')
       router.push(`/articles/${data.data.id}`)
       return
     }

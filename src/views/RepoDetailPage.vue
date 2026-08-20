@@ -167,6 +167,7 @@ async function deleteRepo() {
   if (!await confirm(t('repo.deleteConfirm'))) return
   try {
     await repoAPI.delete(repo.value.id)
+    toast(t('common.deleted'), 'success')
     router.push('/repos')
   } catch { /* ignore */ }
 }
@@ -390,6 +391,7 @@ async function saveEdit() {
       await fetchItems(1)
     }
     showEdit.value = false
+    toast(t('common.updated'), 'success')
   } catch (err) {
     editError.value = getMessage(err, 'common.failed')
   } finally {

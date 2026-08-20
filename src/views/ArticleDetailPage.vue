@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -24,6 +24,7 @@ const { toast } = useToast()
 const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const origin = location.origin
 const article = ref(null)
@@ -192,7 +193,8 @@ async function handleDelete() {
   if (!await confirm(t('article.deleteConfirm'))) return
   try {
     await articleAPI.delete(route.params.id)
-    window.location.href = '/#/articles'
+    toast(t('common.deleted'), 'success')
+    router.push('/articles')
   } catch (err) {
     if (err?.response?.status !== 401) toast(getMessage(err, 'article.deleteError'), 'error')
   }

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
@@ -12,6 +13,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 const { load: loadConfig, get: getConfig } = useConfig()
 
 const typeTabs = [
@@ -127,6 +129,7 @@ async function createRepo() {
       visibility: createForm.value.visibility
     })
     showCreate.value = false
+    toast(t('common.created'), 'success')
     createForm.value = { name: '', description: '', type: null, url: '', tags: '', coverImage: '', visibility: 0 }
     coverFile.value = null
     coverPreview.value = ''

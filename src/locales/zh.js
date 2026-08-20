@@ -510,6 +510,9 @@ export default {
     total: '共 {total} 条',
     perPage: '每页 {size} 条',
     currentPage: '第 {page} 页',
-    notSet: '未设置'
+    notSet: '未设置',
+    created: '创建成功',
+    updated: '更新成功',
+    deleted: '删除成功'
   }
 }

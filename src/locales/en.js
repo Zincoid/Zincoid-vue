@@ -512,6 +512,9 @@ export default {
     total: '{total} items',
     currentPage: 'Page {page}',
     perPage: '{size} per page',
-    notSet: 'Not set'
+    notSet: 'Not set',
+    created: 'Created successfully',
+    updated: 'Updated successfully',
+    deleted: 'Deleted successfully'
   }
 }

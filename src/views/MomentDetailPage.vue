@@ -147,6 +147,7 @@ async function saveEdit() {
     moment.value.urls = [...editKeepImages.value, ...newUrls]
     moment.value.visibility = editVisibility.value
     editing.value = false
+    toast(t('common.updated'), 'success')
   } catch (err) {
     if (err?.response?.status !== 401) toast(getMessage(err, 'moment.updateFailed'), 'error')
   } finally {
@@ -236,6 +237,7 @@ async function handleDelete() {
   if (!await confirm(t('moment.deleteConfirm'))) return
   try {
     await momentAPI.delete(route.params.id)
+    toast(t('common.deleted'), 'success')
     router.push('/moments')
   } catch (err) {
     if (err?.response?.status !== 401) toast(getMessage(err, 'moment.deleteError'), 'error')

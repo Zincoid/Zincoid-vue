@@ -123,6 +123,7 @@ async function submitMoment() {
       urls: urls,
       visibility: newVisibility.value
     })
+    toast(t('common.created'), 'success')
     newContent.value = ''
     newImageFiles.value = []
     newImagePreviews.value = []
