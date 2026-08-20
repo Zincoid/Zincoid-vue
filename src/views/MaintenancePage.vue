@@ -6,13 +6,11 @@ import { useError } from '@/composables/useError'
 const { t } = useI18n()
 const { getMessage } = useError()
 const route = useRoute()
-const isOffline = computed(() => route.query.reason === 'offline')
 const reason = computed(() => {
   const r = route.query.reason
   return Array.isArray(r) ? r[0] : r
 })
 const reasonText = computed(() => {
-  if (isOffline.value) return t('maintenance.offline')
   if (reason.value) return getMessage({ response: { data: { message: reason.value } } })
   return ''
 })

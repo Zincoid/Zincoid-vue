@@ -392,11 +392,11 @@ export default {
     'Access already requested': 'Access already requested',
     'Access already approved': 'Access already approved',
     'Access already rejected': 'Access already rejected',
+    'Server is offline': 'Server is offline',
     'Server is under maintenance': 'Server is under maintenance (scheduled: UTC+8 00:00-00:10)'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
-    offline: 'Server is offline',
     reason: 'Reason: ',
     retry: 'Retry'
   },

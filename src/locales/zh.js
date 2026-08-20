@@ -392,11 +392,11 @@ export default {
     'Access already requested': '已请求过访问',
     'Access already approved': '访问已被批准',
     'Access already rejected': '访问已被拒绝',
+    'Server is offline': '服务器已离线',
     'Server is under maintenance': '服务器维护中（计划：UTC+8 00:00-00:10）'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
-    offline: '服务器已离线',
     reason: '原因：',
     retry: '重试'
   },
