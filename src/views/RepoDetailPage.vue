@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -68,9 +68,7 @@ async function loadMoreItems() {
   if (itemsLoadingMore.value || itemsPage.value >= itemsPages.value) return
   itemsLoadingMore.value = true
   try {
-    const before = (repo.value.items || []).length
     await fetchItems(itemsPage.value + 1)
-    appendItems((repo.value.items || []).slice(before))
   } catch { /* ignore */ } finally {
     itemsLoadingMore.value = false
   }
@@ -95,11 +93,8 @@ const [cRes, iRes] = await Promise.all([
       itemsPage.value = data.page || 1
       itemsPages.value = data.pages || 1
       itemsTotal.value = data.total || 0
-      rebuildBuckets()
-      nextTick(updateColWidth)
     } else {
       repo.value.items = []
-      rebuildBuckets()
     }
     comments.value = cRes.data.data.records || []
     commentPages.value = cRes.data.data.pages || 1
@@ -112,15 +107,10 @@ const [cRes, iRes] = await Promise.all([
 onMounted(() => {
   fetchRepo()
   updateGridCols()
-  window.addEventListener('resize', onWindowResize)
+  window.addEventListener('resize', updateGridCols)
 })
-onBeforeUnmount(() => window.removeEventListener('resize', onWindowResize))
+onBeforeUnmount(() => window.removeEventListener('resize', updateGridCols))
 watch(() => route.params.id, fetchRepo)
-
-function onWindowResize() {
-  updateGridCols()
-  nextTick(updateColWidth)
-}
 
 watch(likeLiked, (liked) => {
   if (!repo.value || !auth.user) return
@@ -152,20 +142,8 @@ const canEdit = () => isOwner() || auth.isAdmin
 const viewerSrc = ref('')
 const viewerVisible = ref(false)
 const mediaLoaded = ref({})
-function onMediaLoad(id, e) {
+function onMediaLoad(id) {
   mediaLoaded.value[id] = true
-  if (e?.target?.naturalWidth) {
-    mediaRatio.value[id] = e.target.naturalWidth / e.target.naturalHeight
-    recalcHeights()
-  }
-}
-function onVideoMeta(id, e) {
-  const t = e.target
-  t.currentTime = 1
-  if (t.videoWidth) {
-    mediaRatio.value[id] = t.videoWidth / t.videoHeight
-    recalcHeights()
-  }
 }
 function previewItem(url) {
   viewerSrc.value = url
@@ -268,7 +246,6 @@ async function handleItemFiles(e) {
       itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
       if (itemsPage.value * itemsSize >= itemsTotal.value) {
         repo.value.items = [...(repo.value.items || []), itemData.data]
-        appendItems([itemData.data])
       }
       uploadState.value.uploaded = i + 1
     }
@@ -277,7 +254,6 @@ async function handleItemFiles(e) {
     setTimeout(() => itemError.value = '', 4000)
   } finally {
     try { await alignItemsTail() } catch { /* ignore */ }
-    rebuildBuckets()
     uploading.value = false
     e.target.value = ''
     uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
@@ -295,7 +271,6 @@ async function deleteItem(itemId) {
     itemsTotal.value = Math.max(0, itemsTotal.value - 1)
     itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
     await alignItemsTail()
-    rebuildBuckets()
   } catch (err) {
     itemError.value = getMessage(err, 'common.failed')
     setTimeout(() => itemError.value = '', 4000)
@@ -317,95 +292,18 @@ async function alignItemsTail() {
   repo.value.items = [...items.slice(0, prefix), ...(data.records || [])]
 }
 
-// ── Media grid: stateful bucketed container ──
-// 每列维护累计高度,item 依次加入"当前高度最小的列"使四列最大高度最小;
-// 高度 = 列宽统一缩放后的媒体实际高度 + 卡片固定部分(名称浮层,无 padding)。
+// ── Media grid (bucketed columns, no reflow on load-more) ──
 const gridCols = ref(4)
-const gridEl = ref(null)
-const colWidth = ref(0)
-const mediaRatio = ref({})
-const colBuckets = ref([])
-const colHeights = ref([])
-
-const CUBE_H = 200
-const FALLBACK_IMG_H = 200
-const MEDIA_BLOCK_H = 120
-
 function updateGridCols() {
   const w = window.innerWidth
   gridCols.value = w >= 1280 ? 4 : w >= 960 ? 3 : w >= 640 ? 2 : 1
 }
-
-function updateColWidth() {
-  const el = gridEl.value
-  if (!el) return
-  const gap = parseFloat(getComputedStyle(el).columnGap) || 16
-  const w = (el.clientWidth - gap * (gridCols.value - 1)) / gridCols.value
-  if (w !== colWidth.value) {
-    colWidth.value = w
-    recalcHeights()
-  }
-}
-
-function cardHeight(item) {
-  if (item.__loadMore) return CUBE_H
-  const r = mediaRatio.value[item.id]
-  if (r && colWidth.value > 0) return colWidth.value / r
-  const type = mediaType(item.url)
-  if (type === 'video' || type === 'audio') return MEDIA_BLOCK_H
-  return FALLBACK_IMG_H
-}
-
-function bestColIndex() {
-  let best = 0
-  for (let c = 1; c < gridCols.value; c++) {
-    if (colHeights.value[c] < colHeights.value[best]) best = c
-  }
-  return best
-}
-
-function appendToBucket(item) {
-  const c = bestColIndex()
-  item.__h = cardHeight(item)
-  colBuckets.value[c].push(item)
-  colHeights.value[c] += item.__h
-}
-
-function removeLoadMore() {
-  colBuckets.value.forEach((b, c) => {
-    const i = b.findIndex(x => x.__loadMore)
-    if (i !== -1) {
-      b.splice(i, 1)
-      colHeights.value[c] -= CUBE_H
-    }
-  })
-}
-
-function rebuildBuckets() {
-  const n = gridCols.value
-  colBuckets.value = Array.from({ length: n }, () => [])
-  colHeights.value = Array(n).fill(0)
-  ;(repo.value?.items || []).forEach(i => appendToBucket(i))
-  if (itemsPage.value < itemsPages.value) appendToBucket({ __loadMore: true })
-}
-
-function appendItems(newItems) {
-  removeLoadMore()
-  ;(newItems || []).forEach(i => appendToBucket(i))
-  if (itemsPage.value < itemsPages.value) appendToBucket({ __loadMore: true })
-}
-
-function recalcHeights() {
-  colHeights.value = colBuckets.value.map(b =>
-    b.reduce((s, x) => s + (x.__h = cardHeight(x)), 0)
-  )
-}
-
-watch(gridCols, () => {
-  nextTick(() => {
-    updateColWidth()
-    rebuildBuckets()
-  })
+const itemColumns = computed(() => {
+  const cols = Array.from({ length: gridCols.value }, () => [])
+  const items = repo.value?.items || []
+  items.forEach((item, i) => cols[i % gridCols.value].push(item))
+  if (itemsPage.value < itemsPages.value) cols[items.length % gridCols.value].push({ __loadMore: true })
+  return cols
 })
 
 // ── Drag sort ──
@@ -444,10 +342,8 @@ async function onDrop(id, e) {
   repo.value.items = items
   try {
     await repoAPI.swapItems(repo.value.id, dragged.id, target.id)
-    rebuildBuckets()
   } catch {
     repo.value.items = oldItems
-    rebuildBuckets()
   }
   dragId = null
 }
@@ -619,8 +515,8 @@ async function saveEdit() {
       <template v-else-if="!repo.restricted && repo.type === 1">
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
-        <div v-else ref="gridEl" class="items-grid" :style="{ '--grid-cols': gridCols }">
-          <div v-for="(column, ci) in colBuckets" :key="ci" class="items-grid__col">
+        <div v-else class="items-grid" :style="{ '--grid-cols': gridCols }">
+          <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
             <template v-for="(item, index) in column" :key="item.__loadMore ? '__load-more' : item.id">
               <button v-if="item.__loadMore" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
                 <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
@@ -642,7 +538,7 @@ async function saveEdit() {
                 <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
                   @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
                 <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
-                  <video :src="item.url" preload="metadata" @loadedmetadata="onVideoMeta(item.id, $event)"></video>
+                  <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
                   <div class="item-card__play-icon">
                     <SvgIcon name="play" :size="24" />
                   </div>
