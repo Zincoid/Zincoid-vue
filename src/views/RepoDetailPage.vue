@@ -267,8 +267,7 @@ async function handleItemFiles(e) {
       uploadState.value.uploaded = i + 1
     }
   } catch (err) {
-    itemError.value = getMessage(err, 'common.uploadFailed')
-    setTimeout(() => itemError.value = '', 4000)
+    toast(getMessage(err, 'common.uploadFailed'), 'error')
   } finally {
     try { await alignItemsTail() } catch { /* ignore */ }
     uploading.value = false
@@ -277,10 +276,7 @@ async function handleItemFiles(e) {
   }
 }
 
-const itemError = ref('')
-
 async function deleteItem(itemId) {
-  itemError.value = ''
   try {
     await repoAPI.deleteItem(repo.value.id, itemId)
     itemsVersion++
@@ -289,8 +285,7 @@ async function deleteItem(itemId) {
     itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
     await alignItemsTail()
   } catch (err) {
-    itemError.value = getMessage(err, 'common.failed')
-    setTimeout(() => itemError.value = '', 4000)
+    toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 
@@ -579,7 +574,6 @@ async function saveEdit() {
 
         <!-- MEDIA → grid -->
         <template v-else-if="!repo.restricted && repo.type === 1">
-          <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
           <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
           <div v-else ref="gridEl" class="items-grid" :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }">
             <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
@@ -624,7 +618,6 @@ async function saveEdit() {
 
         <!-- FILE → list -->
         <template v-else-if="!repo.restricted">
-          <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
           <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
           <div v-else class="items-list">
             <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
