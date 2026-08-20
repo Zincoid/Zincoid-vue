@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -104,7 +104,12 @@ const [cRes, iRes] = await Promise.all([
   }
 }
 
-onMounted(fetchRepo)
+onMounted(() => {
+  fetchRepo()
+  updateGridCols()
+  window.addEventListener('resize', updateGridCols)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', updateGridCols))
 watch(() => route.params.id, fetchRepo)
 
 watch(likeLiked, (liked) => {
@@ -287,11 +292,23 @@ async function alignItemsTail() {
   repo.value.items = [...items.slice(0, prefix), ...(data.records || [])]
 }
 
-// ── Drag sort ──
-let dragIndex = null
+// ── Media grid (bucketed columns, no reflow on load-more) ──
+const gridCols = ref(4)
+function updateGridCols() {
+  const w = window.innerWidth
+  gridCols.value = w >= 1280 ? 4 : w >= 960 ? 3 : w >= 640 ? 2 : 1
+}
+const itemColumns = computed(() => {
+  const cols = Array.from({ length: gridCols.value }, () => [])
+  ;(repo.value?.items || []).forEach((item, i) => cols[i % gridCols.value].push(item))
+  return cols
+})
 
-function onDragStart(index, e) {
-  dragIndex = index
+// ── Drag sort ──
+let dragId = null
+
+function onDragStart(id, e) {
+  dragId = id
   e.dataTransfer.effectAllowed = 'move'
   const el = e.currentTarget
   const rect = el.getBoundingClientRect()
@@ -303,19 +320,22 @@ function onDragStart(index, e) {
   requestAnimationFrame(() => document.body.removeChild(clone))
 }
 
-function onDragOver(index, e) {
+function onDragOver(id, e) {
   e.preventDefault()
   e.dataTransfer.dropEffect = 'move'
 }
 
-async function onDrop(index, e) {
+async function onDrop(id, e) {
   e.preventDefault()
-  if (dragIndex === null || dragIndex === index) return
-  const dragged = repo.value.items[dragIndex]
-  const target = repo.value.items[index]
+  if (dragId === null || dragId === id) return
+  const from = repo.value.items.findIndex(i => i.id === dragId)
+  const to = repo.value.items.findIndex(i => i.id === id)
+  if (from === -1 || to === -1) return
+  const dragged = repo.value.items[from]
+  const target = repo.value.items[to]
   const items = [...repo.value.items]
-  items[dragIndex] = target
-  items[index] = dragged
+  items[from] = target
+  items[to] = dragged
   const oldItems = repo.value.items
   repo.value.items = items
   try {
@@ -323,7 +343,7 @@ async function onDrop(index, e) {
   } catch {
     repo.value.items = oldItems
   }
-  dragIndex = null
+  dragId = null
 }
 
 // ── Edit modal ──
@@ -493,41 +513,43 @@ async function saveEdit() {
       <template v-else-if="!repo.restricted && repo.type === 1">
         <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
-        <div v-else class="items-grid">
-          <div v-for="(item, index) in repo.items" :key="item.id" class="item-card"
-            :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
-            :draggable="canEdit()"
-            @dragstart="canEdit() && onDragStart(index, $event)"
-            @dragover="canEdit() && onDragOver(index, $event)"
-            @drop="canEdit() && onDrop(index, $event)">
-            <div class="item-card__handle">
-              <SvgIcon v-if="canEdit()" name="drag" />
-              <SvgIcon v-else name="chevron-right" />
-            </div>
-            <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
-              @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
-            <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
-              <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
-              <div class="item-card__play-icon">
-                <SvgIcon name="play" :size="24" />
+        <div v-else class="items-grid" :style="{ '--grid-cols': gridCols }">
+          <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
+            <div v-for="(item, index) in column" :key="item.id" class="item-card"
+              :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
+              :draggable="canEdit()"
+              @dragstart="canEdit() && onDragStart(item.id, $event)"
+              @dragover="canEdit() && onDragOver(item.id, $event)"
+              @drop="canEdit() && onDrop(item.id, $event)">
+              <div class="item-card__handle">
+                <SvgIcon v-if="canEdit()" name="drag" />
+                <SvgIcon v-else name="chevron-right" />
               </div>
+              <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
+                @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
+              <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
+                <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+                <div class="item-card__play-icon">
+                  <SvgIcon name="play" :size="24" />
+                </div>
+              </div>
+              <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
+                <SvgIcon name="audio" :size="24" />
+              </div>
+              <span class="item-card__name">{{ item.name }}</span>
+              <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
+                <SvgIcon name="close" :size="10" />
+              </button>
             </div>
-            <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
-              <SvgIcon name="audio" :size="24" />
+            <div v-if="itemsPage < itemsPages && ci === (repo.items.length % gridCols)" class="load-more-cube-wrap">
+              <button class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
+                <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+                <template v-else>
+                  <SvgIcon name="chevron-down" :size="20" />
+                  <span>{{ t('common.loadMore') }}</span>
+                </template>
+              </button>
             </div>
-            <span class="item-card__name">{{ item.name }}</span>
-            <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
-              <SvgIcon name="close" :size="10" />
-            </button>
-          </div>
-          <div v-if="itemsPage < itemsPages" class="load-more-cube-wrap">
-            <button class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
-              <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
-              <template v-else>
-                <SvgIcon name="chevron-down" :size="20" />
-                <span>{{ t('common.loadMore') }}</span>
-              </template>
-            </button>
           </div>
         </div>
       </template>
@@ -539,9 +561,9 @@ async function saveEdit() {
         <div v-else class="items-list">
           <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
             :draggable="canEdit()"
-            @dragstart="canEdit() && onDragStart(index, $event)"
-            @dragover="canEdit() && onDragOver(index, $event)"
-            @drop="canEdit() && onDrop(index, $event)">
+            @dragstart="canEdit() && onDragStart(item.id, $event)"
+            @dragover="canEdit() && onDragOver(item.id, $event)"
+            @drop="canEdit() && onDrop(item.id, $event)">
             <div class="item-row__handle">
               <SvgIcon v-if="canEdit()" name="drag" />
               <SvgIcon v-else name="chevron-right" />
@@ -814,12 +836,14 @@ async function saveEdit() {
 .commit-sha svg { transform: translateY(2px); }
 
 .items-grid {
-  columns: 4 200px;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 4), 1fr);
   gap: var(--spacing-md);
 }
-.items-grid > * {
-  break-inside: avoid;
-  margin-bottom: var(--spacing-md);
+.items-grid__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
 .upload-fab {
@@ -885,7 +909,7 @@ async function saveEdit() {
 }
 @keyframes item-card-spin { to { transform: rotate(360deg); } }
 
-.load-more-cube-wrap { break-inside: avoid; margin-bottom: var(--spacing-md); }
+.load-more-cube-wrap { min-height: 0; }
 
 .load-more-cube {
   display: flex;
