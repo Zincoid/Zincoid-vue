@@ -1,6 +1,14 @@
 <script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 const { t } = useI18n()
+const route = useRoute()
+const isOffline = computed(() => route.query.reason === 'offline')
+const reason = computed(() => {
+  const r = route.query.reason
+  return Array.isArray(r) ? r[0] : r
+})
 </script>
 
 <template>
@@ -12,6 +20,8 @@ const { t } = useI18n()
 |_|  |_/_/ \_\___|_|\_| |_|
     </pre>
     <h1>503</h1>
+    <p v-if="isOffline" class="maintenance__reason">{{ t('maintenance.offline') }}</p>
+    <p v-else-if="reason" class="maintenance__reason">{{ reason }}</p>
     <p>{{ t('maintenance.message') }}</p>
     <router-link to="/" class="btn btn--outline">{{ t('maintenance.retry') }}</router-link>
   </div>
@@ -37,6 +47,7 @@ const { t } = useI18n()
 }
 h1 { font-size: 4rem; color: var(--color-danger); margin-bottom: var(--spacing-sm); }
 p { color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl); padding: 0 var(--spacing-md); }
+.maintenance__reason { color: var(--color-danger); font-weight: var(--weight-medium); margin-bottom: var(--spacing-xs); }
 .btn { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--rounded-md); font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer; transition: all var(--transition-fast); text-decoration: none; }
 .btn--outline { border: 1px solid var(--color-border); color: var(--color-text); background: transparent; }
 .btn--outline:hover { border-color: var(--color-primary); color: var(--color-primary); }

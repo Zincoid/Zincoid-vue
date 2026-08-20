@@ -163,9 +163,9 @@ router.beforeEach(async (to, from, next) => {
 
   try {
     const res = await fetch('/api/health')
-    if (!res.ok) return next('/maintenance')
+    if (!res.ok) return next('/maintenance?reason=offline')
   } catch {
-    return next('/maintenance')
+    return next('/maintenance?reason=offline')
   }
 
   const token = localStorage.getItem('token')

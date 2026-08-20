@@ -395,6 +395,7 @@ export default {
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
+    offline: '服务器已离线',
     retry: '重试'
   },
   notFound: {

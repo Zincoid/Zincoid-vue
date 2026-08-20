@@ -6,6 +6,7 @@ import { useError } from '@/composables/useError'
 import { configAPI, userAPI, healthAPI, notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -122,6 +123,11 @@ async function saveConfig(config) {
   }
 }
 
+function toggleBooleanConfig(config, enabled) {
+  config.configValue = enabled ? 'true' : 'false'
+  saveConfig(config)
+}
+
 async function runCleanup() {
   const confirmMsg = logicCleanup.value ? t('manage.deepCleanupConfirm') : t('manage.cleanupConfirm')
   if (!await confirm(confirmMsg)) return
@@ -193,7 +199,13 @@ async function handleReset() {
             <span class="config-key">{{ cfg.configKey }}</span>
             <span class="config-desc">{{ cfg.description }}</span>
           </div>
-          <div class="config-value-row">
+          <div v-if="cfg.configValue === 'true' || cfg.configValue === 'false'" class="config-value-row">
+            <ToggleSwitch
+              :model-value="cfg.configValue === 'true'"
+              @update:model-value="toggleBooleanConfig(cfg, $event)"
+            />
+          </div>
+          <div v-else class="config-value-row">
             <input v-model="cfg.configValue" class="field__input config-input" />
             <button class="btn btn--primary" @click="saveConfig(cfg)">
               <SvgIcon name="save" />

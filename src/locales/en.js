@@ -395,6 +395,7 @@ export default {
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
+    offline: 'Server is offline',
     retry: 'Retry'
   },
   notFound: {

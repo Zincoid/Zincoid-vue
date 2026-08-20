@@ -19,7 +19,10 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response && [502, 503, 504].includes(error.response.status)) {
-      router.push('/maintenance').catch(() => {})
+      const query = error.response.data?.message
+        ? { reason: error.response.data.message }
+        : undefined
+      router.push({ path: '/maintenance', query }).catch(() => {})
       return Promise.reject(error)
     }
     if (error.response && error.response.status === 401) {
