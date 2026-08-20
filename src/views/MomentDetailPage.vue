@@ -96,6 +96,11 @@ function cancelEdit() {
 function handleEditUpload(e) {
   const file = e.target.files[0]
   if (!file) return
+  if (editKeepImages.value.length + editNewFiles.value.length >= 9) {
+    toast(t('moment.maxAttachments'), 'error')
+    e.target.value = ''
+    return
+  }
   editNewFiles.value.push(file)
   const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'image'
   editNewPreviews.value.push({ url: URL.createObjectURL(file), type })

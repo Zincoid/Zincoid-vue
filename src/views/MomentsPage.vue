@@ -80,6 +80,11 @@ function onMomentInput(e) {
 function handleUpload(e) {
   const file = e.target.files[0]
   if (!file) return
+  if (newImageFiles.value.length >= 9) {
+    toast(t('moment.maxAttachments'), 'error')
+    e.target.value = ''
+    return
+  }
   newImageFiles.value.push(file)
   const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'image'
   newImagePreviews.value.push({ url: URL.createObjectURL(file), type })

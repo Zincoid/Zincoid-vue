@@ -38,7 +38,8 @@ export default {
     pinnedFirst: '置顶',
     private: '动态为私有。',
     filesProgress: '文件',
-    fileProgress: '当前'
+    fileProgress: '当前',
+    maxAttachments: '最多上传 9 个附件'
   },
   visibility: {
     public: '所有人可见',

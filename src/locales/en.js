@@ -38,7 +38,8 @@ export default {
     pinnedFirst: 'Pinned',
     private: 'Moment is private.',
     filesProgress: 'Files',
-    fileProgress: 'Current'
+    fileProgress: 'Current',
+    maxAttachments: 'Up to 9 attachments allowed'
   },
   visibility: {
     public: 'Public',
