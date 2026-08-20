@@ -117,6 +117,7 @@ onMounted(() => {
 onBeforeUnmount(() => window.removeEventListener('resize', onWindowResize))
 watch(() => route.params.id, fetchRepo)
 watch(loadingDone, (done) => { if (done) nextTick(updateColWidth) })
+watch(() => repo.value?.items?.length, () => nextTick(updateColWidth))
 
 watch(likeLiked, (liked) => {
   if (!repo.value || !auth.user) return
