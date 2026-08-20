@@ -346,18 +346,10 @@ function cardHeight(item) {
   return FALLBACK_IMG_H
 }
 
-function bestColumn(heights, add) {
+function bestColumn(heights) {
   let best = 0
-  let bestMax = Infinity
-  let bestH = Infinity
-  for (let c = 0; c < heights.length; c++) {
-    const newH = heights[c] + add
-    const newMax = Math.max(newH, ...heights.filter((_, i) => i !== c))
-    if (newMax < bestMax || (newMax === bestMax && newH < bestH)) {
-      best = c
-      bestMax = newMax
-      bestH = newH
-    }
+  for (let c = 1; c < heights.length; c++) {
+    if (heights[c] < heights[best]) best = c
   }
   return best
 }
@@ -368,13 +360,12 @@ const itemColumns = computed(() => {
   const heights = Array(n).fill(0)
   for (const item of repo.value?.items || []) {
     const add = cardHeight(item) + colGap.value
-    const c = bestColumn(heights, add)
+    const c = bestColumn(heights)
     cols[c].push(item)
     heights[c] += add
   }
   if (itemsPage.value < itemsPages.value) {
-    const add = CUBE_H + colGap.value
-    cols[bestColumn(heights, add)].push({ __loadMore: true })
+    cols[bestColumn(heights)].push({ __loadMore: true })
   }
   return cols
 })
