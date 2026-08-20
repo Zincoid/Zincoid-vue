@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
@@ -83,7 +83,7 @@ async function fetchRepo() {
     repo.value = res.data.data
     likeLiked.value = repo.value.isLiked || false
     likeCount.value = repo.value.likeCount || 0
-const [cRes, iRes] = await Promise.all([
+    const [cRes, iRes] = await Promise.all([
       commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value),
       !repo.value.restricted && repo.value.type !== 0 ? repoAPI.getItems(route.params.id, 1, itemsSize) : Promise.resolve(null)
     ])
@@ -104,13 +104,19 @@ const [cRes, iRes] = await Promise.all([
   }
 }
 
+function onWindowResize() {
+  updateGridCols()
+  nextTick(updateColWidth)
+}
+
 onMounted(() => {
   fetchRepo()
   updateGridCols()
-  window.addEventListener('resize', updateGridCols)
+  window.addEventListener('resize', onWindowResize)
 })
-onBeforeUnmount(() => window.removeEventListener('resize', updateGridCols))
+onBeforeUnmount(() => window.removeEventListener('resize', onWindowResize))
 watch(() => route.params.id, fetchRepo)
+watch(loadingDone, (done) => { if (done) nextTick(updateColWidth) })
 
 watch(likeLiked, (liked) => {
   if (!repo.value || !auth.user) return
@@ -142,8 +148,18 @@ const canEdit = () => isOwner() || auth.isAdmin
 const viewerSrc = ref('')
 const viewerVisible = ref(false)
 const mediaLoaded = ref({})
-function onMediaLoad(id) {
+function onMediaLoad(id, e) {
   mediaLoaded.value[id] = true
+  if (e?.target?.naturalWidth) {
+    mediaRatio.value[id] = e.target.naturalWidth / e.target.naturalHeight
+  }
+}
+function onVideoMeta(id, e) {
+  const target = e.target
+  target.currentTime = 1
+  if (target.videoWidth) {
+    mediaRatio.value[id] = target.videoWidth / target.videoHeight
+  }
 }
 function previewItem(url) {
   viewerSrc.value = url
@@ -292,17 +308,74 @@ async function alignItemsTail() {
   repo.value.items = [...items.slice(0, prefix), ...(data.records || [])]
 }
 
-// ── Media grid (bucketed columns, no reflow on load-more) ──
+// ── Media grid (waterfall: items placed into the column keeping max height minimal) ──
+const GRID_GAP = 12
+const CUBE_H = 200
+const FALLBACK_IMG_H = 200
+const MEDIA_BLOCK_H = 120
+
 const gridCols = ref(4)
+const gridEl = ref(null)
+const colWidth = ref(0)
+const colGap = ref(GRID_GAP)
+const mediaRatio = ref({})
+
 function updateGridCols() {
   const w = window.innerWidth
   gridCols.value = w >= 1280 ? 4 : w >= 960 ? 3 : w >= 640 ? 2 : 1
 }
+
+function updateColWidth() {
+  const el = gridEl.value
+  if (!el || el.clientWidth === 0) return
+  const gap = parseFloat(getComputedStyle(el).columnGap) || GRID_GAP
+  colGap.value = gap
+  const w = (el.clientWidth - gap * (gridCols.value - 1)) / gridCols.value
+  if (w !== colWidth.value) colWidth.value = w
+}
+
+function cardHeight(item) {
+  if (item.__loadMore) return CUBE_H
+  const type = mediaType(item.url)
+  const ratio = mediaRatio.value[item.id]
+  if (ratio && colWidth.value > 0) {
+    const h = colWidth.value / ratio
+    return type === 'video' ? Math.max(MEDIA_BLOCK_H, h) : h
+  }
+  if (type === 'video' || type === 'audio') return MEDIA_BLOCK_H
+  return FALLBACK_IMG_H
+}
+
+function bestColumn(heights, add) {
+  let best = 0
+  let bestMax = Infinity
+  let bestH = Infinity
+  for (let c = 0; c < heights.length; c++) {
+    const newH = heights[c] + add
+    const newMax = Math.max(newH, ...heights.filter((_, i) => i !== c))
+    if (newMax < bestMax || (newMax === bestMax && newH < bestH)) {
+      best = c
+      bestMax = newMax
+      bestH = newH
+    }
+  }
+  return best
+}
+
 const itemColumns = computed(() => {
-  const cols = Array.from({ length: gridCols.value }, () => [])
-  const items = repo.value?.items || []
-  items.forEach((item, i) => cols[i % gridCols.value].push(item))
-  if (itemsPage.value < itemsPages.value) cols[items.length % gridCols.value].push({ __loadMore: true })
+  const n = gridCols.value
+  const cols = Array.from({ length: n }, () => [])
+  const heights = Array(n).fill(0)
+  for (const item of repo.value?.items || []) {
+    const add = cardHeight(item) + colGap.value
+    const c = bestColumn(heights, add)
+    cols[c].push(item)
+    heights[c] += add
+  }
+  if (itemsPage.value < itemsPages.value) {
+    const add = CUBE_H + colGap.value
+    cols[bestColumn(heights, add)].push({ __loadMore: true })
+  }
   return cols
 })
 
@@ -342,8 +415,9 @@ async function onDrop(id, e) {
   repo.value.items = items
   try {
     await repoAPI.swapItems(repo.value.id, dragged.id, target.id)
-  } catch {
+  } catch (err) {
     repo.value.items = oldItems
+    toast(getMessage(err, 'common.failed'), 'error')
   }
   dragId = null
 }
@@ -398,8 +472,8 @@ async function saveEdit() {
       editForm.value.coverImage = data.data.url
     }
     const tags = editForm.value.tags
-      ? editForm.value.tags.split(',').map(s => s.trim()).filter(Boolean)
-      : []
+        ? editForm.value.tags.split(',').map(s => s.trim()).filter(Boolean)
+        : []
     const res = await repoAPI.update(repo.value.id, {
       name: editForm.value.name.trim(),
       description: editForm.value.description.trim(),
@@ -428,292 +502,292 @@ async function saveEdit() {
       <div class="repo-cover-banner__overlay"></div>
     </div>
     <div class="container">
-    <LoadingSpinner :visible="loading" @done="loadingDone = true" />
-    <template v-if="loadingDone && repo">
-      <div class="repo-header">
-        <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
-        <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
-        <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
-        <h1 class="repo-title">{{ repo.name }}</h1>
+      <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+      <template v-if="loadingDone && repo">
+        <div class="repo-header">
+          <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
+          <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
+          <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
+          <h1 class="repo-title">{{ repo.name }}</h1>
 
-        <div class="repo-meta">
-          <router-link :to="`/members/${repo.userId}`" class="repo-author">
-            <img v-if="repo.userAvatar" :src="repo.userAvatar" class="author-avatar" alt="" />
-            <span v-else class="author-avatar-placeholder">{{ (repo.userNickname || 'U')[0] }}</span>
-            <span class="author-nickname">{{ repo.userNickname }}</span>
-          </router-link>
-          <div class="repo-meta__right">
+          <div class="repo-meta">
+            <router-link :to="`/members/${repo.userId}`" class="repo-author">
+              <img v-if="repo.userAvatar" :src="repo.userAvatar" class="author-avatar" alt="" />
+              <span v-else class="author-avatar-placeholder">{{ (repo.userNickname || 'U')[0] }}</span>
+              <span class="author-nickname">{{ repo.userNickname }}</span>
+            </router-link>
+            <div class="repo-meta__right">
               <span class="repo-date">{{ formatDate(repo.createdAt) }}</span>
               <span class="repo-views">
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
               <div v-if="canEdit()" class="repo-actions">
-              <button class="link-muted" @click="openEdit">
-                <SvgIcon name="edit" />
-                {{ t('common.edit') }}
-              </button>
-              <button class="link-danger" @click="deleteRepo">
-                <SvgIcon name="trash" />
-                {{ t('common.delete') }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="repo.restricted" class="repo-access-bar">
-        <p class="repo-access-bar__msg">
-          <SvgIcon name="lock" /> {{ t('repo.restrictedHint') }}
-        </p>
-        <button v-if="auth.isLoggedIn && !isOwner()" class="btn btn--restricted" @click="requestAccess">
-          <SvgIcon name="key" /> {{ t('repo.requestAccess') }}
-        </button>
-      </div>
-      <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
-
-      <div v-if="!repo.restricted && repo.tags?.length" class="repo-tags">
-        <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
-      </div>
-
-      <!-- CODE type → external link + GitHub info -->
-      <template v-if="!repo.restricted && repo.type === 0">
-        <a v-if="repo.url" :href="repo.url" target="_blank" rel="noopener" class="repo-url">
-          <div class="repo-url__left">
-            <SvgIcon name="fork" :size="16" />
-            <span>{{ repo.url }}</span>
-          </div>
-          <div v-if="repo.github" class="repo-url__stats">
-            <span v-if="repo.github.language" class="github-lang">{{ repo.github.language }}</span>
-            <span class="github-stat"><SvgIcon name="star" />{{ repo.github.stars || 0 }}</span>
-            <span class="github-stat"><SvgIcon name="fork" />{{ repo.github.forks || 0 }}</span>
-          </div>
-          <div v-if="repo.github?.description" class="github-desc">
-            <SvgIcon name="chevron-right" :size="12" />
-            <span>{{ repo.github.description }}</span>
-          </div>
-        </a>
-        <div v-if="repo.github?.commits?.length" class="commits-timeline">
-          <div v-for="(c, i) in repo.github.commits" :key="c.sha" class="commit-item">
-            <div class="commit-dot-line">
-              <div class="commit-dot"></div>
-              <div v-if="i < repo.github.commits.length - 1" class="commit-line"></div>
-            </div>
-            <div class="commit-body">
-              <span class="commit-msg">{{ c.message }}</span>
-              <div class="commit-meta">
-                <img v-if="c.authorAvatar" :src="c.authorAvatar" class="commit-avatar" />
-                <span class="commit-author">{{ c.author }}</span>
-                <span class="commit-date">{{ formatDate(c.date) }}</span>
-                <span class="commit-sha"><SvgIcon name="git-commit" :size="12" /> {{ c.sha }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <!-- MEDIA → grid -->
-      <template v-else-if="!repo.restricted && repo.type === 1">
-        <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
-        <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
-        <div v-else class="items-grid" :style="{ '--grid-cols': gridCols }">
-          <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
-            <template v-for="(item, index) in column" :key="item.__loadMore ? '__load-more' : item.id">
-              <button v-if="item.__loadMore" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
-                <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
-                <template v-else>
-                  <SvgIcon name="chevron-down" :size="20" />
-                  <span>{{ t('common.loadMore') }}</span>
-                </template>
-              </button>
-              <div v-else class="item-card"
-                :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
-                :draggable="canEdit()"
-                @dragstart="canEdit() && onDragStart(item.id, $event)"
-                @dragover="canEdit() && onDragOver(item.id, $event)"
-                @drop="canEdit() && onDrop(item.id, $event)">
-                <div class="item-card__handle">
-                  <SvgIcon v-if="canEdit()" name="drag" />
-                  <SvgIcon v-else name="chevron-right" />
-                </div>
-                <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
-                  @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
-                <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
-                  <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
-                  <div class="item-card__play-icon">
-                    <SvgIcon name="play" :size="24" />
-                  </div>
-                </div>
-                <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
-                  <SvgIcon name="audio" :size="24" />
-                </div>
-                <span class="item-card__name">{{ item.name }}</span>
-                <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
-                  <SvgIcon name="close" :size="10" />
+                <button class="link-muted" @click="openEdit">
+                  <SvgIcon name="edit" />
+                  {{ t('common.edit') }}
+                </button>
+                <button class="link-danger" @click="deleteRepo">
+                  <SvgIcon name="trash" />
+                  {{ t('common.delete') }}
                 </button>
               </div>
-            </template>
+            </div>
           </div>
         </div>
-      </template>
 
-      <!-- FILE → list -->
-      <template v-else-if="!repo.restricted">
-        <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
-        <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
-        <div v-else class="items-list">
-          <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
-            :draggable="canEdit()"
-            @dragstart="canEdit() && onDragStart(item.id, $event)"
-            @dragover="canEdit() && onDragOver(item.id, $event)"
-            @drop="canEdit() && onDrop(item.id, $event)">
-            <div class="item-row__handle">
-              <SvgIcon v-if="canEdit()" name="drag" />
-              <SvgIcon v-else name="chevron-right" />
-            </div>
-            <div class="item-row__icon">
-              <SvgIcon name="package" :size="20" />
-            </div>
-            <div class="item-row__info">
-              <span class="item-row__name">{{ item.name }}</span>
-              <span class="item-row__size" v-if="item.fileSize">{{ formatSize(item.fileSize) }}</span>
-            </div>
-            <div class="item-row__actions">
-              <a v-if="item.url" :href="item.url" class="item-row__download" :download="item.name" :title="t('common.download')">
-                <SvgIcon name="download" :size="16" />
-              </a>
-              <button v-if="canEdit()" class="item-row__delete" @click="deleteItem(item.id)">
-                <SvgIcon name="trash" />
-              </button>
-            </div>
-          </div>
-          <button v-if="itemsPage < itemsPages" class="item-row item-row--load-more" @click="loadMoreItems" :disabled="itemsLoadingMore">
-            <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
-            <template v-else>
-              <SvgIcon name="chevron-down" :size="16" />
-              <span>{{ t('common.loadMore') }}</span>
-            </template>
+        <div v-if="repo.restricted" class="repo-access-bar">
+          <p class="repo-access-bar__msg">
+            <SvgIcon name="lock" /> {{ t('repo.restrictedHint') }}
+          </p>
+          <button v-if="auth.isLoggedIn && !isOwner()" class="btn btn--restricted" @click="requestAccess">
+            <SvgIcon name="key" /> {{ t('repo.requestAccess') }}
           </button>
         </div>
+        <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
+
+        <div v-if="!repo.restricted && repo.tags?.length" class="repo-tags">
+          <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
+        </div>
+
+        <!-- CODE type → external link + GitHub info -->
+        <template v-if="!repo.restricted && repo.type === 0">
+          <a v-if="repo.url" :href="repo.url" target="_blank" rel="noopener" class="repo-url">
+            <div class="repo-url__left">
+              <SvgIcon name="fork" :size="16" />
+              <span>{{ repo.url }}</span>
+            </div>
+            <div v-if="repo.github" class="repo-url__stats">
+              <span v-if="repo.github.language" class="github-lang">{{ repo.github.language }}</span>
+              <span class="github-stat"><SvgIcon name="star" />{{ repo.github.stars || 0 }}</span>
+              <span class="github-stat"><SvgIcon name="fork" />{{ repo.github.forks || 0 }}</span>
+            </div>
+            <div v-if="repo.github?.description" class="github-desc">
+              <SvgIcon name="chevron-right" :size="12" />
+              <span>{{ repo.github.description }}</span>
+            </div>
+          </a>
+          <div v-if="repo.github?.commits?.length" class="commits-timeline">
+            <div v-for="(c, i) in repo.github.commits" :key="c.sha" class="commit-item">
+              <div class="commit-dot-line">
+                <div class="commit-dot"></div>
+                <div v-if="i < repo.github.commits.length - 1" class="commit-line"></div>
+              </div>
+              <div class="commit-body">
+                <span class="commit-msg">{{ c.message }}</span>
+                <div class="commit-meta">
+                  <img v-if="c.authorAvatar" :src="c.authorAvatar" class="commit-avatar" />
+                  <span class="commit-author">{{ c.author }}</span>
+                  <span class="commit-date">{{ formatDate(c.date) }}</span>
+                  <span class="commit-sha"><SvgIcon name="git-commit" :size="12" /> {{ c.sha }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- MEDIA → grid -->
+        <template v-else-if="!repo.restricted && repo.type === 1">
+          <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
+          <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
+          <div v-else ref="gridEl" class="items-grid" :style="{ '--grid-cols': gridCols }">
+            <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
+              <template v-for="(item, index) in column" :key="item.__loadMore ? '__load-more' : item.id">
+                <button v-if="item.__loadMore" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
+                  <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+                  <template v-else>
+                    <SvgIcon name="chevron-down" :size="20" />
+                    <span>{{ t('common.loadMore') }}</span>
+                  </template>
+                </button>
+                <div v-else class="item-card"
+                     :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
+                     :draggable="canEdit()"
+                     @dragstart="canEdit() && onDragStart(item.id, $event)"
+                     @dragover="canEdit() && onDragOver(item.id, $event)"
+                     @drop="canEdit() && onDrop(item.id, $event)">
+                  <div class="item-card__handle">
+                    <SvgIcon v-if="canEdit()" name="drag" />
+                    <SvgIcon v-else name="chevron-right" />
+                  </div>
+                  <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
+                       @load="onMediaLoad(item.id, $event)" @error="onMediaLoad(item.id, $event)" @click="previewItem(item.url)" />
+                  <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
+                    <video :src="item.url" preload="metadata" @loadedmetadata="onVideoMeta(item.id, $event)"></video>
+                    <div class="item-card__play-icon">
+                      <SvgIcon name="play" :size="24" />
+                    </div>
+                  </div>
+                  <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
+                    <SvgIcon name="audio" :size="24" />
+                  </div>
+                  <span class="item-card__name">{{ item.name }}</span>
+                  <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
+                    <SvgIcon name="close" :size="10" />
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+
+        <!-- FILE → list -->
+        <template v-else-if="!repo.restricted">
+          <p v-if="itemError" class="msg msg--error">{{ itemError }}</p>
+          <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
+          <div v-else class="items-list">
+            <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
+                 :draggable="canEdit()"
+                 @dragstart="canEdit() && onDragStart(item.id, $event)"
+                 @dragover="canEdit() && onDragOver(item.id, $event)"
+                 @drop="canEdit() && onDrop(item.id, $event)">
+              <div class="item-row__handle">
+                <SvgIcon v-if="canEdit()" name="drag" />
+                <SvgIcon v-else name="chevron-right" />
+              </div>
+              <div class="item-row__icon">
+                <SvgIcon name="package" :size="20" />
+              </div>
+              <div class="item-row__info">
+                <span class="item-row__name">{{ item.name }}</span>
+                <span class="item-row__size" v-if="item.fileSize">{{ formatSize(item.fileSize) }}</span>
+              </div>
+              <div class="item-row__actions">
+                <a v-if="item.url" :href="item.url" class="item-row__download" :download="item.name" :title="t('common.download')">
+                  <SvgIcon name="download" :size="16" />
+                </a>
+                <button v-if="canEdit()" class="item-row__delete" @click="deleteItem(item.id)">
+                  <SvgIcon name="trash" />
+                </button>
+              </div>
+            </div>
+            <button v-if="itemsPage < itemsPages" class="item-row item-row--load-more" @click="loadMoreItems" :disabled="itemsLoadingMore">
+              <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
+              <template v-else>
+                <SvgIcon name="chevron-down" :size="16" />
+                <span>{{ t('common.loadMore') }}</span>
+              </template>
+            </button>
+          </div>
+        </template>
+
+        <div class="detail__actions-bar">
+          <div class="detail__actions-left">
+            <LikeButton
+                :targetType="4"
+                :targetId="repo.id"
+                :liked="likeLiked"
+                :count="likeCount"
+                @update:liked="likeLiked = $event"
+                @update:count="likeCount = $event"
+            />
+            <div v-if="repo.recentLikers?.length" class="recent-likers">
+              <router-link
+                  v-for="liker in repo.recentLikers"
+                  :key="liker.userId"
+                  :to="`/members/${liker.userId}`"
+                  class="recent-liker-link"
+              >
+                <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
+                <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
+              </router-link>
+            </div>
+          </div>
+          <div class="detail__actions-right">
+            <ShareButton
+                :title="`${t('repo.pageTitleSingle')} | ${repo.name} | ${repo.userNickname}`"
+                :text="repo.description || ''"
+                :url="shareUrl"
+                :image="repo.coverImage || ''"
+            />
+            <UploadProgress
+                v-if="uploadState.total > 0"
+                :total="uploadState.total"
+                :uploaded="uploadState.uploaded"
+                :current-progress="uploadState.currentProgress"
+            />
+          </div>
+        </div>
+        <CommentSection
+            :comments="comments"
+            :target-id="route.params.id"
+            target-type="repo"
+            :total="commentTotal"
+            @submit="handleComment"
+            @delete="handleDeleteComment"
+        />
+        <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
       </template>
 
-    <div class="detail__actions-bar">
-      <div class="detail__actions-left">
-        <LikeButton
-          :targetType="4"
-          :targetId="repo.id"
-          :liked="likeLiked"
-          :count="likeCount"
-          @update:liked="likeLiked = $event"
-          @update:count="likeCount = $event"
-        />
-        <div v-if="repo.recentLikers?.length" class="recent-likers">
-          <router-link
-            v-for="liker in repo.recentLikers"
-            :key="liker.userId"
-            :to="`/members/${liker.userId}`"
-            class="recent-liker-link"
-          >
-            <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
-            <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
-          </router-link>
-        </div>
-      </div>
-      <div class="detail__actions-right">
-        <ShareButton
-          :title="`${t('repo.pageTitleSingle')} | ${repo.name} | ${repo.userNickname}`"
-          :text="repo.description || ''"
-          :url="shareUrl"
-          :image="repo.coverImage || ''"
-        />
-        <UploadProgress
-          v-if="uploadState.total > 0"
-          :total="uploadState.total"
-          :uploaded="uploadState.uploaded"
-          :current-progress="uploadState.currentProgress"
-        />
-      </div>
-    </div>
-    <CommentSection
-      :comments="comments"
-      :target-id="route.params.id"
-      target-type="repo"
-      :total="commentTotal"
-      @submit="handleComment"
-      @delete="handleDeleteComment"
-    />
-    <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
-    </template>
-
-    <!-- Edit modal -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div v-if="showEdit" class="modal-overlay" @click.self="showEdit = false">
-          <div class="modal">
-            <h3 class="modal__title">{{ t('common.edit') }}</h3>
-            <div class="fields">
-              <div class="field">
-                <label class="field__label">{{ t('repo.name') }} <span class="field__required">*</span></label>
-                <input v-model="editForm.name" class="field__input" maxlength="255" />
-              </div>
-              <div class="field">
-                <div class="cover-label-row">
-                  <label class="field__label">{{ t('article.cover') }}</label>
-                  <label class="btn btn--outline btn--sm">
-                    <SvgIcon name="upload" />
-                    {{ t('article.upload') }}
-                    <input type="file" accept="image/*" class="hidden-input" @change="handleEditCover" />
-                  </label>
+      <!-- Edit modal -->
+      <Teleport to="body">
+        <Transition name="modal">
+          <div v-if="showEdit" class="modal-overlay" @click.self="showEdit = false">
+            <div class="modal">
+              <h3 class="modal__title">{{ t('common.edit') }}</h3>
+              <div class="fields">
+                <div class="field">
+                  <label class="field__label">{{ t('repo.name') }} <span class="field__required">*</span></label>
+                  <input v-model="editForm.name" class="field__input" maxlength="255" />
                 </div>
-                <div v-if="editCoverPreview || (editForm.coverImage && !repo.isDefaultCover)" class="cover-preview-wrap">
-                  <img :src="editCoverPreview || editForm.coverImage" class="cover-preview" />
-                  <button class="cover-preview-remove" @click="removeEditCover">&times;</button>
+                <div class="field">
+                  <div class="cover-label-row">
+                    <label class="field__label">{{ t('article.cover') }}</label>
+                    <label class="btn btn--outline btn--sm">
+                      <SvgIcon name="upload" />
+                      {{ t('article.upload') }}
+                      <input type="file" accept="image/*" class="hidden-input" @change="handleEditCover" />
+                    </label>
+                  </div>
+                  <div v-if="editCoverPreview || (editForm.coverImage && !repo.isDefaultCover)" class="cover-preview-wrap">
+                    <img :src="editCoverPreview || editForm.coverImage" class="cover-preview" />
+                    <button class="cover-preview-remove" @click="removeEditCover">&times;</button>
+                  </div>
                 </div>
-              </div>
-              <div class="field" v-if="repo.type === 0">
-                <label class="field__label">{{ t('repo.url') }}</label>
-                <input v-model="editForm.url" class="field__input" />
-                <span class="field__hint">{{ t('repo.urlHint') }}</span>
-              </div>
-              <div class="field">
-                <label class="field__label">{{ t('repo.description') }}</label>
-                <textarea v-model="editForm.description" class="field__input field__textarea" rows="2" />
-              </div>
-              <div class="field">
-                <label class="field__label">{{ t('repo.tags') }}</label>
-                <input v-model="editForm.tags" class="field__input" />
-                <span class="field__hint">{{ t('repo.tagsHint') }}</span>
-              </div>
-              <div class="field">
-                <div class="cover-label-row">
-                  <label class="field__label">{{ t('article.visibility') }}</label>
-                  <div class="visibility-slide">
-                    <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
-                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
-                      <SvgIcon name="world" :size="12" />{{ t('visibility.pub') }}
-                    </button>
-                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
-                      <SvgIcon name="lock" :size="12" />{{ t('visibility.pvt') }}
-                    </button>
-                    <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
-                      <SvgIcon name="key" :size="12" />{{ t('visibility.restr') }}
-                    </button>
+                <div class="field" v-if="repo.type === 0">
+                  <label class="field__label">{{ t('repo.url') }}</label>
+                  <input v-model="editForm.url" class="field__input" />
+                  <span class="field__hint">{{ t('repo.urlHint') }}</span>
+                </div>
+                <div class="field">
+                  <label class="field__label">{{ t('repo.description') }}</label>
+                  <textarea v-model="editForm.description" class="field__input field__textarea" rows="2" />
+                </div>
+                <div class="field">
+                  <label class="field__label">{{ t('repo.tags') }}</label>
+                  <input v-model="editForm.tags" class="field__input" />
+                  <span class="field__hint">{{ t('repo.tagsHint') }}</span>
+                </div>
+                <div class="field">
+                  <div class="cover-label-row">
+                    <label class="field__label">{{ t('article.visibility') }}</label>
+                    <div class="visibility-slide">
+                      <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
+                      <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
+                        <SvgIcon name="world" :size="12" />{{ t('visibility.pub') }}
+                      </button>
+                      <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
+                        <SvgIcon name="lock" :size="12" />{{ t('visibility.pvt') }}
+                      </button>
+                      <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
+                        <SvgIcon name="key" :size="12" />{{ t('visibility.restr') }}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <p v-if="editError" class="msg msg--error">{{ editError }}</p>
-            <div class="modal__actions">
-              <button class="btn btn--outline btn--full" @click="showEdit = false">{{ t('common.cancel') }}</button>
-              <button class="btn btn--primary btn--full" :disabled="saving" @click="saveEdit">
-                {{ saving ? t('common.saving') : t('common.save') }}
-              </button>
+              <p v-if="editError" class="msg msg--error">{{ editError }}</p>
+              <div class="modal__actions">
+                <button class="btn btn--outline btn--full" @click="showEdit = false">{{ t('common.cancel') }}</button>
+                <button class="btn btn--primary btn--full" :disabled="saving" @click="saveEdit">
+                  {{ saving ? t('common.saving') : t('common.save') }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Transition>
-    </Teleport>
+        </Transition>
+      </Teleport>
 
-    <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
+      <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
 
     </div>
   </div>
@@ -726,12 +800,12 @@ async function saveEdit() {
 
     <div class="like-fab">
       <LikeButton
-        :targetType="4"
-        :targetId="Number(route.params.id)"
-        :liked="likeLiked"
-        :count="likeCount"
-        @update:liked="likeLiked = $event"
-        @update:count="likeCount = $event"
+          :targetType="4"
+          :targetId="Number(route.params.id)"
+          :liked="likeLiked"
+          :count="likeCount"
+          @update:liked="likeLiked = $event"
+          @update:count="likeCount = $event"
       />
     </div>
 
