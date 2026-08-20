@@ -2,10 +2,12 @@
 import { ref } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { fileAPI } from '@/api'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 
 const emit = defineEmits(['uploaded'])
 
@@ -20,7 +22,7 @@ async function handleUpload(e) {
     const { data } = await fileAPI.upload(file)
     emit('uploaded', data.data.url)
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    toast(getMessage(err, 'common.failed'), 'error')
   } finally {
     uploading.value = false
     e.target.value = ''

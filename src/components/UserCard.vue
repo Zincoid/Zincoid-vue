@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
+import { useToast } from '@/composables/useToast'
 import { useError } from '@/composables/useError'
 import { formatActiveTime } from '@/utils/format'
 import { userAPI } from '@/api'
@@ -10,6 +11,7 @@ import { userAPI } from '@/api'
 const { t } = useI18n()
 const { getMessage } = useError()
 const { confirm } = useConfirm()
+const { toast } = useToast()
 const auth = useAuthStore()
 
 const props = defineProps({
@@ -30,7 +32,7 @@ async function toggleStatus() {
     await userAPI.updateStatus(props.user.id, next)
     emit('update:user', { ...props.user, status: next })
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 
@@ -40,7 +42,7 @@ async function handleDelete() {
     await userAPI.deleteUser(props.user.id)
     emit('delete:user', props.user.id)
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 </script>

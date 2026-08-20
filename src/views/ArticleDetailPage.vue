@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import { useConfig } from '@/composables/useConfig'
 import { articleAPI, commentAPI, likeAPI } from '@/api'
@@ -19,6 +20,7 @@ import 'highlight.js/styles/github-dark.css'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
@@ -150,7 +152,7 @@ async function handleComment({ content, parentId }) {
     await commentAPI.addArticle(route.params.id, { content, parentId })
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.postFailed'), 'error')
   }
 }
 
@@ -160,7 +162,7 @@ async function handleDeleteComment(commentId) {
     await commentAPI.delete(commentId)
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.deleteFailed'), 'error')
   }
 }
 
@@ -182,7 +184,7 @@ async function togglePin() {
     await api(article.value.id)
     article.value.isPinned = !article.value.isPinned
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 
@@ -192,7 +194,7 @@ async function handleDelete() {
     await articleAPI.delete(route.params.id)
     window.location.href = '/#/articles'
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'article.deleteError'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'article.deleteError'), 'error')
   }
 }
 

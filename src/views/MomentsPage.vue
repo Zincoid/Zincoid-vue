@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
 import { useMention } from '@/composables/useMention'
 import { momentAPI, fileAPI } from '@/api'
@@ -16,6 +17,7 @@ import FabContainer from '@/components/FabContainer.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 const auth = useAuthStore()
 const mention = useMention()
 const { load: loadConfig, get: getConfig } = useConfig()
@@ -110,7 +112,7 @@ async function submitMoment() {
         })
         uploadData = data
       } catch (err) {
-        if (err?.response?.status !== 401) alert(getMessage(err, 'common.uploadFailed'))
+        if (err?.response?.status !== 401) toast(getMessage(err, 'common.uploadFailed'), 'error')
         return
       }
       urls.push(uploadData.data.url)
@@ -129,7 +131,7 @@ async function submitMoment() {
     page.value = 1
     await fetchMoments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.postFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'moment.postFailed'), 'error')
   } finally {
     posting.value = false
     uploadState.value = { total: 0, uploaded: 0, currentFile: 0, currentProgress: 0 }

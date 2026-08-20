@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import DigitalFlow from '@/components/DigitalFlow.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import MessageToast from '@/components/MessageToast.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -24,4 +25,5 @@ const showFlow = computed(() => {
   </main>
   <Footer />
   <ConfirmDialog />
+  <MessageToast />
 </template>

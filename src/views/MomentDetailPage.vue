@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
 import { useMention } from '@/composables/useMention'
 import { useConfirm } from '@/composables/useConfirm'
@@ -23,6 +24,7 @@ import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 const route = useRoute()
@@ -130,7 +132,7 @@ async function saveEdit() {
         })
         uploadData = data
       } catch (err) {
-        if (err?.response?.status !== 401) alert(getMessage(err, 'common.uploadFailed'))
+        if (err?.response?.status !== 401) toast(getMessage(err, 'common.uploadFailed'), 'error')
         return
       }
       newUrls.push(uploadData.data.url)
@@ -146,7 +148,7 @@ async function saveEdit() {
     moment.value.visibility = editVisibility.value
     editing.value = false
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.updateFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'moment.updateFailed'), 'error')
   } finally {
     saving.value = false
     uploadState.value = { total: 0, uploaded: 0, currentProgress: 0 }
@@ -194,7 +196,7 @@ async function handleComment({ content, parentId }) {
     await commentAPI.addMoment(route.params.id, { content, parentId })
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.postFailed'), 'error')
   }
 }
 
@@ -204,7 +206,7 @@ async function handleDeleteComment(commentId) {
     await commentAPI.delete(commentId)
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.deleteFailed'), 'error')
   }
 }
 
@@ -226,7 +228,7 @@ async function togglePin() {
     await api(moment.value.id)
     moment.value.isPinned = !moment.value.isPinned
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'common.failed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 
@@ -236,7 +238,7 @@ async function handleDelete() {
     await momentAPI.delete(route.params.id)
     router.push('/moments')
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'moment.deleteError'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'moment.deleteError'), 'error')
   }
 }
 

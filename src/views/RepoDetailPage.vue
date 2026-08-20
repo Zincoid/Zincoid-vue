@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
@@ -22,6 +23,7 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { getMessage } = useError()
+const { toast } = useToast()
 const { confirm } = useConfirm()
 const auth = useAuthStore()
 const { load: loadConfig, get: getConfig } = useConfig()
@@ -174,7 +176,7 @@ async function handleComment({ content, parentId }) {
     await commentAPI.addRepo(route.params.id, { content, parentId })
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.postFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.postFailed'), 'error')
   }
 }
 
@@ -184,7 +186,7 @@ async function handleDeleteComment(commentId) {
     await commentAPI.delete(commentId)
     await fetchComments()
   } catch (err) {
-    if (err?.response?.status !== 401) alert(getMessage(err, 'comment.deleteFailed'))
+    if (err?.response?.status !== 401) toast(getMessage(err, 'comment.deleteFailed'), 'error')
   }
 }
 
@@ -205,9 +207,9 @@ async function requestAccess() {
   if (!await confirm(t('repo.requestAccessConfirm'))) return
   try {
     await repoAPI.requestAccess(repo.value.id)
-    alert(t('repo.requestAccessSent'))
+    toast(t('repo.requestAccessSent'), 'success')
   } catch (err) {
-    alert(getMessage(err, 'common.failed'))
+    toast(getMessage(err, 'common.failed'), 'error')
   }
 }
 
