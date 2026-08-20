@@ -300,7 +300,9 @@ function updateGridCols() {
 }
 const itemColumns = computed(() => {
   const cols = Array.from({ length: gridCols.value }, () => [])
-  ;(repo.value?.items || []).forEach((item, i) => cols[i % gridCols.value].push(item))
+  const items = repo.value?.items || []
+  items.forEach((item, i) => cols[i % gridCols.value].push(item))
+  if (itemsPage.value < itemsPages.value) cols[items.length % gridCols.value].push({ __loadMore: true })
   return cols
 })
 
@@ -515,41 +517,41 @@ async function saveEdit() {
         <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
         <div v-else class="items-grid" :style="{ '--grid-cols': gridCols }">
           <div v-for="(column, ci) in itemColumns" :key="ci" class="items-grid__col">
-            <div v-for="(item, index) in column" :key="item.id" class="item-card"
-              :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
-              :draggable="canEdit()"
-              @dragstart="canEdit() && onDragStart(item.id, $event)"
-              @dragover="canEdit() && onDragOver(item.id, $event)"
-              @drop="canEdit() && onDrop(item.id, $event)">
-              <div class="item-card__handle">
-                <SvgIcon v-if="canEdit()" name="drag" />
-                <SvgIcon v-else name="chevron-right" />
-              </div>
-              <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
-                @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
-              <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
-                <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
-                <div class="item-card__play-icon">
-                  <SvgIcon name="play" :size="24" />
-                </div>
-              </div>
-              <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
-                <SvgIcon name="audio" :size="24" />
-              </div>
-              <span class="item-card__name">{{ item.name }}</span>
-              <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
-                <SvgIcon name="close" :size="10" />
-              </button>
-            </div>
-            <div v-if="itemsPage < itemsPages && ci === (repo.items.length % gridCols)" class="load-more-cube-wrap">
-              <button class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
+            <template v-for="(item, index) in column" :key="item.__loadMore ? '__load-more' : item.id">
+              <button v-if="item.__loadMore" class="load-more-cube" @click="loadMoreItems" :disabled="itemsLoadingMore">
                 <span v-if="itemsLoadingMore" class="load-more-cube__spinner"></span>
                 <template v-else>
                   <SvgIcon name="chevron-down" :size="20" />
                   <span>{{ t('common.loadMore') }}</span>
                 </template>
               </button>
-            </div>
+              <div v-else class="item-card"
+                :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
+                :draggable="canEdit()"
+                @dragstart="canEdit() && onDragStart(item.id, $event)"
+                @dragover="canEdit() && onDragOver(item.id, $event)"
+                @drop="canEdit() && onDrop(item.id, $event)">
+                <div class="item-card__handle">
+                  <SvgIcon v-if="canEdit()" name="drag" />
+                  <SvgIcon v-else name="chevron-right" />
+                </div>
+                <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
+                  @load="onMediaLoad(item.id)" @error="onMediaLoad(item.id)" @click="previewItem(item.url)" />
+                <div v-else-if="mediaType(item.url) === 'video'" class="item-card__video" @click="previewItem(item.url)">
+                  <video :src="item.url" preload="metadata" @loadedmetadata="(e) => e.target.currentTime = 1"></video>
+                  <div class="item-card__play-icon">
+                    <SvgIcon name="play" :size="24" />
+                  </div>
+                </div>
+                <div v-else-if="mediaType(item.url) === 'audio'" class="item-card__audio" @click="previewItem(item.url)">
+                  <SvgIcon name="audio" :size="24" />
+                </div>
+                <span class="item-card__name">{{ item.name }}</span>
+                <button v-if="canEdit()" class="item-card__delete" @click.stop="deleteItem(item.id)">
+                  <SvgIcon name="close" :size="10" />
+                </button>
+              </div>
+            </template>
           </div>
         </div>
       </template>
@@ -908,8 +910,6 @@ async function saveEdit() {
   animation: item-card-spin 0.8s linear infinite;
 }
 @keyframes item-card-spin { to { transform: rotate(360deg); } }
-
-.load-more-cube-wrap { min-height: 0; }
 
 .load-more-cube {
   display: flex;
