@@ -250,14 +250,7 @@ watch(likeLiked, (liked) => {
           <span class="article-views">{{ article.viewCount }} {{ t('article.views') }}</span>
           <div v-if="auth.isAdmin || auth.user?.id === article.userId" class="article-actions">
             <button v-if="auth.isAdmin" class="link-pin" @click="togglePin">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <template v-if="article.isPinned">
-                  <path d="M12 17v5"/><path d="M15 9.34V7h1a2 2 0 0 0 0-4H7.89"/><path d="m2 2 20 20"/><path d="M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h7.32"/>
-                </template>
-                <template v-else>
-                  <path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v3.76z"/>
-                </template>
-              </svg>
+              <SvgIcon :name="article.isPinned ? 'pin-off' : 'pin'" :size="16" />
               {{ article.isPinned ? t('common.unpin') : t('common.pin') }}
             </button>
             <router-link :to="`/articles/${article.id}/edit`" class="link-muted">

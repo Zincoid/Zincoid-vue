@@ -5,6 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 import { useError } from '@/composables/useError'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { formatActiveTime } from '@/utils/format'
 import { userAPI } from '@/api'
 
@@ -81,7 +82,7 @@ async function handleDelete() {
         </svg>
       </button>
       <button class="user-card__btn user-card__btn--danger" @click.stop="handleDelete" title="Delete user">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        <SvgIcon name="trash" :size="14" />
       </button>
     </div>
   </div>
