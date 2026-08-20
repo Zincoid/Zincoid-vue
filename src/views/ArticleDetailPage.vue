@@ -221,7 +221,7 @@ watch(likeLiked, (liked) => {
 
 <template>
   <LoadingSpinner :visible="loading" @done="loadingDone = true" />
-  <div class="article-detail container" v-if="loadingDone && article">
+  <div class="article-detail container" :class="{ 'has-toc': tocItems.length }" v-if="loadingDone && article">
     <nav v-if="tocItems.length" class="article-toc">
       <div class="toc-title">{{ t('article.toc') }}</div>
       <div class="toc-scroll">
@@ -456,7 +456,7 @@ watch(likeLiked, (liked) => {
   font-weight: var(--weight-medium);
 }
 @media (min-width: 1201px) {
-  .article-detail { padding-left: 200px; }
+  .article-detail.has-toc { padding-left: 200px; }
 }
 @media (max-width: 1200px) {
   .article-toc { display: none; }
