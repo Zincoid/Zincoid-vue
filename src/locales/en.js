@@ -515,6 +515,7 @@ export default {
     notSet: 'Not set',
     created: 'Created successfully',
     updated: 'Updated successfully',
-    deleted: 'Deleted successfully'
+    deleted: 'Deleted successfully',
+    updateAvailable: 'A new version is available. Reload now?'
   }
 }

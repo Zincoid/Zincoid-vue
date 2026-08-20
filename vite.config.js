@@ -2,8 +2,23 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
+const buildVersion = () => ({
+  name: 'vite-plugin-build-version',
+  apply: 'build',
+  transformIndexHtml(html) {
+    return {
+      html,
+      tags: [{
+        tag: 'meta',
+        attrs: { name: 'build-version', content: Date.now().toString(36) },
+        injectTo: 'head'
+      }]
+    }
+  }
+})
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), buildVersion()],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')

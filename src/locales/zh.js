@@ -513,6 +513,7 @@ export default {
     notSet: '未设置',
     created: '已创建',
     updated: '已更新',
-    deleted: '已删除'
+    deleted: '已删除',
+    updateAvailable: '检测到新版本，是否立即刷新页面？'
   }
 }
