@@ -190,7 +190,7 @@ function typeLabel(type) {
     </div>
     <div class="tab-content" v-show="tab === 'repos'">
       <LoadingSpinner :visible="tabLoading" />
-      <div class="repo-grid">
+      <div v-if="repos.length" class="repo-grid">
         <div v-for="repo in repos" :key="repo.id" @click="router.push(`/repos/${repo.id}`)">
           <RepoCard :repo="repo" :show-user="false" />
         </div>
