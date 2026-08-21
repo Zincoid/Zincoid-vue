@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
@@ -17,6 +17,7 @@ const configMessage = ref('')
 const configError = ref('')
 const configLoading = ref(true)
 const configDone = ref(false)
+const disk = ref(null)
 const toolMessage = ref('')
 const toolError = ref('')
 const cleaning = ref(false)
@@ -111,7 +112,31 @@ onMounted(async () => {
   } finally {
     configLoading.value = false
   }
+  try {
+    const res = await healthAPI.storageSpace()
+    disk.value = res.data?.data || null
+  } catch (e) {
+    if (e?.response?.status !== 401) configError.value = getMessage(e, 'manage.storageFailed')
+  }
 })
+
+function formatSize(bytes) {
+  if (!bytes) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let i = 0
+  let size = bytes
+  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++ }
+  return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i]
+}
+
+const ringRadius = 48
+const ringCircumference = 2 * Math.PI * ringRadius
+const usedPercent = computed(() => {
+  if (!disk.value || !disk.value.total) return 0
+  return Math.round((disk.value.used / disk.value.total) * 100)
+})
+const ringDash = computed(() => (usedPercent.value / 100) * ringCircumference)
+const ringColor = computed(() => usedPercent.value >= 90 ? 'var(--color-danger)' : 'var(--color-primary)')
 
 async function saveConfig(config) {
   try {
@@ -186,6 +211,44 @@ async function handleReset() {
       <h2 class="page-header__title">## {{ t('personal.manageTab') }}<span class="cursor">_</span></h2>
       <p class="page-header__subtitle">{{ t('manage.subtitle') }}</p>
     </div>
+
+    <section class="section" v-if="disk">
+      <h3>{{ t('manage.storage') }}</h3>
+      <div class="storage-layout">
+        <div class="storage-card">
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageTotal') }}</span>
+            <span class="storage-value">{{ formatSize(disk.total) }}</span>
+          </div>
+          <span class="storage-op">-</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageUsed') }}</span>
+            <span class="storage-value">{{ formatSize(disk.used) }}</span>
+          </div>
+          <span class="storage-op">=</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageFree') }}</span>
+            <span class="storage-value storage-value--free">{{ formatSize(disk.free) }}</span>
+          </div>
+        </div>
+        <div class="storage-chart">
+          <svg class="storage-chart__ring" viewBox="0 0 120 120">
+            <circle class="storage-chart__track" cx="60" cy="60" :r="ringRadius" />
+            <circle
+              class="storage-chart__bar"
+              cx="60" cy="60"
+              :r="ringRadius"
+              :stroke="ringColor"
+              :stroke-dasharray="`${ringDash} ${ringCircumference}`"
+            />
+          </svg>
+          <div class="storage-chart__center">
+            <span class="storage-chart__percent">{{ usedPercent }}%</span>
+            <span class="storage-chart__label">{{ t('manage.storageUsed') }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="section">
       <h3>{{ t('manage.config') }}</h3>
@@ -346,6 +409,24 @@ async function handleReset() {
 h2, h3 { margin-bottom: var(--spacing-lg); }
 
 .config-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
+.storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }
+.storage-card { flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.storage-item { display: flex; flex-direction: column; gap: var(--spacing-xxs); }
+.storage-label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.storage-value { font-weight: var(--weight-medium); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); }
+.storage-value--free { color: var(--color-primary, #4ade80); }
+.storage-op { display: flex; align-items: flex-end; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.storage-chart { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+.storage-chart__ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.storage-chart__track { fill: none; stroke: var(--color-border); stroke-width: 10; }
+.storage-chart__bar { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dasharray var(--transition-fast); }
+.storage-chart__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.storage-chart__percent { font-family: var(--font-mono); font-size: var(--text-base); font-weight: var(--weight-semibold); color: var(--color-text-heading); line-height: 1; }
+.storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+@media (max-width: 640px) {
+  .storage-card { gap: var(--spacing-sm); padding: var(--spacing-md); }
+  .storage-layout { gap: var(--spacing-md); justify-content: center; }
+}
 .config-item { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
 .config-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
 .config-key { font-weight: var(--weight-medium); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -233,8 +233,13 @@ export default {
     noRequests: 'No requests.'
   },
   manage: {
-    subtitle: 'Configuration & tools',
+    subtitle: 'Site information, configuration & tools',
     config: 'Configuration',
+    storage: 'Storage',
+    storageTotal: 'Total',
+    storageFree: 'Free',
+    storageUsed: 'Used',
+    storageFailed: 'Failed to load storage space',
     loadFailed: 'Failed to load configs',
     saveFailed: 'Save failed',
     saved: 'Saved: {key}',

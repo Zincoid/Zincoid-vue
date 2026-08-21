@@ -233,8 +233,13 @@ export default {
     noRequests: '暂无申请。'
   },
   manage: {
-    subtitle: '站点配置与工具',
-    config: '站点配置',
+    subtitle: '站点信息、配置与工具',
+    config: '配置',
+    storage: '存储',
+    storageTotal: '总空间',
+    storageFree: '剩余空间',
+    storageUsed: '已用空间',
+    storageFailed: '获取存储空间失败',
     loadFailed: '加载配置失败',
     saveFailed: '保存失败',
     saved: '已保存: {key}',

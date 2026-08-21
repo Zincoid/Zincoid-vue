@@ -143,7 +143,8 @@ export const chatAPI = {
 // ── Health ──
 export const healthAPI = {
   cleanupFiles: (isLogic = false) => api.delete('/health/cleanup', { params: { isLogic } }),
-  cleanupRecords: () => api.post('/health/cleanup')
+  cleanupRecords: () => api.post('/health/cleanup'),
+  storageSpace: () => api.get('/health/storage')
 }
 
 // ── Repos ──
