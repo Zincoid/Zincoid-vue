@@ -79,9 +79,9 @@ async function handleEmailBroadcast() {
   emailBroadcasting.value = true
   try {
     await notificationAPI.emailBroadcast(
-      emailSubject.value.trim(),
-      emailContent.value.trim(),
-      emailForce.value
+        emailSubject.value.trim(),
+        emailContent.value.trim(),
+        emailForce.value
     )
     toolMessage.value = t('manage.emailBroadcastSuccess')
     emailOpen.value = false
@@ -112,13 +112,23 @@ onMounted(async () => {
   } finally {
     configLoading.value = false
   }
+  await fetchDisk()
+})
+
+const diskLoading = ref(false)
+const storageDone = ref(false)
+
+async function fetchDisk() {
+  diskLoading.value = true
   try {
     const res = await healthAPI.storageSpace()
     disk.value = res.data?.data || null
   } catch (e) {
     if (e?.response?.status !== 401) configError.value = getMessage(e, 'manage.storageFailed')
+  } finally {
+    diskLoading.value = false
   }
-})
+}
 
 function formatSize(bytes) {
   if (!bytes) return '0 B'
@@ -212,10 +222,14 @@ async function handleReset() {
       <p class="page-header__subtitle">{{ t('manage.subtitle') }}</p>
     </div>
 
-    <section class="section" v-if="disk">
+    <section class="section">
       <h3>{{ t('manage.storage') }}</h3>
-      <div class="storage-layout">
+      <LoadingSpinner :visible="diskLoading && !disk" @done="storageDone = true" />
+      <div v-if="storageDone && disk" class="storage-layout">
         <div class="storage-card">
+          <button class="storage-refresh" :disabled="diskLoading" @click="fetchDisk">
+            <SvgIcon name="refresh" :size="16" />
+          </button>
           <div class="storage-item">
             <span class="storage-label">{{ t('manage.storageTotal') }}</span>
             <span class="storage-value">{{ formatSize(disk.total) }}</span>
@@ -235,11 +249,11 @@ async function handleReset() {
           <svg class="storage-chart__ring" viewBox="0 0 120 120">
             <circle class="storage-chart__track" cx="60" cy="60" :r="ringRadius" />
             <circle
-              class="storage-chart__bar"
-              cx="60" cy="60"
-              :r="ringRadius"
-              :stroke="ringColor"
-              :stroke-dasharray="`${ringDash} ${ringCircumference}`"
+                class="storage-chart__bar"
+                cx="60" cy="60"
+                :r="ringRadius"
+                :stroke="ringColor"
+                :stroke-dasharray="`${ringDash} ${ringCircumference}`"
             />
           </svg>
           <div class="storage-chart__center">
@@ -264,8 +278,8 @@ async function handleReset() {
           </div>
           <div v-if="cfg.configValue === 'true' || cfg.configValue === 'false'" class="config-value-row">
             <ToggleSwitch
-              :model-value="cfg.configValue === 'true'"
-              @update:model-value="toggleBooleanConfig(cfg, $event)"
+                :model-value="cfg.configValue === 'true'"
+                @update:model-value="toggleBooleanConfig(cfg, $event)"
             />
           </div>
           <div v-else class="config-value-row">
@@ -289,10 +303,10 @@ async function handleReset() {
           <span class="tool-desc">{{ t('manage.broadcastDesc') }}</span>
           <div v-if="broadcastOpen" class="config-value-row reset-row">
             <input
-              v-model="broadcastContent"
-              class="field__input"
-              :placeholder="t('manage.broadcastPlaceholder')"
-              style="flex: 1; min-width: 0;"
+                v-model="broadcastContent"
+                class="field__input"
+                :placeholder="t('manage.broadcastPlaceholder')"
+                style="flex: 1; min-width: 0;"
             />
             <div class="reset-actions">
               <button class="btn btn--ghost" @click="cancelBroadcast">{{ t('common.cancel') }}</button>
@@ -314,15 +328,15 @@ async function handleReset() {
           <span class="tool-desc">{{ t('manage.emailBroadcastDesc') }}</span>
           <div v-if="emailOpen" class="email-broadcast-form">
             <input
-              v-model="emailSubject"
-              class="field__input"
-              :placeholder="t('manage.emailBroadcastSubject')"
+                v-model="emailSubject"
+                class="field__input"
+                :placeholder="t('manage.emailBroadcastSubject')"
             />
             <textarea
-              v-model="emailContent"
-              class="field__input"
-              :placeholder="t('manage.emailBroadcastContent')"
-              rows="4"
+                v-model="emailContent"
+                class="field__input"
+                :placeholder="t('manage.emailBroadcastContent')"
+                rows="4"
             ></textarea>
             <div class="email-broadcast-row">
               <div class="toggle">
@@ -410,7 +424,28 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 
 .config-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }
-.storage-card { flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.storage-card { position: relative; flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.storage-refresh {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.storage-refresh:hover { color: var(--color-text-heading); border-color: var(--color-primary); background: var(--color-primary-bg); }
+.storage-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.storage-refresh:disabled svg { animation: storage-spin 1s linear infinite; }
+@keyframes storage-spin { to { transform: rotate(360deg); } }
 .storage-item { display: flex; flex-direction: column; gap: var(--spacing-xxs); }
 .storage-label { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .storage-value { font-weight: var(--weight-medium); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); }
