@@ -118,7 +118,7 @@ export default {
     deleteFailed: 'Failed to delete comment'
   },
   personal: {
-    pageTitle: 'Personal Center',
+    pageTitle: 'Personal',
     subtitle: 'Manage your profile, data and account settings',
     profileTab: 'Profile',
     dataTab: 'Data',
