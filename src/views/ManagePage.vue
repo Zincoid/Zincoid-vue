@@ -374,7 +374,7 @@ onBeforeUnmount(stopStream)
           <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
             <span class="log-line__time">{{ entry.timestamp }}</span>
             <span class="log-line__level">{{ entry.level }}</span>
-            <span class="log-line__logger">{{ entry.logger }}</span>
+            <span class="log-line__logger">{{ entry.logger }}:</span>
             <span class="log-line__msg">{{ entry.message }}</span>
             <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
           </div>
@@ -655,7 +655,8 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .log-select:disabled { opacity: 0.5; cursor: not-allowed; }
 .log-select option { font-family: var(--font-mono); }
 .log-viewer { margin-top: var(--spacing-lg); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); overflow: hidden; background: var(--color-surface); }
-.log-viewer__head { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-bottom: 1px solid var(--color-border); }
+.log-viewer__head { position: relative; display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); }
+.log-viewer__head::after { content: ''; position: absolute; left: var(--spacing-sm); right: var(--spacing-sm); bottom: 0; border-bottom: 1px solid var(--color-border); }
 .log-status { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .log-viewer__head .btn { font-size: var(--text-xs); }
 .log-status--on { color: var(--color-success); }
