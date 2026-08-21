@@ -460,6 +460,7 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .config-input { width: 280px; }
 @media (max-width: 640px) {
   .config-item { flex-direction: column; align-items: stretch; }
+  .config-item .config-value-row { justify-content: flex-end; }
   .config-input { width: 100%; }
 }
 .config-info { flex: 1; min-width: 0; }
