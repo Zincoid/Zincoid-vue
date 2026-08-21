@@ -225,5 +225,19 @@ export const logAPI = {
       }
     })()
     return () => controller.abort()
+  },
+  downloadLog: async () => {
+    const res = await api.get('/logs/download', { responseType: 'blob' })
+    const disposition = res.headers['content-disposition'] || ''
+    const match = /filename="?([^"]+)"?/.exec(disposition)
+    const filename = match ? match[1] : 'zincoid.log'
+    const url = URL.createObjectURL(res.data)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
   }
 }

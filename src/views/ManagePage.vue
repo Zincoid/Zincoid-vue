@@ -229,6 +229,19 @@ function clearLogs() {
   logEntries.value = []
 }
 
+const logDownloading = ref(false)
+
+async function downloadLog() {
+  logDownloading.value = true
+  try {
+    await logAPI.downloadLog()
+  } catch (err) {
+    logError.value = getMessage(err, 'manage.logsDownloadFailed')
+  } finally {
+    logDownloading.value = false
+  }
+}
+
 function onLogScroll() {
   const el = logBodyEl.value
   if (!el) return
@@ -256,7 +269,7 @@ async function toggleLogs() {
       }
     }, () => {
       stopStream()
-      logError.value = t('manage.logFailed')
+      logError.value = t('manage.logsFailed')
     })
     logActive.value = true
   } finally {
@@ -321,33 +334,43 @@ onBeforeUnmount(stopStream)
       <p v-if="logError" class="msg msg--error">{{ logError }}</p>
       <div class="tool-item">
         <div class="tool-info">
-          <span class="tool-label">{{ t('manage.logsEntry') }}</span>
-          <span class="tool-desc">{{ t('manage.logsDesc') }}</span>
+          <span class="tool-label">{{ t('manage.logsDownload') }}</span>
+          <span class="tool-desc">{{ t('manage.logsDownloadDesc') }}</span>
+        </div>
+        <button class="btn btn--primary-outline" :disabled="logDownloading" @click="downloadLog">
+          <SvgIcon name="download" />
+          {{ t('manage.logsDownload') }}
+        </button>
+      </div>
+      <div class="tool-item">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.logsLive') }}</span>
+          <span class="tool-desc">{{ t('manage.logsLiveDesc') }}</span>
         </div>
         <select v-model="logLevel" :disabled="logActive" class="field__input log-select">
           <option v-for="l in logLevels" :key="l" :value="l">{{ l }}</option>
         </select>
         <button v-if="!logActive" class="btn btn--success" :disabled="logSwitching" @click="toggleLogs">
           <SvgIcon name="play" />
-          {{ t('manage.logStart') }}
+          {{ t('manage.logsStart') }}
         </button>
         <button v-else class="btn btn--danger" :disabled="logSwitching" @click="toggleLogs">
           <SvgIcon name="close" />
-          {{ t('manage.logStop') }}
+          {{ t('manage.logsStop') }}
         </button>
       </div>
       <div v-if="logActive || logEntries.length" class="log-viewer">
         <div class="log-viewer__head">
           <span class="log-status" :class="{ 'log-status--on': logActive }">
-            {{ logActive ? t('manage.logConnected') : t('manage.logDisconnected') }}
+            {{ logActive ? t('manage.logsConnected') : t('manage.logsDisconnected') }}
           </span>
           <button class="btn btn--ghost" @click="clearLogs">
             <SvgIcon name="trash" />
-            {{ t('manage.logClear') }}
+            {{ t('manage.logsClear') }}
           </button>
         </div>
         <div class="log-viewer__body" ref="logBodyEl" @scroll="onLogScroll">
-          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logEmpty') }}</p>
+          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logsEmpty') }}</p>
           <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
             <span class="log-line__time">{{ entry.timestamp }}</span>
             <span class="log-line__level">{{ entry.level }}</span>
@@ -632,15 +655,16 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .log-select:disabled { opacity: 0.5; cursor: not-allowed; }
 .log-select option { font-family: var(--font-mono); }
 .log-viewer { margin-top: var(--spacing-lg); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); overflow: hidden; background: var(--color-surface); }
-.log-viewer__head { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-border); }
+.log-viewer__head { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-bottom: 1px solid var(--color-border); }
 .log-status { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.log-viewer__head .btn { font-size: var(--text-xs); }
 .log-status--on { color: var(--color-success); }
-.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-sm) var(--spacing-md); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
+.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-lg); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
 .log-empty { color: var(--color-text-secondary); padding: var(--spacing-md) 0; }
 .log-line { display: flex; flex-wrap: wrap; gap: 0 var(--spacing-sm); white-space: pre-wrap; word-break: break-all; }
 .log-line__time { color: var(--color-text-secondary); flex-shrink: 0; }
 .log-line__level { flex-shrink: 0; width: 5ch; font-weight: var(--weight-semibold); }
-.log-line__logger { color: var(--color-text-secondary); flex-shrink: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-line__logger { color: var(--color-text-secondary); flex-shrink: 0; min-width: 0; }
 .log-line__msg { color: var(--color-text-heading); min-width: 0; }
 .log-line--error .log-line__level, .log-line--error .log-line__msg { color: var(--color-danger); }
 .log-line--warn .log-line__level, .log-line--warn .log-line__msg { color: var(--color-warning); }
