@@ -1,9 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
-import { configAPI, userAPI, healthAPI, notificationAPI } from '@/api'
+import { configAPI, userAPI, healthAPI, notificationAPI, logAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
@@ -213,6 +213,58 @@ async function handleReset() {
     resetting.value = false
   }
 }
+
+const logLevels = ['DEBUG', 'INFO', 'WARN', 'ERROR']
+const logLevel = ref('INFO')
+const logActive = ref(false)
+const logSwitching = ref(false)
+const logError = ref('')
+const logEntries = ref([])
+const logBodyEl = ref(null)
+const logMax = 500
+let stopLogStream = null
+let autoScroll = true
+
+function clearLogs() {
+  logEntries.value = []
+}
+
+function onLogScroll() {
+  const el = logBodyEl.value
+  if (!el) return
+  autoScroll = el.scrollTop + el.clientHeight >= el.scrollHeight - 30
+}
+
+function stopStream() {
+  if (stopLogStream) { stopLogStream(); stopLogStream = null }
+  logActive.value = false
+}
+
+async function toggleLogs() {
+  if (logActive.value) { stopStream(); return }
+  logError.value = ''
+  logSwitching.value = true
+  try {
+    stopLogStream = logAPI.stream(logLevel.value, entry => {
+      logEntries.value.push(entry)
+      if (logEntries.value.length > logMax) logEntries.value.splice(0, logEntries.value.length - logMax)
+      if (autoScroll) {
+        nextTick(() => {
+          const el = logBodyEl.value
+          if (el) el.scrollTop = el.scrollHeight
+        })
+      }
+    }, () => {
+      stopStream()
+      logError.value = t('manage.logFailed')
+    })
+    logActive.value = true
+  } finally {
+    logSwitching.value = false
+  }
+}
+
+onBeforeUnmount(stopStream)
 </script>
 
 <template>
@@ -259,6 +311,49 @@ async function handleReset() {
           <div class="storage-chart__center">
             <span class="storage-chart__percent">{{ usedPercent }}%</span>
             <span class="storage-chart__label">{{ t('manage.storageUsed') }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>{{ t('manage.logs') }}</h3>
+      <p v-if="logError" class="msg msg--error">{{ logError }}</p>
+      <div class="tool-item">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.logsEntry') }}</span>
+          <span class="tool-desc">{{ t('manage.logsDesc') }}</span>
+        </div>
+        <select v-model="logLevel" :disabled="logActive" class="field__input log-select">
+          <option v-for="l in logLevels" :key="l" :value="l">{{ l }}</option>
+        </select>
+        <button v-if="!logActive" class="btn btn--success" :disabled="logSwitching" @click="toggleLogs">
+          <SvgIcon name="play" />
+          {{ t('manage.logStart') }}
+        </button>
+        <button v-else class="btn btn--danger" :disabled="logSwitching" @click="toggleLogs">
+          <SvgIcon name="close" />
+          {{ t('manage.logStop') }}
+        </button>
+      </div>
+      <div v-if="logActive || logEntries.length" class="log-viewer">
+        <div class="log-viewer__head">
+          <span class="log-status" :class="{ 'log-status--on': logActive }">
+            {{ logActive ? t('manage.logConnected') : t('manage.logDisconnected') }}
+          </span>
+          <button class="btn btn--ghost" @click="clearLogs">
+            <SvgIcon name="trash" />
+            {{ t('manage.logClear') }}
+          </button>
+        </div>
+        <div class="log-viewer__body" ref="logBodyEl" @scroll="onLogScroll">
+          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logEmpty') }}</p>
+          <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
+            <span class="log-line__time">{{ entry.timestamp }}</span>
+            <span class="log-line__level">{{ entry.level }}</span>
+            <span class="log-line__logger">{{ entry.logger }}</span>
+            <span class="log-line__msg">{{ entry.message }}</span>
+            <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
           </div>
         </div>
       </div>
@@ -517,4 +612,39 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .email-broadcast-form .field__input {
   width: 100%;
 }
+
+.log-select {
+  width: 132px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--spacing-sm) var(--spacing-2xl) var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-heading);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+}
+.log-select:hover { border-color: var(--color-primary); }
+.log-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.log-select option { font-family: var(--font-mono); }
+.log-viewer { margin-top: var(--spacing-lg); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); overflow: hidden; background: var(--color-surface); }
+.log-viewer__head { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-border); }
+.log-status { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.log-status--on { color: var(--color-success); }
+.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-sm) var(--spacing-md); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
+.log-empty { color: var(--color-text-secondary); padding: var(--spacing-md) 0; }
+.log-line { display: flex; flex-wrap: wrap; gap: 0 var(--spacing-sm); white-space: pre-wrap; word-break: break-all; }
+.log-line__time { color: var(--color-text-secondary); flex-shrink: 0; }
+.log-line__level { flex-shrink: 0; width: 5ch; font-weight: var(--weight-semibold); }
+.log-line__logger { color: var(--color-text-secondary); flex-shrink: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-line__msg { color: var(--color-text-heading); min-width: 0; }
+.log-line--error .log-line__level, .log-line--error .log-line__msg { color: var(--color-danger); }
+.log-line--warn .log-line__level, .log-line--warn .log-line__msg { color: var(--color-warning); }
+.log-line--info .log-line__level, .log-line--info .log-line__msg { color: var(--color-success); }
+.log-line--debug .log-line__level, .log-line--trace .log-line__level { color: var(--color-text-secondary); }
+.log-line__stack { flex-basis: 100%; color: var(--color-danger); background: var(--color-bg); padding: var(--spacing-sm); border-radius: var(--rounded-md); font-family: var(--font-mono); font-size: var(--text-xs); overflow-x: auto; }
 </style>

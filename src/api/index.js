@@ -177,3 +177,53 @@ export const notificationAPI = {
   broadcast: (content) => api.post('/notifications/broadcast', { content }),
   emailBroadcast: (subject, content, force) => api.post('/notifications/broadcast/email', { subject, content, force })
 }
+
+// ── Logs (SSE stream via fetch, supports Authorization header) ──
+export const logAPI = {
+  stream(level, onLog, onError) {
+    const token = localStorage.getItem('token')
+    const controller = new AbortController()
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/logs/stream?level=${level}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          signal: controller.signal
+        })
+        if (res.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          window.location.href = '/login?expired=true'
+          return
+        }
+        if ([502, 503, 504].includes(res.status)) {
+          router.push(maintenanceLocation(await res.json().catch(() => null))).catch(() => {})
+          return
+        }
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+        for (;;) {
+          const { value, done } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          for (;;) {
+            const sepCRLF = buffer.indexOf('\r\n\r\n')
+            const sepLF = buffer.indexOf('\n\n')
+            const sep = sepCRLF !== -1 && (sepLF === -1 || sepCRLF < sepLF) ? sepCRLF : sepLF
+            if (sep === -1) break
+            const frame = buffer.slice(0, sep)
+            buffer = buffer.slice(sep + (sep === sepCRLF ? 4 : 2))
+            const dataLine = frame.split('\n').find(l => l.startsWith('data:'))
+            if (dataLine) {
+              try { onLog(JSON.parse(dataLine.slice(5).trim())) } catch { /* ignore malformed */ }
+            }
+          }
+        }
+      } catch (err) {
+        if (!controller.signal.aborted && onError) onError(err)
+      }
+    })()
+    return () => controller.abort()
+  }
+}

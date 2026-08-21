@@ -291,7 +291,17 @@ export default {
     cleanupFile_orphanDb: 'Orphan DB',
     cleanupFile_orphanDisk: 'Orphan files',
     cleanupFile_unlinked: 'Unlinked',
-    cleanupFile_invalidRef: 'Invalid refs'
+    cleanupFile_invalidRef: 'Invalid refs',
+    logs: 'Logs',
+    logsEntry: 'Live',
+    logsDesc: 'Stream server logs in real time (SSE)',
+    logStart: 'Start',
+    logStop: 'Stop',
+    logClear: 'Clear',
+    logConnected: 'Connected',
+    logDisconnected: 'Disconnected',
+    logEmpty: 'No logs yet, waiting for server output...',
+    logFailed: 'Failed to connect log stream'
   },
   system: {
     pageTitle: 'System',

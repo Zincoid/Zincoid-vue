@@ -200,6 +200,15 @@ th {
   background: var(--color-primary);
   color: white;
 }
+.btn--success {
+  border-color: var(--color-success);
+  color: var(--color-success);
+  background: transparent;
+}
+.btn--success:hover {
+  background: var(--color-success);
+  color: white;
+}
 .quick-btn {
   display: inline-flex;
   align-items: center;

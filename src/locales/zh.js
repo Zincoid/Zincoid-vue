@@ -291,7 +291,17 @@ export default {
     cleanupFile_orphanDb: '废弃记录',
     cleanupFile_orphanDisk: '废弃文件',
     cleanupFile_unlinked: '未关联',
-    cleanupFile_invalidRef: '无效引用'
+    cleanupFile_invalidRef: '无效引用',
+    logs: '日志',
+    logsEntry: '实时',
+    logsDesc: '实时查看服务器日志流 (SSE)',
+    logStart: '开始',
+    logStop: '停止',
+    logClear: '清空',
+    logConnected: '已连接',
+    logDisconnected: '已断开',
+    logEmpty: '暂无日志，等待服务器输出...',
+    logFailed: '日志流连接失败'
   },
   system: {
     pageTitle: '系统',
