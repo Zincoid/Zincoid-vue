@@ -660,7 +660,10 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .log-status { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .log-viewer__head .btn { font-size: var(--text-xs); }
 .log-status--on { color: var(--color-success); }
-.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-lg); font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
+.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-lg); border-right: 4px solid transparent; font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
+.log-viewer__body::-webkit-scrollbar { width: 4px; }
+.log-viewer__body::-webkit-scrollbar-track { margin: 6px 0; }
+.log-viewer__body::-webkit-scrollbar-thumb { background: var(--color-border); }
 .log-empty { color: var(--color-text-secondary); padding: var(--spacing-md) 0; }
 .log-line { display: flex; flex-wrap: wrap; gap: 0 var(--spacing-sm); white-space: pre-wrap; word-break: break-all; }
 .log-line__time { color: var(--color-text-secondary); flex-shrink: 0; }
