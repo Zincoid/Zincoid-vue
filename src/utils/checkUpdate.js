@@ -15,6 +15,7 @@ async function fetchBuild() {
 }
 
 export function startUpdateCheck() {
+  if (import.meta.env.DEV) return
   const { confirm, visible } = useConfirm()
   const { t } = useI18n()
   let timer = null
