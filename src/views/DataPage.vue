@@ -49,7 +49,11 @@ const usedPercent = computed(() => {
   return Math.round((storage.value.used / storage.value.capacity) * 100)
 })
 const ringDash = computed(() => (usedPercent.value / 100) * ringCircumference)
-const ringColor = computed(() => usedPercent.value >= 90 ? 'var(--color-danger)' : 'var(--color-primary)')
+const ringColor = computed(() => {
+  if (usedPercent.value >= 80) return 'var(--color-danger)'
+  if (usedPercent.value <= 20) return 'var(--color-success)'
+  return 'var(--color-primary)'
+})
 </script>
 
 <template>

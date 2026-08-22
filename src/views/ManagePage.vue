@@ -184,7 +184,11 @@ const usedPercent = computed(() => {
   return Math.round((disk.value.used / disk.value.total) * 100)
 })
 const ringDash = computed(() => (usedPercent.value / 100) * ringCircumference)
-const ringColor = computed(() => usedPercent.value >= 90 ? 'var(--color-danger)' : 'var(--color-primary)')
+const ringColor = computed(() => {
+  if (usedPercent.value >= 80) return 'var(--color-danger)'
+  if (usedPercent.value <= 20) return 'var(--color-success)'
+  return 'var(--color-primary)'
+})
 
 async function saveConfig(config) {
   try {
