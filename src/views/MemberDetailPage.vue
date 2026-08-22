@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { userAPI, momentAPI, articleAPI, repoAPI } from '@/api'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
+import { useThemeStore } from '@/stores/theme'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import RepoCard from '@/components/RepoCard.vue'
@@ -16,17 +17,32 @@ import FabContainer from '@/components/FabContainer.vue'
 
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
+const themeStore = useThemeStore()
 
-const skillColors = [
-  { bg: '#dbeafe', fg: '#2563eb' },
-  { bg: '#dcfce7', fg: '#16a34a' },
-  { bg: '#fce7f3', fg: '#db2777' },
-  { bg: '#fef3c7', fg: '#d97706' },
-  { bg: '#ede9fe', fg: '#7c3aed' },
-  { bg: '#cffafe', fg: '#0891b2' },
-  { bg: '#fee2e2', fg: '#dc2626' },
-  { bg: '#e0e7ff', fg: '#4f46e5' },
-]
+const skillColors = computed(() => {
+  if (themeStore.theme === 'dark') {
+    return [
+      { bg: 'rgba(37,99,235,0.18)', fg: '#60a5fa' },
+      { bg: 'rgba(22,163,74,0.18)', fg: '#4ade80' },
+      { bg: 'rgba(219,39,119,0.18)', fg: '#f472b6' },
+      { bg: 'rgba(217,119,6,0.18)', fg: '#fbbf24' },
+      { bg: 'rgba(124,58,237,0.18)', fg: '#a78bfa' },
+      { bg: 'rgba(8,145,178,0.18)', fg: '#22d3ee' },
+      { bg: 'rgba(220,38,38,0.18)', fg: '#f87171' },
+      { bg: 'rgba(79,70,229,0.18)', fg: '#818cf8' },
+    ]
+  }
+  return [
+    { bg: '#dbeafe', fg: '#2563eb' },
+    { bg: '#dcfce7', fg: '#16a34a' },
+    { bg: '#fce7f3', fg: '#db2777' },
+    { bg: '#fef3c7', fg: '#d97706' },
+    { bg: '#ede9fe', fg: '#7c3aed' },
+    { bg: '#cffafe', fg: '#0891b2' },
+    { bg: '#fee2e2', fg: '#dc2626' },
+    { bg: '#e0e7ff', fg: '#4f46e5' },
+  ]
+})
 
 const route = useRoute()
 const router = useRouter()

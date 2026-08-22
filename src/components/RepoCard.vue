@@ -113,6 +113,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-bottom: var(--spacing-sm); }
 .repo-card__tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; padding-top: var(--spacing-sm); }
 .repo-card__tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
+[data-theme="dark"] .repo-card__tag { background: #2e303a; }
 .repo-card__tag--empty { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 
 .repo-card__footer {
