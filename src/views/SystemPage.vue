@@ -1,11 +1,21 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import * as echarts from 'echarts/core'
+import { LineChart, BarChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import { useI18n } from '@/composables/useI18n'
 import { siteName } from '@/composables/useConfig'
-import { healthAPI } from '@/api'
+import { useThemeStore } from '@/stores/theme'
+import { useLocaleStore } from '@/stores/locale'
+import { healthAPI, statAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
+echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, CanvasRenderer])
+
 const { t } = useI18n()
+const themeStore = useThemeStore()
+const localeStore = useLocaleStore()
 
 const developer = 'Zincoid'
 const buildVersion = document.querySelector('meta[name="version"]')?.content || '-'
@@ -14,6 +24,7 @@ const buildTime = formatMetaTime(document.querySelector('meta[name="time"]')?.co
 const backendVersion = ref('-')
 const backendBuild = ref('')
 const backendTime = ref('')
+const stats = ref(null)
 const loading = ref(false)
 const done = ref(false)
 
@@ -27,12 +38,16 @@ function tick() {
 onMounted(() => {
   tick()
   timer = setInterval(tick, 1000)
-  fetchBackendVersion()
+  loadData()
 })
 
 onBeforeUnmount(() => {
   clearInterval(timer)
+  window.removeEventListener('resize', onResize)
+  disposeCharts()
 })
+
+watch([() => themeStore.theme, () => localeStore.locale], () => renderCharts())
 
 function formatMetaTime(raw) {
   if (!raw) return '-'
@@ -42,11 +57,14 @@ function formatMetaTime(raw) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
 }
 
-async function fetchBackendVersion() {
+async function loadData() {
   loading.value = true
   try {
-    const { data } = await healthAPI.version()
-    const info = data?.data
+    const [vRes, sRes] = await Promise.all([
+      healthAPI.version().catch(() => null),
+      statAPI.get(7, 50).catch(() => null)
+    ])
+    const info = vRes?.data?.data
     if (info) {
       backendVersion.value = info.version || '-'
       backendBuild.value = info.build || ''
@@ -58,8 +76,10 @@ async function fetchBackendVersion() {
         }
       }
     }
+    stats.value = sRes?.data?.data || null
   } catch { /* ignore */ } finally {
     loading.value = false
+    nextTick(renderCharts)
   }
 }
 
@@ -67,6 +87,103 @@ const timeText = computed(() => {
   const d = now.value
   const pad = n => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+})
+
+// ── Charts ──
+const dailyChartRef = ref(null)
+const apiChartRef = ref(null)
+let dailyChart = null
+let apiChart = null
+
+function chartColors() {
+  const dark = themeStore.theme === 'dark'
+  return {
+    text: dark ? '#9ca3af' : '#6b7280',
+    grid: dark ? '#2e303a' : '#e5e7eb',
+    axis: dark ? '#6b7280' : '#9ca3af',
+    primary: '#2952cc'
+  }
+}
+
+function disposeCharts() {
+  if (dailyChart) { dailyChart.dispose(); dailyChart = null }
+  if (apiChart) { apiChart.dispose(); apiChart = null }
+}
+
+function renderCharts() {
+  if (!stats.value || !done.value) return
+  const { text, grid, axis, primary } = chartColors()
+  disposeCharts()
+
+  if (dailyChartRef.value) {
+    dailyChart = echarts.init(dailyChartRef.value)
+    dailyChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 40, right: 16, top: 24, bottom: 24 },
+      xAxis: {
+        type: 'category',
+        data: stats.value.daily.map(d => d.date.slice(5)),
+        axisLine: { lineStyle: { color: axis } },
+        axisLabel: { color: text }
+      },
+      yAxis: {
+        type: 'value',
+        minInterval: 1,
+        splitLine: { lineStyle: { color: grid } },
+        axisLabel: { color: text }
+      },
+      series: [{
+        name: t('system.statsDaily'),
+        type: 'line',
+        smooth: true,
+        data: stats.value.daily.map(d => d.count),
+        showSymbol: false,
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { color: primary, width: 2 },
+        itemStyle: { color: primary },
+        areaStyle: { color: primary, opacity: 0.12 }
+      }]
+    })
+  }
+
+  if (apiChartRef.value) {
+    apiChart = echarts.init(apiChartRef.value)
+    apiChart.setOption({
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
+      xAxis: {
+        type: 'value',
+        minInterval: 1,
+        splitLine: { lineStyle: { color: grid } },
+        axisLabel: { color: text }
+      },
+      yAxis: {
+        type: 'category',
+        data: stats.value.apis.map(a => a.api).reverse(),
+        axisLine: { lineStyle: { color: axis } },
+        axisLabel: { color: text, fontSize: 10 }
+      },
+      series: [{
+        type: 'bar',
+        data: stats.value.apis.map(a => a.count).reverse(),
+        barMaxWidth: 14,
+        itemStyle: { color: '#f59e0b', borderRadius: [0, 3, 3, 0] }
+      }]
+    })
+  }
+}
+
+function onResize() {
+  dailyChart?.resize()
+  apiChart?.resize()
+}
+
+watch(done, (v) => {
+  if (v) {
+    window.addEventListener('resize', onResize)
+    nextTick(renderCharts)
+  }
 })
 </script>
 
@@ -107,6 +224,19 @@ const timeText = computed(() => {
         </div>
       </div>
       </div>
+      <section class="section">
+        <h3>{{ t('system.stats') }}</h3>
+        <div class="stats-layout">
+          <div class="stats-card">
+            <h4>{{ t('system.statsDaily') }}</h4>
+            <div ref="dailyChartRef" class="stats-chart"></div>
+          </div>
+          <div class="stats-card">
+            <h4>{{ t('system.statsApis') }}</h4>
+            <div ref="apiChartRef" class="stats-chart"></div>
+          </div>
+        </div>
+      </section>
     </template>
   </div>
 </template>
@@ -162,4 +292,39 @@ const timeText = computed(() => {
 .system-info__value { color: var(--color-text-secondary); font-weight: var(--weight-medium); word-break: break-all; text-align: right; }
 .system-info__value--mono { font-family: var(--font-mono); }
 .system-info__hint { color: var(--color-text-secondary); font-weight: var(--weight-regular); }
+
+.section { margin-top: var(--spacing-3xl); }
+.section h3 { margin-bottom: var(--spacing-lg); }
+
+.stats-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+}
+
+.stats-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+  min-width: 0;
+}
+
+.stats-card h4 {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stats-chart {
+  width: 100%;
+  height: 260px;
+}
+
+@media (max-width: 900px) {
+  .stats-layout {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

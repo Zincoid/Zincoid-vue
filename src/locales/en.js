@@ -352,7 +352,10 @@ export default {
     developer: 'Developer',
     frontendVersion: 'Frontend version',
     backendVersion: 'Backend version',
-    systemTime: 'System time'
+    systemTime: 'System time',
+    stats: 'Statistics',
+    statsDaily: 'Daily visits',
+    statsApis: 'Top APIs'
   },
   auth: {
     login: 'Login',

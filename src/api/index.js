@@ -155,6 +155,11 @@ export const storageAPI = {
   cleanupUnlinked: () => api.delete('/storage/unlinked')
 }
 
+// ── Stats ──
+export const statAPI = {
+  get: (days = 30, top = 50) => api.get('/stat', { params: { days, top } })
+}
+
 // ── Repos ──
 export const repoAPI = {
   create: (data) => api.post('/repos', data),

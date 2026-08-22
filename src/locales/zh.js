@@ -352,7 +352,10 @@ export default {
     developer: '开发者',
     frontendVersion: '前端构建版本',
     backendVersion: '后端构建版本',
-    systemTime: '系统时间'
+    systemTime: '系统时间',
+    stats: '统计数据',
+    statsDaily: '每日访问量',
+    statsApis: '接口调用排行'
   },
   auth: {
     login: '登录',
