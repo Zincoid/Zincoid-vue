@@ -28,12 +28,12 @@ function buildCells() {
 
   for (let x = 4; x < leftEnd - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.10 + Math.random() * 0.08 })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.16 + Math.random() * 0.10 })
     }
   }
   for (let x = rightStart + 4; x < w - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.10 + Math.random() * 0.08 })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.16 + Math.random() * 0.10 })
     }
   }
 }
@@ -65,7 +65,7 @@ function tick(now) {
       cell.v = randomChar()
       cell.next = speed * (0.1 + Math.random() * 0.3)
       // Sudden jump in brightness on change
-      cell.alpha = 0.09 + factor * 0.42 + Math.random() * 0.05
+      cell.alpha = 0.14 + factor * 0.42 + Math.random() * 0.05
     }
   }
 
@@ -75,8 +75,11 @@ function tick(now) {
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
   for (const cell of cells) {
-    ctx.fillStyle = `rgba(17,24,39,${cell.alpha.toFixed(3)})`
+    ctx.fillStyle = isDark
+      ? `rgba(75,85,99,${cell.alpha.toFixed(3)})`
+      : `rgba(17,24,39,${cell.alpha.toFixed(3)})`
     ctx.fillText(cell.v, cell.x, cell.y)
   }
 
