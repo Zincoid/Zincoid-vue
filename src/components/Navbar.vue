@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useLocaleStore } from '@/stores/locale'
+import { useThemeStore } from '@/stores/theme'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig, siteBrand } from '@/composables/useConfig'
 import { notificationAPI } from '@/api'
@@ -13,6 +14,7 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const locale = useLocaleStore()
+const theme = useThemeStore()
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
 loadConfig()
@@ -259,6 +261,10 @@ function closeMenu() {
             <SvgIcon name="login" class="navbar__signin-icon" />
             {{ t('nav.signIn') }}
           </router-link>
+          <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="theme.toggleTheme()">
+            <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__signin-icon" />
+            {{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}
+          </button>
           <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="locale.toggleLocale()">
             <SvgIcon name="lang" class="navbar__signin-icon" />
             {{ t('nav.lang') }}
@@ -268,6 +274,10 @@ function closeMenu() {
           <button class="navbar__item" @click="locale.toggleLocale()">
             <SvgIcon name="lang" class="navbar__nav-icon" />
             {{ t('nav.lang') }}
+          </button>
+          <button class="navbar__item" @click="theme.toggleTheme()">
+            <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__nav-icon" />
+            {{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}
           </button>
           <button v-if="auth.isLoggedIn" class="navbar__item navbar__item--logout-mobile" @click="auth.logout(); closeMenu()">
             <SvgIcon name="logout" class="navbar__signin-icon" />

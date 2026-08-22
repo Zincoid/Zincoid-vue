@@ -8,7 +8,9 @@ export default {
     signIn: '登录',
     logout: '登出',
     profile: '个人中心',
-    lang: 'EN'
+    lang: 'EN',
+    dark: '夜间',
+    light: '日间'
   },
   home: {
     recentMoments: '最新动态',

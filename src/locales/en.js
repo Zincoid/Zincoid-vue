@@ -8,7 +8,9 @@ export default {
     signIn: 'Sign In',
     logout: 'Logout',
     profile: 'Profile',
-    lang: '中文'
+    lang: '中文',
+    dark: 'Dark',
+    light: 'Light'
   },
   home: {
     recentMoments: 'Recent Moments',
