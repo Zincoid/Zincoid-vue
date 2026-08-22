@@ -18,6 +18,7 @@ import CommentSection from '@/components/CommentSection.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import UploadProgress from '@/components/UploadProgress.vue'
+import SliderSelect from '@/components/SliderSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -417,6 +418,12 @@ const saving = ref(false)
 const editCoverFile = ref(null)
 const editCoverPreview = ref('')
 
+const visibilityOptions = computed(() => [
+  { value: 0, label: t('visibility.pub'), icon: 'world' },
+  { value: 1, label: t('visibility.pvt'), icon: 'lock' },
+  { value: 2, label: t('visibility.restr'), icon: 'key', color: '#d97706' }
+])
+
 function openEdit() {
   editForm.value = {
     name: repo.value.name || '',
@@ -745,18 +752,12 @@ async function saveEdit() {
                 <div class="field">
                   <div class="cover-label-row">
                     <label class="field__label">{{ t('article.visibility') }}</label>
-                    <div class="visibility-slide">
-                      <div class="visibility-slide__indicator" :style="{ left: editForm.visibility === 0 ? '3px' : editForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
-                      <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 0 }" @click="editForm.visibility = 0" type="button">
-                        <SvgIcon name="world" :size="12" />{{ t('visibility.pub') }}
-                      </button>
-                      <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': editForm.visibility === 1 }" @click="editForm.visibility = 1" type="button">
-                        <SvgIcon name="lock" :size="12" />{{ t('visibility.pvt') }}
-                      </button>
-                      <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': editForm.visibility === 2 }" @click="editForm.visibility = 2" type="button">
-                        <SvgIcon name="key" :size="12" />{{ t('visibility.restr') }}
-                      </button>
-                    </div>
+                    <SliderSelect
+                      fill
+                      :model-value="editForm.visibility"
+                      :options="visibilityOptions"
+                      @update:model-value="v => editForm.visibility = v"
+                    />
                   </div>
                 </div>
               </div>
@@ -1054,11 +1055,6 @@ async function saveEdit() {
 .modal .field__hint { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; }
 .modal .msg { margin-top: var(--spacing-lg); }
 .modal__actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border-light); }
-.visibility-slide { display: flex; flex: 1; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
-.visibility-slide__indicator { position: absolute; top: 3px; width: calc(33.33% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 3px; padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; }
-.visibility-slide-btn--active { color: var(--color-primary); }
-.visibility-slide-btn--restricted.visibility-slide-btn--active { color: #d97706; }
 .modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-2xl); }
 .modal .cover-label-row .field__label { flex-shrink: 0; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }

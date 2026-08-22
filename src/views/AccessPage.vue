@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { repoAPI, userAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SliderSelect from '@/components/SliderSelect.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -14,6 +15,11 @@ const { load: loadConfig, get: getConfig } = useConfig()
 const activeTab = ref('received')
 const loading = ref(true)
 const loadingDone = ref(false)
+
+const tabOptions = computed(() => [
+  { value: 'received', label: t('access.received') },
+  { value: 'sent', label: t('access.sent') }
+])
 
 const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
@@ -82,11 +88,12 @@ function statusLabel(s) {
       <p class="page-header__subtitle">{{ t('access.desc') }}</p>
     </div>
 
-    <div class="access-tabs">
-      <div class="access-tabs__indicator" :style="{ left: activeTab === 'received' ? '3px' : 'calc(50% + 3px)' }"></div>
-      <button :class="{ active: activeTab === 'received' }" @click="activeTab = 'received'">{{ t('access.received') }}</button>
-      <button :class="{ active: activeTab === 'sent' }" @click="activeTab = 'sent'">{{ t('access.sent') }}</button>
-    </div>
+    <SliderSelect
+      class="access-tabs"
+      :model-value="activeTab"
+      :options="tabOptions"
+      @update:model-value="activeTab = $event"
+    />
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <template v-if="loadingDone">
@@ -175,11 +182,7 @@ function statusLabel(s) {
 <style scoped>
 .access-page .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
 .access-page .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: var(--spacing-xs); }
-.access-tabs { display: flex; position: relative; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; margin-bottom: var(--spacing-2xl); background: var(--color-surface); }
-.access-tabs__indicator { position: absolute; top: 3px; width: calc(50% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.access-tabs button { display: inline-flex; align-items: center; justify-content: center; padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: color var(--transition-fast); position: relative; z-index: 1; flex: 1 1 0; white-space: nowrap; }
-.access-tabs button:hover { color: var(--color-text-heading); }
-.access-tabs button.active { color: var(--color-primary); }
+.access-tabs { margin-bottom: var(--spacing-2xl); }
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }

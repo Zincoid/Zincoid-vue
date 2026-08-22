@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import RepoCard from '@/components/RepoCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import SliderSelect from '@/components/SliderSelect.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -27,6 +28,17 @@ const activeType = ref(null)
 const keyword = ref('')
 const tagged = ref(false)
 let searchTimer = null
+
+const searchModeOptions = computed(() => [
+  { value: false, label: t('repo.byName') },
+  { value: true, label: t('repo.byTag') }
+])
+
+const visibilityOptions = computed(() => [
+  { value: 0, label: t('visibility.pub'), icon: 'world' },
+  { value: 1, label: t('visibility.pvt'), icon: 'lock' },
+  { value: 2, label: t('visibility.restr'), icon: 'key', color: '#d97706' }
+])
 const repos = ref([])
 const page = ref(1)
 const pages = ref(1)
@@ -182,21 +194,12 @@ async function createRepo() {
         :style="activeType === tab.value ? { color: tab.color, borderColor: tab.color, background: tab.color + '18' } : {}"
         @click="switchType(tab.value)"
       >{{ t(`repo.${tab.key}`) }}</button>
-      <div class="search-mode">
-        <div class="search-mode__indicator" :style="{ left: tagged ? 'calc(50% + 3px)' : '3px' }"></div>
-        <button
-          type="button"
-          class="search-mode-btn"
-          :class="{ 'search-mode-btn--active': !tagged }"
-          @click="switchSearchMode(false)"
-        >{{ t('repo.byName') }}</button>
-        <button
-          type="button"
-          class="search-mode-btn"
-          :class="{ 'search-mode-btn--active': tagged }"
-          @click="switchSearchMode(true)"
-        >{{ t('repo.byTag') }}</button>
-      </div>
+      <SliderSelect
+        class="repo-search-mode"
+        :model-value="tagged"
+        :options="searchModeOptions"
+        @update:model-value="switchSearchMode"
+      />
     </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -260,18 +263,12 @@ async function createRepo() {
               <div class="field">
                 <div class="cover-label-row">
                   <label class="field__label">{{ t('article.visibility') }}</label>
-                  <div class="visibility-slide">
-                    <div class="visibility-slide__indicator" :style="{ left: createForm.visibility === 0 ? '3px' : createForm.visibility === 1 ? 'calc(33.33% + 3px)' : 'calc(66.66% + 3px)' }"></div>
-                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 0 }" @click="createForm.visibility = 0" type="button">
-                      <SvgIcon name="world" :size="12" />{{ t('visibility.pub') }}
-                    </button>
-                    <button class="visibility-slide-btn" :class="{ 'visibility-slide-btn--active': createForm.visibility === 1 }" @click="createForm.visibility = 1" type="button">
-                      <SvgIcon name="lock" :size="12" />{{ t('visibility.pvt') }}
-                    </button>
-                    <button class="visibility-slide-btn visibility-slide-btn--restricted" :class="{ 'visibility-slide-btn--active': createForm.visibility === 2 }" @click="createForm.visibility = 2" type="button">
-                      <SvgIcon name="key" :size="12" />{{ t('visibility.restr') }}
-                    </button>
-                  </div>
+                  <SliderSelect
+                    fill
+                    :model-value="createForm.visibility"
+                    :options="visibilityOptions"
+                    @update:model-value="v => createForm.visibility = v"
+                  />
                 </div>
               </div>
             </div>
@@ -300,43 +297,7 @@ async function createRepo() {
 .repo-search { margin-bottom: var(--spacing-xl); }
 .repo-search__input { width: 100%; }
 
-.search-mode {
-  margin-left: auto;
-  position: relative;
-  display: flex;
-  flex-shrink: 0;
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-md);
-  overflow: hidden;
-  background: var(--color-surface);
-}
-.search-mode__indicator {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: calc(50% - 6px);
-  height: calc(100% - 6px);
-  background: var(--color-primary-light);
-  border-radius: calc(var(--rounded-md) - 1px);
-  transition: left 0.2s ease;
-}
-.search-mode-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  color: var(--color-text-secondary);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-  white-space: nowrap;
-  position: relative;
-  z-index: 1;
-}
-.search-mode-btn--active { color: var(--color-primary); }
+.repo-search-mode { margin-left: auto; flex-shrink: 0; }
 
 .type-tabs {
   display: flex;
@@ -443,11 +404,6 @@ async function createRepo() {
 .modal .radio-group { display: flex; gap: var(--spacing-sm) var(--spacing-lg); padding-top: var(--spacing-xs); }
 .modal .radio { display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer; font-size: var(--text-sm); }
 .modal .radio input { accent-color: var(--color-primary); }
-.visibility-slide { display: flex; flex: 1; border: 1px solid var(--color-border); border-radius: var(--rounded-md); overflow: hidden; position: relative; background: var(--color-surface); }
-.visibility-slide__indicator { position: absolute; top: 3px; width: calc(33.33% - 6px); height: calc(100% - 6px); background: var(--color-primary-light); border-radius: calc(var(--rounded-md) - 1px); transition: left 0.2s ease; left: 3px; }
-.visibility-slide-btn { display: inline-flex; align-items: center; justify-content: center; gap: 3px; padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: transparent; border: none; cursor: pointer; transition: color var(--transition-fast); white-space: nowrap; position: relative; z-index: 1; flex: 1 1 0; }
-.visibility-slide-btn--active { color: var(--color-primary); }
-.visibility-slide-btn--restricted.visibility-slide-btn--active { color: #d97706; }
 .modal .cover-label-row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-2xl); }
 .modal .cover-label-row .field__label { flex-shrink: 0; }
 .modal .cover-preview-wrap { position: relative; display: inline-block; margin-top: var(--spacing-sm); }
