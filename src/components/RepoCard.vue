@@ -107,6 +107,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__avatar-placeholder { width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
 .repo-card__nickname { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .repo-card__date { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-mono); display: block; margin-bottom: var(--spacing-sm); }
+.repo-card__user .repo-card__date { margin-bottom: 0; }
 
 .repo-card__name { font-size: var(--text-base); font-weight: var(--weight-semibold); line-height: 1.5; margin-bottom: var(--spacing-sm); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .repo-card__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; margin-bottom: var(--spacing-sm); }
