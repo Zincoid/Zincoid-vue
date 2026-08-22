@@ -139,7 +139,7 @@ const timeText = computed(() => {
 }
 
 .system-info__name {
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);
   color: var(--color-text-heading);
 }
