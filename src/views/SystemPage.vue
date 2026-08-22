@@ -62,7 +62,7 @@ async function loadData() {
   try {
     const [vRes, sRes] = await Promise.all([
       healthAPI.version().catch(() => null),
-      statAPI.get(7, 50).catch(() => null)
+      statAPI.get(7, 20).catch(() => null)
     ])
     const info = vRes?.data?.data
     if (info) {
