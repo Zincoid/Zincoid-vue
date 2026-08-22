@@ -362,6 +362,7 @@ function switchTo(path) {
   padding: var(--spacing-3xl);
   position: relative;
   overflow: hidden;
+  border-right: 1px solid #30363d;
 }
 
 .auth-split__sq {
@@ -547,6 +548,8 @@ function switchTo(path) {
     flex: 0 0 200px;
     max-width: none;
     padding: var(--spacing-lg) var(--spacing-xl);
+    border-right: none;
+    border-bottom: 1px solid #30363d;
   }
   .auth-brand {
     display: flex;
