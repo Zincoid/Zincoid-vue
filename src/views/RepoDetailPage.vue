@@ -110,7 +110,8 @@ function onWindowResize() {
   nextTick(updateColWidth)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await loadConfig()
   fetchRepo()
   updateGridCols()
   window.addEventListener('resize', onWindowResize)
