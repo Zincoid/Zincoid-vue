@@ -151,7 +151,8 @@ export const storageAPI = {
   cleanupRecords: () => api.post('/storage/cleanup'),
   storageSpace: () => api.get('/storage'),
   userStorage: () => api.get('/storage/user'),
-  updateCapacity: (username, capacity) => api.put(`/storage/${username}/capacity`, null, { params: { capacity } })
+  updateCapacity: (username, capacity) => api.put(`/storage/${username}/capacity`, null, { params: { capacity } }),
+  cleanupUnlinked: () => api.delete('/storage/unlinked')
 }
 
 // ── Repos ──

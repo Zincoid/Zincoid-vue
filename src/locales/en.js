@@ -221,6 +221,9 @@ export default {
     storageUsed: 'Used',
     storageAvailable: 'Available',
     storageFailed: 'Failed to load storage info',
+    storageCleanupConfirm: 'Clean up unlinked files?',
+    storageCleanupDone: 'Cleaned up {count} unlinked files',
+    storageCleanupFailed: 'Cleanup failed',
     contentTab: 'Content',
     contentDesc: 'Visit your detail page to manage your content...',
     contentView: 'View Me'

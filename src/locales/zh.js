@@ -189,6 +189,9 @@ export default {
     storageUsed: '已用容量',
     storageAvailable: '可用容量',
     storageFailed: '加载存储信息失败',
+    storageCleanupConfirm: '确定要清理未关联的文件吗？',
+    storageCleanupDone: '已清理 {count} 个未关联文件',
+    storageCleanupFailed: '清理失败',
     contentTab: '内容',
     contentDesc: '请前往个人详情页管理你的内容...',
     contentView: '查看主页'

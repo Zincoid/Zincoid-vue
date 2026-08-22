@@ -3,6 +3,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useAuthStore } from '@/stores/auth'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
+import { useConfirm } from '@/composables/useConfirm'
 import { storageAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -10,11 +12,14 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 const { t } = useI18n()
 const auth = useAuthStore()
 const { getMessage } = useError()
+const { toast } = useToast()
+const { confirm } = useConfirm()
 
 const storage = ref(null)
 const storageLoading = ref(false)
 const storageDone = ref(false)
 const storageError = ref('')
+const cleaning = ref(false)
 
 async function fetchStorage() {
   storageLoading.value = true
@@ -26,6 +31,21 @@ async function fetchStorage() {
     if (e?.response?.status !== 401) storageError.value = getMessage(e, 'data.storageFailed')
   } finally {
     storageLoading.value = false
+  }
+}
+
+async function handleCleanup() {
+  if (!await confirm(t('data.storageCleanupConfirm'))) return
+  cleaning.value = true
+  try {
+    const res = await storageAPI.cleanupUnlinked()
+    const count = res.data?.data ?? 0
+    toast(t('data.storageCleanupDone', { count }), count > 0 ? 'success' : 'info')
+    fetchStorage()
+  } catch (e) {
+    toast(getMessage(e, 'data.storageCleanupFailed'), 'error')
+  } finally {
+    cleaning.value = false
   }
 }
 
@@ -72,6 +92,9 @@ const ringColor = computed(() => {
           <div class="storage-card">
             <button class="storage-refresh" :disabled="storageLoading" @click="fetchStorage">
               <SvgIcon name="refresh" :size="16" />
+            </button>
+            <button class="storage-cleanup" :disabled="cleaning" @click="handleCleanup">
+              <SvgIcon name="clean" :size="16" />
             </button>
             <div class="storage-item">
               <span class="storage-label">{{ t('data.storageCapacity') }}</span>
@@ -138,6 +161,26 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 }
 
 .storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }
+.storage-cleanup {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.storage-cleanup:hover { color: var(--color-warning); border-color: var(--color-warning); background: var(--color-warning-bg); }
+.storage-cleanup:disabled { opacity: 0.5; cursor: not-allowed; }
+.storage-cleanup:disabled svg { animation: storage-spin 1s linear infinite; }
 .storage-card { position: relative; flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
 .storage-refresh {
   position: absolute;
