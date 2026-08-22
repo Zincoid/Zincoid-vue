@@ -785,6 +785,9 @@ function closeMenu() {
 .navbar__notif-item:hover {
   background: var(--color-bg-alt);
 }
+[data-theme="dark"] .navbar__notif-item:hover {
+  background: #23252f;
+}
 .navbar__notif-item--unread {
   position: relative;
 }

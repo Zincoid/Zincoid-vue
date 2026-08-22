@@ -188,6 +188,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .access-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); transition: border-color var(--transition-fast); }
 .access-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
+[data-theme="dark"] .access-card:hover { background: #23252f; }
 .access-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: pointer; }
 .access-card__avatar { width: 40px; height: 40px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0; }
 .access-card__avatar-placeholder { width: 40px; height: 40px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--weight-medium); flex-shrink: 0; }
