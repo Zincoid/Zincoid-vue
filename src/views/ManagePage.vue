@@ -99,6 +99,44 @@ function openReset() {
   resetPassword.value = ''
 }
 
+const capacityOpen = ref(false)
+const capacityUserId = ref('')
+const capacityValue = ref('')
+const capacityUnit = ref('GB')
+const capacityUpdating = ref(false)
+
+const CAPACITY_UNITS = { MB: 1024 * 1024, GB: 1024 * 1024 * 1024, TB: 1024 * 1024 * 1024 * 1024 }
+
+function openCapacity() {
+  capacityOpen.value = true
+  capacityUserId.value = ''
+  capacityValue.value = ''
+  capacityUnit.value = 'GB'
+}
+
+function cancelCapacity() {
+  capacityOpen.value = false
+}
+
+async function handleCapacity() {
+  const uid = capacityUserId.value.trim()
+  const val = parseFloat(capacityValue.value)
+  if (!uid || isNaN(val) || val < 0) return
+  if (!await confirm(t('manage.capacityConfirm'))) return
+  capacityUpdating.value = true
+  try {
+    const bytes = Math.round(val * CAPACITY_UNITS[capacityUnit.value])
+    await storageAPI.updateCapacity(uid, bytes)
+    toolMessage.value = t('manage.capacitySuccess')
+    capacityOpen.value = false
+    setTimeout(() => toolMessage.value = '', 2000)
+  } catch (err) {
+    toolError.value = getMessage(err, 'manage.capacityFailed')
+  } finally {
+    capacityUpdating.value = false
+  }
+}
+
 function cancelReset() {
   resetOpen.value = false
 }
@@ -502,6 +540,34 @@ onBeforeUnmount(stopStream)
           {{ t('manage.reset') }}
         </button>
       </div>
+      <div class="tool-item" :class="{ 'tool-item--open': capacityOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.capacity') }}</span>
+          <span class="tool-desc">{{ t('manage.capacityDesc') }}</span>
+          <div v-if="capacityOpen" class="config-value-row reset-row">
+            <div class="reset-inputs" style="flex: 1; min-width: 0;">
+              <input v-model="capacityUserId" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('manage.capacityUserIdPlaceholder')" />
+              <input v-model="capacityValue" type="number" min="0" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('manage.capacityValuePlaceholder')" />
+              <select v-model="capacityUnit" class="field__input capacity-select">
+                <option value="MB">MB</option>
+                <option value="GB">GB</option>
+                <option value="TB">TB</option>
+              </select>
+            </div>
+            <div class="reset-actions">
+              <button class="btn btn--ghost" @click="cancelCapacity">{{ t('common.cancel') }}</button>
+              <button class="btn btn--primary" :disabled="capacityUpdating || !capacityUserId.trim() || isNaN(parseFloat(capacityValue)) || parseFloat(capacityValue) < 0" @click="handleCapacity">
+                <SvgIcon name="check" />
+                {{ capacityUpdating ? t('common.saving') : t('common.confirm') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button v-if="!capacityOpen" class="btn btn--warning" @click="openCapacity">
+          <SvgIcon name="settings" />
+          {{ t('manage.capacityUpdate') }}
+        </button>
+      </div>
       <div class="tool-item">
         <div class="tool-info">
           <span class="tool-label">{{ t('manage.cleanupFiles') }}</span>
@@ -586,6 +652,22 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
 .config-desc { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .config-value-row { display: flex; gap: var(--spacing-sm); align-items: center; flex-shrink: 0; }
 .tool-item { display: flex; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.capacity-select {
+  width: 100px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--spacing-sm) var(--spacing-2xl) var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-text-heading);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+}
+.capacity-select:hover { border-color: var(--color-primary); }
+.capacity-select option { font-family: var(--font-mono); }
 .tool-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .tool-item .btn { margin-left: auto; }
 .tool-label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
