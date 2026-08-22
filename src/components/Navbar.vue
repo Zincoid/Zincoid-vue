@@ -4,7 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useLocaleStore } from '@/stores/locale'
 import { useI18n } from '@/composables/useI18n'
-import { useConfig } from '@/composables/useConfig'
+import { useConfig, siteBrand } from '@/composables/useConfig'
 import { notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -188,8 +188,8 @@ function closeMenu() {
   <nav class="navbar">
     <div class="navbar__inner">
       <router-link to="/" class="navbar__brand">
-        <span class="navbar__brand-text">Zincoid</span>
-        <span class="navbar__brand-text navbar__brand-text--light">'s</span>
+        <span class="navbar__brand-text">{{ siteBrand.main }}</span>
+        <span v-if="siteBrand.suffix" class="navbar__brand-text navbar__brand-text--light">{{ siteBrand.suffix }}</span>
       </router-link>
 
       <div class="navbar__mobile-actions">

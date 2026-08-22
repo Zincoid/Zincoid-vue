@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
 import { momentAPI, articleAPI, userAPI, configAPI, repoAPI } from '@/api'
+import { siteBrand } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -373,7 +374,7 @@ onUnmounted(() => {
       <div class="hero-terminal__inner container-wide">
         <div class="hero-terminal__brand">
           <h1 class="hero-terminal__title">
-            Zincoid<span class="hero-terminal__title--light">'s</span>
+            {{ siteBrand.main }}<span v-if="siteBrand.suffix" class="hero-terminal__title--light">{{ siteBrand.suffix }}</span>
           </h1>
           <p class="hero-terminal__subtitle">{{ typed }} <span class="cursor cursor--square">▌</span></p>
         </div>

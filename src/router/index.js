@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { maintenanceLocation } from '@/utils/maintenance'
+import { siteName } from '@/composables/useConfig'
 
 const routes = [
   {
@@ -194,7 +195,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `Zincoid's | ${to.meta.title}` : `Zincoid's`
+  document.title = to.meta.title ? `${siteName.value} | ${to.meta.title}` : siteName.value
 })
 
 export default router

@@ -1,12 +1,13 @@
 <script setup>
 import { useI18n } from '@/composables/useI18n'
+import { siteBrand } from '@/composables/useConfig'
 const { t } = useI18n()
 </script>
 
 <template>
   <footer class="footer">
     <div class="footer__inner">
-      <span class="footer__logo">Zincoid<span class="footer__logo--light">'s</span></span>
+      <span class="footer__logo">{{ siteBrand.main }}<span v-if="siteBrand.suffix" class="footer__logo--light">{{ siteBrand.suffix }}</span></span>
       <router-link to="/moments">{{ t('footer.moments') }}</router-link>
       <router-link to="/articles">{{ t('footer.articles') }}</router-link>
       <router-link to="/repos">{{ t('footer.repos') }}</router-link>

@@ -1,12 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
-import { useConfig } from '@/composables/useConfig'
+import { siteName } from '@/composables/useConfig'
 
 const { t } = useI18n()
-const { load: loadConfig, get: getConfig } = useConfig()
 
-const siteName = ref("Zincoid's")
 const developer = 'Zincoid'
 const buildVersion = document.querySelector('meta[name="build-version"]')?.content || '-'
 
@@ -17,9 +15,7 @@ function tick() {
   now.value = new Date()
 }
 
-onMounted(async () => {
-  await loadConfig()
-  siteName.value = getConfig('site_name', "Zincoid's")
+onMounted(() => {
   tick()
   timer = setInterval(tick, 1000)
 })
