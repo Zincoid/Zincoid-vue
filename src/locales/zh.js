@@ -328,7 +328,10 @@ export default {
   system: {
     pageTitle: '系统',
     subtitle: '系统信息展示',
-    comingSoon: '系统信息展示功能建设中，敬请期待...'
+    siteName: '网站名',
+    developer: '开发者',
+    buildVersion: '前端构建版本',
+    systemTime: '系统时间'
   },
   auth: {
     login: '登录',

@@ -328,7 +328,10 @@ export default {
   system: {
     pageTitle: 'System',
     subtitle: 'System information',
-    comingSoon: 'System information display is under construction, stay tuned...'
+    siteName: 'Site name',
+    developer: 'Developer',
+    buildVersion: 'Frontend build version',
+    systemTime: 'System time'
   },
   auth: {
     login: 'Login',
