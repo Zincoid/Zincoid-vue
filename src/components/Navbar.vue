@@ -1017,6 +1017,24 @@ function closeMenu() {
     max-width: 200px;
     opacity: 1;
   }
+  html:lang(en) .navbar__links .navbar__item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  html:lang(en) .navbar__links .navbar__label {
+    max-width: 200px;
+    opacity: 1;
+  }
+  html:lang(en) .navbar__actions .navbar__item--personal {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  html:lang(en) .navbar__actions .navbar__item {
+    gap: var(--spacing-sm);
+  }
+  html:lang(en) .navbar__actions .navbar__label {
+    max-width: 200px;
+    opacity: 1;
+  }
   .navbar__brand { border-bottom: none; }
   .navbar__mobile-actions {
     display: flex;
