@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { siteName } from '@/composables/useConfig'
 import { healthAPI } from '@/api'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 
@@ -13,6 +14,8 @@ const buildTime = formatMetaTime(document.querySelector('meta[name="time"]')?.co
 const backendVersion = ref('-')
 const backendBuild = ref('')
 const backendTime = ref('')
+const loading = ref(false)
+const done = ref(false)
 
 const now = ref(new Date())
 let timer = null
@@ -40,6 +43,7 @@ function formatMetaTime(raw) {
 }
 
 async function fetchBackendVersion() {
+  loading.value = true
   try {
     const { data } = await healthAPI.version()
     const info = data?.data
@@ -54,7 +58,9 @@ async function fetchBackendVersion() {
         }
       }
     }
-  } catch { /* ignore */ }
+  } catch { /* ignore */ } finally {
+    loading.value = false
+  }
 }
 
 const timeText = computed(() => {
@@ -71,7 +77,9 @@ const timeText = computed(() => {
       <p class="page-header__subtitle">{{ t('system.subtitle') }}</p>
     </div>
 
-    <div class="system-info__card">
+    <LoadingSpinner :visible="loading" @done="done = true" />
+    <template v-if="done">
+      <div class="system-info__card">
       <div class="system-info__hero">
         <img src="/logo.svg" alt="" class="system-info__icon" />
         <span class="system-info__name">{{ siteName }}</span>
@@ -98,7 +106,8 @@ const timeText = computed(() => {
           <span class="system-info__value system-info__value--mono">{{ timeText }}</span>
         </div>
       </div>
-    </div>
+      </div>
+    </template>
   </div>
 </template>
 
