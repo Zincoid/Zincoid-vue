@@ -1,17 +1,17 @@
 import { useConfirm } from '@/composables/useConfirm'
 import { useI18n } from '@/composables/useI18n'
 
-const VERSION_META = 'build-version'
+const BUILD_META = 'build'
 const CHECK_INTERVAL = 60000
 
-function currentVersion() {
-  return document.querySelector(`meta[name="${VERSION_META}"]`)?.content || ''
+function currentBuild() {
+  return document.querySelector(`meta[name="${BUILD_META}"]`)?.content || ''
 }
 
-async function fetchVersion() {
+async function fetchBuild() {
   const res = await fetch('/index.html', { cache: 'no-store' })
   const html = await res.text()
-  return html.match(/name="build-version" content="([^"]+)"/)?.[1] || ''
+  return html.match(new RegExp(`name="${BUILD_META}" content="([^"]+)"`))?.[1] || ''
 }
 
 export function startUpdateCheck() {
@@ -22,8 +22,8 @@ export function startUpdateCheck() {
   async function check() {
     if (visible.value) return
     try {
-      const latest = await fetchVersion()
-      if (latest && latest !== currentVersion()) {
+      const latest = await fetchBuild()
+      if (latest && latest !== currentBuild()) {
         stop()
         const ok = await confirm(t('common.updateAvailable'))
         if (ok) location.reload()

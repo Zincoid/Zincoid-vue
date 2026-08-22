@@ -7,9 +7,11 @@ import { healthAPI } from '@/api'
 const { t } = useI18n()
 
 const developer = 'Zincoid'
-const buildVersion = document.querySelector('meta[name="build-version"]')?.content || '-'
-const buildTime = formatMetaTime(document.querySelector('meta[name="build-time"]')?.content)
+const buildVersion = document.querySelector('meta[name="version"]')?.content || '-'
+const buildBuild = document.querySelector('meta[name="build"]')?.content || ''
+const buildTime = formatMetaTime(document.querySelector('meta[name="time"]')?.content)
 const backendVersion = ref('-')
+const backendBuild = ref('')
 const backendTime = ref('')
 
 const now = ref(new Date())
@@ -43,6 +45,7 @@ async function fetchBackendVersion() {
     const info = data?.data
     if (info) {
       backendVersion.value = info.version || '-'
+      backendBuild.value = info.build || ''
       if (info.time) {
         const d = new Date(info.time)
         if (!isNaN(d.getTime())) {
@@ -84,11 +87,11 @@ const timeText = computed(() => {
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.buildVersion') }}</span>
-          <span class="system-info__value system-info__value--mono">{{ buildVersion }}<span v-if="buildTime !== '-'" class="system-info__hint"> · {{ buildTime }}</span></span>
+          <span class="system-info__value system-info__value--mono">{{ buildVersion }}<template v-if="buildBuild"> · {{ buildBuild }}</template><template v-if="buildTime !== '-'"> · {{ buildTime }}</template></span>
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.backendVersion') }}</span>
-          <span class="system-info__value system-info__value--mono">{{ backendVersion }}<span v-if="backendTime" class="system-info__hint"> · {{ backendTime }}</span></span>
+          <span class="system-info__value system-info__value--mono">{{ backendVersion }}<template v-if="backendBuild"> · {{ backendBuild }}</template><template v-if="backendTime"> · {{ backendTime }}</template></span>
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.systemTime') }}</span>

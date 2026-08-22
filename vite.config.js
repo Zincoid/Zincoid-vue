@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import pkg from './package.json'
 
-const buildVersion = () => ({
+const buildMeta = () => ({
   name: 'vite-plugin-build-version',
   apply: 'build',
   transformIndexHtml(html) {
@@ -13,12 +13,17 @@ const buildVersion = () => ({
       tags: [
         {
           tag: 'meta',
-          attrs: { name: 'build-version', content: `${pkg.version}-${now.toString(36)}` },
+          attrs: { name: 'version', content: pkg.version },
           injectTo: 'head'
         },
         {
           tag: 'meta',
-          attrs: { name: 'build-time', content: new Date(now).toISOString() },
+          attrs: { name: 'build', content: now.toString(36) },
+          injectTo: 'head'
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'time', content: new Date(now).toISOString() },
           injectTo: 'head'
         }
       ]
@@ -27,7 +32,7 @@ const buildVersion = () => ({
 })
 
 export default defineConfig({
-  plugins: [vue(), buildVersion()],
+  plugins: [vue(), buildMeta()],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
