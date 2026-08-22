@@ -243,7 +243,7 @@ watch(done, (v) => {
 
 <style scoped>
 .system-info .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
-.system-info .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: var(--spacing-xs); }
+.system-info .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); }
 
 .system-info__card {
   border: 1px solid var(--color-border);

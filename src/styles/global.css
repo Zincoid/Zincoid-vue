@@ -372,11 +372,12 @@ th {
   margin-bottom: var(--spacing-2xl);
 }
 .page-header__title {
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 0;
 }
 .page-header__subtitle {
   color: var(--color-text-secondary);
   font-size: var(--text-base);
+  margin-top: var(--spacing-sm);
 }
 
 [data-theme="dark"] .page-header__title {

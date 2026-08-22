@@ -153,7 +153,7 @@ const ringColor = computed(() => {
 .data-management .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
 .data-management .page-header__subtitle { font-size: var(--text-sm); }
 .section { margin-bottom: var(--spacing-3xl); }
-h2, h3 { margin-bottom: var(--spacing-lg); }
+h3 { margin-bottom: var(--spacing-lg); }
 
 .data-management__desc {
   font-size: var(--text-base);

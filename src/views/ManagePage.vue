@@ -608,7 +608,7 @@ onBeforeUnmount(stopStream)
 .admin .page-header__subtitle { font-size: var(--text-sm); }
 .admin { padding-bottom: var(--spacing-4xl); }
 .section { margin-bottom: var(--spacing-3xl); }
-h2, h3 { margin-bottom: var(--spacing-lg); }
+h3 { margin-bottom: var(--spacing-lg); }
 
 .config-list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }

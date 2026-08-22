@@ -181,7 +181,7 @@ function statusLabel(s) {
 
 <style scoped>
 .access-page .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
-.access-page .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); margin-top: var(--spacing-xs); }
+.access-page .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); }
 .access-tabs { margin-bottom: var(--spacing-2xl); }
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
