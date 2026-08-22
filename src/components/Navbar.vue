@@ -261,7 +261,7 @@ function closeMenu() {
             <SvgIcon name="login" class="navbar__signin-icon" />
             {{ t('nav.signIn') }}
           </router-link>
-          <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="theme.toggleTheme()">
+          <button class="navbar__item navbar__lang-btn navbar__theme-btn navbar__lang-btn--desktop" @click="theme.toggleTheme()">
             <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__signin-icon" />
             <span class="navbar__label">{{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}</span>
           </button>
@@ -565,6 +565,12 @@ function closeMenu() {
   color: #111827;
   background: rgba(17, 27, 39, 0.12);
   border-bottom: 4px solid #111827;
+}
+[data-theme="dark"] .navbar__item--profile.navbar__item--active,
+[data-theme="dark"] .navbar__item--signin.navbar__item--active {
+  color: #6b7280;
+  background: rgba(107, 114, 128, 0.12);
+  border-bottom: 4px solid #6b7280;
 }
 
 .navbar__nav-icon {
@@ -918,6 +924,12 @@ function closeMenu() {
     gap: 0;
   }
   .navbar__actions .navbar__item.navbar__lang-btn {
+    gap: var(--spacing-sm);
+  }
+  .navbar__actions .navbar__item.navbar__theme-btn {
+    gap: 0;
+  }
+  .navbar__actions .navbar__item.navbar__item--signin {
     gap: var(--spacing-sm);
   }
   .navbar__actions .navbar__item--profile {

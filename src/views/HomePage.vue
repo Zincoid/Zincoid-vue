@@ -524,6 +524,7 @@ onUnmounted(() => {
     linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
     #0d1117;
   background-size: 24px 24px;
+  background-position: 0 -1px;
   display: flex;
   align-items: center;
   height: 288px;
