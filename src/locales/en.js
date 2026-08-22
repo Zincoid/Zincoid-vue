@@ -319,7 +319,7 @@ export default {
     receiveEmailRepoAccessDesc: 'Receive notification emails when repo access requests are approved',
     loadFailed: 'Failed to load settings',
     saveFailed: 'Failed to save settings',
-    resetConfig: 'Reset Config',
+    resetConfig: 'Reset Configuration',
     resetConfigDesc: 'Restore all personal settings to defaults',
     resetConfigConfirm: 'Reset all personal settings to defaults?',
     reset: 'Reset'
