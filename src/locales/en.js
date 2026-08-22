@@ -331,6 +331,7 @@ export default {
     siteName: 'Site name',
     developer: 'Developer',
     buildVersion: 'Frontend build version',
+    backendVersion: 'Backend build version',
     systemTime: 'System time'
   },
   auth: {

@@ -331,6 +331,7 @@ export default {
     siteName: '网站名',
     developer: '开发者',
     buildVersion: '前端构建版本',
+    backendVersion: '后端构建版本',
     systemTime: '系统时间'
   },
   auth: {

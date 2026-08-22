@@ -2,11 +2,14 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { siteName } from '@/composables/useConfig'
+import { healthAPI } from '@/api'
 
 const { t } = useI18n()
 
 const developer = 'Zincoid'
 const buildVersion = document.querySelector('meta[name="build-version"]')?.content || '-'
+const backendVersion = ref('-')
+const backendTime = ref('')
 
 const now = ref(new Date())
 let timer = null
@@ -18,11 +21,29 @@ function tick() {
 onMounted(() => {
   tick()
   timer = setInterval(tick, 1000)
+  fetchBackendVersion()
 })
 
 onBeforeUnmount(() => {
   clearInterval(timer)
 })
+
+async function fetchBackendVersion() {
+  try {
+    const { data } = await healthAPI.version()
+    const info = data?.data
+    if (info) {
+      backendVersion.value = info.version || '-'
+      if (info.time) {
+        const d = new Date(info.time)
+        if (!isNaN(d.getTime())) {
+          const pad = n => String(n).padStart(2, '0')
+          backendTime.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+        }
+      }
+    }
+  } catch { /* ignore */ }
+}
 
 const timeText = computed(() => {
   const d = now.value
@@ -55,6 +76,10 @@ const timeText = computed(() => {
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.buildVersion') }}</span>
           <span class="system-info__value system-info__value--mono">{{ buildVersion }}</span>
+        </div>
+        <div class="system-info__row">
+          <span class="system-info__label">{{ t('system.backendVersion') }}</span>
+          <span class="system-info__value system-info__value--mono">{{ backendVersion }}<span v-if="backendTime" class="system-info__hint"> · {{ backendTime }}</span></span>
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.systemTime') }}</span>
@@ -115,4 +140,5 @@ const timeText = computed(() => {
 .system-info__label { color: var(--color-text-secondary); flex-shrink: 0; }
 .system-info__value { color: var(--color-text-secondary); font-weight: var(--weight-medium); word-break: break-all; text-align: right; }
 .system-info__value--mono { font-family: var(--font-mono); }
+.system-info__hint { color: var(--color-text-tertiary); font-weight: var(--weight-regular); }
 </style>
