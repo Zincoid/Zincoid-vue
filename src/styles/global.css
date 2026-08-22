@@ -173,6 +173,12 @@ th {
 .btn--primary:active {
   transform: scale(0.98);
 }
+[data-theme="dark"] .btn--primary {
+  border-color: #374151;
+}
+[data-theme="dark"] .btn--primary:hover {
+  border-color: #4b5563;
+}
 .btn--outline {
   border-color: var(--color-border);
   color: var(--color-text);
@@ -371,6 +377,10 @@ th {
 .page-header__subtitle {
   color: var(--color-text-secondary);
   font-size: var(--text-base);
+}
+
+[data-theme="dark"] .page-header__title {
+  color: #d1d5db;
 }
 
 /* ── Empty state ── */
@@ -583,5 +593,3 @@ th {
 .like-fab .like-btn span {
   display: none;
 }
-
-
