@@ -354,8 +354,8 @@ export default {
     backendVersion: '后端构建版本',
     systemTime: '系统时间',
     stats: '统计数据',
-    statsDaily: '每日访问量',
-    statsApis: '接口调用排行'
+    statsDaily: '日访问量',
+    statsApis: '接口调用'
   },
   auth: {
     login: '登录',
