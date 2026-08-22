@@ -946,6 +946,47 @@ function closeMenu() {
   }
 }
 
+@media (max-width: 1375px) {
+  html:lang(en) .navbar__links .navbar__item {
+    min-width: auto;
+    padding: 0 var(--spacing-lg);
+    gap: 0;
+  }
+  html:lang(en) .navbar__links .navbar__nav-icon {
+    margin-right: 0;
+  }
+  html:lang(en) .navbar__links .navbar__label {
+    max-width: 0;
+    opacity: 0;
+  }
+  html:lang(en) .navbar__actions .navbar__item:not(.navbar__item--profile) {
+    min-width: 0;
+    padding: 0 var(--spacing-md);
+    gap: 0;
+  }
+  html:lang(en) .navbar__actions .navbar__item.navbar__lang-btn {
+    gap: var(--spacing-sm);
+  }
+  html:lang(en) .navbar__actions .navbar__item.navbar__theme-btn {
+    gap: 0;
+  }
+  html:lang(en) .navbar__actions .navbar__item.navbar__item--signin {
+    gap: var(--spacing-sm);
+  }
+  html:lang(en) .navbar__actions .navbar__item--profile {
+    min-width: 0;
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  html:lang(en) .navbar__actions .navbar__signin-icon {
+    margin-right: 0;
+  }
+  html:lang(en) .navbar__actions .navbar__label {
+    max-width: 0;
+    opacity: 0;
+  }
+}
+
 @media (max-width: 857px) {
   .navbar__links .navbar__item {
     min-width: auto;
