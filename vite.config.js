@@ -5,7 +5,6 @@ import pkg from './package.json'
 
 const buildMeta = () => ({
   name: 'vite-plugin-build-version',
-  apply: 'build',
   transformIndexHtml(html) {
     const now = Date.now()
     return {
