@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
-import { configAPI, userAPI, healthAPI, notificationAPI, logAPI } from '@/api'
+import { configAPI, userAPI, storageAPI, notificationAPI, logAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
@@ -121,7 +121,7 @@ const storageDone = ref(false)
 async function fetchDisk() {
   diskLoading.value = true
   try {
-    const res = await healthAPI.storageSpace()
+    const res = await storageAPI.storageSpace()
     disk.value = res.data?.data || null
   } catch (e) {
     if (e?.response?.status !== 401) configError.value = getMessage(e, 'manage.storageFailed')
@@ -168,7 +168,7 @@ async function runCleanup() {
   if (!await confirm(confirmMsg)) return
   cleaning.value = true
   try {
-    const res = await healthAPI.cleanupFiles(logicCleanup.value)
+    const res = await storageAPI.cleanupFiles(logicCleanup.value)
     const counts = res.data?.data ?? {}
     const parts = Object.entries(counts).map(([k, v]) => `${t(`manage.cleanupFile_${k}`)} ${v}`).join(', ')
     toolMessage.value = `${t('manage.cleanupSuccess')}：${parts || t('manage.cleanupNone')}`
@@ -186,7 +186,7 @@ async function runRecordsCleanup() {
   if (!await confirm(t('manage.cleanupRecordsConfirm'))) return
   recordsCleaning.value = true
   try {
-    const res = await healthAPI.cleanupRecords()
+    const res = await storageAPI.cleanupRecords()
     const counts = res.data?.data ?? {}
     const parts = Object.entries(counts).map(([k, v]) => `${t(`manage.${k}`)} ${v}`).join(', ')
     toolMessage.value = `${t('manage.cleanupSuccess')}：${parts || t('manage.cleanupNone')}`
