@@ -36,7 +36,7 @@ const routes = [
   {
     path: '/personal',
     name: 'Personal',
-    component: () => import('@/views/PersonalCenterPage.vue'),
+    component: () => import('@/views/PersonalPage.vue'),
     redirect: '/personal/profile',
     meta: { requiresAuth: true, title: 'Personal' },
     children: [
