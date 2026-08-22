@@ -283,7 +283,7 @@ export default {
     resetFailed: '重置失败',
     capacity: '容量更新',
     capacityDesc: '设置指定用户的存储容量上限',
-    capacityUserIdPlaceholder: '用户ID',
+    capacityUsernamePlaceholder: '用户名',
     capacityValuePlaceholder: '容量数值',
     capacityUpdate: '更新',
     capacityConfirm: '确定要更新该用户的存储容量吗？',

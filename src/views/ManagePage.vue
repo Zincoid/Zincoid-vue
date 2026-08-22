@@ -100,7 +100,7 @@ function openReset() {
 }
 
 const capacityOpen = ref(false)
-const capacityUserId = ref('')
+const capacityUsername = ref('')
 const capacityValue = ref('')
 const capacityUnit = ref('GB')
 const capacityUpdating = ref(false)
@@ -109,7 +109,7 @@ const CAPACITY_UNITS = { MB: 1024 * 1024, GB: 1024 * 1024 * 1024, TB: 1024 * 102
 
 function openCapacity() {
   capacityOpen.value = true
-  capacityUserId.value = ''
+  capacityUsername.value = ''
   capacityValue.value = ''
   capacityUnit.value = 'GB'
 }
@@ -119,14 +119,14 @@ function cancelCapacity() {
 }
 
 async function handleCapacity() {
-  const uid = capacityUserId.value.trim()
+  const username = capacityUsername.value.trim()
   const val = parseFloat(capacityValue.value)
-  if (!uid || isNaN(val) || val < 0) return
+  if (!username || isNaN(val) || val < 0) return
   if (!await confirm(t('manage.capacityConfirm'))) return
   capacityUpdating.value = true
   try {
     const bytes = Math.round(val * CAPACITY_UNITS[capacityUnit.value])
-    await storageAPI.updateCapacity(uid, bytes)
+    await storageAPI.updateCapacity(username, bytes)
     toolMessage.value = t('manage.capacitySuccess')
     capacityOpen.value = false
     setTimeout(() => toolMessage.value = '', 2000)
@@ -546,7 +546,7 @@ onBeforeUnmount(stopStream)
           <span class="tool-desc">{{ t('manage.capacityDesc') }}</span>
           <div v-if="capacityOpen" class="config-value-row reset-row">
             <div class="reset-inputs" style="flex: 1; min-width: 0;">
-              <input v-model="capacityUserId" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('manage.capacityUserIdPlaceholder')" />
+              <input v-model="capacityUsername" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('manage.capacityUsernamePlaceholder')" />
               <input v-model="capacityValue" type="number" min="0" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('manage.capacityValuePlaceholder')" />
               <select v-model="capacityUnit" class="field__input capacity-select">
                 <option value="MB">MB</option>
@@ -556,7 +556,7 @@ onBeforeUnmount(stopStream)
             </div>
             <div class="reset-actions">
               <button class="btn btn--ghost" @click="cancelCapacity">{{ t('common.cancel') }}</button>
-              <button class="btn btn--primary" :disabled="capacityUpdating || !capacityUserId.trim() || isNaN(parseFloat(capacityValue)) || parseFloat(capacityValue) < 0" @click="handleCapacity">
+              <button class="btn btn--primary" :disabled="capacityUpdating || !capacityUsername.trim() || isNaN(parseFloat(capacityValue)) || parseFloat(capacityValue) < 0" @click="handleCapacity">
                 <SvgIcon name="check" />
                 {{ capacityUpdating ? t('common.saving') : t('common.confirm') }}
               </button>

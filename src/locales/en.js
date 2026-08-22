@@ -283,7 +283,7 @@ export default {
     resetFailed: 'Reset failed',
     capacity: 'Capacity Update',
     capacityDesc: 'Set the storage capacity limit for a user',
-    capacityUserIdPlaceholder: 'User ID',
+    capacityUsernamePlaceholder: 'Username',
     capacityValuePlaceholder: 'Capacity value',
     capacityUpdate: 'Update',
     capacityConfirm: 'Update this user\'s storage capacity?',
