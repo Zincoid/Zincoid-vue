@@ -183,9 +183,15 @@ export default {
   },
   data: {
     pageTitle: '数据',
-    subtitle: '管理文章、动态等数据',
-    desc: '请前往个人详情页管理你的内容...',
-    viewMe: '查看主页'
+    subtitle: '管理存储、内容等数据',
+    storageTab: '存储',
+    storageCapacity: '总容量',
+    storageUsed: '已用容量',
+    storageAvailable: '可用容量',
+    storageFailed: '加载存储信息失败',
+    contentTab: '内容',
+    contentDesc: '请前往个人详情页管理你的内容...',
+    contentView: '查看主页'
   },
   repo: {
     pageTitle: '仓库',

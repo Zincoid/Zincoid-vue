@@ -149,7 +149,8 @@ export const healthAPI = {
 export const storageAPI = {
   cleanupFiles: (isLogic = false) => api.delete('/storage/cleanup', { params: { isLogic } }),
   cleanupRecords: () => api.post('/storage/cleanup'),
-  storageSpace: () => api.get('/storage')
+  storageSpace: () => api.get('/storage'),
+  userStorage: () => api.get('/storage/user')
 }
 
 // ── Repos ──

@@ -215,9 +215,15 @@ export default {
   },
   data: {
     pageTitle: 'Data',
-    subtitle: 'Manage your articles, moments and other data',
-    desc: 'Visit your detail page to manage your content...',
-    viewMe: 'View Me'
+    subtitle: 'Manage your storage, content and other data',
+    storageTab: 'Storage',
+    storageCapacity: 'Capacity',
+    storageUsed: 'Used',
+    storageAvailable: 'Available',
+    storageFailed: 'Failed to load storage info',
+    contentTab: 'Content',
+    contentDesc: 'Visit your detail page to manage your content...',
+    contentView: 'View Me'
   },
   access: {
     desc: 'Manage repo access requests & authorizations',
