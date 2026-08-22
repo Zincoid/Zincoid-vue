@@ -123,7 +123,7 @@ export default {
     profileTab: '基本',
     dataTab: '数据',
     accessTab: '授权',
-    systemTab: '系统',
+    settingTab: '设置',
     manageTab: '管理'
   },
   profile: {
@@ -308,8 +308,8 @@ export default {
     logsDownloadDesc: '下载服务器日志文件',
     logsDownloadFailed: '日志下载失败'
   },
-  system: {
-    pageTitle: '系统',
+  setting: {
+    pageTitle: '设置',
     subtitle: '自定义偏好设置',
     receiveEmail: '接收邮件通知',
     receiveEmailDesc: '通过绑定邮箱接收推送，关闭后不再接收任何邮件推送',

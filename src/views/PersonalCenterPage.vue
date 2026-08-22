@@ -14,7 +14,7 @@ const tabs = computed(() => {
     { to: '/personal/profile', key: 'profileTab', icon: 'profile' },
     { to: '/personal/data', key: 'dataTab', icon: 'data' },
     { to: '/personal/access', key: 'accessTab', icon: 'auth' },
-    { to: '/personal/system', key: 'systemTab', icon: 'admin' }
+    { to: '/personal/setting', key: 'settingTab', icon: 'admin' }
   ]
   if (auth.isAdmin) {
     items.push({ to: '/personal/manage', key: 'manageTab', icon: 'lock' })

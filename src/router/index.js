@@ -58,10 +58,10 @@ const routes = [
         meta: { requiresAuth: true, title: 'Access' }
       },
       {
-        path: 'system',
-        name: 'System',
-        component: () => import('@/views/SystemPage.vue'),
-        meta: { requiresAuth: true, title: 'System' }
+        path: 'setting',
+        name: 'Setting',
+        component: () => import('@/views/SettingPage.vue'),
+        meta: { requiresAuth: true, title: 'Setting' }
       },
       {
         path: 'manage',

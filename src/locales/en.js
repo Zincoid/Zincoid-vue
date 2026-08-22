@@ -123,7 +123,7 @@ export default {
     profileTab: 'Profile',
     dataTab: 'Data',
     accessTab: 'Access',
-    systemTab: 'System',
+    settingTab: 'Setting',
     manageTab: 'Manage'
   },
   profile: {
@@ -308,8 +308,8 @@ export default {
     logsDownloadDesc: 'Download the server log file',
     logsDownloadFailed: 'Failed to download log'
   },
-  system: {
-    pageTitle: 'System',
+  setting: {
+    pageTitle: 'Setting',
     subtitle: 'Customise your preferences',
     receiveEmail: 'Receive email notifications',
     receiveEmailDesc: 'Receive push notifications via your bound email, no email notifications will be sent when disabled',

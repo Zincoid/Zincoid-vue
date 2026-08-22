@@ -28,7 +28,7 @@ onMounted(async () => {
       receiveEmailRepoAccess.value = data.data.receiveEmailRepoAccess
     }
   } catch (e) {
-    handle(e, 'system.loadFailed')
+    handle(e, 'setting.loadFailed')
   } finally {
     loading.value = false
   }
@@ -48,14 +48,14 @@ async function saveConfig(partial) {
     receiveEmailSys.value = payload.receiveEmailSys
     receiveEmailRepoAccess.value = payload.receiveEmailRepoAccess
   } catch (e) {
-    handle(e, 'system.saveFailed')
+    handle(e, 'setting.saveFailed')
   } finally {
     saving.value = false
   }
 }
 
 async function resetConfig() {
-  if (!await confirm(t('system.resetConfigConfirm'))) return
+  if (!await confirm(t('setting.resetConfigConfirm'))) return
   saving.value = true
   try {
     await userAPI.updateUserConfig({
@@ -67,7 +67,7 @@ async function resetConfig() {
     receiveEmailSys.value = false
     receiveEmailRepoAccess.value = true
   } catch (e) {
-    handle(e, 'system.saveFailed')
+    handle(e, 'setting.saveFailed')
   } finally {
     saving.value = false
   }
@@ -77,8 +77,8 @@ async function resetConfig() {
 <template>
   <div class="system">
     <div class="page-header">
-      <h2 class="page-header__title">## {{ t('system.pageTitle') }}<span class="cursor">_</span></h2>
-      <p class="page-header__subtitle">{{ t('system.subtitle') }}</p>
+      <h2 class="page-header__title">## {{ t('setting.pageTitle') }}<span class="cursor">_</span></h2>
+      <p class="page-header__subtitle">{{ t('setting.subtitle') }}</p>
     </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -86,8 +86,8 @@ async function resetConfig() {
       <div class="system__list">
         <div class="system__item">
           <div class="system__info">
-            <span class="system__label">{{ t('system.receiveEmail') }}</span>
-            <span class="system__desc">{{ t('system.receiveEmailDesc') }}</span>
+            <span class="system__label">{{ t('setting.receiveEmail') }}</span>
+            <span class="system__desc">{{ t('setting.receiveEmailDesc') }}</span>
           </div>
           <ToggleSwitch
             :model-value="receiveEmail"
@@ -98,8 +98,8 @@ async function resetConfig() {
         <div v-if="receiveEmail" class="system__sub">
           <div class="system__item">
             <div class="system__info">
-              <span class="system__label">{{ t('system.receiveEmailSys') }}</span>
-              <span class="system__desc">{{ t('system.receiveEmailSysDesc') }}</span>
+              <span class="system__label">{{ t('setting.receiveEmailSys') }}</span>
+              <span class="system__desc">{{ t('setting.receiveEmailSysDesc') }}</span>
             </div>
             <ToggleSwitch
               :model-value="receiveEmailSys"
@@ -109,8 +109,8 @@ async function resetConfig() {
           </div>
           <div class="system__item">
             <div class="system__info">
-              <span class="system__label">{{ t('system.receiveEmailRepoAccess') }}</span>
-              <span class="system__desc">{{ t('system.receiveEmailRepoAccessDesc') }}</span>
+              <span class="system__label">{{ t('setting.receiveEmailRepoAccess') }}</span>
+              <span class="system__desc">{{ t('setting.receiveEmailRepoAccessDesc') }}</span>
             </div>
             <ToggleSwitch
               :model-value="receiveEmailRepoAccess"
@@ -121,8 +121,8 @@ async function resetConfig() {
         </div>
       <div class="system__item">
         <div class="system__info">
-          <span class="system__label">{{ t('system.resetConfig') }}</span>
-          <span class="system__desc">{{ t('system.resetConfigDesc') }}</span>
+          <span class="system__label">{{ t('setting.resetConfig') }}</span>
+          <span class="system__desc">{{ t('setting.resetConfigDesc') }}</span>
         </div>
         <button
           class="btn btn--warning"
@@ -130,7 +130,7 @@ async function resetConfig() {
           @click="resetConfig"
         >
           <SvgIcon name="reset" />
-          {{ t('system.reset') }}</button>
+          {{ t('setting.reset') }}</button>
       </div>
       </div>
     </template>
