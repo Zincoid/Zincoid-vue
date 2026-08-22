@@ -536,6 +536,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3xl);
+  padding: 0 calc(24px + max(0px, min(56px, calc(56px - (100vw - 1000px) / 2))));
 }
 .hero-terminal__brand {
   flex: 1;
@@ -738,6 +739,9 @@ onUnmounted(() => {
   .section {
     margin-bottom: var(--spacing-xl);
   }
+}
+
+@media (max-width: 857px) {
   .hero-terminal__inner {
     flex-direction: column;
     text-align: center;
