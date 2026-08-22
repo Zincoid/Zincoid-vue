@@ -350,7 +350,7 @@ export default {
     subtitle: '系统信息展示',
     siteName: '网站名',
     developer: '开发者',
-    buildVersion: '前端构建版本',
+    frontendVersion: '前端构建版本',
     backendVersion: '后端构建版本',
     systemTime: '系统时间'
   },

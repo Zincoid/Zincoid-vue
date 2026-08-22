@@ -350,8 +350,8 @@ export default {
     subtitle: 'System information',
     siteName: 'Site name',
     developer: 'Developer',
-    buildVersion: 'Frontend build version',
-    backendVersion: 'Backend build version',
+    frontendVersion: 'Frontend version',
+    backendVersion: 'Backend version',
     systemTime: 'System time'
   },
   auth: {

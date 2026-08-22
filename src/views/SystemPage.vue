@@ -94,7 +94,7 @@ const timeText = computed(() => {
           <span class="system-info__value">{{ developer }}</span>
         </div>
         <div class="system-info__row">
-          <span class="system-info__label">{{ t('system.buildVersion') }}</span>
+          <span class="system-info__label">{{ t('system.frontendVersion') }}</span>
           <span class="system-info__value system-info__value--mono">{{ buildVersion }}<template v-if="buildBuild"> · {{ buildBuild }}</template><template v-if="buildTime !== '-'"> · {{ buildTime }}</template></span>
         </div>
         <div class="system-info__row">
