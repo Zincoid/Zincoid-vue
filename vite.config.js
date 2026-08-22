@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
+import pkg from './package.json'
 
 const buildVersion = () => ({
   name: 'vite-plugin-build-version',
@@ -10,7 +11,7 @@ const buildVersion = () => ({
       html,
       tags: [{
         tag: 'meta',
-        attrs: { name: 'build-version', content: Date.now().toString(36) },
+        attrs: { name: 'build-version', content: `${pkg.version}-${Date.now().toString(36)}` },
         injectTo: 'head'
       }]
     }
