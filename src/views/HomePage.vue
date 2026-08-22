@@ -711,8 +711,8 @@ onUnmounted(() => {
   min-height: 120px;
 }
 .collapsed-sidebar:hover {
-  border-color: #f9a8d4;
-  color: #f9a8d4;
+  border-color: var(--color-card-hover);
+  color: var(--color-card-hover);
 }
 .collapsed-sidebar__label {
   writing-mode: vertical-rl;

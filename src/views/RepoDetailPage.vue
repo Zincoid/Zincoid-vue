@@ -947,7 +947,7 @@ async function saveEdit() {
   text-align: center;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
-.item-card:hover { border-color: #f9a8d4; transform: scale(1.02); box-shadow: 0 0 0 0.5px #f9a8d4; }
+.item-card:hover { border-color: var(--color-card-hover); transform: scale(1.02); box-shadow: 0 0 0 0.5px var(--color-card-hover); }
 .item-card[draggable="true"] { cursor: grab; }
 .item-card[draggable="true"]:active { cursor: grabbing; }
 .item-card:hover .item-card__handle, .item-card:hover .item-card__delete { opacity: 1; }

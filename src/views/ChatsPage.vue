@@ -436,7 +436,7 @@ function openPreview(src) {
   border: 2px solid transparent;
   transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
-.chat-msg__img:hover { border-color: #f9a8d4; transform: scale(1.01); }
+.chat-msg__img:hover { border-color: var(--color-card-hover); transform: scale(1.01); }
 
 .chat-msg__video-card {
   position: relative;
@@ -458,7 +458,7 @@ function openPreview(src) {
   border: 0;
   outline: 0;
 }
-.chat-msg__video-card:hover { border-color: #f9a8d4; }
+.chat-msg__video-card:hover { border-color: var(--color-card-hover); }
 
 .chat-msg__video-play {
   position: absolute;
@@ -480,11 +480,11 @@ function openPreview(src) {
   border-radius: var(--rounded-md);
   cursor: pointer;
   font-size: var(--text-sm);
-  color: #f9a8d4;
+  color: var(--color-card-hover);
   border: 2px solid transparent;
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
-.chat-msg__audio:hover { border-color: #f9a8d4; color: #f472b6; }
+.chat-msg__audio:hover { border-color: var(--color-card-hover); color: #f472b6; }
 
 .chat-msg__file-link {
   display: inline-flex;
@@ -568,8 +568,8 @@ function openPreview(src) {
   border-color: var(--color-text-secondary);
 }
 .chat-live-toggle--on {
-  color: #f9a8d4;
-  border-color: #f9a8d4;
+  color: var(--color-card-hover);
+  border-color: var(--color-card-hover);
   background: rgba(249, 168, 212, 0.08);
 }
 .chat-live-toggle--on:hover {
@@ -593,8 +593,8 @@ function openPreview(src) {
   border: 1px solid var(--color-border-light);
 }
 .chat-input__file-btn:hover {
-  color: #f9a8d4;
-  border-color: #f9a8d4;
+  color: var(--color-card-hover);
+  border-color: var(--color-card-hover);
   background: rgba(249, 168, 212, 0.08);
 }
 .chat-input__file-btn--disabled { opacity: 0.4; pointer-events: none; }
@@ -639,8 +639,8 @@ function openPreview(src) {
   transition: all var(--transition-fast);
 }
 .chat-scroll-bottom-btn:hover {
-  color: #f9a8d4;
-  border-color: #f9a8d4;
+  color: var(--color-card-hover);
+  border-color: var(--color-card-hover);
   background: rgba(249, 168, 212, 0.08);
 }
 

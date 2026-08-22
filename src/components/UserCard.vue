@@ -101,8 +101,8 @@ async function handleDelete() {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .user-card:hover {
-  border-color: #f9a8d4;
-  box-shadow: var(--shadow-lg), 0 0 0 0.5px #f9a8d4;
+  border-color: var(--color-card-hover);
+  box-shadow: var(--shadow-lg), 0 0 0 0.5px var(--color-card-hover);
   transform: translateY(-5px);
 }
 

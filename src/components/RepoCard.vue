@@ -78,9 +78,9 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .repo-card:hover {
-  border-color: #f9a8d4;
+  border-color: var(--color-card-hover);
   transform: scale(1.02);
-  box-shadow: 0 0 0 0.5px #f9a8d4;
+  box-shadow: 0 0 0 0.5px var(--color-card-hover);
 }
 
 .repo-card__cover {
