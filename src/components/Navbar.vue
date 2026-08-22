@@ -254,7 +254,7 @@ function closeMenu() {
             </router-link>
             <button class="navbar__item navbar__item--logout" @click="auth.logout(); closeMenu()">
               <SvgIcon name="logout" class="navbar__signin-icon" />
-              {{ t('nav.logout') }}
+              <span class="navbar__label">{{ t('nav.logout') }}</span>
             </button>
           </template>
           <router-link v-else to="/login" class="navbar__item navbar__item--signin" :class="{ 'navbar__item--active': isActive('/login') || isActive('/register') }">
@@ -263,7 +263,7 @@ function closeMenu() {
           </router-link>
           <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="theme.toggleTheme()">
             <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__signin-icon" />
-            {{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}
+            <span class="navbar__label">{{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}</span>
           </button>
           <button class="navbar__item navbar__lang-btn navbar__lang-btn--desktop" @click="locale.toggleLocale()">
             <SvgIcon name="lang" class="navbar__signin-icon" />
@@ -893,6 +893,12 @@ function closeMenu() {
 .navbar__links .navbar__nav-icon {
   transition: margin-right 0.2s ease;
 }
+.navbar__actions .navbar__label {
+  overflow: hidden;
+  max-width: 200px;
+  opacity: 1;
+  transition: max-width 0.2s ease, opacity 0.2s ease, margin 0.2s ease;
+}
 @media (max-width: 1275px) {
   .navbar__links .navbar__item {
     min-width: auto;
@@ -903,6 +909,26 @@ function closeMenu() {
     margin-right: 0;
   }
   .navbar__links .navbar__label {
+    max-width: 0;
+    opacity: 0;
+  }
+  .navbar__actions .navbar__item:not(.navbar__item--profile) {
+    min-width: 0;
+    padding: 0 var(--spacing-md);
+    gap: 0;
+  }
+  .navbar__actions .navbar__item.navbar__lang-btn {
+    gap: var(--spacing-sm);
+  }
+  .navbar__actions .navbar__item--profile {
+    min-width: 0;
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+  .navbar__actions .navbar__signin-icon {
+    margin-right: 0;
+  }
+  .navbar__actions .navbar__label {
     max-width: 0;
     opacity: 0;
   }
@@ -919,6 +945,13 @@ function closeMenu() {
   }
   .navbar__links .navbar__label {
     display: inline;
+    max-width: 200px;
+    opacity: 1;
+  }
+  .navbar__actions .navbar__item {
+    gap: var(--spacing-sm);
+  }
+  .navbar__actions .navbar__label {
     max-width: 200px;
     opacity: 1;
   }
