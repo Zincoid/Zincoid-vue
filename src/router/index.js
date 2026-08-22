@@ -68,6 +68,12 @@ const routes = [
         name: 'Manage',
         component: () => import('@/views/ManagePage.vue'),
         meta: { requiresAuth: true, requiresAdmin: true, title: 'Manage' }
+      },
+      {
+        path: 'system',
+        name: 'System',
+        component: () => import('@/views/SystemPage.vue'),
+        meta: { requiresAuth: true, title: 'System' }
       }
     ]
   },

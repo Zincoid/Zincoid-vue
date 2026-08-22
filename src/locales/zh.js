@@ -124,6 +124,7 @@ export default {
     dataTab: '数据',
     accessTab: '授权',
     settingTab: '设置',
+    systemTab: '系统',
     manageTab: '管理'
   },
   profile: {
@@ -323,6 +324,11 @@ export default {
     resetConfigDesc: '将所有个人设置恢复为默认值',
     resetConfigConfirm: '确定要重置所有个人设置为默认值吗？',
     reset: '重置'
+  },
+  system: {
+    pageTitle: '系统',
+    subtitle: '系统信息展示',
+    comingSoon: '系统信息展示功能建设中，敬请期待...'
   },
   auth: {
     login: '登录',

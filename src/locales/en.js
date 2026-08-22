@@ -124,7 +124,8 @@ export default {
     dataTab: 'Data',
     accessTab: 'Access',
     settingTab: 'Setting',
-    manageTab: 'Manage'
+    manageTab: 'Manage',
+    systemTab: 'System'
   },
   profile: {
     pageTitle: 'Profile',
@@ -323,6 +324,11 @@ export default {
     resetConfigDesc: 'Restore all personal settings to defaults',
     resetConfigConfirm: 'Reset all personal settings to defaults?',
     reset: 'Reset'
+  },
+  system: {
+    pageTitle: 'System',
+    subtitle: 'System information',
+    comingSoon: 'System information display is under construction, stay tuned...'
   },
   auth: {
     login: 'Login',
