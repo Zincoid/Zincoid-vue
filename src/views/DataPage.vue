@@ -85,6 +85,7 @@ const ringColor = computed(() => {
 
     <section class="section">
       <h3>{{ t('data.storageTab') }}</h3>
+      <p class="data-storage-desc">{{ t('data.storageDesc') }}</p>
       <p v-if="storageError" class="msg msg--error">{{ storageError }}</p>
       <LoadingSpinner :visible="storageLoading && !storage" @done="storageDone = true" />
       <template v-if="storageDone && storage">
@@ -158,6 +159,13 @@ h2, h3 { margin-bottom: var(--spacing-lg); }
   font-size: var(--text-base);
   color: var(--color-text);
   margin-bottom: var(--spacing-xl);
+}
+
+.data-storage-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-lg);
 }
 
 .storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }

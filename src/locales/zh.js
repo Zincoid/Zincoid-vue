@@ -185,6 +185,7 @@ export default {
     pageTitle: '数据',
     subtitle: '管理存储、内容等数据',
     storageTab: '存储',
+    storageDesc: '您上传的所有文件会被计入存储使用量中，达到上限后将无法上传更多文件。极端情况下，例如已经上传了部分文件但是因可用空间不足导致操作被终止，已上传的未关联业务的文件会滞留在系统中，直到服务器维护期间（UTC+8 00:00-00:10）自动清理，或者通过以下清理按钮手动清理。如需扩容请联系管理员。',
     storageCapacity: '总容量',
     storageUsed: '已用容量',
     storageAvailable: '可用容量',
