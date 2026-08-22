@@ -207,6 +207,8 @@ export default {
     tags: '标签',
     tagsHint: '用逗号分隔',
     searchPlaceholder: '搜索仓库...',
+    byName: '按名称',
+    byTag: '按标签',
     requestAccess: '授权',
     requestAccessConfirm: '确定要申请访问此仓库？',
     requestAccessSent: '申请已发送',

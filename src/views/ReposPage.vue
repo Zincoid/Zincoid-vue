@@ -25,6 +25,7 @@ const typeTabs = [
 
 const activeType = ref(null)
 const keyword = ref('')
+const tagged = ref(false)
 let searchTimer = null
 const repos = ref([])
 const page = ref(1)
@@ -45,7 +46,7 @@ async function fetchRepos() {
   loadingDone.value = false
   try {
     const kw = keyword.value.trim() || null
-    const res = await repoAPI.getList(page.value, pageSize.value, activeType.value, kw)
+    const res = await repoAPI.getList(page.value, pageSize.value, tagged.value, activeType.value, kw)
     const data = res.data.data
     repos.value = data.records ?? []
     pages.value = data.pages ?? 1
@@ -65,6 +66,13 @@ function onSearchInput() {
 
 function switchType(type) {
   activeType.value = type
+  page.value = 1
+  fetchRepos()
+}
+
+function switchSearchMode(enabled) {
+  if (tagged.value === enabled) return
+  tagged.value = enabled
   page.value = 1
   fetchRepos()
 }
@@ -174,6 +182,21 @@ async function createRepo() {
         :style="activeType === tab.value ? { color: tab.color, borderColor: tab.color, background: tab.color + '18' } : {}"
         @click="switchType(tab.value)"
       >{{ t(`repo.${tab.key}`) }}</button>
+      <div class="search-mode">
+        <div class="search-mode__indicator" :style="{ left: tagged ? 'calc(50% + 3px)' : '3px' }"></div>
+        <button
+          type="button"
+          class="search-mode-btn"
+          :class="{ 'search-mode-btn--active': !tagged }"
+          @click="switchSearchMode(false)"
+        >{{ t('repo.byName') }}</button>
+        <button
+          type="button"
+          class="search-mode-btn"
+          :class="{ 'search-mode-btn--active': tagged }"
+          @click="switchSearchMode(true)"
+        >{{ t('repo.byTag') }}</button>
+      </div>
     </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -277,8 +300,47 @@ async function createRepo() {
 .repo-search { margin-bottom: var(--spacing-xl); }
 .repo-search__input { width: 100%; }
 
+.search-mode {
+  margin-left: auto;
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.search-mode__indicator {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 6px);
+  height: calc(100% - 6px);
+  background: var(--color-primary-light);
+  border-radius: calc(var(--rounded-md) - 1px);
+  transition: left 0.2s ease;
+}
+.search-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+.search-mode-btn--active { color: var(--color-primary); }
+
 .type-tabs {
   display: flex;
+  align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-2xl);
 }

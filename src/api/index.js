@@ -152,7 +152,7 @@ export const repoAPI = {
   create: (data) => api.post('/repos', data),
   update: (id, data) => api.put(`/repos/${id}`, data),
   delete: (id) => api.delete(`/repos/${id}`),
-  getList: (page = 1, size = 10, type, keyword) => api.get('/repos/public', { params: { page, size, type, keyword } }),
+  getList: (page = 1, size = 10, tagged, type, keyword) => api.get('/repos/public', { params: { page, size, tagged, type, keyword } }),
   getByUser: (userId, page = 1, size = 10, type) => api.get(`/repos/public/user/${userId}`, { params: { page, size, type } }),
   getDetail: (id) => api.get(`/repos/public/${id}`),
   getItems: (id, page = 1, size = 10) => api.get(`/repos/public/${id}/items`, { params: { page, size } }),

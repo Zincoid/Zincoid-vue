@@ -201,6 +201,8 @@ export default {
     tags: 'Tags',
     tagsHint: 'Separate with commas',
     searchPlaceholder: 'Search repos...',
+    byName: 'BY NAME',
+    byTag: 'BY TAG',
     requestAccess: 'Authorize',
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',
