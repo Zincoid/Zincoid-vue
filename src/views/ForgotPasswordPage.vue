@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { authAPI } from '@/api'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -116,6 +117,7 @@ async function handleSubmit() {
 
         <div class="forgot-form__actions">
           <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
+            <SvgIcon v-if="!loading" name="reset" :size="18" />
             {{ loading ? t('auth.resetting') : t('auth.resetPassword') }}
           </button>
         </div>
@@ -194,6 +196,7 @@ async function handleSubmit() {
 
 .forgot-form .btn--primary {
   background: #111827;
+  gap: var(--spacing-md);
 }
 .forgot-form .btn--primary:hover {
   background: #1f2937;

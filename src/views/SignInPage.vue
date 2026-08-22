@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { authAPI } from '@/api'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -314,6 +315,7 @@ function switchTo(path) {
 
           <div class="auth-form__actions">
             <button class="btn btn--primary btn--lg btn--full" type="submit" :disabled="loading">
+              <SvgIcon v-if="!loading" :name="isLogin ? 'login' : 'user'" :size="18" />
               {{ loading ? (isLogin ? t('auth.loggingIn') : t('auth.registering')) : (isLogin ? t('auth.login') : t('auth.register')) }}
             </button>
           </div>
@@ -512,6 +514,7 @@ function switchTo(path) {
 
 .auth-form .btn--primary {
   background: #111827;
+  gap: var(--spacing-md);
 }
 .auth-form .btn--primary:hover {
   background: #1f2937;
