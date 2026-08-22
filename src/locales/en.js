@@ -217,7 +217,7 @@ export default {
     pageTitle: 'Data',
     subtitle: 'Manage your storage, content and other data',
     storageTab: 'Storage',
-    storageDesc: 'All files you upload count toward your storage usage. Once the limit is reached, no more files can be uploaded. In extreme cases, such as when an upload is interrupted due to insufficient space after some files were already written, uploaded files not linked to any business record will remain in the system until they are automatically cleaned up during server maintenance (UTC+8 00:00-00:10), or manually cleaned up with the button below. Contact an administrator to increase your storage.',
+    storageDesc: 'All files you upload count toward your storage usage. Once the limit is reached, no more files can be uploaded. In extreme cases, such as when an upload is interrupted due to insufficient space after some files were already written, uploaded files not linked to any business record will remain in the system until they are automatically cleaned up during server maintenance (UTC+8 00:00-00:10), or manually cleaned up with the button below. Contact an administrator to increase your storage capacity.',
     storageCapacity: 'Capacity',
     storageUsed: 'Used',
     storageAvailable: 'Available',
