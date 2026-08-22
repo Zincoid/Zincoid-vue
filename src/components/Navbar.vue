@@ -242,7 +242,7 @@ function closeMenu() {
                 <span v-if="unreadCount > 0" class="navbar__notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
               </button>
             </div>
-            <router-link to="/personal/profile" class="navbar__item navbar__item--profile" :class="{ 'navbar__item--active': isActive('/personal') }">
+            <router-link to="/personal/profile" class="navbar__item navbar__item--personal" :class="{ 'navbar__item--active': isActive('/personal') }">
               <img
                 v-if="auth.user?.avatar"
                 :src="auth.user.avatar"
@@ -563,13 +563,13 @@ function closeMenu() {
   background: rgba(107, 33, 168, 0.12);
   border-bottom: 4px solid #6b21a8;
 }
-.navbar__item--profile.navbar__item--active,
+.navbar__item--personal.navbar__item--active,
 .navbar__item--signin.navbar__item--active {
   color: #111827;
   background: rgba(17, 27, 39, 0.12);
   border-bottom: 4px solid #111827;
 }
-[data-theme="dark"] .navbar__item--profile.navbar__item--active,
+[data-theme="dark"] .navbar__item--personal.navbar__item--active,
 [data-theme="dark"] .navbar__item--signin.navbar__item--active {
   color: #6b7280;
   background: rgba(107, 114, 128, 0.12);
@@ -924,7 +924,7 @@ function closeMenu() {
     max-width: 0;
     opacity: 0;
   }
-  .navbar__actions .navbar__item:not(.navbar__item--profile) {
+  .navbar__actions .navbar__item:not(.navbar__item--personal) {
     min-width: 0;
     padding: 0 var(--spacing-md);
     gap: 0;
@@ -938,7 +938,7 @@ function closeMenu() {
   .navbar__actions .navbar__item.navbar__item--signin {
     gap: var(--spacing-sm);
   }
-  .navbar__actions .navbar__item--profile {
+  .navbar__actions .navbar__item--personal {
     min-width: 0;
     padding: 0 var(--spacing-md);
     gap: var(--spacing-sm);
@@ -965,7 +965,7 @@ function closeMenu() {
     max-width: 0;
     opacity: 0;
   }
-  html:lang(en) .navbar__actions .navbar__item:not(.navbar__item--profile) {
+  html:lang(en) .navbar__actions .navbar__item:not(.navbar__item--personal) {
     min-width: 0;
     padding: 0 var(--spacing-md);
     gap: 0;
@@ -979,7 +979,7 @@ function closeMenu() {
   html:lang(en) .navbar__actions .navbar__item.navbar__item--signin {
     gap: var(--spacing-sm);
   }
-  html:lang(en) .navbar__actions .navbar__item--profile {
+  html:lang(en) .navbar__actions .navbar__item--personal {
     min-width: 0;
     padding: 0 var(--spacing-md);
     gap: var(--spacing-sm);
@@ -1009,6 +1009,9 @@ function closeMenu() {
   }
   .navbar__actions .navbar__item {
     gap: var(--spacing-sm);
+  }
+  .navbar__actions .navbar__item--personal {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
   .navbar__actions .navbar__label {
     max-width: 200px;
