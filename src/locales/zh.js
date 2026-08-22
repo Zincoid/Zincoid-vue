@@ -414,6 +414,7 @@ export default {
     'Invalid or expired verification code': '验证码错误或已过期',
     'Email already registered': '邮箱已被注册',
     'Email is required': '邮箱不能为空',
+    'Insufficient personal storage space': '个人存储空间不足',
     'Verification code is required': '验证码不能为空',
     'Please wait before requesting a new code': '验证码已请求，请稍后再试',
     'Verification code already requested, please wait': '验证码已请求，请稍后再试',
