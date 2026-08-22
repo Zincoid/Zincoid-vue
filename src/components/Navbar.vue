@@ -420,6 +420,9 @@ function closeMenu() {
   height: 100%;
   border-bottom: 2px solid rgba(0, 0, 0, 0.25);
 }
+[data-theme="dark"] .navbar__brand {
+  border-bottom-color: #374151;
+}
 .navbar__brand-text--light {
   font-weight: var(--weight-light);
   color: var(--color-text-secondary);
