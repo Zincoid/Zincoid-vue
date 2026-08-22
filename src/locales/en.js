@@ -415,6 +415,7 @@ export default {
     'Email already registered': 'Email already registered',
     'Email is required': 'Email is required',
     'Insufficient personal storage space': 'Insufficient personal storage space',
+    'Insufficient server disk space': 'Insufficient server disk space',
     'Verification code is required': 'Verification code is required',
     'Please wait before requesting a new code': 'Verification code already requested. Please wait',
     'Verification code already requested, please wait': 'Verification code already requested, please wait',
