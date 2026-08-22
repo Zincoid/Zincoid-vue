@@ -8,6 +8,7 @@ const { t } = useI18n()
 
 const developer = 'Zincoid'
 const buildVersion = document.querySelector('meta[name="build-version"]')?.content || '-'
+const buildTime = formatMetaTime(document.querySelector('meta[name="build-time"]')?.content)
 const backendVersion = ref('-')
 const backendTime = ref('')
 
@@ -28,6 +29,14 @@ onBeforeUnmount(() => {
   clearInterval(timer)
 })
 
+function formatMetaTime(raw) {
+  if (!raw) return '-'
+  const d = new Date(raw)
+  if (isNaN(d.getTime())) return '-'
+  const pad = n => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
 async function fetchBackendVersion() {
   try {
     const { data } = await healthAPI.version()
@@ -38,7 +47,7 @@ async function fetchBackendVersion() {
         const d = new Date(info.time)
         if (!isNaN(d.getTime())) {
           const pad = n => String(n).padStart(2, '0')
-          backendTime.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+          backendTime.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
         }
       }
     }
@@ -75,7 +84,7 @@ const timeText = computed(() => {
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.buildVersion') }}</span>
-          <span class="system-info__value system-info__value--mono">{{ buildVersion }}</span>
+          <span class="system-info__value system-info__value--mono">{{ buildVersion }}<span v-if="buildTime !== '-'" class="system-info__hint"> · {{ buildTime }}</span></span>
         </div>
         <div class="system-info__row">
           <span class="system-info__label">{{ t('system.backendVersion') }}</span>
@@ -140,5 +149,5 @@ const timeText = computed(() => {
 .system-info__label { color: var(--color-text-secondary); flex-shrink: 0; }
 .system-info__value { color: var(--color-text-secondary); font-weight: var(--weight-medium); word-break: break-all; text-align: right; }
 .system-info__value--mono { font-family: var(--font-mono); }
-.system-info__hint { color: var(--color-text-tertiary); font-weight: var(--weight-regular); }
+.system-info__hint { color: var(--color-text-secondary); font-weight: var(--weight-regular); }
 </style>

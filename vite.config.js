@@ -7,13 +7,21 @@ const buildVersion = () => ({
   name: 'vite-plugin-build-version',
   apply: 'build',
   transformIndexHtml(html) {
+    const now = Date.now()
     return {
       html,
-      tags: [{
-        tag: 'meta',
-        attrs: { name: 'build-version', content: `${pkg.version}-${Date.now().toString(36)}` },
-        injectTo: 'head'
-      }]
+      tags: [
+        {
+          tag: 'meta',
+          attrs: { name: 'build-version', content: `${pkg.version}-${now.toString(36)}` },
+          injectTo: 'head'
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'build-time', content: new Date(now).toISOString() },
+          injectTo: 'head'
+        }
+      ]
     }
   }
 })
