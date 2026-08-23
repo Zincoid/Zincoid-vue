@@ -332,8 +332,8 @@ onMounted(async () => {
   animation: walkman-ripple 1.8s ease-out infinite;
 }
 @keyframes walkman-ripple {
-  0% { transform: scale(0.4); border-width: 6px; opacity: 0.7; }
-  100% { transform: scale(1.2); border-width: 0.5px; opacity: 0; }
+  0% { transform: scale(0.5); border-width: 1px; opacity: 0.5; }
+  100% { transform: scale(1.0); border-width: 5px; opacity: 0; }
 }
 
 .walkman__eq {
