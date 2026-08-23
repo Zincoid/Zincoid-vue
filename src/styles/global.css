@@ -454,6 +454,11 @@ th {
   background: rgba(128, 128, 128, 0.55);
 }
 
+/* ── Textarea resize handle ── */
+textarea::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* ── Selection ── */
 ::selection {
   background: var(--color-primary-light);
