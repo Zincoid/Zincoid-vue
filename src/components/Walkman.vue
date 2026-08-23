@@ -124,6 +124,14 @@ function playListTrack(track) {
   playTrack(idx)
 }
 
+function toggleTrack(track) {
+  if (track.id === currentTrack.value?.id) {
+    toggle()
+  } else {
+    playListTrack(track)
+  }
+}
+
 function playTrack(index) {
   if (index < 0 || index >= tracks.value.length) return
   currentIndex.value = index
@@ -310,11 +318,16 @@ onMounted(async () => {
                   @click="playListTrack(tr)"
               >
                 <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
+                <button
+                    class="walkman__track-play"
+                    @click.stop="toggleTrack(tr)"
+                >
+                  <SvgIcon :name="tr.id === currentTrack?.id && playing ? 'pause' : 'play'" :size="10" />
+                </button>
                 <a
                     class="walkman__track-download"
                     :href="tr.url"
                     download
-                    :title="t('common.download')"
                     @click.stop
                 >
                   <SvgIcon name="download" :size="12" />
@@ -572,6 +585,7 @@ onMounted(async () => {
 .walkman__list-scroll::-webkit-scrollbar-thumb { background: var(--color-border); }
 
 .walkman__track {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -598,9 +612,35 @@ onMounted(async () => {
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  padding-right: 48px;
 }
 
+.walkman__track-play {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-sm);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.walkman__track:hover .walkman__track-play { color: var(--color-text-secondary); }
+.walkman__track-play:hover { color: var(--color-primary); background: var(--color-bg-alt); }
+
 .walkman__track-download {
+  position: absolute;
+  right: var(--spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -608,7 +648,6 @@ onMounted(async () => {
   height: 18px;
   border-radius: var(--rounded-sm);
   color: var(--color-text-tertiary);
-  flex-shrink: 0;
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .walkman__track:hover .walkman__track-download { color: var(--color-text-secondary); }
