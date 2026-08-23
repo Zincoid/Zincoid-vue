@@ -370,8 +370,8 @@ export default {
     backendVersion: '后端构建版本',
     systemTime: '系统时间',
     stats: '统计数据',
-    statsDaily: '日访问量',
-    statsApis: '接口调用'
+    statsDaily: '日访问量（近7日）',
+    statsApis: '接口调用（近7日）'
   },
   auth: {
     login: '登录',

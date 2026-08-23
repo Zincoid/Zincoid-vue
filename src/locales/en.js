@@ -370,8 +370,8 @@ export default {
     backendVersion: 'Backend version',
     systemTime: 'System time',
     stats: 'Statistics',
-    statsDaily: 'Daily usage',
-    statsApis: 'API usage'
+    statsDaily: 'Daily visits (last 7 days)',
+    statsApis: 'Top APIs (last 7 days)'
   },
   auth: {
     login: 'Login',

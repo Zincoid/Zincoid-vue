@@ -216,7 +216,7 @@ async function refreshDaily() {
 async function refreshApis() {
   apisLoading.value = true
   try {
-    const res = await statAPI.get(1, 15).catch(() => null)
+    const res = await statAPI.get(7, 15).catch(() => null)
     const data = res?.data?.data
     if (data?.apis) stats.value = { ...(stats.value || {}), apis: data.apis }
   } catch { /* ignore */ } finally {
