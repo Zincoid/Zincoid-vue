@@ -102,7 +102,10 @@ function chartColors() {
     text: dark ? '#9ca3af' : '#6b7280',
     grid: dark ? '#2e303a' : '#e5e7eb',
     axis: dark ? '#6b7280' : '#9ca3af',
-    primary: '#2952cc'
+    primary: '#2952cc',
+    tooltipBg: dark ? '#1a1d27' : '#ffffff',
+    tooltipBorder: dark ? '#2e303a' : '#e5e7eb',
+    tooltipText: dark ? '#f3f4f6' : '#111827'
   }
 }
 
@@ -118,12 +121,18 @@ function renderCharts() {
 
 function renderDaily() {
   if (!stats.value || !done.value) return
-  const { text, grid, axis, primary } = chartColors()
+  const { text, grid, axis, primary, tooltipBg, tooltipBorder, tooltipText } = chartColors()
   if (dailyChart) { dailyChart.dispose(); dailyChart = null }
   if (!dailyChartRef.value) return
   dailyChart = echarts.init(dailyChartRef.value)
   dailyChart.setOption({
-    tooltip: { trigger: 'axis' },
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: tooltipBg,
+      borderColor: tooltipBorder,
+      borderRadius: 8,
+      textStyle: { color: tooltipText }
+    },
     grid: { left: 40, right: 16, top: 24, bottom: 24 },
     xAxis: {
       type: 'category',
@@ -154,12 +163,19 @@ function renderDaily() {
 
 function renderApis() {
   if (!stats.value || !done.value) return
-  const { text, grid, axis } = chartColors()
+  const { text, grid, axis, tooltipBg, tooltipBorder, tooltipText } = chartColors()
   if (apiChart) { apiChart.dispose(); apiChart = null }
   if (!apiChartRef.value) return
   apiChart = echarts.init(apiChartRef.value)
   apiChart.setOption({
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: tooltipBg,
+      borderColor: tooltipBorder,
+      borderRadius: 8,
+      textStyle: { color: tooltipText }
+    },
     grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
     xAxis: {
       type: 'value',
