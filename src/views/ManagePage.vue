@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
 import { configAPI, userAPI, storageAPI, notificationAPI, logAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -11,6 +12,7 @@ import ToggleSwitch from '@/components/ToggleSwitch.vue'
 const { t } = useI18n()
 const { getMessage } = useError()
 const { confirm } = useConfirm()
+const { toast } = useToast()
 
 const configs = ref([])
 const configMessage = ref('')
@@ -168,6 +170,23 @@ async function fetchDisk() {
   }
 }
 
+const cacheCleaning = ref(false)
+
+async function handleClearCache() {
+  if (!await confirm(t('manage.cacheCleanupConfirm'))) return
+  cacheCleaning.value = true
+  try {
+    const res = await storageAPI.clearCache()
+    const count = res.data?.data ?? 0
+    toast(t('manage.cacheCleanupDone', { count }), count > 0 ? 'success' : 'info')
+    fetchDisk()
+  } catch (err) {
+    toast(getMessage(err, 'manage.cacheCleanupFailed'), 'error')
+  } finally {
+    cacheCleaning.value = false
+  }
+}
+
 function formatSize(bytes) {
   if (!bytes) return '0 B'
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -192,12 +211,14 @@ const ringSegments = computed(() => {
     { key: 'cache', color: 'var(--color-warning)' },
     { key: 'other', color: 'var(--color-text-tertiary)' },
   ]
-  const segments = parts.map(part => {
-    const ratio = Math.max(0, Math.min((disk.value[part.key] || 0) / total, 1))
-    let dash = ratio * ringCircumference
-    if (dash > 0) dash = Math.max(dash, minDash)
-    return { color: part.color, dash, offset: 0 }
-  })
+  const segments = parts
+    .map(part => {
+      const ratio = Math.max(0, Math.min((disk.value[part.key] || 0) / total, 1))
+      let dash = ratio * ringCircumference
+      if (dash > 0) dash = Math.max(dash, minDash)
+      return { color: part.color, dash, offset: 0 }
+    })
+    .filter(seg => seg.dash > 0)
   const sum = segments.reduce((acc, seg) => acc + seg.dash, 0)
   if (sum > ringCircumference) {
     const scale = ringCircumference / sum
@@ -410,6 +431,9 @@ onBeforeUnmount(stopStream)
         <div class="storage-card">
           <button class="storage-refresh" :disabled="diskLoading" @click="fetchDisk">
             <SvgIcon name="refresh" :size="16" />
+          </button>
+          <button class="storage-cache-cleanup" :disabled="cacheCleaning" @click="handleClearCache">
+            <SvgIcon name="trash" :size="16" />
           </button>
           <div class="storage-item">
             <span class="storage-label">{{ t('manage.storageTotal') }}</span>
@@ -667,6 +691,26 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-refresh:hover { color: var(--color-text-heading); border-color: var(--color-primary); background: var(--color-primary-bg); }
 .storage-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 .storage-refresh:disabled svg { animation: storage-spin 1s linear infinite; }
+.storage-cache-cleanup {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.storage-cache-cleanup:hover { color: var(--color-danger); border-color: var(--color-danger); background: var(--color-danger-bg); }
+.storage-cache-cleanup:disabled { opacity: 0.5; cursor: not-allowed; }
+.storage-cache-cleanup:disabled svg { animation: storage-spin 1s linear infinite; }
 @keyframes storage-spin { to { transform: rotate(360deg); } }
 .storage-item { display: flex; flex-direction: column; gap: var(--spacing-xxs); }
 .storage-label { font-size: var(--text-xs); color: var(--color-text-secondary); }

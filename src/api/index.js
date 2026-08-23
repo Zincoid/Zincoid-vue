@@ -152,7 +152,8 @@ export const storageAPI = {
   storageSpace: () => api.get('/storage'),
   userStorage: () => api.get('/storage/user'),
   updateCapacity: (username, capacity) => api.put(`/storage/${username}/capacity`, null, { params: { capacity } }),
-  cleanupUnlinked: () => api.delete('/storage/unlinked')
+  cleanupUnlinked: () => api.delete('/storage/unlinked'),
+  clearCache: () => api.delete('/storage/cache')
 }
 
 // ── Stats ──
