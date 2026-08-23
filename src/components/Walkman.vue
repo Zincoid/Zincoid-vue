@@ -203,7 +203,10 @@ onMounted(async () => {
   await loadConfig()
   listSize.value = parseInt(getConfig('page_size', '10'))
   if (audioRef.value) audioRef.value.volume = volume.value
-  loadList(1)
+  await loadList(1)
+  if (!currentTrack.value && tracks.value.length) {
+    currentTrack.value = tracks.value[0]
+  }
 })
 </script>
 
@@ -272,7 +275,7 @@ onMounted(async () => {
         </div>
         <Transition name="walkman-list">
           <div v-if="listOpen" class="walkman__list">
-            <div class="walkman__list-scroll">
+            <div v-if="listTracks.length" class="walkman__list-scroll">
               <button
                   v-for="tr in listTracks"
                   :key="tr.id"
@@ -283,6 +286,7 @@ onMounted(async () => {
                 <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
               </button>
             </div>
+            <div v-else class="walkman__list-empty">{{ t('walkman.empty') }}</div>
             <div class="walkman__list-pager">
               <button class="walkman__page-btn" :disabled="listPage <= 1 || listLoading" @click="loadList(listPage - 1)">&#8249;</button>
               <span class="walkman__page-info">{{ listPage }} / {{ listPages }} · {{ t('walkman.pageSize', { size: listSize }) }}</span>
@@ -544,6 +548,13 @@ onMounted(async () => {
   color: var(--color-text-tertiary);
   font-family: var(--font-mono);
   flex-shrink: 0;
+}
+
+.walkman__list-empty {
+  padding: var(--spacing-lg) var(--spacing-md);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
 }
 
 .walkman__list-pager {
