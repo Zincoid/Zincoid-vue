@@ -330,48 +330,6 @@ onBeforeUnmount(stopStream)
     </div>
 
     <section class="section">
-      <h3>{{ t('manage.storage') }}</h3>
-      <LoadingSpinner :visible="diskLoading && !disk" @done="storageDone = true" />
-      <div v-if="storageDone && disk" class="storage-layout">
-        <div class="storage-card">
-          <button class="storage-refresh" :disabled="diskLoading" @click="fetchDisk">
-            <SvgIcon name="refresh" :size="16" />
-          </button>
-          <div class="storage-item">
-            <span class="storage-label">{{ t('manage.storageTotal') }}</span>
-            <span class="storage-value">{{ formatSize(disk.total) }}</span>
-          </div>
-          <span class="storage-op">-</span>
-          <div class="storage-item">
-            <span class="storage-label">{{ t('manage.storageUsed') }}</span>
-            <span class="storage-value">{{ formatSize(disk.used) }}</span>
-          </div>
-          <span class="storage-op">=</span>
-          <div class="storage-item">
-            <span class="storage-label">{{ t('manage.storageFree') }}</span>
-            <span class="storage-value storage-value--free">{{ formatSize(disk.free) }}</span>
-          </div>
-        </div>
-        <div class="storage-chart">
-          <svg class="storage-chart__ring" viewBox="0 0 120 120">
-            <circle class="storage-chart__track" cx="60" cy="60" :r="ringRadius" />
-            <circle
-                class="storage-chart__bar"
-                cx="60" cy="60"
-                :r="ringRadius"
-                :stroke="ringColor"
-                :stroke-dasharray="`${ringDash} ${ringCircumference}`"
-            />
-          </svg>
-          <div class="storage-chart__center">
-            <span class="storage-chart__percent">{{ usedPercent }}%</span>
-            <span class="storage-chart__label">{{ t('manage.storageUsed') }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
       <h3>{{ t('manage.log') }}</h3>
       <p v-if="logError" class="msg msg--error">{{ logError }}</p>
       <div class="tool-item">
@@ -419,6 +377,48 @@ onBeforeUnmount(stopStream)
             <span class="log-line__logger">{{ entry.logger }}:</span>
             <span class="log-line__msg">{{ entry.message }}</span>
             <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h3>{{ t('manage.storage') }}</h3>
+      <LoadingSpinner :visible="diskLoading && !disk" @done="storageDone = true" />
+      <div v-if="storageDone && disk" class="storage-layout">
+        <div class="storage-card">
+          <button class="storage-refresh" :disabled="diskLoading" @click="fetchDisk">
+            <SvgIcon name="refresh" :size="16" />
+          </button>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageTotal') }}</span>
+            <span class="storage-value">{{ formatSize(disk.total) }}</span>
+          </div>
+          <span class="storage-op">-</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageUsed') }}</span>
+            <span class="storage-value">{{ formatSize(disk.used) }}</span>
+          </div>
+          <span class="storage-op">=</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageFree') }}</span>
+            <span class="storage-value storage-value--free">{{ formatSize(disk.free) }}</span>
+          </div>
+        </div>
+        <div class="storage-chart">
+          <svg class="storage-chart__ring" viewBox="0 0 120 120">
+            <circle class="storage-chart__track" cx="60" cy="60" :r="ringRadius" />
+            <circle
+                class="storage-chart__bar"
+                cx="60" cy="60"
+                :r="ringRadius"
+                :stroke="ringColor"
+                :stroke-dasharray="`${ringDash} ${ringCircumference}`"
+            />
+          </svg>
+          <div class="storage-chart__center">
+            <span class="storage-chart__percent">{{ usedPercent }}%</span>
+            <span class="storage-chart__label">{{ t('manage.storageUsed') }}</span>
           </div>
         </div>
       </div>
