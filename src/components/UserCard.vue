@@ -1,7 +1,9 @@
 <script setup>
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useLocaleStore } from '@/stores/locale'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 import { useError } from '@/composables/useError'
@@ -10,6 +12,7 @@ import { formatActiveTime } from '@/utils/format'
 import { userAPI } from '@/api'
 
 const { t } = useI18n()
+const localeStore = useLocaleStore()
 const { getMessage } = useError()
 const { confirm } = useConfirm()
 const { toast } = useToast()
@@ -22,6 +25,28 @@ const props = defineProps({
 const emit = defineEmits(['update:user', 'delete:user'])
 
 const router = useRouter()
+
+const activeOuterRef = ref(null)
+const activeInnerRef = ref(null)
+const activeOverflow = ref(false)
+const activeDistance = ref(0)
+
+function checkActiveOverflow() {
+  const inner = activeInnerRef.value
+  const outer = activeOuterRef.value
+  if (!inner || !outer) {
+    activeOverflow.value = false
+    return
+  }
+  const iw = inner.scrollWidth
+  const ow = outer.clientWidth
+  activeOverflow.value = iw > ow
+  activeDistance.value = Math.max(iw - ow, 0)
+}
+
+onMounted(() => nextTick(checkActiveOverflow))
+watch(() => props.user, () => nextTick(checkActiveOverflow))
+watch(() => localeStore.locale, () => nextTick(checkActiveOverflow))
 
 function goDetail() {
   router.push(`/members/${props.user.id}`)
@@ -69,7 +94,13 @@ async function handleDelete() {
         <div class="user-card__title-inner">
           <span v-if="user.title" class="user-card__title">{{ user.title }}</span>
           <span v-else class="user-card__title">&nbsp;</span>
-          <span class="user-card__active">{{ t('user.lastActive') }}: {{ formatActiveTime(user.activeAt) }}</span>
+          <span ref="activeOuterRef" class="user-card__active" :class="{ 'user-card__active--scroll': activeOverflow }">
+            <span
+                ref="activeInnerRef"
+                class="user-card__active-inner"
+                :style="activeOverflow ? { '--distance': activeDistance + 'px' } : null"
+            >{{ t('user.lastActive') }}: {{ formatActiveTime(user.activeAt) }}</span>
+          </span>
         </div>
       </div>
     </div>
@@ -198,6 +229,19 @@ async function handleDelete() {
 }
 .user-card__active {
   color: var(--color-text-secondary);
+}
+.user-card__active-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+.user-card:hover .user-card__active--scroll .user-card__active-inner {
+  animation: user-card-marquee 10s linear infinite;
+}
+@keyframes user-card-marquee {
+  0%, 10% { transform: translateX(0); }
+  45% { transform: translateX(calc(-1 * var(--distance))); }
+  55% { transform: translateX(calc(-1 * var(--distance))); }
+  90%, 100% { transform: translateX(0); }
 }
 
 .user-card__actions {
