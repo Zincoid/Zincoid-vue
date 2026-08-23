@@ -7,6 +7,7 @@ import Footer from '@/components/Footer.vue'
 import DigitalFlow from '@/components/DigitalFlow.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import MessageToast from '@/components/MessageToast.vue'
+import Walkman from '@/components/Walkman.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -24,6 +25,7 @@ const showFlow = computed(() => {
     <router-view />
   </main>
   <Footer />
+  <Walkman v-if="auth.isLoggedIn" />
   <ConfirmDialog />
   <MessageToast />
 </template>

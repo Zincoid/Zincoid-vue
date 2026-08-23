@@ -471,6 +471,17 @@ export default {
     chats: 'Chats',
     members: 'Members'
   },
+  walkman: {
+    empty: 'No tracks',
+    play: 'Play',
+    pause: 'Pause',
+    prev: 'Previous',
+    next: 'Next',
+    expand: 'Expand player',
+    collapse: 'Collapse player',
+    list: 'Playlist',
+    loadFailed: 'Failed to load playlist'
+  },
   chat: {
     title: 'Chats',
     subtitle: 'Public chat',

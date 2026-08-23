@@ -471,6 +471,17 @@ export default {
     chats: '聊天',
     members: '成员'
   },
+  walkman: {
+    empty: '暂无曲目',
+    play: '播放',
+    pause: '暂停',
+    prev: '上一首',
+    next: '下一首',
+    expand: '展开播放器',
+    collapse: '收起播放器',
+    list: '播放列表',
+    loadFailed: '加载音乐列表失败'
+  },
   chat: {
     title: '聊天',
     subtitle: '公共聊天',

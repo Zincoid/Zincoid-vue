@@ -145,6 +145,20 @@ export const healthAPI = {
   version: () => api.get('/health/version')
 }
 
+// ── Music ──
+export const musicAPI = {
+  list: (page = 1, size = 10) => api.get('/music', { params: { page, size } }),
+  upload: (file) => {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post('/music', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 600000
+    })
+  },
+  remove: (fileId) => api.delete(`/music/${fileId}`)
+}
+
 // ── Storage ──
 export const storageAPI = {
   cleanupFiles: (isLogic = false) => api.delete('/storage/cleanup', { params: { isLogic } }),
