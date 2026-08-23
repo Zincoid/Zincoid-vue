@@ -367,12 +367,13 @@ onMounted(async () => {
   border-radius: var(--rounded-full);
   background: transparent;
   color: #db2777;
+  opacity: 0.55;
   cursor: grab;
   touch-action: none;
   user-select: none;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
-.walkman__fab:hover { background: rgba(236, 72, 153, 0.15); transform: scale(1.06); }
+.walkman__fab:hover { background: rgba(236, 72, 153, 0.15); transform: scale(1.06); opacity: 1; }
 .walkman__fab--dragging { cursor: grabbing; }
 .walkman__fab--playing::after {
   content: '';
