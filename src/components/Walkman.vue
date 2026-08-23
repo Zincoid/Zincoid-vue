@@ -252,7 +252,7 @@ onMounted(async () => {
     />
     <button
         class="walkman__fab"
-        :class="{ 'walkman__fab--playing': playing, 'walkman__fab--dragging': dragging }"
+        :class="{ 'walkman__fab--playing': playing, 'walkman__fab--dragging': dragging, 'walkman__fab--open': open }"
         @click="onFabClick"
         @pointerdown="onPointerDown"
         @pointermove="onPointerMove"
@@ -374,6 +374,7 @@ onMounted(async () => {
   transition: background var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
 }
 .walkman__fab:hover { background: rgba(236, 72, 153, 0.15); transform: scale(1.06); opacity: 1; }
+.walkman__fab--open { opacity: 1; background: rgba(236, 72, 153, 0.15); }
 .walkman__fab--dragging { cursor: grabbing; }
 .walkman__fab--playing::after {
   content: '';
