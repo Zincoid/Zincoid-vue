@@ -423,7 +423,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-md);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
@@ -634,7 +634,8 @@ onMounted(async () => {
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .walkman__track:hover .walkman__track-play { color: var(--color-text-secondary); }
-.walkman__track-play:hover { color: var(--color-primary); background: var(--color-bg-alt); }
+.walkman__track-play:hover { color: #3b82f6; background: rgba(59, 130, 246, 0.12); }
+.walkman__track--active .walkman__track-play:hover { color: var(--color-warning); background: var(--color-warning-bg); }
 
 .walkman__track-download {
   position: absolute;
@@ -651,7 +652,7 @@ onMounted(async () => {
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .walkman__track:hover .walkman__track-download { color: var(--color-text-secondary); }
-.walkman__track-download:hover { color: var(--color-primary); background: var(--color-bg-alt); }
+.walkman__track-download:hover { color: #22c55e; background: rgba(34, 197, 94, 0.12); }
 
 .walkman__track-size {
   font-size: 10px;
