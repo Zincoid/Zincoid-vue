@@ -352,7 +352,7 @@ onMounted(async () => {
   position: fixed;
   left: var(--spacing-md);
   top: 80px;
-  z-index: 40;
+  z-index: 120;
 }
 
 .walkman__fab {
