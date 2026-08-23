@@ -109,6 +109,7 @@ function goDetail(id) {
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);
 }
+[data-theme="dark"] .article-card__visibility { background: #23252f; }
 
 .article-card__title {
   font-size: var(--text-lg);

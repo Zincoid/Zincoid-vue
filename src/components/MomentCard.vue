@@ -228,6 +228,7 @@ function goUser(e) {
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);
 }
+[data-theme="dark"] .moment-card__visibility { background: #23252f; }
 
 .moment-card__content {
   font-size: var(--text-sm);
