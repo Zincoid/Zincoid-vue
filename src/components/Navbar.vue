@@ -563,6 +563,11 @@ function closeMenu() {
   background: rgba(107, 33, 168, 0.12);
   border-bottom: 4px solid #6b21a8;
 }
+[data-theme="dark"] .navbar__item--repos.navbar__item--active {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.14);
+  border-bottom: 4px solid #a78bfa;
+}
 .navbar__item--personal.navbar__item--active,
 .navbar__item--signin.navbar__item--active {
   color: #111827;
@@ -1117,6 +1122,7 @@ function closeMenu() {
   .navbar__item--chats.navbar__item--active { border-bottom: none; border-left: 4px solid #f59e0b; }
   .navbar__item--members.navbar__item--active { border-bottom: none; border-left: 4px solid #2563eb; }
   .navbar__item--repos.navbar__item--active { border-bottom: none; border-left: 4px solid #6b21a8; }
+  [data-theme="dark"] .navbar__item--repos.navbar__item--active { border-left: 4px solid #a78bfa; }
   .navbar__item--logout {
     display: none;
   }
