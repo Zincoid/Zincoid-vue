@@ -513,8 +513,15 @@ onMounted(async () => {
 .walkman__list-scroll {
   max-height: 128px;
   overflow-y: auto;
-  padding: var(--spacing-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  border-right: 4px solid transparent;
 }
+.walkman__list-scroll::-webkit-scrollbar { width: 4px; }
+.walkman__list-scroll::-webkit-scrollbar-track { margin: 6px 0; }
+.walkman__list-scroll::-webkit-scrollbar-thumb { background: var(--color-border); }
 
 .walkman__track {
   display: flex;
@@ -522,9 +529,9 @@ onMounted(async () => {
   justify-content: space-between;
   gap: var(--spacing-sm);
   width: 100%;
-  height: 24px;
-  padding: 0 var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   border: none;
+  border-radius: var(--rounded-md);
   background: transparent;
   font-size: 11px;
   line-height: 1;
@@ -532,10 +539,11 @@ onMounted(async () => {
   cursor: pointer;
   text-align: left;
   font-family: var(--font-body);
+  transition: background var(--transition-fast);
 }
 .walkman__track:hover { background: var(--color-bg-alt); color: var(--color-text-heading); }
-[data-theme="dark"] .walkman__track:hover { background: #2e303a; }
-.walkman__track--active { color: #db2777; background: rgba(236, 72, 153, 0.1); }
+[data-theme="dark"] .walkman__track:hover { background: #23252f; }
+.walkman__track--active { color: #db2777; background: rgba(236, 72, 153, 0.1); border-radius: var(--rounded-md); }
 
 .walkman__track-name {
   overflow: hidden;
@@ -562,7 +570,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 24px;
+  height: 27px;
   padding: 0 var(--spacing-sm);
   border-top: 1px solid var(--color-border-light);
 }
