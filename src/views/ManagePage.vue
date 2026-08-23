@@ -278,7 +278,7 @@ async function downloadLog() {
   try {
     await logAPI.downloadLog()
   } catch (err) {
-    logError.value = getMessage(err, 'manage.logsDownloadFailed')
+    logError.value = getMessage(err, 'manage.logDownloadFailed')
   } finally {
     logDownloading.value = false
   }
@@ -311,7 +311,7 @@ async function toggleLogs() {
       }
     }, () => {
       stopStream()
-      logError.value = t('manage.logsFailed')
+      logError.value = t('manage.logFailed')
     })
     logActive.value = true
   } finally {
@@ -372,47 +372,47 @@ onBeforeUnmount(stopStream)
     </section>
 
     <section class="section">
-      <h3>{{ t('manage.logs') }}</h3>
+      <h3>{{ t('manage.log') }}</h3>
       <p v-if="logError" class="msg msg--error">{{ logError }}</p>
       <div class="tool-item">
         <div class="tool-info">
-          <span class="tool-label">{{ t('manage.logsDownload') }}</span>
-          <span class="tool-desc">{{ t('manage.logsDownloadDesc') }}</span>
+          <span class="tool-label">{{ t('manage.logDownload') }}</span>
+          <span class="tool-desc">{{ t('manage.logDownloadDesc') }}</span>
         </div>
         <button class="btn btn--primary-outline" :disabled="logDownloading" @click="downloadLog">
           <SvgIcon name="download" />
-          {{ t('manage.logsDownload') }}
+          {{ t('manage.logDownload') }}
         </button>
       </div>
       <div class="tool-item">
         <div class="tool-info">
-          <span class="tool-label">{{ t('manage.logsLive') }}</span>
-          <span class="tool-desc">{{ t('manage.logsLiveDesc') }}</span>
+          <span class="tool-label">{{ t('manage.logLive') }}</span>
+          <span class="tool-desc">{{ t('manage.logLiveDesc') }}</span>
         </div>
         <select v-model="logLevel" :disabled="logActive" class="field__input log-select">
           <option v-for="l in logLevels" :key="l" :value="l">{{ l }}</option>
         </select>
         <button v-if="!logActive" class="btn btn--success" :disabled="logSwitching" @click="toggleLogs">
           <SvgIcon name="play" />
-          {{ t('manage.logsStart') }}
+          {{ t('manage.logStart') }}
         </button>
         <button v-else class="btn btn--danger" :disabled="logSwitching" @click="toggleLogs">
           <SvgIcon name="close" />
-          {{ t('manage.logsStop') }}
+          {{ t('manage.logStop') }}
         </button>
       </div>
       <div v-if="logActive || logEntries.length" class="log-viewer">
         <div class="log-viewer__head">
           <span class="log-status" :class="{ 'log-status--on': logActive }">
-            {{ logActive ? t('manage.logsConnected') : t('manage.logsDisconnected') }}
+            {{ logActive ? t('manage.logConnected') : t('manage.logDisconnected') }}
           </span>
           <button class="btn btn--ghost" @click="clearLogs">
             <SvgIcon name="trash" />
-            {{ t('manage.logsClear') }}
+            {{ t('manage.logClear') }}
           </button>
         </div>
         <div class="log-viewer__body" ref="logBodyEl" @scroll="onLogScroll">
-          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logsEmpty') }}</p>
+          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logEmpty') }}</p>
           <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
             <span class="log-line__time">{{ entry.timestamp }}</span>
             <span class="log-line__level">{{ entry.level }}</span>
@@ -454,7 +454,7 @@ onBeforeUnmount(stopStream)
     </section>
 
     <section class="section">
-      <h3>{{ t('manage.tools') }}</h3>
+      <h3>{{ t('manage.tool') }}</h3>
       <p v-if="toolMessage" class="msg msg--success">{{ toolMessage }}</p>
       <p v-if="toolError" class="msg msg--error">{{ toolError }}</p>
       <div class="tool-item" :class="{ 'tool-item--open': broadcastOpen }">
