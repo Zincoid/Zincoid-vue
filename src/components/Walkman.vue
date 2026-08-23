@@ -327,7 +327,7 @@ onMounted(async () => {
                 <a
                     class="walkman__track-download"
                     :href="tr.url"
-                    download
+                    :download="tr.fileName"
                     @click.stop
                 >
                   <SvgIcon name="download" :size="12" />

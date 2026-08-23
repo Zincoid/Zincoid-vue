@@ -770,7 +770,7 @@ onBeforeUnmount(stopStream)
               <span class="music-item__name">{{ tr.fileName }}</span>
               <span class="music-item__size">{{ formatSize(tr.fileSize) }}</span>
               <span class="music-item__ops">
-                <a class="music-item__download" :href="tr.url" download :title="t('common.download')">
+                <a class="music-item__download" :href="tr.url" :download="tr.fileName" :title="t('common.download')">
                   <SvgIcon name="download" :size="14" />
                 </a>
                 <button class="music-item__del" :disabled="musicDeleting === tr.id" :title="t('manage.musicDelete')" @click="handleMusicDelete(tr)">
