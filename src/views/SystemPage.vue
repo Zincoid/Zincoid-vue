@@ -10,6 +10,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useLocaleStore } from '@/stores/locale'
 import { healthAPI, statAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, CanvasRenderer])
 
@@ -111,66 +112,100 @@ function disposeCharts() {
 }
 
 function renderCharts() {
+  renderDaily()
+  renderApis()
+}
+
+function renderDaily() {
   if (!stats.value || !done.value) return
   const { text, grid, axis, primary } = chartColors()
-  disposeCharts()
+  if (dailyChart) { dailyChart.dispose(); dailyChart = null }
+  if (!dailyChartRef.value) return
+  dailyChart = echarts.init(dailyChartRef.value)
+  dailyChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 40, right: 16, top: 24, bottom: 24 },
+    xAxis: {
+      type: 'category',
+      data: stats.value.daily.map(d => d.date.slice(5)),
+      axisLine: { lineStyle: { color: axis } },
+      axisLabel: { color: text }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      splitLine: { lineStyle: { color: grid } },
+      axisLabel: { color: text }
+    },
+    series: [{
+      name: t('system.statsDaily'),
+      type: 'line',
+      smooth: true,
+      data: stats.value.daily.map(d => d.count),
+      showSymbol: false,
+      symbol: 'circle',
+      symbolSize: 6,
+      lineStyle: { color: primary, width: 2 },
+      itemStyle: { color: primary },
+      areaStyle: { color: primary, opacity: 0.12 }
+    }]
+  })
+}
 
-  if (dailyChartRef.value) {
-    dailyChart = echarts.init(dailyChartRef.value)
-    dailyChart.setOption({
-      tooltip: { trigger: 'axis' },
-      grid: { left: 40, right: 16, top: 24, bottom: 24 },
-      xAxis: {
-        type: 'category',
-        data: stats.value.daily.map(d => d.date.slice(5)),
-        axisLine: { lineStyle: { color: axis } },
-        axisLabel: { color: text }
-      },
-      yAxis: {
-        type: 'value',
-        minInterval: 1,
-        splitLine: { lineStyle: { color: grid } },
-        axisLabel: { color: text }
-      },
-      series: [{
-        name: t('system.statsDaily'),
-        type: 'line',
-        smooth: true,
-        data: stats.value.daily.map(d => d.count),
-        showSymbol: false,
-        symbol: 'circle',
-        symbolSize: 6,
-        lineStyle: { color: primary, width: 2 },
-        itemStyle: { color: primary },
-        areaStyle: { color: primary, opacity: 0.12 }
-      }]
-    })
+function renderApis() {
+  if (!stats.value || !done.value) return
+  const { text, grid, axis } = chartColors()
+  if (apiChart) { apiChart.dispose(); apiChart = null }
+  if (!apiChartRef.value) return
+  apiChart = echarts.init(apiChartRef.value)
+  apiChart.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
+    xAxis: {
+      type: 'value',
+      minInterval: 1,
+      splitLine: { lineStyle: { color: grid } },
+      axisLabel: { color: text }
+    },
+    yAxis: {
+      type: 'category',
+      data: stats.value.apis.map(a => a.api).reverse(),
+      axisLine: { lineStyle: { color: axis } },
+      axisLabel: { color: text, fontSize: 10 }
+    },
+    series: [{
+      type: 'bar',
+      data: stats.value.apis.map(a => a.count).reverse(),
+      barMaxWidth: 14,
+      itemStyle: { color: '#f59e0b', borderRadius: [0, 3, 3, 0] }
+    }]
+  })
+}
+
+const dailyLoading = ref(false)
+const apisLoading = ref(false)
+
+async function refreshDaily() {
+  dailyLoading.value = true
+  try {
+    const res = await statAPI.get(7, 0).catch(() => null)
+    const data = res?.data?.data
+    if (data?.daily) stats.value = { ...(stats.value || {}), daily: data.daily }
+  } catch { /* ignore */ } finally {
+    dailyLoading.value = false
+    nextTick(renderDaily)
   }
+}
 
-  if (apiChartRef.value) {
-    apiChart = echarts.init(apiChartRef.value)
-    apiChart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
-      xAxis: {
-        type: 'value',
-        minInterval: 1,
-        splitLine: { lineStyle: { color: grid } },
-        axisLabel: { color: text }
-      },
-      yAxis: {
-        type: 'category',
-        data: stats.value.apis.map(a => a.api).reverse(),
-        axisLine: { lineStyle: { color: axis } },
-        axisLabel: { color: text, fontSize: 10 }
-      },
-      series: [{
-        type: 'bar',
-        data: stats.value.apis.map(a => a.count).reverse(),
-        barMaxWidth: 14,
-        itemStyle: { color: '#f59e0b', borderRadius: [0, 3, 3, 0] }
-      }]
-    })
+async function refreshApis() {
+  apisLoading.value = true
+  try {
+    const res = await statAPI.get(1, 15).catch(() => null)
+    const data = res?.data?.data
+    if (data?.apis) stats.value = { ...(stats.value || {}), apis: data.apis }
+  } catch { /* ignore */ } finally {
+    apisLoading.value = false
+    nextTick(renderApis)
   }
 }
 
@@ -228,10 +263,16 @@ watch(done, (v) => {
         <h3>{{ t('system.stats') }}</h3>
         <div class="stats-layout">
           <div class="stats-card">
+            <button class="stats-refresh" :disabled="dailyLoading" @click="refreshDaily">
+              <SvgIcon name="refresh" :size="16" />
+            </button>
             <h4>{{ t('system.statsDaily') }}</h4>
             <div ref="dailyChartRef" class="stats-chart"></div>
           </div>
           <div class="stats-card">
+            <button class="stats-refresh" :disabled="apisLoading" @click="refreshApis">
+              <SvgIcon name="refresh" :size="16" />
+            </button>
             <h4>{{ t('system.statsApis') }}</h4>
             <div ref="apiChartRef" class="stats-chart"></div>
           </div>
@@ -303,6 +344,7 @@ watch(done, (v) => {
 }
 
 .stats-card {
+  position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
@@ -315,7 +357,30 @@ watch(done, (v) => {
   font-weight: var(--weight-medium);
   color: var(--color-text-secondary);
   margin-bottom: var(--spacing-sm);
+  padding-right: 36px;
 }
+
+.stats-refresh {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.stats-refresh:hover { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
+.stats-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.stats-refresh:disabled svg { animation: stats-spin 1s linear infinite; }
+@keyframes stats-spin { to { transform: rotate(360deg); } }
 
 .stats-chart {
   width: 100%;
