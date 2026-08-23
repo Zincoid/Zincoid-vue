@@ -42,6 +42,26 @@ const progress = computed(() => {
   return Math.min((currentTime.value / duration.value) * 100, 100)
 })
 
+const nameOuterRef = ref(null)
+const nameInnerRef = ref(null)
+const nameOverflow = ref(false)
+const nameDistance = ref(0)
+
+function checkNameOverflow() {
+  const inner = nameInnerRef.value
+  const outer = nameOuterRef.value
+  if (!inner || !outer) {
+    nameOverflow.value = false
+    return
+  }
+  const innerW = inner.scrollWidth
+  const outerW = outer.clientWidth
+  nameOverflow.value = innerW > outerW
+  nameDistance.value = Math.max(innerW - outerW, 0)
+}
+
+watch([currentTrack, open], () => nextTick(checkNameOverflow), { flush: 'post' })
+
 function formatTime(sec) {
   if (!sec || isNaN(sec)) return '0:00'
   const m = Math.floor(sec / 60)
@@ -237,7 +257,13 @@ onMounted(async () => {
     <Transition name="walkman-pop">
       <div v-if="open" class="walkman__dock">
         <div class="walkman__panel">
-          <span class="walkman__name">{{ currentTrack?.fileName || t('walkman.empty') }}</span>
+          <span ref="nameOuterRef" class="walkman__name" :class="{ 'walkman__name--scroll': nameOverflow }">
+            <span
+                ref="nameInnerRef"
+                class="walkman__name-inner"
+                :style="nameOverflow ? { '--distance': nameDistance + 'px' } : null"
+            >{{ displayName(currentTrack?.fileName) || t('walkman.empty') }}</span>
+          </span>
           <span class="walkman__time">{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
           <div class="walkman__bar" @click="seek">
             <div class="walkman__bar-fill" :style="{ width: progress + '%' }"></div>
@@ -409,9 +435,22 @@ onMounted(async () => {
   color: var(--color-text-heading);
   max-width: 110px;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-mono);
+  margin-right: var(--spacing-sm);
+}
+.walkman__name-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+.walkman__name--scroll .walkman__name-inner {
+  animation: walkman-marquee 10s linear infinite;
+}
+@keyframes walkman-marquee {
+  0%, 10% { transform: translateX(0); }
+  45% { transform: translateX(calc(-1 * var(--distance))); }
+  55% { transform: translateX(calc(-1 * var(--distance))); }
+  90%, 100% { transform: translateX(0); }
 }
 
 .walkman__time {
