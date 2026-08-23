@@ -91,25 +91,29 @@ const ringColor = computed(() => {
       <template v-if="storageDone && storage">
         <div class="storage-layout">
           <div class="storage-card">
-            <button class="storage-refresh" :disabled="storageLoading" @click="fetchStorage">
-              <SvgIcon name="refresh" :size="16" />
-            </button>
-            <button class="storage-cleanup" :disabled="cleaning" @click="handleCleanup">
-              <SvgIcon name="clean" :size="16" />
-            </button>
-            <div class="storage-item">
-              <span class="storage-label">{{ t('data.storageCapacity') }}</span>
-              <span class="storage-value">{{ formatSize(storage.capacity) }}</span>
+            <div class="storage-info">
+              <div class="storage-item">
+                <span class="storage-label">{{ t('data.storageCapacity') }}</span>
+                <span class="storage-value">{{ formatSize(storage.capacity) }}</span>
+              </div>
+              <span class="storage-op">-</span>
+              <div class="storage-item">
+                <span class="storage-label">{{ t('data.storageUsed') }}</span>
+                <span class="storage-value">{{ formatSize(storage.used) }}</span>
+              </div>
+              <span class="storage-op">=</span>
+              <div class="storage-item">
+                <span class="storage-label">{{ t('data.storageAvailable') }}</span>
+                <span class="storage-value storage-value--free">{{ formatSize(storage.available) }}</span>
+              </div>
             </div>
-            <span class="storage-op">-</span>
-            <div class="storage-item">
-              <span class="storage-label">{{ t('data.storageUsed') }}</span>
-              <span class="storage-value">{{ formatSize(storage.used) }}</span>
-            </div>
-            <span class="storage-op">=</span>
-            <div class="storage-item">
-              <span class="storage-label">{{ t('data.storageAvailable') }}</span>
-              <span class="storage-value storage-value--free">{{ formatSize(storage.available) }}</span>
+            <div class="storage-actions">
+              <button class="storage-cleanup" :disabled="cleaning" @click="handleCleanup">
+                <SvgIcon name="clean" :size="16" />
+              </button>
+              <button class="storage-refresh" :disabled="storageLoading" @click="fetchStorage">
+                <SvgIcon name="refresh" :size="16" />
+              </button>
             </div>
           </div>
           <div class="storage-chart">
@@ -170,9 +174,6 @@ h3 { margin-bottom: var(--spacing-lg); }
 
 .storage-layout { display: flex; align-items: center; gap: var(--spacing-xl); flex-wrap: wrap; }
 .storage-cleanup {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,10 +191,9 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-cleanup:disabled { opacity: 0.5; cursor: not-allowed; }
 .storage-cleanup:disabled svg { animation: storage-spin 1s linear infinite; }
 .storage-card { position: relative; flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.storage-info { display: flex; gap: var(--spacing-lg); min-width: 0; flex-wrap: wrap; padding-right: 72px; }
+.storage-actions { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; flex-direction: row; gap: var(--spacing-sm); }
 .storage-refresh {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
   display: flex;
   align-items: center;
   justify-content: center;
