@@ -5,6 +5,7 @@ import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI } from '@/api'
+import { useConfig } from '@/composables/useConfig'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
@@ -13,6 +14,7 @@ const { t } = useI18n()
 const { getMessage } = useError()
 const { confirm } = useConfirm()
 const { toast } = useToast()
+const { load: loadConfig, get: getConfig } = useConfig()
 
 const configs = ref([])
 const configMessage = ref('')
@@ -152,6 +154,8 @@ onMounted(async () => {
   } finally {
     configLoading.value = false
   }
+  await loadConfig()
+  musicSize.value = parseInt(getConfig('page_size', '10'))
   await fetchDisk()
 })
 
@@ -776,7 +780,7 @@ onBeforeUnmount(stopStream)
             <button class="music-pager__btn" :disabled="musicPage >= musicPages || musicLoading" @click="fetchMusicList(musicPage + 1)">&#8250;</button>
           </div>
           <div class="modal__actions">
-            <span v-if="musicTotal" class="music-total">{{ t('manage.musicTotal', { total: musicTotal }) }}</span>
+            <span v-if="musicTotal" class="music-total">{{ t('manage.musicTotal', { total: musicTotal }) }} · {{ t('manage.musicPageSize', { size: musicSize }) }}</span>
             <button class="btn btn--primary btn--full" :disabled="musicUploading" @click="musicFileInput?.click()">
               <SvgIcon name="upload" />
               {{ musicUploading ? t('common.uploading') : t('manage.musicUpload') }}

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
@@ -13,12 +13,13 @@ const { load: loadConfig, get: getConfig } = useConfig()
 const open = ref(false)
 const listOpen = ref(false)
 const tracks = ref([])
+const currentTrack = ref(null)
 const currentIndex = ref(-1)
 const playing = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 const error = ref('')
-const volume = ref(1)
+const volume = ref(0.25)
 const muted = ref(false)
 
 const listTracks = ref([])
@@ -36,7 +37,6 @@ let moved = false
 
 const audioRef = ref(null)
 
-const currentTrack = computed(() => tracks.value[currentIndex.value] || null)
 const progress = computed(() => {
   if (!duration.value) return 0
   return Math.min((currentTime.value / duration.value) * 100, 100)
@@ -50,13 +50,7 @@ function formatTime(sec) {
 }
 
 async function loadTracks() {
-  try {
-    const res = await musicAPI.list(1, 100)
-    tracks.value = res.data?.data?.records || []
-    if (currentIndex.value === -1 && tracks.value.length) currentIndex.value = 0
-  } catch (e) {
-    if (e?.response?.status !== 401) error.value = getMessage(e, 'walkman.loadFailed')
-  }
+  await loadList(1)
 }
 
 function formatSize(bytes) {
@@ -68,14 +62,25 @@ function formatSize(bytes) {
   return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i]
 }
 
+function displayName(fileName) {
+  return fileName?.replace(/\.[^.]+$/, '') || fileName
+}
+
 async function loadList(pageNum) {
   listLoading.value = true
   try {
     const res = await musicAPI.list(pageNum, listSize.value)
     const data = res.data?.data || {}
-    listTracks.value = data.records || []
+    const records = data.records || []
+    listTracks.value = records
+    tracks.value = records
     listPages.value = data.pages || 1
     listPage.value = pageNum
+    if (currentTrack.value) {
+      currentIndex.value = records.findIndex(t => t.id === currentTrack.value.id)
+    } else if (tracks.value.length) {
+      currentIndex.value = 0
+    }
   } catch (e) {
     if (e?.response?.status !== 401) error.value = getMessage(e, 'walkman.loadFailed')
   } finally {
@@ -91,14 +96,19 @@ function toggleList() {
 }
 
 function playListTrack(track) {
-  const idx = tracks.value.findIndex(t => t.id === track.id)
-  if (idx !== -1) playTrack(idx)
+  let idx = tracks.value.findIndex(t => t.id === track.id)
+  if (idx === -1) {
+    tracks.value = [...tracks.value, track]
+    idx = tracks.value.length - 1
+  }
+  playTrack(idx)
 }
 
 function playTrack(index) {
   if (index < 0 || index >= tracks.value.length) return
   currentIndex.value = index
-  audioRef.value.play()
+  currentTrack.value = tracks.value[index]
+  nextTick(() => audioRef.value.play())
 }
 
 function toggle() {
@@ -115,13 +125,24 @@ function toggle() {
 
 function next() {
   if (!tracks.value.length) return
-  playTrack((currentIndex.value + 1) % tracks.value.length)
+  if (currentIndex.value < tracks.value.length - 1) {
+    playTrack(currentIndex.value + 1)
+  } else if (listPage.value < listPages.value) {
+    loadList(listPage.value + 1).then(() => playTrack(0))
+  } else {
+    loadList(1).then(() => playTrack(0))
+  }
 }
 
 function prev() {
   if (!tracks.value.length) return
-  const index = currentIndex.value <= 0 ? tracks.value.length - 1 : currentIndex.value - 1
-  playTrack(index)
+  if (currentIndex.value > 0) {
+    playTrack(currentIndex.value - 1)
+  } else if (listPage.value > 1) {
+    loadList(listPage.value - 1).then(() => playTrack(tracks.value.length - 1))
+  } else {
+    playTrack(tracks.value.length - 1)
+  }
 }
 
 function seek(e) {
@@ -181,7 +202,8 @@ function onFabClick() {
 onMounted(async () => {
   await loadConfig()
   listSize.value = parseInt(getConfig('page_size', '10'))
-  loadTracks()
+  if (audioRef.value) audioRef.value.volume = volume.value
+  loadList(1)
 })
 </script>
 
@@ -258,13 +280,13 @@ onMounted(async () => {
                   :class="{ 'walkman__track--active': tr.id === currentTrack?.id }"
                   @click="playListTrack(tr)"
               >
-                <span class="walkman__track-name">{{ tr.fileName }}</span>
+                <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
                 <span class="walkman__track-size">{{ formatSize(tr.fileSize) }}</span>
               </button>
             </div>
             <div class="walkman__list-pager">
               <button class="walkman__page-btn" :disabled="listPage <= 1 || listLoading" @click="loadList(listPage - 1)">&#8249;</button>
-              <span class="walkman__page-info">{{ listPage }} / {{ listPages }}</span>
+              <span class="walkman__page-info">{{ listPage }} / {{ listPages }} · {{ t('walkman.pageSize', { size: listSize }) }}</span>
               <button class="walkman__page-btn" :disabled="listPage >= listPages || listLoading" @click="loadList(listPage + 1)">&#8250;</button>
             </div>
           </div>
@@ -476,16 +498,19 @@ onMounted(async () => {
 }
 
 .walkman__list {
-  margin-top: var(--spacing-xs);
+  margin-top: -10px;
+  margin-left: 10px;
+  width: calc(100% - 20px);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
+  border-radius: var(--rounded-xl);
   overflow: hidden;
 }
 
 .walkman__list-scroll {
   max-height: 200px;
   overflow-y: auto;
+  padding: var(--spacing-xs) 0;
 }
 
 .walkman__track {
@@ -494,10 +519,12 @@ onMounted(async () => {
   justify-content: space-between;
   gap: var(--spacing-sm);
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
+  height: 24px;
+  padding: 0 var(--spacing-sm);
   border: none;
   background: transparent;
-  font-size: var(--text-xs);
+  font-size: 11px;
+  line-height: 1;
   color: var(--color-text-secondary);
   cursor: pointer;
   text-align: left;
@@ -524,7 +551,8 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  height: 24px;
+  padding: 0 var(--spacing-sm);
   border-top: 1px solid var(--color-border-light);
 }
 
@@ -532,21 +560,23 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   border: none;
   border-radius: var(--rounded-sm);
   background: transparent;
   color: var(--color-text-secondary);
   cursor: pointer;
+  font-size: var(--text-xs);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .walkman__page-btn:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
 .walkman__page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .walkman__page-info {
-  font-size: var(--text-xs);
+  font-size: 10px;
+  line-height: 1;
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
 }

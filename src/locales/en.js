@@ -292,6 +292,7 @@ export default {
     musicEmpty: 'No music yet',
     musicLoading: 'Loading...',
     musicTotal: '{total} tracks',
+    musicPageSize: '{size} per page',
     message: 'Messages',
     moment: 'Moments',
     article: 'Articles',
@@ -495,6 +496,7 @@ export default {
     mute: 'Mute',
     unmute: 'Unmute',
     list: 'Playlist',
+    pageSize: '{size} per page',
     loadFailed: 'Failed to load playlist'
   },
   chat: {

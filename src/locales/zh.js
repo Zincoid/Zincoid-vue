@@ -292,6 +292,7 @@ export default {
     musicEmpty: '暂无音乐',
     musicLoading: '加载中...',
     musicTotal: '共 {total} 首',
+    musicPageSize: '每页 {size} 首',
     message: '消息',
     moment: '动态',
     article: '文章',
@@ -495,6 +496,7 @@ export default {
     mute: '静音',
     unmute: '取消静音',
     list: '播放列表',
+    pageSize: '每页 {size} 首',
     loadFailed: '加载音乐列表失败'
   },
   chat: {
