@@ -185,6 +185,14 @@ function seek(e) {
 
 function onTimeUpdate() {
   currentTime.value = audioRef.value.currentTime
+  if (!isFinite(duration.value) && isFinite(audioRef.value.duration)) {
+    duration.value = audioRef.value.duration
+  }
+}
+
+function onDurationChange() {
+  const d = audioRef.value.duration
+  if (isFinite(d)) duration.value = d
 }
 
 function onLoadedMetadata() {
@@ -275,6 +283,7 @@ onMounted(async () => {
         preload="metadata"
         @timeupdate="onTimeUpdate"
         @loadedmetadata="onLoadedMetadata"
+        @durationchange="onDurationChange"
         @ended="onEnded"
         @play="playing = true"
         @pause="playing = false"
