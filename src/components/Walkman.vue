@@ -29,11 +29,14 @@ const listSize = ref(10)
 const listLoading = ref(false)
 
 const navbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 64
-const posX = ref(16)
+const posX = ref(0)
 const posY = ref(navbarH + 16)
 const dragging = ref(false)
+const docked = ref(true)
 let dragStart = null
 let moved = false
+let wasDocked = false
+let suppressClick = false
 
 const audioRef = ref(null)
 
@@ -203,7 +206,10 @@ function toggleMute() {
 
 function onPointerDown(e) {
   dragging.value = true
+  wasDocked = docked.value
+  docked.value = false
   moved = false
+  suppressClick = false
   dragStart = { x: e.clientX, y: e.clientY, left: posX.value, top: posY.value }
   e.currentTarget.setPointerCapture(e.pointerId)
 }
@@ -213,18 +219,41 @@ function onPointerMove(e) {
   const dx = e.clientX - dragStart.x
   const dy = e.clientY - dragStart.y
   if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true
-  posX.value = Math.max(0, Math.min(window.innerWidth - 44, dragStart.left + dx))
+  posX.value = Math.max(-30, Math.min(window.innerWidth - 44, dragStart.left + dx))
   posY.value = Math.max(0, Math.min(window.innerHeight - 44, dragStart.top + dy))
 }
 
 function onPointerUp() {
   dragging.value = false
   dragStart = null
+  if (moved) {
+    if (posX.value <= 20) {
+      docked.value = true
+      open.value = false
+      posX.value = 0
+    }
+  } else if (wasDocked) {
+    posX.value = 16
+    open.value = true
+    suppressClick = true
+  }
 }
 
 function onFabClick() {
   if (moved) return
-  open.value = !open.value
+  if (suppressClick) {
+    suppressClick = false
+    return
+  }
+  if (open.value) {
+    open.value = false
+    if (posX.value <= 20) {
+      docked.value = true
+      posX.value = 0
+    }
+  } else {
+    open.value = true
+  }
 }
 
 onMounted(async () => {
@@ -252,14 +281,15 @@ onMounted(async () => {
     />
     <button
         class="walkman__fab"
-        :class="{ 'walkman__fab--playing': playing, 'walkman__fab--dragging': dragging, 'walkman__fab--open': open }"
+        :class="{ 'walkman__fab--playing': playing, 'walkman__fab--dragging': dragging, 'walkman__fab--open': open, 'walkman__fab--docked': docked }"
         @click="onFabClick"
         @pointerdown="onPointerDown"
         @pointermove="onPointerMove"
         @pointerup="onPointerUp"
         @pointercancel="onPointerUp"
     >
-      <span v-if="playing" class="walkman__eq"><i></i><i></i><i></i></span>
+      <span v-if="docked" class="walkman__fab-dock-icon"><SvgIcon name="audio" :size="10" /></span>
+      <span v-else-if="playing" class="walkman__eq"><i></i><i></i><i></i></span>
       <SvgIcon v-else name="audio" :size="20" />
     </button>
     <Transition name="walkman-pop">
@@ -375,6 +405,26 @@ onMounted(async () => {
 }
 .walkman__fab:hover { background: rgba(236, 72, 153, 0.15); transform: scale(1.06); opacity: 1; }
 .walkman__fab--open { opacity: 1; background: rgba(236, 72, 153, 0.15); }
+.walkman__fab--docked {
+  opacity: 1;
+  cursor: pointer;
+  width: 14px;
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.45);
+  border-left: none;
+  border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
+}
+
+.walkman__fab-dock-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #db2777;
+}
 .walkman__fab--dragging { cursor: grabbing; }
 .walkman__fab--playing::after {
   content: '';
