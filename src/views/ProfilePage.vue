@@ -665,7 +665,7 @@ async function changeEmail() {
 .btn--danger {
   background: var(--color-danger);
   color: white;
-  border: none;
+  border: 1px solid var(--color-danger);
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--rounded-md);
   cursor: pointer;
@@ -674,7 +674,7 @@ async function changeEmail() {
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 .btn--danger:hover {
   opacity: 0.85;
@@ -682,6 +682,15 @@ async function changeEmail() {
 .btn--danger:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+[data-theme="dark"] .btn--danger {
+  background: #5f1414;
+  border-color: #7f1d1d;
+}
+[data-theme="dark"] .btn--danger:hover {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  opacity: 1;
 }
 
 @media (max-width: 700px) {
