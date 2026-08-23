@@ -143,7 +143,7 @@ function goDetail(id) {
 .article-card__author {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

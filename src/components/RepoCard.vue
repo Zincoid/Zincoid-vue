@@ -104,7 +104,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__body { padding: var(--spacing-lg); display: flex; flex-direction: column; flex: 1; }
 
 .repo-card__user { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-sm); }
-.repo-card__user-left { display: flex; align-items: center; gap: var(--spacing-xs); }
+.repo-card__user-left { display: flex; align-items: center; gap: var(--spacing-sm); }
 .repo-card__avatar { width: 20px; height: 20px; border-radius: var(--rounded-full); object-fit: cover; }
 .repo-card__avatar-placeholder { width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; }
 .repo-card__nickname { font-size: var(--text-xs); color: var(--color-text-secondary); }
