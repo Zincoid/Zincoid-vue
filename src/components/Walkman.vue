@@ -426,10 +426,15 @@ onMounted(async () => {
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-md);
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
   white-space: nowrap;
+}
+[data-theme="dark"] .walkman__panel {
+  background: rgba(26, 29, 39, 0.6);
 }
 
 .walkman-pop-enter-active,
@@ -567,10 +572,15 @@ onMounted(async () => {
   margin-top: -10px;
   margin-left: 10px;
   width: calc(100% - 20px);
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-xl);
   overflow: hidden;
+}
+[data-theme="dark"] .walkman__list {
+  background: rgba(26, 29, 39, 0.6);
 }
 
 .walkman__list-scroll {
