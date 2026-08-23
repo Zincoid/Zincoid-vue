@@ -511,7 +511,7 @@ onMounted(async () => {
 }
 
 .walkman__list-scroll {
-  max-height: 200px;
+  max-height: 128px;
   overflow-y: auto;
   padding: var(--spacing-xs) 0;
 }
@@ -534,6 +534,7 @@ onMounted(async () => {
   font-family: var(--font-body);
 }
 .walkman__track:hover { background: var(--color-bg-alt); color: var(--color-text-heading); }
+[data-theme="dark"] .walkman__track:hover { background: #2e303a; }
 .walkman__track--active { color: #db2777; background: rgba(236, 72, 153, 0.1); }
 
 .walkman__track-name {
