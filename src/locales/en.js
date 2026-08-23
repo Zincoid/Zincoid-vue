@@ -7,7 +7,6 @@ export default {
     repos: 'Repos',
     signIn: 'Sign In',
     logout: 'Logout',
-    profile: 'Profile',
     lang: '中文',
     dark: 'Dark',
     light: 'Light'
@@ -39,8 +38,6 @@ export default {
     updateFailed: 'Failed to update',
     pinnedFirst: 'Pinned',
     private: 'Moment is private.',
-    filesProgress: 'Files',
-    fileProgress: 'Current',
     maxAttachments: 'Up to 9 attachments allowed'
   },
   visibility: {
@@ -194,7 +191,6 @@ export default {
     empty: 'No repos yet.',
     emptyItems: 'No items yet.',
     deleteConfirm: 'Delete this repo?',
-    itemName: 'Name',
     new: 'New',
     name: 'Name',
     type: 'Type',
@@ -213,7 +209,6 @@ export default {
     noDesc: 'No description',
     noTags: 'No tags',
     views: 'views',
-    likes: 'likes'
   },
   data: {
     pageTitle: 'Data',
@@ -402,25 +397,19 @@ export default {
     joinUs: 'Join us',
     email: 'Email',
     sendCode: 'Send Code',
-    codeSent: 'Sent',
     code: 'Verification Code',
-    codePlaceholder: '6-digit code',
     emailRequired: 'Please enter your email',
     invalidEmailFormat: 'Invalid email format',
     codeRequired: 'Please enter the verification code',
-    invalidCode: 'Invalid or expired verification code',
-    emailRegistered: 'Email already registered',
     forgotPassword: 'Forgot password?',
     resetHere: 'Reset here',
     forgotPasswordTitle: 'Reset Password',
     forgotPasswordDesc: 'Enter your registered email and verification code to reset your password',
     newPassword: 'New Password',
-    newPasswordPlaceholder: '6-100 characters required',
     resetPassword: 'Reset',
     resetting: 'Resetting...',
     resetSuccess: 'Password reset successfully, please login',
     backToLogin: 'Back to Login',
-    emailNotFound: 'Email not registered'
   },
   errors: {
     'Username already exists': 'Username already exists',
@@ -595,7 +584,6 @@ export default {
     mdPlaceholder: 'Write in Markdown...',
     website: 'Website',
     email: 'Email',
-    x: 'X',
     download: 'Download',
     close: 'Close',
     cropAvatar: 'Crop Avatar',

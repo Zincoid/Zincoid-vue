@@ -7,7 +7,6 @@ export default {
     repos: '仓库',
     signIn: '登录',
     logout: '登出',
-    profile: '个人中心',
     lang: 'EN',
     dark: '夜间',
     light: '日间'
@@ -39,8 +38,6 @@ export default {
     updateFailed: '更新失败',
     pinnedFirst: '置顶',
     private: '动态为私有。',
-    filesProgress: '文件',
-    fileProgress: '当前',
     maxAttachments: '最多上传 9 个附件'
   },
   visibility: {
@@ -210,7 +207,6 @@ export default {
     empty: '暂无仓库。',
     emptyItems: '暂无内容。',
     deleteConfirm: '确定删除这个仓库？',
-    itemName: '名称',
     new: '新建',
     name: '名称',
     type: '类型',
@@ -229,7 +225,6 @@ export default {
     noDesc: '暂无简介',
     noTags: '暂无标签',
     views: '次浏览',
-    likes: '次赞'
   },
   access: {
     desc: '管理仓库访问申请与授权',
@@ -402,25 +397,19 @@ export default {
     joinUs: '加入我们',
     email: '邮箱',
     sendCode: '发送验证码',
-    codeSent: '已发送',
     code: '验证码',
-    codePlaceholder: '请输入6位验证码',
     emailRequired: '请输入邮箱地址',
     invalidEmailFormat: '邮箱格式错误',
     codeRequired: '请输入验证码',
-    invalidCode: '验证码错误或已过期',
-    emailRegistered: '邮箱已被注册',
     forgotPassword: '忘记密码？',
     resetHere: '立即找回',
     forgotPasswordTitle: '重置密码',
     forgotPasswordDesc: '输入注册邮箱和验证码，即可重置密码',
     newPassword: '新密码',
-    newPasswordPlaceholder: '新密码需6-100字符',
     resetPassword: '重置',
     resetting: '重置中...',
     resetSuccess: '密码重置成功，请登录',
     backToLogin: '返回登录',
-    emailNotFound: '该邮箱未注册'
   },
   errors: {
     'Username already exists': '用户名已存在',
@@ -593,7 +582,6 @@ export default {
     mdPlaceholder: '用 Markdown 编写...',
     website: '网站',
     email: '邮箱',
-    x: 'X',
     download: '下载',
     close: '关闭',
     cropAvatar: '裁剪头像',
