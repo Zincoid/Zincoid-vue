@@ -179,19 +179,36 @@ function formatSize(bytes) {
 
 const ringRadius = 48
 const ringCircumference = 2 * Math.PI * ringRadius
-const occupiedPercent = computed(() => {
-  if (!disk.value || !disk.value.total) return 0
-  return Math.round(((disk.value.total - disk.value.free) / disk.value.total) * 100)
-})
 const freePercent = computed(() => {
   if (!disk.value || !disk.value.total) return 0
   return Math.round((disk.value.free / disk.value.total) * 100)
 })
-const ringDash = computed(() => (occupiedPercent.value / 100) * ringCircumference)
-const ringColor = computed(() => {
-  if (occupiedPercent.value >= 80) return 'var(--color-danger)'
-  if (occupiedPercent.value <= 20) return 'var(--color-success)'
-  return 'var(--color-primary)'
+const ringSegments = computed(() => {
+  if (!disk.value || !disk.value.total) return []
+  const total = disk.value.total
+  const minDash = ringCircumference * 0.01
+  const parts = [
+    { key: 'used', color: 'var(--color-primary)' },
+    { key: 'cache', color: 'var(--color-warning)' },
+    { key: 'other', color: 'var(--color-text-tertiary)' },
+  ]
+  const segments = parts.map(part => {
+    const ratio = Math.max(0, Math.min((disk.value[part.key] || 0) / total, 1))
+    let dash = ratio * ringCircumference
+    if (dash > 0) dash = Math.max(dash, minDash)
+    return { color: part.color, dash, offset: 0 }
+  })
+  const sum = segments.reduce((acc, seg) => acc + seg.dash, 0)
+  if (sum > ringCircumference) {
+    const scale = ringCircumference / sum
+    for (const seg of segments) seg.dash *= scale
+  }
+  let offset = 0
+  for (const seg of segments) {
+    seg.offset = offset
+    offset += seg.dash
+  }
+  return segments
 })
 
 async function saveConfig(config) {
@@ -423,11 +440,14 @@ onBeforeUnmount(stopStream)
           <svg class="storage-chart__ring" viewBox="0 0 120 120">
             <circle class="storage-chart__track" cx="60" cy="60" :r="ringRadius" />
             <circle
-                class="storage-chart__bar"
+                v-for="seg in ringSegments.slice().reverse()"
+                :key="seg.color"
+                class="storage-chart__segment"
                 cx="60" cy="60"
                 :r="ringRadius"
-                :stroke="ringColor"
-                :stroke-dasharray="`${ringDash} ${ringCircumference}`"
+                :stroke="seg.color"
+                :stroke-dasharray="`${seg.dash} ${ringCircumference}`"
+                :stroke-dashoffset="-seg.offset"
             />
           </svg>
           <div class="storage-chart__center">
@@ -656,7 +676,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-chart { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
 .storage-chart__ring { width: 100%; height: 100%; transform: rotate(-90deg); }
 .storage-chart__track { fill: none; stroke: var(--color-border); stroke-width: 10; }
-.storage-chart__bar { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dasharray var(--transition-fast); }
+.storage-chart__segment { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dasharray var(--transition-fast), stroke-dashoffset var(--transition-fast); }
 .storage-chart__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .storage-chart__percent { font-family: var(--font-mono); font-size: var(--text-base); font-weight: var(--weight-semibold); color: var(--color-text-heading); line-height: 1; }
 .storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
