@@ -179,14 +179,18 @@ function formatSize(bytes) {
 
 const ringRadius = 48
 const ringCircumference = 2 * Math.PI * ringRadius
-const usedPercent = computed(() => {
+const occupiedPercent = computed(() => {
   if (!disk.value || !disk.value.total) return 0
-  return Math.round((disk.value.used / disk.value.total) * 100)
+  return Math.round(((disk.value.total - disk.value.free) / disk.value.total) * 100)
 })
-const ringDash = computed(() => (usedPercent.value / 100) * ringCircumference)
+const freePercent = computed(() => {
+  if (!disk.value || !disk.value.total) return 0
+  return Math.round((disk.value.free / disk.value.total) * 100)
+})
+const ringDash = computed(() => (occupiedPercent.value / 100) * ringCircumference)
 const ringColor = computed(() => {
-  if (usedPercent.value >= 80) return 'var(--color-danger)'
-  if (usedPercent.value <= 20) return 'var(--color-success)'
+  if (occupiedPercent.value >= 80) return 'var(--color-danger)'
+  if (occupiedPercent.value <= 20) return 'var(--color-success)'
   return 'var(--color-primary)'
 })
 
@@ -399,6 +403,16 @@ onBeforeUnmount(stopStream)
             <span class="storage-label">{{ t('manage.storageUsed') }}</span>
             <span class="storage-value">{{ formatSize(disk.used) }}</span>
           </div>
+          <span class="storage-op">-</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageCache') }}</span>
+            <span class="storage-value">{{ formatSize(disk.cache) }}</span>
+          </div>
+          <span class="storage-op">-</span>
+          <div class="storage-item">
+            <span class="storage-label">{{ t('manage.storageOther') }}</span>
+            <span class="storage-value">{{ formatSize(disk.other) }}</span>
+          </div>
           <span class="storage-op">=</span>
           <div class="storage-item">
             <span class="storage-label">{{ t('manage.storageFree') }}</span>
@@ -417,8 +431,8 @@ onBeforeUnmount(stopStream)
             />
           </svg>
           <div class="storage-chart__center">
-            <span class="storage-chart__percent">{{ usedPercent }}%</span>
-            <span class="storage-chart__label">{{ t('manage.storageUsed') }}</span>
+            <span class="storage-chart__percent">{{ freePercent }}%</span>
+            <span class="storage-chart__label">{{ t('manage.storageFree') }}</span>
           </div>
         </div>
       </div>

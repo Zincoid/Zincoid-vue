@@ -254,6 +254,8 @@ export default {
     storageTotal: '总空间',
     storageFree: '剩余空间',
     storageUsed: '已用空间',
+    storageCache: '缓存',
+    storageOther: '其他',
     storageFailed: '获取存储空间失败',
     loadFailed: '加载配置失败',
     saveFailed: '保存失败',

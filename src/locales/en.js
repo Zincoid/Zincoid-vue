@@ -254,6 +254,8 @@ export default {
     storageTotal: 'Total',
     storageFree: 'Free',
     storageUsed: 'Used',
+    storageCache: 'Cache',
+    storageOther: 'Other',
     storageFailed: 'Failed to load storage space',
     loadFailed: 'Failed to load configs',
     saveFailed: 'Save failed',
