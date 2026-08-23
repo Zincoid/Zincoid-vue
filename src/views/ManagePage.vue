@@ -1026,4 +1026,18 @@ h3 { margin-bottom: var(--spacing-lg); }
 .music-pager__btn:hover { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
 .music-pager__btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .music-pager__info { font-size: var(--text-xs); color: var(--color-text-secondary); font-family: var(--font-mono); }
+
+@media (max-width: 640px) {
+  .modal {
+    padding: var(--spacing-2xl);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .music-list {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+  }
+}
 </style>
