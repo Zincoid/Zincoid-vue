@@ -302,7 +302,7 @@ onMounted(async () => {
         <Transition name="walkman-list">
           <div v-if="listOpen" class="walkman__list">
             <div v-if="listTracks.length" class="walkman__list-scroll">
-              <button
+              <div
                   v-for="tr in listTracks"
                   :key="tr.id"
                   class="walkman__track"
@@ -310,7 +310,16 @@ onMounted(async () => {
                   @click="playListTrack(tr)"
               >
                 <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
-              </button>
+                <a
+                    class="walkman__track-download"
+                    :href="tr.url"
+                    download
+                    :title="t('common.download')"
+                    @click.stop
+                >
+                  <SvgIcon name="download" :size="12" />
+                </a>
+              </div>
             </div>
             <div v-else class="walkman__list-empty">{{ t('walkman.empty') }}</div>
             <div class="walkman__list-pager">
@@ -590,6 +599,20 @@ onMounted(async () => {
   white-space: nowrap;
   min-width: 0;
 }
+
+.walkman__track-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.walkman__track:hover .walkman__track-download { color: var(--color-text-secondary); }
+.walkman__track-download:hover { color: var(--color-primary); background: var(--color-bg-alt); }
 
 .walkman__track-size {
   font-size: 10px;

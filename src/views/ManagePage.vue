@@ -769,6 +769,9 @@ onBeforeUnmount(stopStream)
             <div v-for="tr in musicTracks" :key="tr.id" class="music-item">
               <span class="music-item__name">{{ tr.fileName }}</span>
               <span class="music-item__size">{{ formatSize(tr.fileSize) }}</span>
+              <a class="music-item__download" :href="tr.url" download :title="t('common.download')">
+                <SvgIcon name="download" :size="14" />
+              </a>
               <button class="music-item__del" :disabled="musicDeleting === tr.id" :title="t('manage.musicDelete')" @click="handleMusicDelete(tr)">
                 <SvgIcon name="trash" :size="14" />
               </button>
@@ -1008,6 +1011,8 @@ h3 { margin-bottom: var(--spacing-lg); }
 .music-item { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
 .music-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); color: var(--color-text-heading); font-family: var(--font-mono); }
 .music-item__size { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-mono); flex-shrink: 0; }
+.music-item__download { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: var(--rounded-md); color: var(--color-text-secondary); flex-shrink: 0; transition: color var(--transition-fast), background var(--transition-fast); }
+.music-item__download:hover { color: var(--color-primary); background: var(--color-primary-bg); }
 .music-item__del { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; border-radius: var(--rounded-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; flex-shrink: 0; transition: color var(--transition-fast), background var(--transition-fast); }
 .music-item__del:hover { color: var(--color-danger); background: var(--color-danger-bg); }
 .music-item__del:disabled { opacity: 0.5; cursor: not-allowed; }
