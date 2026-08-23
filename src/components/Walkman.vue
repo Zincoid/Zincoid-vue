@@ -123,26 +123,26 @@ function toggle() {
   }
 }
 
-function next() {
+async function next() {
   if (!tracks.value.length) return
   if (currentIndex.value < tracks.value.length - 1) {
     playTrack(currentIndex.value + 1)
-  } else if (listPage.value < listPages.value) {
-    loadList(listPage.value + 1).then(() => playTrack(0))
-  } else {
-    loadList(1).then(() => playTrack(0))
+    return
   }
+  const target = listPage.value < listPages.value ? listPage.value + 1 : 1
+  await loadList(target)
+  if (tracks.value.length) playTrack(0)
 }
 
-function prev() {
+async function prev() {
   if (!tracks.value.length) return
   if (currentIndex.value > 0) {
     playTrack(currentIndex.value - 1)
-  } else if (listPage.value > 1) {
-    loadList(listPage.value - 1).then(() => playTrack(tracks.value.length - 1))
-  } else {
-    playTrack(tracks.value.length - 1)
+    return
   }
+  const target = listPage.value > 1 ? listPage.value - 1 : listPages.value
+  await loadList(target)
+  if (tracks.value.length) playTrack(tracks.value.length - 1)
 }
 
 function seek(e) {
@@ -281,7 +281,6 @@ onMounted(async () => {
                   @click="playListTrack(tr)"
               >
                 <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
-                <span class="walkman__track-size">{{ formatSize(tr.fileSize) }}</span>
               </button>
             </div>
             <div class="walkman__list-pager">
@@ -333,8 +332,8 @@ onMounted(async () => {
   animation: walkman-ripple 1.8s ease-out infinite;
 }
 @keyframes walkman-ripple {
-  0% { transform: scale(0.4); opacity: 0.7; }
-  100% { transform: scale(1.2); opacity: 0; }
+  0% { transform: scale(0.4); border-width: 6px; opacity: 0.7; }
+  100% { transform: scale(1.2); border-width: 0.5px; opacity: 0; }
 }
 
 .walkman__eq {
