@@ -288,7 +288,7 @@ onMounted(async () => {
         @pointerup="onPointerUp"
         @pointercancel="onPointerUp"
     >
-      <span v-if="docked" class="walkman__fab-dock-icon"><SvgIcon name="audio" :size="10" /></span>
+      <span v-if="docked" class="walkman__fab-dock-icon"></span>
       <span v-else-if="playing" class="walkman__eq"><i></i><i></i><i></i></span>
       <SvgIcon v-else name="audio" :size="20" />
     </button>
@@ -410,8 +410,7 @@ onMounted(async () => {
   cursor: pointer;
   width: 14px;
   background: rgba(236, 72, 153, 0.15);
-  border: 1px solid rgba(236, 72, 153, 0.45);
-  border-left: none;
+  border: none;
   border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
 }
 
@@ -420,11 +419,12 @@ onMounted(async () => {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #db2777;
+  width: 2px;
+  height: 20px;
+  border-radius: var(--rounded-full);
+  background: rgba(219, 39, 119, 0.55);
 }
+.walkman__fab--docked:hover .walkman__fab-dock-icon { background: #db2777; }
 .walkman__fab--dragging { cursor: grabbing; }
 .walkman__fab--playing::after {
   content: '';
