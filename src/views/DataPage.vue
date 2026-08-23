@@ -207,7 +207,7 @@ h3 { margin-bottom: var(--spacing-lg); }
   cursor: pointer;
   transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
-.storage-refresh:hover { color: var(--color-text-heading); border-color: var(--color-primary); background: var(--color-primary-bg); }
+.storage-refresh:hover { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
 .storage-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 .storage-refresh:disabled svg { animation: storage-spin 1s linear infinite; }
 @keyframes storage-spin { to { transform: rotate(360deg); } }
