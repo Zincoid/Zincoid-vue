@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
@@ -18,6 +18,8 @@ const playing = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 const error = ref('')
+const volume = ref(1)
+const muted = ref(false)
 
 const listTracks = ref([])
 const listPage = ref(1)
@@ -141,6 +143,15 @@ function onEnded() {
   next()
 }
 
+watch(volume, v => {
+  if (audioRef.value) audioRef.value.volume = v
+})
+
+function toggleMute() {
+  muted.value = !muted.value
+  audioRef.value.volume = muted.value ? 0 : volume.value
+}
+
 function onPointerDown(e) {
   dragging.value = true
   moved = false
@@ -189,7 +200,6 @@ onMounted(async () => {
     <button
         class="walkman__fab"
         :class="{ 'walkman__fab--playing': playing, 'walkman__fab--dragging': dragging }"
-        :title="open ? t('walkman.collapse') : t('walkman.expand')"
         @click="onFabClick"
         @pointerdown="onPointerDown"
         @pointermove="onPointerMove"
@@ -220,6 +230,21 @@ onMounted(async () => {
             <button class="walkman__btn" :class="{ 'walkman__btn--active': listOpen }" :title="t('walkman.list')" @click="toggleList">
               <SvgIcon name="list" :size="13" />
             </button>
+          </div>
+          <div class="walkman__volume">
+            <button class="walkman__btn" :title="muted ? t('walkman.unmute') : t('walkman.mute')" @click="toggleMute">
+              <SvgIcon :name="muted ? 'volume-muted' : 'volume'" :size="13" />
+            </button>
+            <input
+                v-model.number="volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                class="walkman__volume-slider"
+                :style="{ '--fill': (muted ? 0 : volume * 100) + '%' }"
+                @input="muted = false"
+            />
           </div>
           <span v-if="error" class="walkman__error" :title="error">{{ error }}</span>
         </div>
@@ -258,6 +283,7 @@ onMounted(async () => {
 }
 
 .walkman__fab {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,7 +301,19 @@ onMounted(async () => {
 }
 .walkman__fab:hover { background: rgba(236, 72, 153, 0.15); transform: scale(1.06); }
 .walkman__fab--dragging { cursor: grabbing; }
-.walkman__fab--playing { box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15); }
+.walkman__fab--playing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #db2777;
+  border-radius: var(--rounded-full);
+  pointer-events: none;
+  animation: walkman-ripple 1.8s ease-out infinite;
+}
+@keyframes walkman-ripple {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
 
 .walkman__eq {
   display: flex;
@@ -304,7 +342,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  max-width: 340px;
+  max-width: 420px;
 }
 
 .walkman__panel {
@@ -403,6 +441,39 @@ onMounted(async () => {
 }
 .walkman__btn--toggle:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
 .walkman__btn--active { color: #db2777; background: rgba(236, 72, 153, 0.12); }
+
+.walkman__volume {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.walkman__volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 40px;
+  height: 3px;
+  border-radius: var(--rounded-full);
+  background: linear-gradient(to right, #be185d var(--fill, 0%), var(--color-border) var(--fill, 0%));
+  cursor: pointer;
+}
+.walkman__volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rounded-full);
+  background: #ec4899;
+  cursor: pointer;
+}
+.walkman__volume-slider::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: var(--rounded-full);
+  background: #ec4899;
+  cursor: pointer;
+}
 
 .walkman__list {
   margin-top: var(--spacing-xs);

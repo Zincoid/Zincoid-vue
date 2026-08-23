@@ -4,7 +4,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
-import { configAPI, userAPI, storageAPI, notificationAPI, logAPI } from '@/api'
+import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
@@ -279,6 +279,80 @@ async function runRecordsCleanup() {
     toolError.value = getMessage(err, 'manage.cleanupFailed')
   } finally {
     recordsCleaning.value = false
+  }
+}
+
+const musicOpen = ref(false)
+const musicTracks = ref([])
+const musicPage = ref(1)
+const musicPages = ref(1)
+const musicTotal = ref(0)
+const musicSize = ref(10)
+const musicLoading = ref(false)
+const musicUploading = ref(false)
+const musicDeleting = ref(null)
+const musicMessage = ref('')
+const musicError = ref('')
+const musicFileInput = ref(null)
+
+function openMusicManage() {
+  musicOpen.value = true
+  musicMessage.value = ''
+  musicError.value = ''
+  fetchMusicList(1)
+}
+
+function closeMusicManage() {
+  musicOpen.value = false
+}
+
+async function fetchMusicList(pageNum) {
+  musicLoading.value = true
+  try {
+    const res = await musicAPI.list(pageNum, musicSize.value)
+    const data = res.data?.data || {}
+    musicTracks.value = data.records || []
+    musicPages.value = data.pages || 1
+    musicTotal.value = data.total || 0
+    musicPage.value = pageNum
+  } catch (err) {
+    musicError.value = getMessage(err, 'manage.musicLoadFailed')
+  } finally {
+    musicLoading.value = false
+  }
+}
+
+async function handleMusicUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  musicUploading.value = true
+  musicError.value = ''
+  try {
+    await musicAPI.upload(file)
+    musicMessage.value = t('manage.musicUploadDone')
+    setTimeout(() => musicMessage.value = '', 2000)
+    fetchMusicList(musicPage.value)
+  } catch (err) {
+    musicError.value = getMessage(err, 'manage.musicUploadFailed')
+  } finally {
+    musicUploading.value = false
+    e.target.value = ''
+  }
+}
+
+async function handleMusicDelete(track) {
+  if (!await confirm(t('manage.musicDeleteConfirm', { name: track.fileName }))) return
+  musicDeleting.value = track.id
+  musicError.value = ''
+  try {
+    await musicAPI.remove(track.id)
+    musicMessage.value = t('manage.musicDeleteDone')
+    setTimeout(() => musicMessage.value = '', 2000)
+    fetchMusicList(musicPage.value)
+  } catch (err) {
+    musicError.value = getMessage(err, 'manage.musicDeleteFailed')
+  } finally {
+    musicDeleting.value = null
   }
 }
 
@@ -661,7 +735,56 @@ onBeforeUnmount(stopStream)
           {{ recordsCleaning ? t('common.cleaning') : t('manage.cleanup') }}
         </button>
       </div>
+      <div class="tool-item">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.music') }}</span>
+          <span class="tool-desc">{{ t('manage.musicDesc') }}</span>
+        </div>
+        <button class="btn btn--music" @click="openMusicManage">
+          <SvgIcon name="audio" />
+          {{ t('manage.musicManage') }}
+        </button>
+      </div>
     </section>
+
+    <Transition name="modal">
+      <div v-if="musicOpen" class="modal-overlay" @click.self="closeMusicManage">
+        <div class="modal">
+          <h3 class="modal__title">
+            <span>{{ t('manage.musicManageTitle') }}</span>
+            <button class="modal__close" :title="t('common.close')" @click="closeMusicManage">
+              <SvgIcon name="close" :size="16" />
+            </button>
+          </h3>
+          <input ref="musicFileInput" type="file" accept="audio/*" class="hidden-input" @change="handleMusicUpload" />
+          <p v-if="musicMessage" class="msg msg--success">{{ musicMessage }}</p>
+          <p v-if="musicError" class="msg msg--error">{{ musicError }}</p>
+          <div class="music-list">
+            <div v-if="musicLoading && !musicTracks.length" class="music-list__empty">{{ t('manage.musicLoading') }}</div>
+            <div v-else-if="!musicTracks.length" class="music-list__empty">{{ t('manage.musicEmpty') }}</div>
+            <div v-for="tr in musicTracks" :key="tr.id" class="music-item">
+              <span class="music-item__name">{{ tr.fileName }}</span>
+              <span class="music-item__size">{{ formatSize(tr.fileSize) }}</span>
+              <button class="music-item__del" :disabled="musicDeleting === tr.id" :title="t('manage.musicDelete')" @click="handleMusicDelete(tr)">
+                <SvgIcon name="trash" :size="14" />
+              </button>
+            </div>
+          </div>
+          <div class="music-pager">
+            <button class="music-pager__btn" :disabled="musicPage <= 1 || musicLoading" @click="fetchMusicList(musicPage - 1)">&#8249;</button>
+            <span class="music-pager__info">{{ musicPage }} / {{ musicPages }}</span>
+            <button class="music-pager__btn" :disabled="musicPage >= musicPages || musicLoading" @click="fetchMusicList(musicPage + 1)">&#8250;</button>
+          </div>
+          <div class="modal__actions">
+            <span v-if="musicTotal" class="music-total">{{ t('manage.musicTotal', { total: musicTotal }) }}</span>
+            <button class="btn btn--primary btn--full" :disabled="musicUploading" @click="musicFileInput?.click()">
+              <SvgIcon name="upload" />
+              {{ musicUploading ? t('common.uploading') : t('manage.musicUpload') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -839,4 +962,54 @@ h3 { margin-bottom: var(--spacing-lg); }
 .log-line--info .log-line__level, .log-line--info .log-line__msg { color: var(--color-success); }
 .log-line--debug .log-line__level, .log-line--trace .log-line__level { color: var(--color-text-secondary); }
 .log-line__stack { flex-basis: 100%; color: var(--color-danger); background: var(--color-bg); padding: var(--spacing-sm); border-radius: var(--rounded-md); font-family: var(--font-mono); font-size: var(--text-xs); overflow-x: auto; }
+
+/* ── Music manage modal ── */
+.btn--music {
+  border-color: #6d28d9;
+  color: #6d28d9;
+  background: transparent;
+}
+.btn--music:hover {
+  background: #6d28d9;
+  color: white;
+}
+.modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
+.modal { position: relative; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); max-width: 480px; width: 100%; padding: var(--spacing-2xl); max-height: 80vh; overflow-y: auto; }
+.modal__title { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
+.modal__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border-light); }
+.modal-enter-active, .modal-leave-active { transition: opacity .2s ease; }
+.modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .modal, .modal-leave-to .modal { transform: scale(0.95); }
+
+.hidden-input { display: none; }
+.music-total { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.music-list { display: flex; flex-direction: column; gap: var(--spacing-xs); max-height: 320px; overflow-y: auto; }
+.music-list__empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--text-sm); }
+.music-item { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
+.music-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); color: var(--color-text-heading); font-family: var(--font-mono); }
+.music-item__size { font-size: var(--text-xs); color: var(--color-text-tertiary); font-family: var(--font-mono); flex-shrink: 0; }
+.music-item__del { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; border-radius: var(--rounded-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; flex-shrink: 0; transition: color var(--transition-fast), background var(--transition-fast); }
+.music-item__del:hover { color: var(--color-danger); background: var(--color-danger-bg); }
+.music-item__del:disabled { opacity: 0.5; cursor: not-allowed; }
+.music-pager { display: flex; align-items: center; justify-content: space-between; margin-top: var(--spacing-lg); }
+.music-pager__btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--color-border); border-radius: var(--rounded-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; font-size: var(--text-base); transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast); }
+.music-pager__btn:hover { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
+.music-pager__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.music-pager__info { font-size: var(--text-xs); color: var(--color-text-secondary); font-family: var(--font-mono); }
 </style>
