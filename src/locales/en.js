@@ -483,6 +483,7 @@ export default {
     'Not a music file': 'Not a music file',
     'Sender and receiver cannot be the same': 'Sender and receiver cannot be the same',
     'Invalid handle status': 'Invalid handle status',
+    'Invalid capacity in request': 'Invalid capacity in request'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
