@@ -233,6 +233,9 @@ async function submitRequest() {
               </div>
             </div>
             <div class="storage-actions">
+              <button class="storage-request" @click="openRequest">
+                <SvgIcon name="plus" :size="16" />
+              </button>
               <button class="storage-cleanup" :disabled="cleaning" @click="handleCleanup">
                 <SvgIcon name="clean" :size="16" />
               </button>
@@ -258,10 +261,6 @@ async function submitRequest() {
             </div>
           </div>
         </div>
-        <button class="storage-request btn btn--primary" @click="openRequest">
-          <SvgIcon name="plus" :size="16" />
-          {{ t('data.requestCapacity') }}
-        </button>
       </template>
     </section>
 
@@ -401,6 +400,21 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-cleanup:hover { color: var(--color-warning); border-color: var(--color-warning); background: var(--color-warning-bg); }
 .storage-cleanup:disabled { opacity: 0.5; cursor: not-allowed; }
 .storage-cleanup:disabled svg { animation: storage-spin 1s linear infinite; }
+.storage-request {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.storage-request:hover { color: var(--color-success); border-color: var(--color-success); background: var(--color-success-bg); }
 .storage-card { position: relative; flex: 1; min-width: 280px; display: flex; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
 .storage-info { display: flex; gap: var(--spacing-lg); min-width: 0; flex-wrap: wrap; padding-right: 72px; }
 .storage-actions { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; flex-direction: row; gap: var(--spacing-sm); }
@@ -434,10 +448,22 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-chart__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .storage-chart__percent { font-family: var(--font-mono); font-size: var(--text-base); font-weight: var(--weight-semibold); color: var(--color-text-heading); line-height: 1; }
 .storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
-.storage-request { margin-top: var(--spacing-lg); display: inline-flex; align-items: center; gap: var(--spacing-xs); }
 
 .request-form { display: flex; gap: var(--spacing-sm); }
-.capacity-select { flex-shrink: 0; }
+.capacity-select {
+  width: 100px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--spacing-sm) var(--spacing-2xl) var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-text-heading);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+}
 .capacity-select:hover { border-color: var(--color-primary); }
 .capacity-select option { font-family: var(--font-mono); }
 .modal__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
