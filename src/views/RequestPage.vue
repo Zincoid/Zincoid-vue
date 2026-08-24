@@ -184,7 +184,7 @@ function formatSize(bytes) {
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -218,7 +218,7 @@ function formatSize(bytes) {
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
@@ -249,7 +249,7 @@ function formatSize(bytes) {
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -271,7 +271,7 @@ function formatSize(bytes) {
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>

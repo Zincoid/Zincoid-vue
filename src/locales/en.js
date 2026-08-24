@@ -279,7 +279,8 @@ export default {
     pendingSent: 'Pending Requests',
     resolvedSent: 'Resolved Requests',
     noRequests: 'No requests.',
-    storageExtension: 'Storage Expansion'
+    storageExtension: 'Storage Expansion',
+    reasonLabel: 'Reason: '
   },
   manage: {
     subtitle: 'Site information, configuration & tools',
