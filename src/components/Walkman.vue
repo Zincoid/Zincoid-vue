@@ -329,13 +329,13 @@ onMounted(async () => {
             <div class="walkman__bar-fill" :style="{ width: progress + '%' }"></div>
           </div>
           <div class="walkman__controls">
-            <button class="walkman__btn" :disabled="!tracks.length" :title="t('walkman.prev')" @click="prev">
+            <button class="walkman__btn" :disabled="!tracks.length && !currentTrack" :title="t('walkman.prev')" @click="prev">
               <SvgIcon name="prev" :size="13" />
             </button>
-            <button class="walkman__btn walkman__btn--toggle" :disabled="!tracks.length" :title="playing ? t('walkman.pause') : t('walkman.play')" @click="toggle">
+            <button class="walkman__btn walkman__btn--toggle" :disabled="!tracks.length && !currentTrack" :title="playing ? t('walkman.pause') : t('walkman.play')" @click="toggle">
               <SvgIcon :name="playing ? 'pause' : 'play'" :size="13" />
             </button>
-            <button class="walkman__btn" :disabled="!tracks.length" :title="t('walkman.next')" @click="next">
+            <button class="walkman__btn" :disabled="!tracks.length && !currentTrack" :title="t('walkman.next')" @click="next">
               <SvgIcon name="next" :size="13" />
             </button>
             <button class="walkman__btn" :class="{ 'walkman__btn--active': listOpen }" :title="t('walkman.list')" @click="toggleList">
