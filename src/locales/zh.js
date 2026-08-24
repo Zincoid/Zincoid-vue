@@ -280,7 +280,11 @@ export default {
     resolvedSent: '已处理的请求',
     noRequests: '暂无请求。',
     storageExtension: '存储扩容',
-    reasonLabel: '原因：'
+    reasonLabel: '原因：',
+    remove: '移除',
+    deleteConfirm: '确定删除此请求？',
+    deleteDone: '已删除',
+    deleteFailed: '删除失败'
   },
   manage: {
     subtitle: '站点信息、配置与工具',
@@ -478,6 +482,7 @@ export default {
     'No permission to delete this music': '无权删除此音乐',
     'No permission to upload public music': '无权上传公共音乐',
     'No permission to handle this request': '无权处理此请求',
+    'No permission to delete this request': '无权删除此请求',
     'Only founder can pin moments': '仅管理员可置顶动态',
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',

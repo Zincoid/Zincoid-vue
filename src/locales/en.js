@@ -280,7 +280,11 @@ export default {
     resolvedSent: 'Resolved Requests',
     noRequests: 'No requests.',
     storageExtension: 'Storage Expansion',
-    reasonLabel: 'Reason: '
+    reasonLabel: 'Reason: ',
+    remove: 'Remove',
+    deleteConfirm: 'Delete this request?',
+    deleteDone: 'Deleted',
+    deleteFailed: 'Delete failed'
   },
   manage: {
     subtitle: 'Site information, configuration & tools',
@@ -478,6 +482,7 @@ export default {
     'No permission to delete this music': 'No permission to delete this music',
     'No permission to upload public music': 'No permission to upload public music',
     'No permission to handle this request': 'No permission to handle this request',
+    'No permission to delete this request': 'No permission to delete this request',
     'Only founder can pin moments': 'Only admin can pin moments',
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',

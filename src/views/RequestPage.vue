@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
+import { useToast } from '@/composables/useToast'
 import { requestAPI, userAPI } from '@/api'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -11,6 +12,7 @@ import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
+const { toast } = useToast()
 const { load: loadConfig, get: getConfig } = useConfig()
 
 const activeTab = ref('received')
@@ -61,13 +63,11 @@ async function fetchSP(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
   const d = data.data
   spData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
-  await loadMaps(spData.value.records)
 }
 async function fetchSR(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
   const d = data.data
   srData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
-  await loadMaps(srData.value.records)
 }
 
 async function loadMaps(records) {
@@ -96,6 +96,23 @@ async function handleRequest(r, access) {
     fetchRP(); fetchRR(); fetchSP(); fetchSR()
   } catch { /* ignore */ } finally {
     handlingId.value = null
+  }
+}
+
+async function handleDelete(r) {
+  if (handlingId.value) return
+  rpData.value.records = rpData.value.records.filter(x => x.id !== r.id)
+  rrData.value.records = rrData.value.records.filter(x => x.id !== r.id)
+  spData.value.records = spData.value.records.filter(x => x.id !== r.id)
+  srData.value.records = srData.value.records.filter(x => x.id !== r.id)
+  handlingId.value = r.id
+  try {
+    await requestAPI.remove(r.id)
+  } catch (err) {
+    toast(err?.response?.data?.message || t('request.deleteFailed'), 'error')
+  } finally {
+    handlingId.value = null
+    fetchRP(); fetchRR(); fetchSP(); fetchSR()
   }
 }
 
@@ -191,6 +208,11 @@ function formatSize(bytes) {
                 <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
                 <div class="request-card__actions">
                   <button
+                    class="request-card__btn request-card__btn--del"
+                    :disabled="handlingId !== null"
+                    @click="handleDelete(r)"
+                  >{{ t('request.remove') }}</button>
+                  <button
                     class="request-card__btn request-card__btn--reject"
                     :disabled="handlingId !== null"
                     @click="handleRequest(r, 2)"
@@ -223,6 +245,13 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
                 <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
+                <div class="request-card__actions">
+                  <button
+                    class="request-card__btn request-card__btn--del"
+                    :disabled="handlingId !== null"
+                    @click="handleDelete(r)"
+                  >{{ t('request.remove') }}</button>
+                </div>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
@@ -251,6 +280,13 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
                 <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
+                <div class="request-card__actions">
+                  <button
+                    class="request-card__btn request-card__btn--del"
+                    :disabled="handlingId !== null"
+                    @click="handleDelete(r)"
+                  >{{ t('request.remove') }}</button>
+                </div>
               </div>
             </div>
             <Pagination :page="spData.pages > 0 ? (spData.page || 1) : 1" :pages="spData.pages" :total="spData.total" :size="pageSize" @change="p => fetchSP(p)" />
@@ -270,6 +306,13 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
                 <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
+                <div class="request-card__actions">
+                  <button
+                    class="request-card__btn request-card__btn--del"
+                    :disabled="handlingId !== null"
+                    @click="handleDelete(r)"
+                  >{{ t('request.remove') }}</button>
+                </div>
               </div>
             </div>
             <Pagination :page="srData.pages > 0 ? (srData.page || 1) : 1" :pages="srData.pages" :total="srData.total" :size="pageSize" @change="p => fetchSR(p)" />
@@ -301,7 +344,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__reason { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .request-card__meta { font-family: var(--font-mono); color: var(--color-primary); flex-shrink: 0; }
 .request-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
-.request-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); margin-right: var(--spacing-sm); }
+.request-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
 .request-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }
 .request-card__status.approved { color: #16a34a; background: rgba(22,163,74,0.1); }
 .request-card__status.rejected { color: #dc2626; background: rgba(220,38,38,0.1); }
@@ -312,6 +355,8 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__btn--reject:hover:not(:disabled) { background: rgba(220,38,38,0.08); }
 .request-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); }
 .request-card__btn--allow:hover:not(:disabled) { background: rgba(22,163,74,0.08); }
+.request-card__btn--del { display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); border: 1px solid var(--color-border); background: transparent; }
+.request-card__btn--del:hover:not(:disabled) { color: #dc2626; border-color: #dc2626; background: rgba(220,38,38,0.04); }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>
