@@ -459,6 +459,11 @@ textarea::-webkit-scrollbar-corner {
   background: transparent;
 }
 
+/* ── Number input spinners ── */
+[data-theme="dark"] .field__input {
+  color-scheme: dark;
+}
+
 /* ── Selection ── */
 ::selection {
   background: var(--color-primary-light);
