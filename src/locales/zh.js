@@ -265,7 +265,7 @@ export default {
     noAuthorizations: '暂无授权。'
   },
   request: {
-    desc: '管理发往你或由你发出的请求',
+    desc: '管理各类请求操作',
     received: '接收',
     sent: '发送',
     pending: '待处理',

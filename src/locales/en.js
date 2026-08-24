@@ -265,7 +265,7 @@ export default {
     noAuthorizations: 'No authorizations.'
   },
   request: {
-    desc: 'Manage requests sent to or from you',
+    desc: 'Manage all types of request operations',
     received: 'Received',
     sent: 'Sent',
     pending: 'Pending',
