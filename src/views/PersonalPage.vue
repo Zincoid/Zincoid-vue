@@ -14,7 +14,7 @@ const tabs = computed(() => {
     { to: '/personal/profile', key: 'profileTab', icon: 'profile' },
     { to: '/personal/data', key: 'dataTab', icon: 'data' },
     { to: '/personal/access', key: 'accessTab', icon: 'auth' },
-    { to: '/personal/request', key: 'requestTab', icon: 'bell' },
+    { to: '/personal/request', key: 'requestTab', icon: 'mail' },
     { to: '/personal/setting', key: 'settingTab', icon: 'admin' }
   ]
   if (auth.isAdmin) {
@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
           <SvgIcon v-else-if="tab.icon === 'lock'" name="lock" :size="16" />
           <SvgIcon v-else-if="tab.icon === 'server'" name="server" :size="16" />
           <SvgIcon v-else-if="tab.icon === 'auth'" name="key" :size="16" />
-          <SvgIcon v-else-if="tab.icon === 'bell'" name="bell" :size="16" />
+          <SvgIcon v-else-if="tab.icon === 'mail'" name="mail" :size="16" />
           <span>{{ t(`personal.${tab.key}`) }}</span>
         </router-link>
       </nav>
