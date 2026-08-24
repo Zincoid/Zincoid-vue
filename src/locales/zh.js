@@ -442,6 +442,8 @@ export default {
     'Article not found': '文章不存在',
     'Article is private': '文章为私有',
     'Comment not found': '评论不存在',
+    'Request not found': '请求不存在',
+    'Request already handled': '请求已处理过',
     'You can only edit your own moments': '只能编辑自己的动态',
     'You can only edit your own articles': '只能编辑自己的文章',
     'You can only edit your own repos': '只能编辑自己的仓库',
@@ -451,6 +453,7 @@ export default {
     'No permission to delete this comment': '无权删除此评论',
     'No permission to delete this music': '无权删除此音乐',
     'No permission to upload public music': '无权上传公共音乐',
+    'No permission to handle this request': '无权处理此请求',
     'Only founder can pin moments': '仅管理员可置顶动态',
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',
@@ -478,6 +481,8 @@ export default {
     'Server is offline': '服务器已离线',
     'Server is under maintenance': '服务器维护中（计划：UTC+8 00:00-00:10）',
     'Not a music file': '非音乐文件',
+    'Sender and receiver cannot be the same': '发送者和接收者不能相同',
+    'Invalid handle status': '无效的处理状态'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
