@@ -571,6 +571,7 @@ export default {
     accessRejected: 'rejected your access request',
     system: 'System broadcast',
     request: 'You have request-related updates',
+    viewRequests: 'Go to request management',
     markRead: 'Mark all read',
     deleteAll: 'Clear all',
     deleteAllConfirm: 'Clear all notifications?'

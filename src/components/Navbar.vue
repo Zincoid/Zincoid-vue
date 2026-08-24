@@ -384,6 +384,12 @@ function closeMenu() {
           <h3 class="notif-detail-modal__title">{{ detailKind === 'request' ? t('notification.request') : t('notification.system') }}</h3>
           <p class="notif-detail-modal__sender" v-if="detailSender">{{ detailSender }}</p>
           <p class="notif-detail-modal__body">{{ detailMessage }}</p>
+          <a
+            v-if="detailKind === 'request'"
+            class="notif-detail-modal__goto"
+            href="/personal/request"
+            @click.prevent="detailMessage = null; detailKind = null; router.push('/personal/request')"
+          >{{ t('notification.viewRequests') }}</a>
         </div>
       </div>
     </Transition>
@@ -1258,6 +1264,19 @@ function closeMenu() {
   padding: var(--spacing-md) var(--spacing-lg);
   white-space: pre-line;
   word-break: break-word;
+}
+.notif-detail-modal__goto {
+  display: block;
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.notif-detail-modal__goto:hover {
+  color: var(--color-text-heading);
 }
 .notif-detail-enter-active,
 .notif-detail-leave-active {

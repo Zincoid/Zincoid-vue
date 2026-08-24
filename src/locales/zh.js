@@ -571,6 +571,7 @@ export default {
     accessRejected: '拒绝了你的访问请求',
     system: '系统公告',
     request: '有请求相关变动',
+    viewRequests: '前往请求管理',
     markRead: '全部已读',
     deleteAll: '清除全部',
     deleteAllConfirm: '确定要清除全部通知吗？'
