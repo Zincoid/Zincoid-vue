@@ -542,7 +542,8 @@ export default {
     accessRejected: '拒绝了你的访问请求',
     system: '系统公告',
     markRead: '全部已读',
-    deleteAll: '清除全部'
+    deleteAll: '清除全部',
+    deleteAllConfirm: '确定要清除全部通知吗？'
   },
   share: {
     forward: '转发',

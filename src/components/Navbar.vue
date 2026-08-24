@@ -6,6 +6,7 @@ import { useLocaleStore } from '@/stores/locale'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig, siteBrand } from '@/composables/useConfig'
+import { useConfirm } from '@/composables/useConfirm'
 import { notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -16,6 +17,7 @@ const auth = useAuthStore()
 const locale = useLocaleStore()
 const theme = useThemeStore()
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const { load: loadConfig, get: getConfig } = useConfig()
 loadConfig()
 const menuOpen = ref(false)
@@ -138,8 +140,9 @@ function markAllRead() {
   }).catch(() => {})
 }
 
-function deleteAll() {
+async function deleteAll() {
   if (notifications.value.length === 0) return
+  if (!await confirm(t('notification.deleteAllConfirm'))) return
   notificationAPI.deleteAll().then(() => {
     notifications.value = []
     unreadCount.value = 0

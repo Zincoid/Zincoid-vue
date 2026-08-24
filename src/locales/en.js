@@ -542,7 +542,8 @@ export default {
     accessRejected: 'rejected your access request',
     system: 'System broadcast',
     markRead: 'Mark all read',
-    deleteAll: 'Clear all'
+    deleteAll: 'Clear all',
+    deleteAllConfirm: 'Clear all notifications?'
   },
   share: {
     forward: 'Forward',
