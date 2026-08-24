@@ -327,21 +327,29 @@ async function fetchMusicList(pageNum) {
 }
 
 async function handleMusicUpload(e) {
-  const file = e.target.files?.[0]
-  if (!file) return
+  const files = Array.from(e.target.files || [])
+  if (!files.length) return
   musicUploading.value = true
   musicError.value = ''
-  try {
-    await musicAPI.upload(file, true)
-    musicMessage.value = t('manage.musicUploadDone')
-    setTimeout(() => musicMessage.value = '', 2000)
-    fetchMusicList(musicPage.value)
-  } catch (err) {
-    musicError.value = getMessage(err, 'manage.musicUploadFailed')
-  } finally {
-    musicUploading.value = false
-    e.target.value = ''
+  let ok = 0
+  let fail = 0
+  for (const file of files) {
+    try {
+      await musicAPI.upload(file, true)
+      ok++
+    } catch (err) {
+      fail++
+    }
   }
+  if (fail === 0) {
+    musicMessage.value = t('manage.musicUploadDone', { count: ok })
+    setTimeout(() => musicMessage.value = '', 2000)
+  } else {
+    musicError.value = t('manage.musicUploadFailed', { count: fail })
+  }
+  fetchMusicList(musicPage.value)
+  musicUploading.value = false
+  e.target.value = ''
 }
 
 async function handleMusicDelete(track) {
@@ -760,7 +768,7 @@ onBeforeUnmount(stopStream)
               <SvgIcon name="close" :size="16" />
             </button>
           </h3>
-          <input ref="musicFileInput" type="file" accept="audio/*" class="hidden-input" @change="handleMusicUpload" />
+          <input ref="musicFileInput" type="file" accept="audio/*" multiple class="hidden-input" @change="handleMusicUpload" />
           <p v-if="musicMessage" class="msg msg--success">{{ musicMessage }}</p>
           <p v-if="musicError" class="msg msg--error">{{ musicError }}</p>
           <div class="music-list">
