@@ -392,7 +392,7 @@ onMounted(async () => {
             <div v-else class="walkman__list-empty">
               <template v-if="musicScope === 'private'">
                 <span>{{ t('walkman.emptyGoPrefix') }}</span>
-                <router-link to="/data" class="walkman__list-link">{{ t('walkman.emptyGoLink') }}</router-link>
+                <router-link to="/personal/data" class="walkman__list-link">{{ t('walkman.emptyGoLink') }}</router-link>
                 <span>{{ t('walkman.emptyGoSuffix') }}</span>
               </template>
               <span v-else>{{ t('walkman.empty') }}</span>
