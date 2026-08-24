@@ -6,7 +6,7 @@ import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfirm } from '@/composables/useConfirm'
 import { useConfig } from '@/composables/useConfig'
-import { storageAPI, musicAPI } from '@/api'
+import { storageAPI, musicAPI, requestAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
@@ -160,6 +160,45 @@ const ringColor = computed(() => {
   if (usedPercent.value <= 20) return 'var(--color-success)'
   return 'var(--color-primary)'
 })
+
+const reqOpen = ref(false)
+const reqValue = ref('')
+const reqUnit = ref('GB')
+const reqSubmitting = ref(false)
+const reqMessage = ref('')
+const reqError = ref('')
+
+const REQUEST_CAPACITY_UNITS = { MB: 1024 * 1024, GB: 1024 * 1024 * 1024, TB: 1024 * 1024 * 1024 * 1024 }
+
+function openRequest() {
+  reqOpen.value = true
+  reqValue.value = ''
+  reqUnit.value = 'GB'
+  reqMessage.value = ''
+  reqError.value = ''
+}
+
+function closeRequest() {
+  reqOpen.value = false
+}
+
+async function submitRequest() {
+  const val = parseFloat(reqValue.value)
+  if (isNaN(val) || val <= 0) return
+  if (!await confirm(t('data.requestCapacityConfirm', { value: reqValue.value, unit: reqUnit.value }))) return
+  reqSubmitting.value = true
+  reqError.value = ''
+  try {
+    const bytes = Math.round(val * REQUEST_CAPACITY_UNITS[reqUnit.value])
+    await requestAPI.create(-1, 'STORAGE_EXTENSION', JSON.stringify({ expansion: bytes }))
+    reqMessage.value = t('data.requestCapacitySuccess')
+    setTimeout(() => { reqOpen.value = false; reqMessage.value = '' }, 1500)
+  } catch (err) {
+    reqError.value = getMessage(err, 'data.requestCapacityFailed')
+  } finally {
+    reqSubmitting.value = false
+  }
+}
 </script>
 
 <template>
@@ -219,6 +258,10 @@ const ringColor = computed(() => {
             </div>
           </div>
         </div>
+        <button class="storage-request btn btn--primary" @click="openRequest">
+          <SvgIcon name="plus" :size="16" />
+          {{ t('data.requestCapacity') }}
+        </button>
       </template>
     </section>
 
@@ -244,6 +287,35 @@ const ringColor = computed(() => {
         {{ t('data.musicManage') }}
       </button>
     </section>
+
+    <Transition name="modal">
+      <div v-if="reqOpen" class="modal-overlay" @click.self="closeRequest">
+        <div class="modal">
+          <h3 class="modal__title">
+            <span>{{ t('data.requestCapacityTitle') }}</span>
+            <button class="modal__close" :title="t('common.close')" @click="closeRequest">
+              <SvgIcon name="close" :size="16" />
+            </button>
+          </h3>
+          <p class="modal__desc">{{ t('data.requestCapacityDesc') }}</p>
+          <p v-if="reqMessage" class="msg msg--success">{{ reqMessage }}</p>
+          <p v-if="reqError" class="msg msg--error">{{ reqError }}</p>
+          <div class="request-form">
+            <input v-model="reqValue" type="number" min="0" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('data.requestCapacityPlaceholder')" />
+            <select v-model="reqUnit" class="field__input capacity-select">
+              <option value="MB">MB</option>
+              <option value="GB">GB</option>
+              <option value="TB">TB</option>
+            </select>
+          </div>
+          <div class="modal__actions">
+            <button class="btn btn--primary btn--full" :disabled="reqSubmitting || isNaN(parseFloat(reqValue)) || parseFloat(reqValue) <= 0" @click="submitRequest">
+              {{ reqSubmitting ? t('common.submitting') : t('common.confirm') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <Transition name="modal">
       <div v-if="musicOpen" class="modal-overlay" @click.self="closeMusicManage">
@@ -362,6 +434,13 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-chart__center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
 .storage-chart__percent { font-family: var(--font-mono); font-size: var(--text-base); font-weight: var(--weight-semibold); color: var(--color-text-heading); line-height: 1; }
 .storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.storage-request { margin-top: var(--spacing-lg); display: inline-flex; align-items: center; gap: var(--spacing-xs); }
+
+.request-form { display: flex; gap: var(--spacing-sm); }
+.capacity-select { flex-shrink: 0; }
+.capacity-select:hover { border-color: var(--color-primary); }
+.capacity-select option { font-family: var(--font-mono); }
+.modal__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
 
 @media (max-width: 640px) {
   .storage-card { gap: var(--spacing-sm); padding: var(--spacing-md); }

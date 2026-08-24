@@ -208,6 +208,14 @@ export const notificationAPI = {
   emailBroadcast: (subject, content, force) => api.post('/notifications/broadcast/email', { subject, content, force })
 }
 
+// ── Requests ──
+export const requestAPI = {
+  create: (receiverId, type, meta) => api.post(`/requests/${receiverId}`, null, { params: { type, meta } }),
+  sent: (page = 1, size = 10) => api.get('/requests/sent', { params: { page, size } }),
+  received: (page = 1, size = 10) => api.get('/requests/received', { params: { page, size } }),
+  handle: (requestId, access) => api.put(`/requests/${requestId}`, null, { params: { access } })
+}
+
 // ── Logs (SSE stream via fetch, supports Authorization header) ──
 export const logAPI = {
   stream(level, onLog, onError) {

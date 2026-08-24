@@ -59,6 +59,12 @@ const routes = [
         meta: { requiresAuth: true, title: 'Access' }
       },
       {
+        path: 'request',
+        name: 'Request',
+        component: () => import('@/views/RequestPage.vue'),
+        meta: { requiresAuth: true, title: 'Request' }
+      },
+      {
         path: 'setting',
         name: 'Setting',
         component: () => import('@/views/SettingPage.vue'),

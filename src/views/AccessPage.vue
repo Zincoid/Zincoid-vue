@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
@@ -101,11 +101,11 @@ function statusLabel(s) {
       <!-- Received -->
       <div v-show="activeTab === 'received'">
         <template v-if="!rpData.records.length && !rrData.records.length">
-          <p class="empty">{{ t('access.noRequests') }}</p>
+          <p class="empty">{{ t('access.noAuthorizations') }}</p>
         </template>
         <template v-else>
           <div v-if="rpData.records.length" class="section">
-            <h3>{{ t('access.pendingRequests') }}</h3>
+            <h3>{{ t('access.pendingAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in rpData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
@@ -126,7 +126,7 @@ function statusLabel(s) {
             <Pagination :page="rpData.pages > 0 ? (rpData.page || 1) : 1" :pages="rpData.pages" :total="rpData.total" :size="pageSize" @change="p => fetchRP(p)" />
           </div>
           <div v-if="rrData.records.length" class="section">
-            <h3>{{ t('access.resolvedRequests') }}</h3>
+            <h3>{{ t('access.resolvedAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in rrData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
@@ -149,11 +149,11 @@ function statusLabel(s) {
       <!-- Sent -->
       <div v-show="activeTab === 'sent'">
         <template v-if="!spData.records.length && !srData.records.length">
-          <p class="empty">{{ t('access.noRequests') }}</p>
+          <p class="empty">{{ t('access.noAuthorizations') }}</p>
         </template>
         <template v-else>
           <div v-if="spData.records.length" class="section">
-            <h3>{{ t('access.pendingSent') }}</h3>
+            <h3>{{ t('access.pendingAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
@@ -163,7 +163,7 @@ function statusLabel(s) {
             <Pagination :page="spData.pages > 0 ? (spData.page || 1) : 1" :pages="spData.pages" :total="spData.total" :size="pageSize" @change="p => fetchSP(p)" />
           </div>
           <div v-if="srData.records.length" class="section">
-            <h3>{{ t('access.resolvedSent') }}</h3>
+            <h3>{{ t('access.resolvedAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>

@@ -114,6 +114,7 @@ function goNotification(n) {
   if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
   if (n.relatedType === 8) { router.push('/personal/access'); return }
   if (n.relatedType === 9 || n.relatedType === 10) { router.push(`/repos/${n.relatedId}`); return }
+  if (n.relatedType === 11) { router.push('/personal/request'); return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -328,10 +329,12 @@ function closeMenu() {
                     ? t('notification.registered')
                     : n.relatedType === 8
                       ? t('notification.accessRequest')
-                      : n.relatedType === 9
-                        ? t('notification.accessGranted')
-                        : n.relatedType === 10
-                          ? t('notification.accessRejected')
+                    : n.relatedType === 9
+                      ? t('notification.accessGranted')
+                      : n.relatedType === 10
+                        ? t('notification.accessRejected')
+                        : n.relatedType === 11
+                          ? t('notification.request')
                           : n.relatedType === 6
                             ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : t('notification.likedArticle'))
                     : n.relatedType === 2

@@ -122,6 +122,7 @@ export default {
     profileTab: '基本',
     dataTab: '数据',
     accessTab: '授权',
+    requestTab: '请求',
     settingTab: '设置',
     systemTab: '系统',
     manageTab: '管理'
@@ -210,7 +211,14 @@ export default {
     musicEmpty: '暂无音乐',
     musicLoading: '加载中...',
     musicTotal: '共 {total} 首',
-    musicPageSize: '每页 {size} 首'
+    musicPageSize: '每页 {size} 首',
+    requestCapacity: '申请扩容',
+    requestCapacityTitle: '申请存储扩容',
+    requestCapacityDesc: '向管理员提交扩容申请，审批通过后将自动调整你的存储上限。',
+    requestCapacityPlaceholder: '容量数值',
+    requestCapacityConfirm: '确定申请扩容 {value} {unit}？',
+    requestCapacitySuccess: '扩容申请已提交',
+    requestCapacityFailed: '扩容申请提交失败'
   },
   repo: {
     pageTitle: '仓库',
@@ -243,7 +251,7 @@ export default {
     views: '次浏览',
   },
   access: {
-    desc: '管理仓库访问申请与授权',
+    desc: '管理仓库访问授权',
     received: '接收',
     sent: '发送',
     pending: '待处理',
@@ -252,11 +260,26 @@ export default {
     reject: '拒绝',
     allow: '允许',
     remove: '移除',
-    pendingRequests: '待处理的申请',
-    resolvedRequests: '已处理的申请',
-    pendingSent: '待处理的申请',
-    resolvedSent: '已处理的申请',
-    noRequests: '暂无申请。'
+    pendingAuthorizations: '待处理的授权',
+    resolvedAuthorizations: '已处理的授权',
+    noAuthorizations: '暂无授权。'
+  },
+  request: {
+    desc: '管理发往你或由你发出的请求',
+    received: '接收',
+    sent: '发送',
+    pending: '待处理',
+    approved: '已同意',
+    rejected: '已拒绝',
+    approve: '同意',
+    reject: '拒绝',
+    approveConfirm: '确定同意此请求？',
+    pendingRequests: '待处理的请求',
+    resolvedRequests: '已处理的请求',
+    pendingSent: '待处理的请求',
+    resolvedSent: '已处理的请求',
+    noRequests: '暂无请求。',
+    storageExtension: '存储扩容'
   },
   manage: {
     subtitle: '站点信息、配置与工具',
@@ -483,7 +506,7 @@ export default {
     'Not a music file': '非音乐文件',
     'Sender and receiver cannot be the same': '发送者和接收者不能相同',
     'Invalid handle status': '无效的处理状态',
-    'Invalid capacity in request': '无效的容量请求'
+    'Invalid expansion in request': '无效的请求扩容'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
@@ -547,6 +570,7 @@ export default {
     accessGranted: '通过了你的访问请求',
     accessRejected: '拒绝了你的访问请求',
     system: '系统公告',
+    request: '向你发送了一个请求',
     markRead: '全部已读',
     deleteAll: '清除全部',
     deleteAllConfirm: '确定要清除全部通知吗？'
@@ -589,6 +613,7 @@ export default {
     creating: '创建中...',
     saving: '保存中...',
     cleaning: '清理中...',
+    submitting: '提交中...',
     goBack: '返回',
     confirm: '确定',
     cancel: '取消',

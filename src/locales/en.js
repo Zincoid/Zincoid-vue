@@ -122,6 +122,7 @@ export default {
     profileTab: 'Profile',
     dataTab: 'Data',
     accessTab: 'Access',
+    requestTab: 'Request',
     settingTab: 'Setting',
     manageTab: 'Manage',
     systemTab: 'System'
@@ -240,10 +241,17 @@ export default {
     musicEmpty: 'No music yet',
     musicLoading: 'Loading...',
     musicTotal: '{total} tracks',
-    musicPageSize: '{size} per page'
+    musicPageSize: '{size} per page',
+    requestCapacity: 'Request Expansion',
+    requestCapacityTitle: 'Request Storage Expansion',
+    requestCapacityDesc: 'Submit an expansion request to the administrator. Once approved, your storage limit will be adjusted automatically.',
+    requestCapacityPlaceholder: 'Capacity value',
+    requestCapacityConfirm: 'Request an expansion of {value} {unit}?',
+    requestCapacitySuccess: 'Expansion request submitted',
+    requestCapacityFailed: 'Failed to submit expansion request'
   },
   access: {
-    desc: 'Manage repo access requests & authorizations',
+    desc: 'Manage repo access authorizations',
     received: 'Received',
     sent: 'Sent',
     pending: 'Pending',
@@ -252,11 +260,26 @@ export default {
     reject: 'Reject',
     allow: 'Allow',
     remove: 'Remove',
+    pendingAuthorizations: 'Pending Authorizations',
+    resolvedAuthorizations: 'Resolved Authorizations',
+    noAuthorizations: 'No authorizations.'
+  },
+  request: {
+    desc: 'Manage requests sent to or from you',
+    received: 'Received',
+    sent: 'Sent',
+    pending: 'Pending',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    approve: 'Approve',
+    reject: 'Reject',
+    approveConfirm: 'Approve this request?',
     pendingRequests: 'Pending Requests',
     resolvedRequests: 'Resolved Requests',
-    pendingSent: 'Pending Approvals',
-    resolvedSent: 'Resolved Approvals',
-    noRequests: 'No requests.'
+    pendingSent: 'Pending Requests',
+    resolvedSent: 'Resolved Requests',
+    noRequests: 'No requests.',
+    storageExtension: 'Storage Expansion'
   },
   manage: {
     subtitle: 'Site information, configuration & tools',
@@ -483,7 +506,7 @@ export default {
     'Not a music file': 'Not a music file',
     'Sender and receiver cannot be the same': 'Sender and receiver cannot be the same',
     'Invalid handle status': 'Invalid handle status',
-    'Invalid capacity in request': 'Invalid capacity in request'
+    'Invalid expansion in request': 'Invalid expansion in request'
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
@@ -547,6 +570,7 @@ export default {
     accessGranted: 'approved your access request',
     accessRejected: 'rejected your access request',
     system: 'System broadcast',
+    request: 'sent you a request',
     markRead: 'Mark all read',
     deleteAll: 'Clear all',
     deleteAllConfirm: 'Clear all notifications?'
@@ -591,6 +615,7 @@ export default {
     creating: 'Creating...',
     saving: 'Saving...',
     cleaning: 'Cleaning...',
+    submitting: 'Submitting...',
     goBack: 'Back',
     confirm: 'Confirm',
     cancel: 'Cancel',
