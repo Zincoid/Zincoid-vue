@@ -332,7 +332,7 @@ async function handleMusicUpload(e) {
   musicUploading.value = true
   musicError.value = ''
   try {
-    await musicAPI.upload(file)
+    await musicAPI.upload(file, true)
     musicMessage.value = t('manage.musicUploadDone')
     setTimeout(() => musicMessage.value = '', 2000)
     fetchMusicList(musicPage.value)

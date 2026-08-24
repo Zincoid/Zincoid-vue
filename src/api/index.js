@@ -148,9 +148,11 @@ export const healthAPI = {
 // ── Music ──
 export const musicAPI = {
   list: (page = 1, size = 10) => api.get('/music', { params: { page, size } }),
-  upload: (file) => {
+  listUser: (page = 1, size = 10) => api.get('/music/user', { params: { page, size } }),
+  upload: (file, isPublic = false) => {
     const form = new FormData()
     form.append('file', file)
+    form.append('isPublic', String(isPublic))
     return api.post('/music', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
       timeout: 600000
