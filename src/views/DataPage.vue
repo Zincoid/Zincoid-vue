@@ -165,7 +165,6 @@ const reqOpen = ref(false)
 const reqValue = ref('')
 const reqUnit = ref('GB')
 const reqSubmitting = ref(false)
-const reqMessage = ref('')
 const reqError = ref('')
 
 const REQUEST_CAPACITY_UNITS = { MB: 1024 * 1024, GB: 1024 * 1024 * 1024, TB: 1024 * 1024 * 1024 * 1024 }
@@ -174,7 +173,6 @@ function openRequest() {
   reqOpen.value = true
   reqValue.value = ''
   reqUnit.value = 'GB'
-  reqMessage.value = ''
   reqError.value = ''
 }
 
@@ -191,8 +189,8 @@ async function submitRequest() {
   try {
     const bytes = Math.round(val * REQUEST_CAPACITY_UNITS[reqUnit.value])
     await requestAPI.create(-1, 'STORAGE_EXTENSION', JSON.stringify({ expansion: bytes }))
-    reqMessage.value = t('data.requestCapacitySuccess')
-    setTimeout(() => { reqOpen.value = false; reqMessage.value = '' }, 1500)
+    toast(t('data.requestCapacitySuccess'), 'success')
+    reqOpen.value = false
   } catch (err) {
     reqError.value = getMessage(err, 'data.requestCapacityFailed')
   } finally {
@@ -297,7 +295,6 @@ async function submitRequest() {
             </button>
           </h3>
           <p class="modal__desc">{{ t('data.requestCapacityDesc') }}</p>
-          <p v-if="reqMessage" class="msg msg--success">{{ reqMessage }}</p>
           <p v-if="reqError" class="msg msg--error">{{ reqError }}</p>
           <div class="request-form">
             <input v-model="reqValue" type="number" min="0" class="field__input" style="flex: 1; min-width: 0;" :placeholder="t('data.requestCapacityPlaceholder')" />
