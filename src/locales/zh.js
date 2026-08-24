@@ -433,6 +433,7 @@ export default {
     'No permission to delete this article': '无权删除此文章',
     'No permission to delete this repo': '无权删除此仓库',
     'No permission to delete this comment': '无权删除此评论',
+    'No permission to delete this music': '无权删除此音乐',
     'Only founder can pin moments': '仅管理员可置顶动态',
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',
@@ -458,7 +459,8 @@ export default {
     'Access already approved': '访问已被批准',
     'Access already rejected': '访问已被拒绝',
     'Server is offline': '服务器已离线',
-    'Server is under maintenance': '服务器维护中（计划：UTC+8 00:00-00:10）'
+    'Server is under maintenance': '服务器维护中（计划：UTC+8 00:00-00:10）',
+    'Not a music file': '非音乐文件',
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',

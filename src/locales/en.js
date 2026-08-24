@@ -433,6 +433,7 @@ export default {
     'No permission to delete this article': 'No permission to delete this article',
     'No permission to delete this repo': 'No permission to delete this repo',
     'No permission to delete this comment': 'No permission to delete this comment',
+    'No permission to delete this music': 'No permission to delete this music',
     'Only founder can pin moments': 'Only admin can pin moments',
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',
@@ -458,7 +459,8 @@ export default {
     'Access already approved': 'Access already approved',
     'Access already rejected': 'Access already rejected',
     'Server is offline': 'Server is offline',
-    'Server is under maintenance': 'Server is under maintenance (scheduled: UTC+8 00:00-00:10)'
+    'Server is under maintenance': 'Server is under maintenance (scheduled: UTC+8 00:00-00:10)',
+    'Not a music file': 'Not a music file',
   },
   maintenance: {
     message: 'Server is currently unavailable. Please try again later.',
