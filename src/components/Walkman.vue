@@ -441,7 +441,7 @@ onMounted(async () => {
   opacity: 1;
   cursor: pointer;
   width: 14px;
-  background: rgba(236, 72, 153, 0.15);
+  background: transparent;
   border: none;
   border-radius: 0 var(--rounded-md) var(--rounded-md) 0;
 }
