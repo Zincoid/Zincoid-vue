@@ -434,6 +434,7 @@ export default {
     'No permission to delete this repo': '无权删除此仓库',
     'No permission to delete this comment': '无权删除此评论',
     'No permission to delete this music': '无权删除此音乐',
+    'No permission to upload public music': '无权上传公共音乐',
     'Only founder can pin moments': '仅管理员可置顶动态',
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',

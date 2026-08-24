@@ -434,6 +434,7 @@ export default {
     'No permission to delete this repo': 'No permission to delete this repo',
     'No permission to delete this comment': 'No permission to delete this comment',
     'No permission to delete this music': 'No permission to delete this music',
+    'No permission to upload public music': 'No permission to upload public music',
     'Only founder can pin moments': 'Only admin can pin moments',
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',
