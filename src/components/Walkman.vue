@@ -372,6 +372,7 @@ onMounted(async () => {
                   :class="{ 'walkman__track--active': tr.id === currentTrack?.id }"
                   @click="playListTrack(tr)"
               >
+                <span v-if="tr.id === currentTrack?.id && playing" class="walkman__track-eq"><i></i><i></i><i></i></span>
                 <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
                 <button
                     class="walkman__track-play"
@@ -717,7 +718,26 @@ onMounted(async () => {
 [data-theme="dark"] .walkman__track:hover { background: #23252f; }
 .walkman__track--active { color: #db2777; background: rgba(236, 72, 153, 0.1); border-radius: var(--rounded-md); }
 
+.walkman__track-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+.walkman__track-eq i {
+  width: 2px;
+  background: #db2777;
+  border-radius: var(--rounded-full);
+  animation: walkman-eq 0.9s ease-in-out infinite;
+}
+.walkman__track-eq i:nth-child(1) { height: 60%; }
+.walkman__track-eq i:nth-child(2) { height: 100%; animation-delay: 0.2s; }
+.walkman__track-eq i:nth-child(3) { height: 40%; animation-delay: 0.4s; }
+
 .walkman__track-name {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
