@@ -569,7 +569,7 @@ export default {
     accessGranted: 'approved your access request',
     accessRejected: 'rejected your access request',
     system: 'System broadcast',
-    request: 'sent you a request',
+    request: 'You have request-related updates',
     markRead: 'Mark all read',
     deleteAll: 'Clear all',
     deleteAllConfirm: 'Clear all notifications?'
