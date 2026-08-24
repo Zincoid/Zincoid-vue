@@ -44,10 +44,26 @@ async function fetchAll() {
   }
 }
 
-async function fetchRP(p = 1) { const { data } = await requestAPI.received(p, pageSize); rpData.value = data.data }
-async function fetchRR(p = 1) { const { data } = await requestAPI.received(p, pageSize); rrData.value = data.data }
-async function fetchSP(p = 1) { const { data } = await requestAPI.sent(p, pageSize); spData.value = data.data }
-async function fetchSR(p = 1) { const { data } = await requestAPI.sent(p, pageSize); srData.value = data.data }
+async function fetchRP(p = 1) {
+  const { data } = await requestAPI.received(p, pageSize)
+  const d = data.data
+  rpData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
+}
+async function fetchRR(p = 1) {
+  const { data } = await requestAPI.received(p, pageSize)
+  const d = data.data
+  rrData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
+}
+async function fetchSP(p = 1) {
+  const { data } = await requestAPI.sent(p, pageSize)
+  const d = data.data
+  spData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
+}
+async function fetchSR(p = 1) {
+  const { data } = await requestAPI.sent(p, pageSize)
+  const d = data.data
+  srData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
+}
 
 async function handleRequest(r, access) {
   if (handlingId.value) return
