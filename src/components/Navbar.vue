@@ -28,6 +28,7 @@ const notifLoading = ref(false)
 const notifLoadingDone = ref(false)
 const broadcastMessage = ref(null)
 const broadcastSender = ref(null)
+const broadcastKind = ref(null)
 const notifPage = ref(1)
 const notifPages = ref(1)
 const notifTotal = ref(0)
@@ -110,11 +111,11 @@ function goNotification(n) {
       unreadCount.value = Math.max(0, unreadCount.value - 1)
     }).catch(() => {})
   }
-  if (n.relatedType === 5) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; return }
+  if (n.relatedType === 5) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; broadcastKind.value = 'system'; return }
   if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
   if (n.relatedType === 8) { router.push('/personal/access'); return }
   if (n.relatedType === 9 || n.relatedType === 10) { router.push(`/repos/${n.relatedId}`); return }
-  if (n.relatedType === 11) { router.push('/personal/request'); return }
+  if (n.relatedType === 11) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; broadcastKind.value = 'request'; return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -371,16 +372,16 @@ function closeMenu() {
   </nav>
   <Teleport to="body">
     <Transition name="broadcast">
-      <div v-if="broadcastMessage" class="broadcast-overlay" @click.self="broadcastMessage = null">
+      <div v-if="broadcastMessage" class="broadcast-overlay" @click.self="broadcastMessage = null; broadcastKind = null">
         <div class="broadcast-modal">
           <div class="broadcast-modal__bar"></div>
-          <button class="broadcast-modal__close" @click="broadcastMessage = null">
+          <button class="broadcast-modal__close" @click="broadcastMessage = null; broadcastKind = null">
             <SvgIcon name="close" :size="16" />
           </button>
           <div class="broadcast-modal__icon">
             <SvgIcon name="bell" :size="28" />
           </div>
-          <h3 class="broadcast-modal__title">{{ t('notification.system') }}</h3>
+          <h3 class="broadcast-modal__title">{{ broadcastKind === 'request' ? t('notification.request') : t('notification.system') }}</h3>
           <p class="broadcast-modal__sender" v-if="broadcastSender">{{ broadcastSender }}</p>
           <p class="broadcast-modal__body">{{ broadcastMessage }}</p>
         </div>

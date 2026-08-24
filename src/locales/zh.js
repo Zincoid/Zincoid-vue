@@ -565,7 +565,7 @@ export default {
     likedArticle: '点赞了你的文章',
     likedRepo: '点赞了你的仓库',
     registered: '注册了新账号',
-    accessRequest: '请求访问你的仓库',
+    accessRequest: '申请访问你的仓库',
     accessGranted: '通过了你的访问请求',
     accessRejected: '拒绝了你的访问请求',
     system: '系统公告',
