@@ -119,7 +119,7 @@ function statusLabel(s) {
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
                 <div class="access-card__actions">
                   <button class="access-card__btn access-card__btn--reject" @click="rejectAccess(a.id)">{{ t('access.reject') }}</button>
-                  <button class="access-card__btn access-card__btn--allow" @click="approve(a.id)">{{ t('access.allow') }}</button>
+                  <button class="access-card__btn access-card__btn--allow" @click="approve(a.id)">{{ t('access.approve') }}</button>
                 </div>
               </div>
             </div>
