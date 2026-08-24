@@ -164,6 +164,7 @@ const ringColor = computed(() => {
 const reqOpen = ref(false)
 const reqValue = ref('')
 const reqUnit = ref('GB')
+const reqReason = ref('')
 const reqSubmitting = ref(false)
 const reqError = ref('')
 
@@ -173,6 +174,7 @@ function openRequest() {
   reqOpen.value = true
   reqValue.value = ''
   reqUnit.value = 'GB'
+  reqReason.value = ''
   reqError.value = ''
 }
 
@@ -188,7 +190,10 @@ async function submitRequest() {
   reqError.value = ''
   try {
     const bytes = Math.round(val * REQUEST_CAPACITY_UNITS[reqUnit.value])
-    await requestAPI.create(-1, 'STORAGE_EXTENSION', JSON.stringify({ expansion: bytes }))
+    const meta = { expansion: bytes }
+    const reason = reqReason.value.trim()
+    if (reason) meta.reason = reason
+    await requestAPI.create(-1, 'STORAGE_EXTENSION', JSON.stringify(meta))
     toast(t('data.requestCapacitySuccess'), 'success')
     reqOpen.value = false
   } catch (err) {
@@ -304,6 +309,7 @@ async function submitRequest() {
               <option value="TB">TB</option>
             </select>
           </div>
+          <textarea v-model="reqReason" class="field__input request-reason" rows="3" maxlength="200" :placeholder="t('data.requestCapacityReason')"></textarea>
           <div class="modal__actions">
             <button class="btn btn--primary btn--full" :disabled="reqSubmitting || isNaN(parseFloat(reqValue)) || parseFloat(reqValue) <= 0" @click="submitRequest">
               {{ reqSubmitting ? t('common.submitting') : t('common.confirm') }}
@@ -446,7 +452,8 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-chart__percent { font-family: var(--font-mono); font-size: var(--text-base); font-weight: var(--weight-semibold); color: var(--color-text-heading); line-height: 1; }
 .storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
 
-.request-form { display: flex; gap: var(--spacing-sm); }
+.request-form { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.request-reason { width: 100%; resize: vertical; min-height: 60px; font-family: var(--font-mono); }
 .capacity-select {
   width: 100px;
   flex-shrink: 0;

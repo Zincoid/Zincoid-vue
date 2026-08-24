@@ -245,6 +245,7 @@ export default {
     requestCapacityTitle: 'Request Storage Expansion',
     requestCapacityDesc: 'Submit an expansion request to the administrator. Once approved, your storage limit will be adjusted automatically.',
     requestCapacityPlaceholder: 'Expansion value',
+    requestCapacityReason: 'Reason (optional)',
     requestCapacityConfirm: 'Request an expansion of {value} {unit}?',
     requestCapacitySuccess: 'Expansion request submitted',
     requestCapacityFailed: 'Failed to submit expansion request'

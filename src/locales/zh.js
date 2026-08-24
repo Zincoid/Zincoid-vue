@@ -215,6 +215,7 @@ export default {
     requestCapacityTitle: '申请存储扩容',
     requestCapacityDesc: '向管理员提交扩容申请，审批通过后将自动调整你的存储上限。',
     requestCapacityPlaceholder: '扩充数值',
+    requestCapacityReason: '申请原因（选填）',
     requestCapacityConfirm: '确定申请扩容 {value} {unit}？',
     requestCapacitySuccess: '扩容申请已提交',
     requestCapacityFailed: '扩容申请提交失败'

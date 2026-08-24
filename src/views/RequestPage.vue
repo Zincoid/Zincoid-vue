@@ -105,11 +105,34 @@ function statusLabel(a) {
   return t('request.rejected')
 }
 
+const TYPE_VIEWS = {
+  0: {
+    labelKey: 'request.storageExtension',
+    meta(r) {
+      try {
+        const meta = JSON.parse(r.meta || '{}')
+        return meta.expansion != null ? formatSize(Number(meta.expansion)) : ''
+      } catch {
+        return ''
+      }
+    }
+  }
+}
+
+function typeLabel(r) {
+  const view = TYPE_VIEWS[r.type]
+  return view ? t(view.labelKey) : `Type#${r.type}`
+}
+
 function requestMeta(r) {
-  if (r.type !== 0) return ''
+  const view = TYPE_VIEWS[r.type]
+  return view ? view.meta(r) : ''
+}
+
+function requestReason(r) {
   try {
     const meta = JSON.parse(r.meta || '{}')
-    return meta.expansion != null ? formatSize(Number(meta.expansion)) : ''
+    return meta.reason || ''
   } catch {
     return ''
   }
@@ -158,9 +181,10 @@ function formatSize(bytes) {
                   <div class="request-card__info">
                     <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
-                      <span class="request-card__type-name">{{ t('request.storageExtension') }}</span>
+                      <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -191,9 +215,10 @@ function formatSize(bytes) {
                   <div class="request-card__info">
                     <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
-                      <span class="request-card__type-name">{{ t('request.storageExtension') }}</span>
+                      <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
@@ -221,9 +246,10 @@ function formatSize(bytes) {
                   <div class="request-card__info">
                     <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
-                      <span class="request-card__type-name">{{ t('request.storageExtension') }}</span>
+                      <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -242,9 +268,10 @@ function formatSize(bytes) {
                   <div class="request-card__info">
                     <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
-                      <span class="request-card__type-name">{{ t('request.storageExtension') }}</span>
+                      <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
@@ -277,6 +304,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; }
 .request-card__type { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; white-space: nowrap; }
 .request-card__type-name { flex-shrink: 0; }
+.request-card__reason { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .request-card__meta { font-family: var(--font-mono); color: var(--color-primary); flex-shrink: 0; }
 .request-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
 .request-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); margin-right: var(--spacing-sm); }
