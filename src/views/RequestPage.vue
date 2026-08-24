@@ -241,10 +241,7 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in spData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
-                  <img v-if="userOf(r)?.avatar" :src="userOf(r).avatar" class="request-card__avatar" />
-                  <span v-else class="request-card__avatar-placeholder">{{ (userOf(r)?.nickname || r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
@@ -263,10 +260,7 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in srData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
-                  <img v-if="userOf(r)?.avatar" :src="userOf(r).avatar" class="request-card__avatar" />
-                  <span v-else class="request-card__avatar-placeholder">{{ (userOf(r)?.nickname || r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
