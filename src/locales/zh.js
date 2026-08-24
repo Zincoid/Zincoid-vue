@@ -258,7 +258,7 @@ export default {
     approved: '已授权',
     rejected: '已拒绝',
     reject: '拒绝',
-    allow: '允许',
+    approve: '同意',
     revoke: '撤销',
     pendingAuthorizations: '待处理的授权',
     resolvedAuthorizations: '已处理的授权',
