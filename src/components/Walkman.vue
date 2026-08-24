@@ -31,8 +31,8 @@ const listLoading = ref(false)
 const musicScope = ref('public')
 
 const scopeOptions = computed(() => [
-  { value: 'public', label: t('walkman.public'), icon: 'world' },
-  { value: 'private', label: t('walkman.private'), icon: 'lock' }
+  { value: 'public', label: t('walkman.public'), icon: 'members' },
+  { value: 'private', label: t('walkman.private'), icon: 'heart' }
 ])
 
 const navbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 64
@@ -389,7 +389,14 @@ onMounted(async () => {
                 </a>
               </div>
             </div>
-            <div v-else class="walkman__list-empty">{{ t('walkman.empty') }}</div>
+            <div v-else class="walkman__list-empty">
+              <template v-if="musicScope === 'private'">
+                <span>{{ t('walkman.emptyGoPrefix') }}</span>
+                <router-link to="/data" class="walkman__list-link">{{ t('walkman.emptyGoLink') }}</router-link>
+                <span>{{ t('walkman.emptyGoSuffix') }}</span>
+              </template>
+              <span v-else>{{ t('walkman.empty') }}</span>
+            </div>
             <div class="walkman__list-pager">
               <button class="walkman__page-btn" :disabled="listPage <= 1 || listLoading" @click="loadList(listPage - 1)">&#8249;</button>
               <span class="walkman__page-info">{{ listPage }} / {{ listPages }} · {{ t('walkman.pageSize', { size: listSize }) }}</span>
@@ -770,6 +777,12 @@ onMounted(async () => {
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
 }
+
+.walkman__list-link {
+  color: #db2777;
+  text-decoration: none;
+}
+.walkman__list-link:hover { text-decoration: underline; }
 
 .walkman__list-pager {
   display: flex;

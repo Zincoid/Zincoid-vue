@@ -507,6 +507,9 @@ export default {
     pageSize: '{size} per page',
     public: 'Public',
     private: 'Private',
+    emptyGoPrefix: 'Go to ',
+    emptyGoLink: 'Data Management',
+    emptyGoSuffix: ' to add...',
     loadFailed: 'Failed to load playlist'
   },
   chat: {

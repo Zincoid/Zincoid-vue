@@ -507,6 +507,9 @@ export default {
     pageSize: '每页 {size} 首',
     public: '公共',
     private: '私有',
+    emptyGoPrefix: '前往',
+    emptyGoLink: '数据管理',
+    emptyGoSuffix: '添加...',
     loadFailed: '加载音乐列表失败'
   },
   chat: {
