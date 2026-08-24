@@ -259,7 +259,7 @@ export default {
     rejected: 'Rejected',
     reject: 'Reject',
     allow: 'Allow',
-    remove: 'Remove',
+    revoke: 'Revoke',
     pendingAuthorizations: 'Pending Authorizations',
     resolvedAuthorizations: 'Resolved Authorizations',
     noAuthorizations: 'No authorizations.'

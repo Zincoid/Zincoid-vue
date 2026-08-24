@@ -259,7 +259,7 @@ export default {
     rejected: '已拒绝',
     reject: '拒绝',
     allow: '允许',
-    remove: '移除',
+    revoke: '撤销',
     pendingAuthorizations: '待处理的授权',
     resolvedAuthorizations: '已处理的授权',
     noAuthorizations: '暂无授权。'

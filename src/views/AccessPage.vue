@@ -138,7 +138,7 @@ function statusLabel(s) {
                   </div>
                 </div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button class="access-card__btn access-card__btn--remove" @click="remove(a.id)">{{ t('access.remove') }}</button>
+                <button class="access-card__btn access-card__btn--remove" @click="remove(a.id)">{{ t('access.revoke') }}</button>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
