@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -26,9 +26,9 @@ const notifOpen = ref(false)
 const notifications = ref([])
 const notifLoading = ref(false)
 const notifLoadingDone = ref(false)
-const broadcastMessage = ref(null)
-const broadcastSender = ref(null)
-const broadcastKind = ref(null)
+const detailMessage = ref(null)
+const detailSender = ref(null)
+const detailKind = ref(null)
 const notifPage = ref(1)
 const notifPages = ref(1)
 const notifTotal = ref(0)
@@ -111,11 +111,11 @@ function goNotification(n) {
       unreadCount.value = Math.max(0, unreadCount.value - 1)
     }).catch(() => {})
   }
-  if (n.relatedType === 5) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; broadcastKind.value = 'system'; return }
+  if (n.relatedType === 5) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'system'; return }
   if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
   if (n.relatedType === 8) { router.push('/personal/access'); return }
   if (n.relatedType === 9 || n.relatedType === 10) { router.push(`/repos/${n.relatedId}`); return }
-  if (n.relatedType === 11) { broadcastMessage.value = n.snippet; broadcastSender.value = n.senderNickname; broadcastKind.value = 'request'; return }
+  if (n.relatedType === 11) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'request'; return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -371,19 +371,19 @@ function closeMenu() {
     </Transition>
   </nav>
   <Teleport to="body">
-    <Transition name="broadcast">
-      <div v-if="broadcastMessage" class="broadcast-overlay" @click.self="broadcastMessage = null; broadcastKind = null">
-        <div class="broadcast-modal">
-          <div class="broadcast-modal__bar"></div>
-          <button class="broadcast-modal__close" @click="broadcastMessage = null; broadcastKind = null">
+    <Transition name="notif-detail">
+      <div v-if="detailMessage" class="notif-detail-overlay" @click.self="detailMessage = null; detailKind = null">
+        <div class="notif-detail-modal">
+          <div class="notif-detail-modal__bar"></div>
+          <button class="notif-detail-modal__close" @click="detailMessage = null; detailKind = null">
             <SvgIcon name="close" :size="16" />
           </button>
-          <div class="broadcast-modal__icon">
+          <div class="notif-detail-modal__icon">
             <SvgIcon name="bell" :size="28" />
           </div>
-          <h3 class="broadcast-modal__title">{{ broadcastKind === 'request' ? t('notification.request') : t('notification.system') }}</h3>
-          <p class="broadcast-modal__sender" v-if="broadcastSender">{{ broadcastSender }}</p>
-          <p class="broadcast-modal__body">{{ broadcastMessage }}</p>
+          <h3 class="notif-detail-modal__title">{{ detailKind === 'request' ? t('notification.request') : t('notification.system') }}</h3>
+          <p class="notif-detail-modal__sender" v-if="detailSender">{{ detailSender }}</p>
+          <p class="notif-detail-modal__body">{{ detailMessage }}</p>
         </div>
       </div>
     </Transition>
@@ -1179,7 +1179,7 @@ function closeMenu() {
   }
 }
 
-.broadcast-overlay {
+.notif-detail-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -1189,7 +1189,7 @@ function closeMenu() {
   justify-content: center;
   padding: var(--spacing-xl);
 }
-.broadcast-modal {
+.notif-detail-modal {
   background: var(--color-surface);
   border-radius: var(--rounded-xl);
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
@@ -1199,7 +1199,7 @@ function closeMenu() {
   overflow: hidden;
   padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-xl);
 }
-.broadcast-modal__bar {
+.notif-detail-modal__bar {
   position: absolute;
   top: 0;
   left: 0;
@@ -1207,7 +1207,7 @@ function closeMenu() {
   height: 4px;
   background: linear-gradient(90deg, #f9a8d4, #db2777);
 }
-.broadcast-modal__close {
+.notif-detail-modal__close {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -1220,11 +1220,11 @@ function closeMenu() {
   border-radius: var(--rounded-full);
   transition: all var(--transition-fast);
 }
-.broadcast-modal__close:hover {
+.notif-detail-modal__close:hover {
   color: var(--color-text);
   background: var(--color-bg-alt);
 }
-.broadcast-modal__icon {
+.notif-detail-modal__icon {
   width: 48px;
   height: 48px;
   border-radius: var(--rounded-full);
@@ -1235,42 +1235,45 @@ function closeMenu() {
   justify-content: center;
   margin: 0 auto var(--spacing-md);
 }
-.broadcast-modal__title {
+.notif-detail-modal__title {
   text-align: center;
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   color: var(--color-text-heading);
   margin-bottom: var(--spacing-xs);
 }
-.broadcast-modal__sender {
+.notif-detail-modal__sender {
   text-align: center;
   font-size: var(--text-sm);
   color: #db2777;
   font-weight: var(--weight-medium);
   margin-bottom: var(--spacing-lg);
 }
-.broadcast-modal__body {
+.notif-detail-modal__body {
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text);
   background: var(--color-bg-alt);
   border-radius: var(--rounded-md);
   padding: var(--spacing-md) var(--spacing-lg);
+  white-space: pre-line;
+  word-break: break-word;
 }
-.broadcast-enter-active,
-.broadcast-leave-active {
+.notif-detail-enter-active,
+.notif-detail-leave-active {
   transition: opacity .2s ease;
 }
-.broadcast-enter-active .broadcast-modal,
-.broadcast-leave-active .broadcast-modal {
+.notif-detail-enter-active .notif-detail-modal,
+.notif-detail-leave-active .notif-detail-modal {
   transition: transform .2s ease;
 }
-.broadcast-enter-from,
-.broadcast-leave-to {
+.notif-detail-enter-from,
+.notif-detail-leave-to {
   opacity: 0;
 }
-.broadcast-enter-from .broadcast-modal,
-.broadcast-leave-to .broadcast-modal {
+.notif-detail-enter-from .notif-detail-modal,
+.notif-detail-leave-to .notif-detail-modal {
   transform: scale(0.95);
 }
 </style>
+
