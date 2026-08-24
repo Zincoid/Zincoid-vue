@@ -1265,6 +1265,9 @@ function closeMenu() {
   white-space: pre-line;
   word-break: break-word;
 }
+[data-theme="dark"] .notif-detail-modal__body {
+  background: #23252f;
+}
 .notif-detail-modal__goto {
   display: block;
   text-align: center;

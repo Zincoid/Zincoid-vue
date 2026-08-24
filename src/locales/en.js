@@ -570,7 +570,7 @@ export default {
     accessGranted: 'approved your access request',
     accessRejected: 'rejected your access request',
     system: 'System broadcast',
-    request: 'You have request-related updates',
+    request: 'Request-related updates',
     viewRequests: 'Go to request management',
     markRead: 'Mark all read',
     deleteAll: 'Clear all',
