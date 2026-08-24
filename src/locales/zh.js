@@ -505,6 +505,8 @@ export default {
     unmute: '取消静音',
     list: '播放列表',
     pageSize: '每页 {size} 首',
+    public: '公共',
+    private: '私有',
     loadFailed: '加载音乐列表失败'
   },
   chat: {

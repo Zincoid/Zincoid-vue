@@ -5,6 +5,7 @@ import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
 import { musicAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
+import SliderSelect from '@/components/SliderSelect.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -27,6 +28,12 @@ const listPage = ref(1)
 const listPages = ref(1)
 const listSize = ref(10)
 const listLoading = ref(false)
+const musicScope = ref('public')
+
+const scopeOptions = computed(() => [
+  { value: 'public', label: t('walkman.public'), icon: 'world' },
+  { value: 'private', label: t('walkman.private'), icon: 'lock' }
+])
 
 const navbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 64
 const posX = ref(0)
@@ -92,7 +99,9 @@ function displayName(fileName) {
 async function loadList(pageNum) {
   listLoading.value = true
   try {
-    const res = await musicAPI.list(pageNum, listSize.value)
+    const res = musicScope.value === 'public'
+      ? await musicAPI.list(pageNum, listSize.value)
+      : await musicAPI.listUser(pageNum, listSize.value)
     const data = res.data?.data || {}
     const records = data.records || []
     listTracks.value = records
@@ -205,6 +214,10 @@ function onEnded() {
 
 watch(volume, v => {
   if (audioRef.value) audioRef.value.volume = v
+})
+
+watch(musicScope, () => {
+  loadList(1)
 })
 
 function toggleMute() {
@@ -348,6 +361,9 @@ onMounted(async () => {
         </div>
         <Transition name="walkman-list">
           <div v-if="listOpen" class="walkman__list">
+            <div class="walkman__list-head">
+              <SliderSelect v-model="musicScope" :options="scopeOptions" fill />
+            </div>
             <div v-if="listTracks.length" class="walkman__list-scroll">
               <div
                   v-for="tr in listTracks"
@@ -641,6 +657,22 @@ onMounted(async () => {
 [data-theme="dark"] .walkman__list {
   background: rgba(26, 29, 39, 0.6);
 }
+
+.walkman__list-head {
+  padding: var(--spacing-xs) var(--spacing-xs) 0;
+}
+.walkman__list-head :deep(.slider-select) {
+  background: transparent;
+  border: none;
+}
+.walkman__list-head :deep(.slider-select__indicator) {
+  background: rgba(236, 72, 153, 0.15);
+}
+.walkman__list-head :deep(.slider-select__btn) { font-size: 10px; padding: var(--spacing-xs) var(--spacing-md); }
+.walkman__list-head :deep(.slider-select__btn svg) { width: 10px; height: 10px; }
+.walkman__list-head :deep(.slider-select__btn--active) { color: #db2777; }
+.walkman__list-head :deep(.slider-select__btn--active:hover) { color: #db2777; }
+.walkman__list-head :deep(.slider-select__btn:hover) { color: var(--color-text-heading); }
 
 .walkman__list-scroll {
   max-height: 128px;

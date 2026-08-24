@@ -505,6 +505,8 @@ export default {
     unmute: 'Unmute',
     list: 'Playlist',
     pageSize: '{size} per page',
+    public: 'Public',
+    private: 'Private',
     loadFailed: 'Failed to load playlist'
   },
   chat: {
