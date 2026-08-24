@@ -310,7 +310,7 @@ async function submitRequest() {
             </select>
           </div>
           <textarea v-model="reqReason" class="field__input request-reason" rows="3" maxlength="200" :placeholder="t('data.requestCapacityReason')"></textarea>
-          <div class="modal__actions">
+          <div class="modal__actions request-actions">
             <button class="btn btn--primary btn--full" :disabled="reqSubmitting || isNaN(parseFloat(reqValue)) || parseFloat(reqValue) <= 0" @click="submitRequest">
               {{ reqSubmitting ? t('common.submitting') : t('common.confirm') }}
             </button>
@@ -453,6 +453,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 .storage-chart__label { font-size: var(--text-xs); color: var(--color-text-secondary); }
 
 .request-form { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+.request-actions { margin-top: var(--spacing-md) !important; padding-top: var(--spacing-md) !important; }
 .request-reason { width: 100%; resize: vertical; min-height: 60px; font-family: var(--font-mono); }
 .capacity-select {
   width: 100px;
