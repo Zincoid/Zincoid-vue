@@ -297,6 +297,8 @@ export default {
     musicRequest: 'Music Request',
     musicLabel: 'Music',
     musicPending: 'Available after approval',
+    playInWalkman: 'Play in walkman',
+    musicDownload: 'Download',
     reasonLabel: 'Reason: ',
     contentLabel: 'Content: ',
     reason: 'Reason',

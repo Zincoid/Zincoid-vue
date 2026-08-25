@@ -6,6 +6,7 @@ import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 import { requestAPI } from '@/api'
+import { useWalkman } from '@/composables/useWalkman'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -16,6 +17,12 @@ const { t } = useI18n()
 const { confirm } = useConfirm()
 const { toast } = useToast()
 const router = useRouter()
+const { playExternal } = useWalkman()
+
+function playInWalkman() {
+  if (!detail.value) return
+  playExternal({ name: musicName(detail.value), url: musicUrl(detail.value) })
+}
 const { load: loadConfig, get: getConfig } = useConfig()
 
 const activeTab = ref('received')
@@ -140,9 +147,17 @@ const TYPE_VIEWS = {
   2: {
     labelKey: 'request.musicRequest',
     meta(r) {
-      const url = musicUrl(r)
-      return url ? url.split('/').pop() : ''
+      return musicName(r)
     }
+  }
+}
+
+function musicName(r) {
+  try {
+    const meta = JSON.parse(r.meta || '{}')
+    return (meta.name || '').replace(/\.[^.]+$/, '')
+  } catch {
+    return ''
   }
 }
 
@@ -399,15 +414,23 @@ function formatSize(bytes) {
               </div>
             </template>
             <template v-else-if="detail.type === 2">
-              <div v-if="musicUrl(detail)" class="detail-row">
+              <div v-if="musicName(detail)" class="detail-row">
                 <span class="detail-label">{{ t('request.musicLabel') }}</span>
-                <span class="detail-value">
-                  <audio :src="musicUrl(detail)" controls class="detail-audio"></audio>
-                </span>
+                <span class="detail-value">{{ musicName(detail) }}</span>
               </div>
               <div v-else class="detail-row">
                 <span class="detail-label">{{ t('request.musicLabel') }}</span>
                 <span class="detail-value">{{ t('request.musicPending') }}</span>
+              </div>
+              <div v-if="musicUrl(detail)" class="detail-actions">
+                <button class="btn btn--outline" @click="playInWalkman">
+                  <SvgIcon name="audio" :size="14" />
+                  {{ t('request.playInWalkman') }}
+                </button>
+                <a class="btn btn--outline" :href="musicUrl(detail)" :download="musicName(detail)">
+                  <SvgIcon name="download" :size="14" />
+                  {{ t('request.musicDownload') }}
+                </a>
               </div>
             </template>
           </div>
@@ -555,7 +578,8 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .detail-label { color: var(--color-text-secondary); flex-shrink: 0; width: 64px; }
 .detail-value { color: var(--color-text-heading); flex: 1; min-width: 0; word-break: break-word; }
 .detail-value--wrap { white-space: pre-wrap; }
-.detail-audio { height: 32px; max-width: 100%; }
+.detail-actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+.detail-actions .btn { flex: 1; padding: var(--spacing-xs) var(--spacing-md); }
 .detail-block .request-card__status { display: inline-block; margin: 0; }
 
 .request-actions { width: 100%; }

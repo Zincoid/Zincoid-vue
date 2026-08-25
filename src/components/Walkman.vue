@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
+import { useWalkman } from '@/composables/useWalkman'
 import { musicAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -10,6 +11,7 @@ import SliderSelect from '@/components/SliderSelect.vue'
 const { t } = useI18n()
 const { getMessage } = useError()
 const { load: loadConfig, get: getConfig } = useConfig()
+const { external } = useWalkman()
 
 const open = ref(false)
 const listOpen = ref(false)
@@ -249,6 +251,16 @@ watch(volume, v => {
 
 watch(musicScope, () => {
   loadList(1)
+})
+
+watch(external, (track) => {
+  if (!track?.url) return
+  currentTrack.value = { id: -1, fileName: track.name, url: track.url }
+  currentIndex.value = -1
+  docked.value = false
+  posX.value = 16
+  open.value = true
+  nextTick(() => audioRef.value.play())
 })
 
 function toggleMute() {

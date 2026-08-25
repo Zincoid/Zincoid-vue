@@ -297,6 +297,8 @@ export default {
     musicRequest: '音乐请求',
     musicLabel: '音乐',
     musicPending: '批准后可获取',
+    playInWalkman: '在随身听中播放',
+    musicDownload: '下载',
     reasonLabel: '原因：',
     contentLabel: '内容：',
     reason: '原因',
