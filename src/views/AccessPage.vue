@@ -7,6 +7,7 @@ import { useConfig } from '@/composables/useConfig'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import { formatDate } from '@/utils/format'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -96,6 +97,7 @@ function statusLabel(s) {
                     <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                   </div>
                 </div>
+                <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
                 <div class="access-card__actions">
                   <button class="access-card__btn access-card__btn--reject" @click="rejectAccess(a.id)">{{ t('access.reject') }}</button>
@@ -117,6 +119,7 @@ function statusLabel(s) {
                     <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                   </div>
                 </div>
+                <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
                 <button class="access-card__btn access-card__btn--remove" @click="remove(a.id)">{{ t('access.revoke') }}</button>
               </div>
@@ -137,6 +140,7 @@ function statusLabel(s) {
             <div class="access-list">
               <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoNameOf(a) }}</span>
+                <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
@@ -147,6 +151,7 @@ function statusLabel(s) {
             <div class="access-list">
               <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo">{{ repoNameOf(a) }}</span>
+                <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
@@ -175,7 +180,8 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; }
 .access-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; }
 .access-card__repo { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-.access-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); margin-right: var(--spacing-sm); }
+.access-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
+.access-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
 .access-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }
 .access-card__status.approved { color: #16a34a; background: rgba(22,163,74,0.1); }
 .access-card__status.rejected { color: #dc2626; background: rgba(220,38,38,0.1); }
