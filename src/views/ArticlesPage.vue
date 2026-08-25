@@ -77,7 +77,7 @@ function onPageChange(p) {
     <button
       class="pin-fab"
       :class="{ 'pin-fab--active': pinnedFirst }"
-      :title="t('article.pinnedFirst')"
+      :title="pinnedFirst ? t('common.unpin') : t('common.pin')"
       @click="pinnedFirst = !pinnedFirst; page = 1; fetchArticles()"
     >
       <SvgIcon :name="pinnedFirst ? 'pin-off' : 'pin'" :size="20" />

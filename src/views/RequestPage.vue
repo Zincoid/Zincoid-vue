@@ -136,6 +136,22 @@ const TYPE_VIEWS = {
         return t('request.untitled')
       }
     }
+  },
+  2: {
+    labelKey: 'request.musicRequest',
+    meta(r) {
+      const url = musicUrl(r)
+      return url ? url.split('/').pop() : ''
+    }
+  }
+}
+
+function musicUrl(r) {
+  try {
+    const meta = JSON.parse(r.meta || '{}')
+    return meta.url || ''
+  } catch {
+    return ''
   }
 }
 
@@ -382,6 +398,18 @@ function formatSize(bytes) {
                 <span class="detail-value detail-value--wrap">{{ requestReason(detail) }}</span>
               </div>
             </template>
+            <template v-else-if="detail.type === 2">
+              <div v-if="musicUrl(detail)" class="detail-row">
+                <span class="detail-label">{{ t('request.musicLabel') }}</span>
+                <span class="detail-value">
+                  <audio :src="musicUrl(detail)" controls class="detail-audio"></audio>
+                </span>
+              </div>
+              <div v-else class="detail-row">
+                <span class="detail-label">{{ t('request.musicLabel') }}</span>
+                <span class="detail-value">{{ t('request.musicPending') }}</span>
+              </div>
+            </template>
           </div>
 
           <div class="detail-block">
@@ -527,6 +555,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .detail-label { color: var(--color-text-secondary); flex-shrink: 0; width: 64px; }
 .detail-value { color: var(--color-text-heading); flex: 1; min-width: 0; word-break: break-word; }
 .detail-value--wrap { white-space: pre-wrap; }
+.detail-audio { height: 32px; max-width: 100%; }
 .detail-block .request-card__status { display: inline-block; margin: 0; }
 
 .request-actions { width: 100%; }

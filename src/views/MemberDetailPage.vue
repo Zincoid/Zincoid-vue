@@ -1,10 +1,13 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { userAPI, momentAPI, articleAPI, repoAPI } from '@/api'
+import { userAPI, momentAPI, articleAPI, repoAPI, requestAPI } from '@/api'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { useThemeStore } from '@/stores/theme'
+import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
+import { useError } from '@/composables/useError'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import RepoCard from '@/components/RepoCard.vue'
@@ -18,6 +21,29 @@ import FabContainer from '@/components/FabContainer.vue'
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
 const themeStore = useThemeStore()
+const auth = useAuthStore()
+const { toast } = useToast()
+const { getMessage } = useError()
+
+const settingsOpen = ref(false)
+const musicSending = ref(false)
+
+function openSettings() {
+  settingsOpen.value = true
+}
+
+async function sendMusicRequest() {
+  musicSending.value = true
+  try {
+    await requestAPI.create(userId.value, 'MUSIC_REQUEST')
+    toast(t('user.musicRequestSuccess'), 'success')
+    settingsOpen.value = false
+  } catch (err) {
+    toast(getMessage(err, 'user.musicRequestFailed'), 'error')
+  } finally {
+    musicSending.value = false
+  }
+}
 
 const skillColors = computed(() => {
   if (themeStore.theme === 'dark') {
@@ -59,6 +85,8 @@ const notFound = ref(false)
 const banned = ref(false)
 const pinnedMoments = ref(false)
 const pinnedArticles = ref(false)
+
+const isPinned = computed(() => (tab.value === 'moments' && pinnedMoments.value) || (tab.value === 'articles' && pinnedArticles.value))
 const tabLoading = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
@@ -218,16 +246,44 @@ function typeLabel(type) {
 
   <FabContainer>
     <button
+      v-if="auth.isLoggedIn && userId !== auth.user?.id"
+      class="pin-fab pin-fab--settings"
+      :title="t('user.setting')"
+      @click="openSettings">
+      <SvgIcon name="settings" :size="20" />
+    </button>
+    <button
       v-if="tab !== 'repos'"
       class="pin-fab"
-      :class="{ 'pin-fab--active': (tab === 'moments' && pinnedMoments) || (tab === 'articles' && pinnedArticles) }"
+      :class="{ 'pin-fab--active': isPinned }"
+      :title="isPinned ? t('common.unpin') : t('common.pin')"
       @click="togglePinned">
-      <SvgIcon :name="((tab === 'moments' && pinnedMoments) || (tab === 'articles' && pinnedArticles)) ? 'pin-off' : 'pin'" :size="20" />
+      <SvgIcon :name="isPinned ? 'pin-off' : 'pin'" :size="20" />
     </button>
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
       <SvgIcon name="back-arrow" :size="20" />
     </button>
   </FabContainer>
+
+  <Transition name="modal">
+    <div v-if="settingsOpen" class="modal-overlay" @click.self="settingsOpen = false">
+      <div class="modal">
+        <h3 class="modal__title">
+          <span>{{ t('user.setting') }}</span>
+          <button class="modal__close" @click="settingsOpen = false">
+            <SvgIcon name="close" :size="16" />
+          </button>
+        </h3>
+        <p class="modal__desc">{{ t('user.musicRequestDesc') }}</p>
+        <div class="modal__actions">
+          <button class="btn btn--primary btn--full" :disabled="musicSending" @click="sendMusicRequest">
+            <SvgIcon name="audio" :size="16" />
+            {{ t('user.musicRequestSend') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -356,6 +412,37 @@ function typeLabel(type) {
 
 .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--spacing-md); }
 .repo-grid > * { cursor: pointer; }
+
+.pin-fab--settings:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+/* ── Settings modal ── */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
+.modal { position: relative; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); max-width: 440px; width: 100%; padding: var(--spacing-2xl); max-height: 80vh; overflow-y: auto; }
+.modal__title { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
+.modal__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
+.modal__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); }
+.modal-enter-active, .modal-leave-active { transition: opacity .2s ease; }
+.modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .modal, .modal-leave-to .modal { transform: scale(0.95); }
 
 @media (max-width: 600px) {
   .profile-header {

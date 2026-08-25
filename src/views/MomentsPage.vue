@@ -259,7 +259,7 @@ async function submitMoment() {
     <button
       class="pin-fab"
       :class="{ 'pin-fab--active': pinnedFirst }"
-      :title="t('moment.pinnedFirst')"
+      :title="pinnedFirst ? t('common.unpin') : t('common.pin')"
       @click="pinnedFirst = !pinnedFirst; page = 1; fetchMoments()"
     >
       <SvgIcon :name="pinnedFirst ? 'pin-off' : 'pin'" :size="20" />
