@@ -562,12 +562,42 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }
 .request-card__status.approved { color: #16a34a; background: rgba(22,163,74,0.1); }
 .request-card__status.rejected { color: #dc2626; background: rgba(220,38,38,0.1); }
-.request-card__actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
+.request-card__actions { display: flex; gap: 0; flex-shrink: 0; }
 .request-card__btn { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
 .request-card__btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.request-card__btn--reject { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: var(--color-text-secondary); }
+.request-card__btn--reject {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  margin-right: var(--spacing-sm);
+  transition: width var(--transition-fast), opacity var(--transition-fast), margin var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+.request-card:not(:hover) .request-card__btn--reject { width: 0; margin-right: 0; opacity: 0; }
 .request-card__btn--reject:hover:not(:disabled) { color: #dc2626; background: rgba(220,38,38,0.1); }
-.request-card__btn--allow { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: var(--color-text-secondary); }
+.request-card__btn--allow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  margin-right: var(--spacing-sm);
+  transition: width var(--transition-fast), opacity var(--transition-fast), margin var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+}
+.request-card:not(:hover) .request-card__btn--allow { width: 0; margin-right: 0; opacity: 0; }
 .request-card__btn--allow:hover:not(:disabled) { color: #16a34a; background: rgba(22,163,74,0.1); }
 .request-card__btn--del { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: var(--color-text-secondary); }
 .request-card__btn--del:hover:not(:disabled) { color: #d97706; background: rgba(217, 119, 6, 0.1); }
