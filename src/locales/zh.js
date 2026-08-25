@@ -293,6 +293,8 @@ export default {
     adminPending: '管理请求：待处理',
     handledBy: '由 {name} 处理',
     adminHandledBy: '管理请求：由 {name} 处理',
+    fromLabel: '来自：',
+    toLabel: '发送给：',
     storageExtension: '存储扩容',
     report: '报告',
     untitled: '无标题',

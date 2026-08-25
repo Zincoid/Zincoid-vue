@@ -293,6 +293,8 @@ export default {
     adminPending: 'Admin request: Pending',
     handledBy: 'Handled by {name}',
     adminHandledBy: 'Admin request: Handled by {name}',
+    fromLabel: 'From: ',
+    toLabel: 'To: ',
     storageExtension: 'Storage Expansion',
     report: 'Report',
     untitled: 'Untitled',

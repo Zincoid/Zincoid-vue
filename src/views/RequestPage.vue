@@ -184,6 +184,19 @@ function reasonPrefix(r) {
   return r.type === 1 ? t('request.contentLabel') : t('request.reasonLabel')
 }
 
+function isAdminRequest(r) {
+  return r.type === 0 || r.type === 1
+}
+
+function sentUserLabel(r) {
+  if (isAdminRequest(r)) {
+    return r.receiverName
+      ? t('request.adminHandledBy', { name: r.receiverName })
+      : t('request.adminPending')
+  }
+  return t('request.toLabel') + (r.receiverName || t('request.waitingAdmin'))
+}
+
 function requestReason(r) {
   try {
     const meta = JSON.parse(r.meta || '{}')
@@ -240,7 +253,7 @@ function formatSize(bytes) {
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
+                    <span class="request-card__user">{{ t('request.fromLabel') }}{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
@@ -280,7 +293,7 @@ function formatSize(bytes) {
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
+                    <span class="request-card__user">{{ t('request.fromLabel') }}{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
@@ -319,7 +332,7 @@ function formatSize(bytes) {
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ r.receiverName || t('request.adminPending') }}</span>
+                    <span class="request-card__user">{{ sentUserLabel(r) }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
@@ -349,7 +362,7 @@ function formatSize(bytes) {
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ r.receiverName ? t('request.adminHandledBy', { name: r.receiverName }) : t('request.adminPending') }}</span>
+                    <span class="request-card__user">{{ sentUserLabel(r) }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
