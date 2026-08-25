@@ -121,9 +121,9 @@ const TYPE_VIEWS = {
     meta(r) {
       try {
         const meta = JSON.parse(r.meta || '{}')
-        return meta.content || ''
+        return meta.title || t('request.untitled')
       } catch {
-        return ''
+        return t('request.untitled')
       }
     }
   }
@@ -139,9 +139,14 @@ function requestMeta(r) {
   return view ? view.meta(r) : ''
 }
 
+function reasonPrefix(r) {
+  return r.type === 1 ? t('request.contentLabel') : t('request.reasonLabel')
+}
+
 function requestReason(r) {
   try {
     const meta = JSON.parse(r.meta || '{}')
+    if (r.type === 1) return meta.content || ''
     return meta.reason || ''
   } catch {
     return ''
@@ -192,9 +197,10 @@ function formatSize(bytes) {
                     <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
+                      <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ reasonPrefix(r) }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -231,9 +237,10 @@ function formatSize(bytes) {
                     <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
+                      <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ reasonPrefix(r) }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
@@ -269,9 +276,10 @@ function formatSize(bytes) {
                     <span class="request-card__user">{{ r.receiverName || t('request.waitingAdmin') }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
+                      <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ reasonPrefix(r) }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
@@ -298,9 +306,10 @@ function formatSize(bytes) {
                     <span class="request-card__user">{{ r.receiverName ? t('request.handledBy', { name: r.receiverName }) : t('request.waitingAdmin') }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
+                      <span v-if="requestMeta(r)" class="request-card__type-sep">-</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
                     </span>
-                    <span v-if="requestReason(r)" class="request-card__reason">{{ t('request.reasonLabel') }}{{ requestReason(r) }}</span>
+                    <span v-if="requestReason(r)" class="request-card__reason">{{ reasonPrefix(r) }}{{ requestReason(r) }}</span>
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
@@ -339,9 +348,10 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; min-width: 0; }
 .request-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .request-card__type { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; margin-top: 2px; }
-.request-card__type-name { flex-shrink: 0; }
+.request-card__type-name { flex-shrink: 0; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.request-card__type-sep { color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
 .request-card__reason { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
-.request-card__meta { font-family: var(--font-mono); color: var(--color-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.request-card__meta { font-family: var(--font-mono); color: var(--color-primary); flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .request-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
 .request-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
 .request-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }

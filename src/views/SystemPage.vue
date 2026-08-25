@@ -23,11 +23,13 @@ const { getMessage } = useError()
 const { toast } = useToast()
 
 const reportOpen = ref(false)
+const reportTitle = ref('')
 const reportContent = ref('')
 const reportError = ref('')
 const reportSubmitting = ref(false)
 
 function openReport() {
+  reportTitle.value = ''
   reportContent.value = ''
   reportError.value = ''
   reportOpen.value = true
@@ -38,12 +40,13 @@ function closeReport() {
 }
 
 async function submitReport() {
+  const title = reportTitle.value.trim()
   const content = reportContent.value.trim()
-  if (!content) return
+  if (!title || !content) return
   reportSubmitting.value = true
   reportError.value = ''
   try {
-    await requestAPI.create(-1, 'REPORT', JSON.stringify({ content }))
+    await requestAPI.create(-1, 'REPORT', JSON.stringify({ title, content }))
     toast(t('system.reportSuccess'), 'success')
     reportOpen.value = false
   } catch (err) {
@@ -353,6 +356,12 @@ watch(done, (v) => {
             </h3>
             <p class="modal__desc">{{ t('system.reportDesc') }}</p>
             <p v-if="reportError" class="msg msg--error">{{ reportError }}</p>
+            <input
+                v-model="reportTitle"
+                class="field__input report-title"
+                maxlength="100"
+                :placeholder="t('system.reportTitlePlaceholder')"
+            />
             <textarea
                 v-model="reportContent"
                 class="field__input report-content"
@@ -361,7 +370,7 @@ watch(done, (v) => {
                 :placeholder="t('system.reportPlaceholder')"
             ></textarea>
             <div class="modal__actions">
-              <button class="btn btn--primary btn--full" :disabled="reportSubmitting || !reportContent.trim()" @click="submitReport">
+              <button class="btn btn--primary btn--full" :disabled="reportSubmitting || !reportTitle.trim() || !reportContent.trim()" @click="submitReport">
                 <SvgIcon name="send" :size="16" />
                 {{ t('system.reportSubmit') }}
               </button>
@@ -434,6 +443,11 @@ watch(done, (v) => {
   width: 100%;
   resize: vertical;
   min-height: 96px;
+}
+
+.report-title {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
 }
 
 .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
