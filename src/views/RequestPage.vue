@@ -1,5 +1,6 @@
 ﻿<script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
@@ -13,6 +14,7 @@ import { formatDate } from '@/utils/format'
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const { toast } = useToast()
+const router = useRouter()
 const { load: loadConfig, get: getConfig } = useConfig()
 
 const activeTab = ref('received')
@@ -172,7 +174,7 @@ function formatSize(bytes) {
             <h3>{{ t('request.pendingRequests') }}</h3>
             <div class="request-list">
               <div v-for="r in rpData.records" :key="r.id" class="request-card">
-                <div class="request-card__left">
+                <div class="request-card__left" @click="router.push(`/members/${r.senderId}`)">
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -211,7 +213,7 @@ function formatSize(bytes) {
             <h3>{{ t('request.resolvedRequests') }}</h3>
             <div class="request-list">
               <div v-for="r in rrData.records" :key="r.id" class="request-card">
-                <div class="request-card__left">
+                <div class="request-card__left" @click="router.push(`/members/${r.senderId}`)">
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -249,7 +251,7 @@ function formatSize(bytes) {
             <h3>{{ t('request.pendingSent') }}</h3>
             <div class="request-list">
               <div v-for="r in spData.records" :key="r.id" class="request-card">
-                <div class="request-card__left">
+                <div class="request-card__left" @click="r.receiverId > 0 && router.push(`/members/${r.receiverId}`)">
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -278,7 +280,7 @@ function formatSize(bytes) {
             <h3>{{ t('request.resolvedSent') }}</h3>
             <div class="request-list">
               <div v-for="r in srData.records" :key="r.id" class="request-card">
-                <div class="request-card__left">
+                <div class="request-card__left" @click="r.receiverId > 0 && router.push(`/members/${r.receiverId}`)">
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -320,7 +322,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); transition: border-color var(--transition-fast); }
 .request-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
 [data-theme="dark"] .request-card:hover { background: #23252f; }
-.request-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; }
+.request-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: pointer; }
 .request-card__avatar { width: 40px; height: 40px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0; }
 .request-card__avatar-placeholder { width: 40px; height: 40px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--weight-medium); flex-shrink: 0; }
 .request-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; }
