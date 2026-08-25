@@ -352,7 +352,7 @@ watch(done, (v) => {
 .system-info__label { color: var(--color-text-secondary); flex-shrink: 0; }
 .system-info__value { color: var(--color-text-secondary); font-weight: var(--weight-medium); word-break: break-all; text-align: right; }
 .system-info__value--mono { font-family: var(--font-mono); }
-.system-info__hint { color: var(--color-text-secondary); font-weight: var(--weight-regular); }
+.system-info__hint { color: var(--color-text-secondary); font-weight: var(--weight-normal); }
 
 .section { margin-top: var(--spacing-3xl); }
 .section h3 { margin-bottom: var(--spacing-lg); }
@@ -404,7 +404,7 @@ watch(done, (v) => {
 
 .stats-chart {
   width: 100%;
-  height: 260px;
+  height: 310px;
 }
 
 @media (max-width: 900px) {
