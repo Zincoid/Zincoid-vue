@@ -238,10 +238,10 @@ async function handleDelete() {
   animation: user-card-marquee 5s linear infinite;
 }
 @keyframes user-card-marquee {
-  0%, 10% { transform: translateX(0); }
-  45% { transform: translateX(calc(-1 * var(--distance))); }
-  55% { transform: translateX(calc(-1 * var(--distance))); }
-  90%, 100% { transform: translateX(0); }
+  0%, 20% { transform: translateX(0); }
+  40% { transform: translateX(calc(-1 * var(--distance))); }
+  60% { transform: translateX(calc(-1 * var(--distance))); }
+  80%, 100% { transform: translateX(0); }
 }
 
 .user-card__actions {
