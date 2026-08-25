@@ -422,7 +422,7 @@ export default {
   },
   system: {
     pageTitle: 'System',
-    subtitle: 'System information & statistics',
+    subtitle: 'System information, statistics & report',
     siteName: 'Site name',
     developer: 'Developer',
     frontendVersion: 'Frontend version',

@@ -422,7 +422,7 @@ export default {
   },
   system: {
     pageTitle: '系统',
-    subtitle: '系统信息与统计数据',
+    subtitle: '系统信息、统计数据与问题报告',
     siteName: '网站名',
     developer: '开发者',
     frontendVersion: '前端构建版本',
