@@ -297,6 +297,7 @@ export default {
     musicRequest: 'Music Request',
     musicLabel: 'Music',
     musicPending: 'Available after approval',
+    musicNone: 'No music available',
     playInWalkman: 'Play',
     musicDownload: 'Download',
     operationLabel: 'Actions',

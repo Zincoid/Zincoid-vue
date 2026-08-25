@@ -425,7 +425,7 @@ function formatSize(bytes) {
               </div>
               <div v-else class="detail-row">
                 <span class="detail-label">{{ t('request.musicLabel') }}</span>
-                <span class="detail-value">{{ t('request.musicPending') }}</span>
+                <span class="detail-value">{{ detail.access === 1 ? t('request.musicNone') : t('request.musicPending') }}</span>
               </div>
               <div v-if="musicUrl(detail)" class="detail-row detail-row--center">
                 <span class="detail-label">{{ t('request.operationLabel') }}</span>
