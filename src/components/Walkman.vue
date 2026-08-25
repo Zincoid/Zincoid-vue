@@ -694,6 +694,7 @@ onMounted(async () => {
 .walkman__list-scroll::-webkit-scrollbar { width: 4px; }
 .walkman__list-scroll::-webkit-scrollbar-track { margin: 6px 0; }
 .walkman__list-scroll::-webkit-scrollbar-thumb { background: var(--color-border); }
+.walkman__list-scroll::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .walkman__track {
   position: relative;
