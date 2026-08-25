@@ -131,7 +131,11 @@ function renderDaily() {
       backgroundColor: tooltipBg,
       borderColor: tooltipBorder,
       borderRadius: 8,
-      textStyle: { color: tooltipText }
+      textStyle: { color: tooltipText },
+      formatter: (params) => {
+        const p = params[0]
+        return p ? `${p.marker} ${t('system.statsDailyShort')} ${p.value}` : ''
+      }
     },
     grid: { left: 40, right: 16, top: 24, bottom: 24 },
     xAxis: {
