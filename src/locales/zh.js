@@ -514,7 +514,7 @@ export default {
     'Not a music file': '非音乐文件',
     'Sender and receiver cannot be the same': '发送者和接收者不能相同',
     'Invalid handle status': '无效的处理状态',
-    'Invalid expansion in request': '无效的请求扩容'
+    'Invalid request meta': '无效的请求元数据'
   },
   maintenance: {
     message: '服务器暂时不可用，请稍后重试。',
