@@ -232,6 +232,10 @@ function ensurePlayList() {
   playPage.value = listPage.value
   playPages.value = listPages.value
   playTotal.value = listTotal.value
+  if (currentTrack.value) {
+    const idx = tracks.value.findIndex(t => t.id === currentTrack.value.id)
+    if (idx >= 0) currentIndex.value = idx
+  }
 }
 
 async function next() {
