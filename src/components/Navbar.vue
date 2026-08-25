@@ -756,6 +756,7 @@ function closeMenu() {
 .navbar__notif-dropdown-body::-webkit-scrollbar-thumb {
   background: var(--color-border);
 }
+.navbar__notif-dropdown-body::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .navbar__notif-empty {
   text-align: center;

@@ -20,31 +20,33 @@ watch(() => props.suggestions, () => {
 </script>
 
 <template>
-  <div
-    v-if="suggestions.length"
-    class="mention-dropdown"
-    :style="{ top: pos.top + 'px', left: pos.left + 'px' }"
-  >
-    <div ref="scrollEl" class="mention-dropdown__scroll" :class="{ 'mention-dropdown__scroll--bar': hasScrollbar }">
-      <div
-        v-for="user in suggestions"
-        :key="user.id"
-        class="mention-dropdown__item"
-        @mousedown.prevent="emit('select', user.username)"
-      >
-        <img v-if="user.avatar" :src="user.avatar" class="mention-dropdown__avatar" />
-        <span v-else class="mention-dropdown__avatar-placeholder">{{ (user.nickname || '?')[0] }}</span>
-        <span class="mention-dropdown__name">{{ user.nickname }}</span>
-        <span class="mention-dropdown__username">@{{ user.username }}</span>
+  <Teleport to="body">
+    <div
+      v-if="suggestions.length"
+      class="mention-dropdown"
+      :style="{ top: pos.top + 'px', left: pos.left + 'px' }"
+    >
+      <div ref="scrollEl" class="mention-dropdown__scroll" :class="{ 'mention-dropdown__scroll--bar': hasScrollbar }">
+        <div
+          v-for="user in suggestions"
+          :key="user.id"
+          class="mention-dropdown__item"
+          @mousedown.prevent="emit('select', user.username)"
+        >
+          <img v-if="user.avatar" :src="user.avatar" class="mention-dropdown__avatar" />
+          <span v-else class="mention-dropdown__avatar-placeholder">{{ (user.nickname || '?')[0] }}</span>
+          <span class="mention-dropdown__name">{{ user.nickname }}</span>
+          <span class="mention-dropdown__username">@{{ user.username }}</span>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
 .mention-dropdown {
-  position: absolute;
-  z-index: 200;
+  position: fixed;
+  z-index: 300;
   transform: translateY(-100%);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -65,6 +67,7 @@ watch(() => props.suggestions, () => {
   background: var(--color-border);
   border-radius: 2px;
 }
+.mention-dropdown__scroll::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 .mention-dropdown__item {
   display: flex;
   align-items: center;

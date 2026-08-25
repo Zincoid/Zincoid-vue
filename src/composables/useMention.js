@@ -92,9 +92,10 @@ export function useMention() {
     span.textContent = '​'
     mirror.appendChild(span)
 
+    const rect = mirror.getBoundingClientRect()
     const result = {
-      top: textarea.offsetTop + span.offsetTop - 8,
-      left: textarea.offsetLeft + span.offsetLeft + 8
+      top: rect.top + span.offsetTop - 8,
+      left: rect.left + span.offsetLeft + 8
     }
     container.removeChild(mirror)
     return result
