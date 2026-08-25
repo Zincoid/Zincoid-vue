@@ -56,6 +56,7 @@ let wasDocked = false
 let suppressClick = false
 
 const audioRef = ref(null)
+const listScrollRef = ref(null)
 
 const progress = computed(() => {
   if (!duration.value) return 0
@@ -134,6 +135,14 @@ async function loadPlayList(pageNum) {
   playPages.value = data.pages || 1
   playTotal.value = data.total || 0
   playPage.value = pageNum
+  listTracks.value = tracks.value
+  listPages.value = playPages.value
+  listTotal.value = playTotal.value
+  listPage.value = playPage.value
+  if (musicScope.value !== scope) {
+    scopeSyncing = true
+    musicScope.value = scope
+  }
 }
 
 function toggleList() {
@@ -172,6 +181,14 @@ function playTrack(index) {
   currentIndex.value = index
   currentTrack.value = tracks.value[index]
   nextTick(() => audioRef.value.play())
+  scrollToActive()
+}
+
+function scrollToActive() {
+  nextTick(() => {
+    const el = listScrollRef.value?.querySelector('.walkman__track--active')
+    el?.scrollIntoView({ block: 'nearest' })
+  })
 }
 
 function toggle() {
@@ -207,7 +224,18 @@ async function shuffleNext() {
   return true
 }
 
+function ensurePlayList() {
+  if (tracks.value.length) return
+  if (!listTracks.value.length) return
+  tracks.value = listTracks.value
+  playScope.value = musicScope.value
+  playPage.value = listPage.value
+  playPages.value = listPages.value
+  playTotal.value = listTotal.value
+}
+
 async function next() {
+  ensurePlayList()
   if (!tracks.value.length) return
   if (playSource.value === 'external') return
   if (playMode.value === 'shuffle' && await shuffleNext()) return
@@ -221,6 +249,7 @@ async function next() {
 }
 
 async function prev() {
+  ensurePlayList()
   if (!tracks.value.length) return
   if (playSource.value === 'external') return
   if (currentIndex.value > 0) {
@@ -272,7 +301,13 @@ watch(volume, v => {
   if (audioRef.value) audioRef.value.volume = v
 })
 
+let scopeSyncing = false
+
 watch(musicScope, () => {
+  if (scopeSyncing) {
+    scopeSyncing = false
+    return
+  }
   loadList(1)
 })
 
@@ -436,7 +471,7 @@ onMounted(async () => {
             <div class="walkman__list-head">
               <SliderSelect v-model="musicScope" :options="scopeOptions" fill />
             </div>
-            <div v-if="listTracks.length" class="walkman__list-scroll">
+            <div ref="listScrollRef" v-if="listTracks.length" class="walkman__list-scroll">
               <div
                   v-for="tr in listTracks"
                   :key="tr.id"
