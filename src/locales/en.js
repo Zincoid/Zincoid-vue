@@ -291,7 +291,6 @@ export default {
     noRequests: 'No requests.',
     waitingAdmin: 'Awaiting admin',
     adminPending: 'Admin request: Awaiting admin',
-    handledBy: 'Handled by {name}',
     adminHandledBy: 'Admin request: Handled by {name}',
     fromLabel: 'From: ',
     toLabel: 'To: ',

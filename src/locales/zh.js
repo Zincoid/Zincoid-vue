@@ -291,7 +291,6 @@ export default {
     noRequests: '暂无请求。',
     waitingAdmin: '待管理员处理',
     adminPending: '管理请求：待管理员处理',
-    handledBy: '由 {name} 处理',
     adminHandledBy: '管理请求：由 {name} 处理',
     fromLabel: '来自：',
     toLabel: '发送至：',
