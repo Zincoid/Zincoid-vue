@@ -79,7 +79,7 @@ function openDetail(r, received) {
 
 async function handleRequest(r, access) {
   if (handlingId.value) return
-  if (access === 1 && !await confirm(t('request.approveConfirm'))) return
+  if (!await confirm(access === 1 ? t('request.approveConfirm') : t('request.rejectConfirm'))) return
   handlingId.value = r.id
   try {
     await requestAPI.handle(r.id, access === 1 ? 'APPROVED' : 'REJECTED')
@@ -90,8 +90,9 @@ async function handleRequest(r, access) {
   }
 }
 
-async function handleDelete(r) {
+async function handleRevoke(r) {
   if (handlingId.value) return
+  if (!await confirm(t('request.deleteConfirm'))) return
   rpData.value.records = rpData.value.records.filter(x => x.id !== r.id)
   rrData.value.records = rrData.value.records.filter(x => x.id !== r.id)
   spData.value.records = spData.value.records.filter(x => x.id !== r.id)
@@ -219,7 +220,7 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
-                    @click="handleDelete(r)"
+                    @click="handleRevoke(r)"
                   >{{ t('request.remove') }}</button>
                   <button
                     class="request-card__btn request-card__btn--reject"
@@ -259,7 +260,7 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
-                    @click="handleDelete(r)"
+                    @click="handleRevoke(r)"
                   >{{ t('request.remove') }}</button>
                 </div>
               </div>
@@ -298,7 +299,7 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
-                    @click="handleDelete(r)"
+                    @click="handleRevoke(r)"
                   >{{ t('request.remove') }}</button>
                 </div>
               </div>
@@ -328,7 +329,7 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
-                    @click="handleDelete(r)"
+                    @click="handleRevoke(r)"
                   >{{ t('request.remove') }}</button>
                 </div>
               </div>
@@ -410,7 +411,7 @@ function formatSize(bytes) {
               <button
                 class="btn btn--outline"
                 :disabled="handlingId !== null"
-                @click="handleDelete(detail)"
+                @click="handleRevoke(detail)"
               >
                 <SvgIcon name="trash" :size="14" />
                 {{ t('request.remove') }}

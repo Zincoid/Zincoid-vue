@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { repoAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
+import { useConfirm } from '@/composables/useConfirm'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -12,6 +13,7 @@ import { formatDate } from '@/utils/format'
 const router = useRouter()
 const { t } = useI18n()
 const { load: loadConfig, get: getConfig } = useConfig()
+const { confirm } = useConfirm()
 
 const activeTab = ref('received')
 const loading = ref(true)
@@ -51,9 +53,18 @@ async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/a
 function repoNameOf(a) { return a.repoName || `#${a.repoId}` }
 function userNameOf(a) { return a.userNickname || `User#${a.userId}` }
 
-async function approve(id) { await repoAPI._put(`/access/${id}/approve`); fetchRP(); fetchRR() }
-async function rejectAccess(id) { await repoAPI._put(`/access/${id}/reject`); fetchRP(); fetchRR() }
-async function remove(id) { await repoAPI._delete(`/access/${id}`); fetchRR() }
+async function approve(id) {
+  if (!await confirm(t('access.approveConfirm'))) return
+  await repoAPI._put(`/access/${id}/approve`); fetchRP(); fetchRR()
+}
+async function rejectAccess(id) {
+  if (!await confirm(t('access.rejectConfirm'))) return
+  await repoAPI._put(`/access/${id}/reject`); fetchRP(); fetchRR()
+}
+async function revoke(id) {
+  if (!await confirm(t('access.revokeConfirm'))) return
+  await repoAPI._delete(`/access/${id}`); fetchRR()
+}
 
 function statusLabel(s) {
   if (s === 0) return t('access.pending')
@@ -121,7 +132,7 @@ function statusLabel(s) {
                 </div>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button class="access-card__btn access-card__btn--remove" @click="remove(a.id)">{{ t('access.revoke') }}</button>
+                <button class="access-card__btn access-card__btn--remove" @click="revoke(a.id)">{{ t('access.revoke') }}</button>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
