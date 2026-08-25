@@ -99,8 +99,8 @@ function statusLabel(s) {
           <div v-if="rpData.records.length" class="section">
             <h3>{{ t('access.pendingAuthorizations') }}</h3>
             <div class="access-list">
-              <div v-for="a in rpData.records" :key="a.id" class="access-card">
-                <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
+              <div v-for="a in rpData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
+                <div class="access-card__left">
                   <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
                   <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
                   <div class="access-card__info">
@@ -110,7 +110,7 @@ function statusLabel(s) {
                 </div>
                 <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
-                <div class="access-card__actions">
+                <div class="access-card__actions" @click.stop>
                   <button class="access-card__btn access-card__btn--reject" @click="rejectAccess(a.id)">{{ t('access.reject') }}</button>
                   <button class="access-card__btn access-card__btn--allow" @click="approve(a.id)">{{ t('access.approve') }}</button>
                 </div>
@@ -121,8 +121,8 @@ function statusLabel(s) {
           <div v-if="rrData.records.length" class="section">
             <h3>{{ t('access.resolvedAuthorizations') }}</h3>
             <div class="access-list">
-              <div v-for="a in rrData.records" :key="a.id" class="access-card">
-                <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
+              <div v-for="a in rrData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
+                <div class="access-card__left">
                   <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
                   <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
                   <div class="access-card__info">
@@ -132,7 +132,7 @@ function statusLabel(s) {
                 </div>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button class="access-card__btn access-card__btn--remove" @click="revoke(a.id)">{{ t('access.revoke') }}</button>
+                <button class="access-card__btn access-card__btn--remove" @click.stop="revoke(a.id)">{{ t('access.revoke') }}</button>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
@@ -182,7 +182,7 @@ function statusLabel(s) {
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-.access-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); transition: border-color var(--transition-fast); }
+.access-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); cursor: pointer; transition: border-color var(--transition-fast); }
 .access-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
 [data-theme="dark"] .access-card:hover { background: #23252f; }
 .access-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: pointer; }
