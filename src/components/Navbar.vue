@@ -96,7 +96,10 @@ watch(() => auth.isLoggedIn, (val) => {
 
 function toggleNotif() {
   notifOpen.value = !notifOpen.value
-  if (notifOpen.value) fetchNotifications()
+  if (notifOpen.value) {
+    fetchNotifications()
+    fetchUnreadCount()
+  }
 }
 
 function closeNotif() {
