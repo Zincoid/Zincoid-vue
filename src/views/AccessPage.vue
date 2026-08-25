@@ -139,7 +139,7 @@ function statusLabel(s) {
             <h3>{{ t('access.pendingAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
-                <span class="access-card__repo">{{ repoNameOf(a) }}</span>
+                <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
               </div>
@@ -150,7 +150,7 @@ function statusLabel(s) {
             <h3>{{ t('access.resolvedAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
-                <span class="access-card__repo">{{ repoNameOf(a) }}</span>
+                <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
               </div>
@@ -180,6 +180,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; }
 .access-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; }
 .access-card__repo { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.access-card__repo--fill { flex: 1; min-width: 0; }
 .access-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
 .access-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
 .access-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }
