@@ -266,20 +266,23 @@ function formatSize(bytes) {
                 <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
                 <div class="request-card__actions" @click.stop>
                   <button
-                    class="request-card__btn request-card__btn--del"
-                    :disabled="handlingId !== null"
-                    @click="handleRevoke(r)"
-                  >{{ t('request.remove') }}</button>
-                  <button
                     class="request-card__btn request-card__btn--reject"
                     :disabled="handlingId !== null"
+                    :title="t('request.reject')"
                     @click="handleRequest(r, 2)"
-                  >{{ t('request.reject') }}</button>
+                  ><SvgIcon name="close" :size="14" /></button>
                   <button
                     class="request-card__btn request-card__btn--allow"
                     :disabled="handlingId !== null"
+                    :title="t('request.approve')"
                     @click="handleRequest(r, 1)"
-                  >{{ t('request.approve') }}</button>
+                  ><SvgIcon name="check" :size="14" /></button>
+                  <button
+                    class="request-card__btn request-card__btn--del"
+                    :disabled="handlingId !== null"
+                    :title="t('request.remove')"
+                    @click="handleRevoke(r)"
+                  ><SvgIcon name="trash" :size="14" /></button>
                 </div>
               </div>
             </div>
@@ -308,8 +311,9 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
+                    :title="t('request.remove')"
                     @click="handleRevoke(r)"
-                  >{{ t('request.remove') }}</button>
+                  ><SvgIcon name="trash" :size="14" /></button>
                 </div>
               </div>
             </div>
@@ -347,8 +351,9 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
+                    :title="t('request.remove')"
                     @click="handleRevoke(r)"
-                  >{{ t('request.remove') }}</button>
+                  ><SvgIcon name="trash" :size="14" /></button>
                 </div>
               </div>
             </div>
@@ -377,8 +382,9 @@ function formatSize(bytes) {
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
+                    :title="t('request.remove')"
                     @click="handleRevoke(r)"
-                  >{{ t('request.remove') }}</button>
+                  ><SvgIcon name="trash" :size="14" /></button>
                 </div>
               </div>
             </div>
@@ -480,7 +486,7 @@ function formatSize(bytes) {
           <div class="modal__actions request-actions">
             <div class="request-actions-row">
               <button
-                class="btn btn--outline"
+                class="btn btn--outline btn--revoke"
                 :disabled="handlingId !== null"
                 @click="handleRevoke(detail)"
               >
@@ -559,12 +565,12 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
 .request-card__btn { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
 .request-card__btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.request-card__btn--reject { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); background: transparent; }
-.request-card__btn--reject:hover:not(:disabled) { background: rgba(220,38,38,0.08); }
-.request-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); background: transparent; }
-.request-card__btn--allow:hover:not(:disabled) { background: rgba(22,163,74,0.08); }
-.request-card__btn--del { display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); border: 1px solid var(--color-border); background: transparent; }
-.request-card__btn--del:hover:not(:disabled) { color: #dc2626; border-color: #dc2626; background: rgba(220,38,38,0.04); }
+.request-card__btn--reject { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: #dc2626; }
+.request-card__btn--reject:hover:not(:disabled) { background: rgba(220,38,38,0.1); }
+.request-card__btn--allow { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: #16a34a; }
+.request-card__btn--allow:hover:not(:disabled) { background: rgba(22,163,74,0.1); }
+.request-card__btn--del { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: none; background: transparent; color: var(--color-text-secondary); }
+.request-card__btn--del:hover:not(:disabled) { color: #d97706; background: rgba(217, 119, 6, 0.1); }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 
@@ -627,5 +633,6 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-actions { width: 100%; }
 .request-actions-row { display: flex; gap: var(--spacing-sm); width: 100%; }
 .request-actions-row .btn { flex: 1; padding: var(--spacing-sm) var(--spacing-md); }
+.btn--revoke:hover:not(:disabled) { border-color: #d97706; color: #d97706; }
 </style>
 

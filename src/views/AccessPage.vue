@@ -228,7 +228,7 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); }
 .access-card__btn--allow:hover { background: rgba(22,163,74,0.08); }
 .access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
-.access-card__btn--remove:hover { color: #dc2626; border-color: #dc2626; background: rgba(220,38,38,0.04); }
+.access-card__btn--remove:hover { color: #d97706; border-color: #d97706; background: rgba(217, 119, 6, 0.08); }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>
