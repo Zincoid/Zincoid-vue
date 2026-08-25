@@ -279,6 +279,8 @@ export default {
     pendingSent: 'Pending Requests',
     resolvedSent: 'Resolved Requests',
     noRequests: 'No requests.',
+    waitingAdmin: 'Awaiting admin',
+    handledBy: 'Handled by {name}',
     storageExtension: 'Storage Expansion',
     reasonLabel: 'Reason: ',
     remove: 'Remove',

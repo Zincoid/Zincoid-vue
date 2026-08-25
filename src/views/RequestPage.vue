@@ -4,7 +4,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
-import { requestAPI, userAPI } from '@/api'
+import { requestAPI } from '@/api'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -29,7 +29,6 @@ const rpData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const rrData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
-const userMap = ref({})
 let pageSize = 10
 
 onMounted(async () => {
@@ -51,13 +50,11 @@ async function fetchRP(p = 1) {
   const { data } = await requestAPI.received(p, pageSize)
   const d = data.data
   rpData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
-  await loadMaps(rpData.value.records)
 }
 async function fetchRR(p = 1) {
   const { data } = await requestAPI.received(p, pageSize)
   const d = data.data
   rrData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
-  await loadMaps(rrData.value.records)
 }
 async function fetchSP(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
@@ -68,23 +65,6 @@ async function fetchSR(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
   const d = data.data
   srData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
-}
-
-async function loadMaps(records) {
-  if (!records?.length) return
-  for (const r of records) {
-    if (userMap.value[r.senderId]) continue
-    try {
-      const { data } = await userAPI.getDetail(r.senderId)
-      userMap.value[r.senderId] = data.data
-    } catch {
-      userMap.value[r.senderId] = null
-    }
-  }
-}
-
-function userOf(r) {
-  return userMap.value[r.senderId] || null
 }
 
 async function handleRequest(r, access) {
@@ -193,10 +173,10 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in rpData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
-                  <img v-if="userOf(r)?.avatar" :src="userOf(r).avatar" class="request-card__avatar" />
-                  <span v-else class="request-card__avatar-placeholder">{{ (userOf(r)?.nickname || r.senderName || '?')[0].toUpperCase() }}</span>
+                  <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
+                  <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
+                    <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
@@ -232,10 +212,10 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in rrData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
-                  <img v-if="userOf(r)?.avatar" :src="userOf(r).avatar" class="request-card__avatar" />
-                  <span v-else class="request-card__avatar-placeholder">{{ (userOf(r)?.nickname || r.senderName || '?')[0].toUpperCase() }}</span>
+                  <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
+                  <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
-                    <span class="request-card__user">{{ userOf(r)?.nickname || r.senderName || `User#${r.senderId}` }}</span>
+                    <span class="request-card__user">{{ r.senderName || `User#${r.senderId}` }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
@@ -270,7 +250,10 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in spData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
+                  <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
+                  <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
+                    <span class="request-card__user">{{ r.receiverName || t('request.waitingAdmin') }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>
@@ -296,7 +279,10 @@ function formatSize(bytes) {
             <div class="request-list">
               <div v-for="r in srData.records" :key="r.id" class="request-card">
                 <div class="request-card__left">
+                  <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
+                  <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
+                    <span class="request-card__user">{{ r.receiverName ? t('request.handledBy', { name: r.receiverName }) : t('request.waitingAdmin') }}</span>
                     <span class="request-card__type">
                       <span class="request-card__type-name">{{ typeLabel(r) }}</span>
                       <span v-if="requestMeta(r)" class="request-card__meta">{{ requestMeta(r) }}</span>

@@ -279,6 +279,8 @@ export default {
     pendingSent: '待处理的请求',
     resolvedSent: '已处理的请求',
     noRequests: '暂无请求。',
+    waitingAdmin: '待管理员处理',
+    handledBy: '由 {name} 处理',
     storageExtension: '存储扩容',
     reasonLabel: '原因：',
     remove: '移除',

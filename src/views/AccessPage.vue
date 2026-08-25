@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
-import { repoAPI, userAPI } from '@/api'
+import { repoAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -25,8 +25,6 @@ const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const rpData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const rrData = ref({ records: [], pages: 1, total: 0, page: 1 })
-const repoMap = ref({})
-const userMap = ref({})
 let pageSize = 10
 
 onMounted(async () => {
@@ -44,31 +42,13 @@ async function fetchAll() {
   }
 }
 
-async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/pending', p, pageSize); spData.value = data.data; await loadRepoMaps(data.data.records) }
-async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/resolved', p, pageSize); srData.value = data.data; await loadRepoMaps(data.data.records) }
-async function fetchRP(p = 1) { const r = await repoAPI.getAccessList('/access/received/pending', p, pageSize); rpData.value = r.data.data; await loadMaps(rpData.value.records) }
-async function fetchRR(p = 1) { const r = await repoAPI.getAccessList('/access/received/resolved', p, pageSize); rrData.value = r.data.data; await loadMaps(rrData.value.records) }
+async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/pending', p, pageSize); spData.value = data.data }
+async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/resolved', p, pageSize); srData.value = data.data }
+async function fetchRP(p = 1) { const { data } = await repoAPI.getAccessList('/access/received/pending', p, pageSize); rpData.value = data.data }
+async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/access/received/resolved', p, pageSize); rrData.value = data.data }
 
-async function loadRepoMaps(records) {
-  if (!records?.length) return
-  for (const a of records) {
-    if (!repoMap.value[a.repoId]) {
-      try { const { data } = await repoAPI.getDetail(a.repoId); repoMap.value[a.repoId] = data.data?.name || `#${a.repoId}` } catch { repoMap.value[a.repoId] = `#${a.repoId}` }
-    }
-  }
-}
-
-async function loadMaps(records) {
-  if (!records?.length) return
-  for (const a of records) {
-    if (!repoMap.value[a.repoId]) {
-      try { const { data } = await repoAPI.getDetail(a.repoId); repoMap.value[a.repoId] = data.data?.name || `#${a.repoId}` } catch { repoMap.value[a.repoId] = `#${a.repoId}` }
-    }
-    if (!userMap.value[a.userId]) {
-      try { const { data } = await userAPI.getDetail(a.userId); userMap.value[a.userId] = data.data } catch { userMap.value[a.userId] = null }
-    }
-  }
-}
+function repoNameOf(a) { return a.repoName || `#${a.repoId}` }
+function userNameOf(a) { return a.userNickname || `User#${a.userId}` }
 
 async function approve(id) { await repoAPI._put(`/access/${id}/approve`); fetchRP(); fetchRR() }
 async function rejectAccess(id) { await repoAPI._put(`/access/${id}/reject`); fetchRP(); fetchRR() }
@@ -109,11 +89,11 @@ function statusLabel(s) {
             <div class="access-list">
               <div v-for="a in rpData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
-                  <img v-if="userMap[a.userId]?.avatar" :src="userMap[a.userId].avatar" class="access-card__avatar" />
-                  <span v-else class="access-card__avatar-placeholder">{{ (userMap[a.userId]?.nickname || '?')[0] }}</span>
+                  <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
+                  <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
                   <div class="access-card__info">
-                    <span class="access-card__user">{{ userMap[a.userId]?.nickname || `User#${a.userId}` }}</span>
-                    <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
+                    <span class="access-card__user">{{ userNameOf(a) }}</span>
+                    <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                   </div>
                 </div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
@@ -130,11 +110,11 @@ function statusLabel(s) {
             <div class="access-list">
               <div v-for="a in rrData.records" :key="a.id" class="access-card">
                 <div class="access-card__left" @click="router.push(`/repos/${a.repoId}`)">
-                  <img v-if="userMap[a.userId]?.avatar" :src="userMap[a.userId].avatar" class="access-card__avatar" />
-                  <span v-else class="access-card__avatar-placeholder">{{ (userMap[a.userId]?.nickname || '?')[0] }}</span>
+                  <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
+                  <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
                   <div class="access-card__info">
-                    <span class="access-card__user">{{ userMap[a.userId]?.nickname || `User#${a.userId}` }}</span>
-                    <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
+                    <span class="access-card__user">{{ userNameOf(a) }}</span>
+                    <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                   </div>
                 </div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
@@ -156,7 +136,7 @@ function statusLabel(s) {
             <h3>{{ t('access.pendingAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
-                <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
+                <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
@@ -166,7 +146,7 @@ function statusLabel(s) {
             <h3>{{ t('access.resolvedAuthorizations') }}</h3>
             <div class="access-list">
               <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
-                <span class="access-card__repo">{{ repoMap[a.repoId] }}</span>
+                <span class="access-card__repo">{{ repoNameOf(a) }}</span>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
               </div>
             </div>
