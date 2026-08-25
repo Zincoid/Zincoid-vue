@@ -9,6 +9,7 @@ import { requestAPI } from '@/api'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -21,6 +22,8 @@ const activeTab = ref('received')
 const loading = ref(true)
 const loadingDone = ref(false)
 const handlingId = ref(null)
+const detail = ref(null)
+const detailReceived = ref(false)
 
 const tabOptions = computed(() => [
   { value: 'received', label: t('request.received') },
@@ -69,12 +72,18 @@ async function fetchSR(p = 1) {
   srData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
 }
 
+function openDetail(r, received) {
+  detail.value = r
+  detailReceived.value = received
+}
+
 async function handleRequest(r, access) {
   if (handlingId.value) return
   if (access === 1 && !await confirm(t('request.approveConfirm'))) return
   handlingId.value = r.id
   try {
     await requestAPI.handle(r.id, access === 1 ? 'APPROVED' : 'REJECTED')
+    detail.value = null
     fetchRP(); fetchRR(); fetchSP(); fetchSR()
   } catch { /* ignore */ } finally {
     handlingId.value = null
@@ -90,6 +99,7 @@ async function handleDelete(r) {
   handlingId.value = r.id
   try {
     await requestAPI.remove(r.id)
+    detail.value = null
   } catch (err) {
     toast(err?.response?.data?.message || t('request.deleteFailed'), 'error')
   } finally {
@@ -189,8 +199,8 @@ function formatSize(bytes) {
           <div v-if="rpData.records.length" class="section">
             <h3>{{ t('request.pendingRequests') }}</h3>
             <div class="request-list">
-              <div v-for="r in rpData.records" :key="r.id" class="request-card">
-                <div class="request-card__left" @click="router.push(`/members/${r.senderId}`)">
+              <div v-for="r in rpData.records" :key="r.id" class="request-card" @click="openDetail(r, true)">
+                <div class="request-card__left">
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -205,7 +215,7 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
                 <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
-                <div class="request-card__actions">
+                <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
@@ -229,8 +239,8 @@ function formatSize(bytes) {
           <div v-if="rrData.records.length" class="section">
             <h3>{{ t('request.resolvedRequests') }}</h3>
             <div class="request-list">
-              <div v-for="r in rrData.records" :key="r.id" class="request-card">
-                <div class="request-card__left" @click="router.push(`/members/${r.senderId}`)">
+              <div v-for="r in rrData.records" :key="r.id" class="request-card" @click="openDetail(r, true)">
+                <div class="request-card__left">
                   <img v-if="r.senderAvatar" :src="r.senderAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.senderName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -245,7 +255,7 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
                 <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
-                <div class="request-card__actions">
+                <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
@@ -268,8 +278,8 @@ function formatSize(bytes) {
           <div v-if="spData.records.length" class="section">
             <h3>{{ t('request.pendingSent') }}</h3>
             <div class="request-list">
-              <div v-for="r in spData.records" :key="r.id" class="request-card">
-                <div class="request-card__left" @click="r.receiverId > 0 && router.push(`/members/${r.receiverId}`)">
+              <div v-for="r in spData.records" :key="r.id" class="request-card" @click="openDetail(r, false)">
+                <div class="request-card__left">
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -284,7 +294,7 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
                 <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
-                <div class="request-card__actions">
+                <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
@@ -298,8 +308,8 @@ function formatSize(bytes) {
           <div v-if="srData.records.length" class="section">
             <h3>{{ t('request.resolvedSent') }}</h3>
             <div class="request-list">
-              <div v-for="r in srData.records" :key="r.id" class="request-card">
-                <div class="request-card__left" @click="r.receiverId > 0 && router.push(`/members/${r.receiverId}`)">
+              <div v-for="r in srData.records" :key="r.id" class="request-card" @click="openDetail(r, false)">
+                <div class="request-card__left">
                   <img v-if="r.receiverAvatar" :src="r.receiverAvatar" class="request-card__avatar" />
                   <span v-else class="request-card__avatar-placeholder">{{ (r.receiverName || '?')[0].toUpperCase() }}</span>
                   <div class="request-card__info">
@@ -314,7 +324,7 @@ function formatSize(bytes) {
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
                 <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
-                <div class="request-card__actions">
+                <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
                     :disabled="handlingId !== null"
@@ -329,6 +339,105 @@ function formatSize(bytes) {
       </div>
 
     </template>
+
+    <Transition name="modal">
+      <div v-if="detail" class="modal-overlay" @click.self="detail = null">
+        <div class="modal">
+          <h3 class="modal__title">
+            <span>{{ t('request.detailTitle') }}</span>
+            <button class="modal__close" @click="detail = null">
+              <SvgIcon name="close" :size="16" />
+            </button>
+          </h3>
+
+          <div class="detail-sender" @click="router.push(`/members/${detail.senderId}`)">
+            <img v-if="detail.senderAvatar" :src="detail.senderAvatar" class="detail-avatar" />
+            <span v-else class="detail-avatar detail-avatar--placeholder">{{ (detail.senderName || '?')[0].toUpperCase() }}</span>
+            <span class="detail-sender-name">{{ detail.senderName || `User#${detail.senderId}` }}</span>
+            <SvgIcon name="chevron-right" :size="12" class="detail-sender-arrow" />
+          </div>
+
+          <div class="detail-block">
+            <div class="detail-row">
+              <span class="detail-label">{{ t('request.typeLabel') }}</span>
+              <span class="detail-value">{{ typeLabel(detail) }}</span>
+            </div>
+            <template v-if="detail.type === 0">
+              <div class="detail-row">
+                <span class="detail-label">{{ t('request.expansionLabel') }}</span>
+                <span class="detail-value">{{ requestMeta(detail) }}</span>
+              </div>
+              <div v-if="requestReason(detail)" class="detail-row">
+                <span class="detail-label">{{ t('request.reason') }}</span>
+                <span class="detail-value detail-value--wrap">{{ requestReason(detail) }}</span>
+              </div>
+            </template>
+            <template v-else-if="detail.type === 1">
+              <div class="detail-row">
+                <span class="detail-label">{{ t('request.titleLabel') }}</span>
+                <span class="detail-value detail-value--wrap">{{ requestMeta(detail) }}</span>
+              </div>
+              <div v-if="requestReason(detail)" class="detail-row">
+                <span class="detail-label">{{ t('request.content') }}</span>
+                <span class="detail-value detail-value--wrap">{{ requestReason(detail) }}</span>
+              </div>
+            </template>
+          </div>
+
+          <div class="detail-block">
+            <div class="detail-row">
+              <span class="detail-label">{{ t('request.statusLabel') }}</span>
+              <span class="detail-value">
+                <span class="request-card__status" :class="{ pending: detail.access === 0, approved: detail.access === 1, rejected: detail.access === 2 }">{{ statusLabel(detail.access) }}</span>
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">{{ t('request.handlerLabel') }}</span>
+              <span class="detail-value">{{ detail.receiverName || t('request.waitingAdmin') }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">{{ t('request.createdLabel') }}</span>
+              <span class="detail-value">{{ formatDate(detail.createdAt) }}</span>
+            </div>
+            <div v-if="detail.handledAt" class="detail-row">
+              <span class="detail-label">{{ t('request.handledLabel') }}</span>
+              <span class="detail-value">{{ formatDate(detail.handledAt) }}</span>
+            </div>
+          </div>
+
+          <div class="modal__actions request-actions">
+            <div class="request-actions-row">
+              <button
+                class="btn btn--outline"
+                :disabled="handlingId !== null"
+                @click="handleDelete(detail)"
+              >
+                <SvgIcon name="trash" :size="14" />
+                {{ t('request.remove') }}
+              </button>
+              <template v-if="detailReceived && detail.access === 0">
+                <button
+                  class="btn btn--danger"
+                  :disabled="handlingId !== null"
+                  @click="handleRequest(detail, 2)"
+                >
+                  <SvgIcon name="close" :size="14" />
+                  {{ t('request.reject') }}
+                </button>
+                <button
+                  class="btn btn--success"
+                  :disabled="handlingId !== null"
+                  @click="handleRequest(detail, 1)"
+                >
+                  <SvgIcon name="check" :size="14" />
+                  {{ t('request.approve') }}
+                </button>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -339,7 +448,7 @@ function formatSize(bytes) {
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .request-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-.request-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); transition: border-color var(--transition-fast); }
+.request-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); cursor: pointer; transition: border-color var(--transition-fast); }
 .request-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
 [data-theme="dark"] .request-card:hover { background: #23252f; }
 .request-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: pointer; }
@@ -360,13 +469,68 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
 .request-card__btn { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
 .request-card__btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.request-card__btn--reject { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
+.request-card__btn--reject { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); background: transparent; }
 .request-card__btn--reject:hover:not(:disabled) { background: rgba(220,38,38,0.08); }
-.request-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); }
+.request-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); background: transparent; }
 .request-card__btn--allow:hover:not(:disabled) { background: rgba(22,163,74,0.08); }
 .request-card__btn--del { display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); border: 1px solid var(--color-border); background: transparent; }
 .request-card__btn--del:hover:not(:disabled) { color: #dc2626; border-color: #dc2626; background: rgba(220,38,38,0.04); }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
+
+/* ── Detail modal ── */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
+.modal { position: relative; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); max-width: 440px; width: 100%; padding: var(--spacing-2xl); max-height: 80vh; overflow-y: auto; }
+.modal__title { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
+.modal__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-lg); padding-top: var(--spacing-md); }
+.modal-enter-active, .modal-leave-active { transition: opacity .2s ease; }
+.modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .modal, .modal-leave-to .modal { transform: scale(0.95); }
+
+.detail-sender {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-bottom: var(--spacing-lg);
+}
+.detail-sender:hover { background: var(--color-bg-alt); }
+[data-theme="dark"] .detail-sender:hover { background: #23252f; }
+.detail-avatar { width: 32px; height: 32px; border-radius: var(--rounded-full); object-fit: cover; flex-shrink: 0; }
+.detail-avatar--placeholder { background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.detail-sender-name { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.detail-sender-arrow { color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
+
+.detail-block { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-lg) var(--spacing-sm); margin: 0 var(--spacing-xs); border-bottom: 1px solid var(--color-border-light); }
+.detail-block:nth-last-child(2) { border-bottom: none; }
+.detail-row { display: flex; align-items: flex-start; gap: var(--spacing-2xl); font-size: var(--text-sm); }
+.detail-label { color: var(--color-text-secondary); flex-shrink: 0; width: 64px; }
+.detail-value { color: var(--color-text-heading); flex: 1; min-width: 0; word-break: break-word; }
+.detail-value--wrap { white-space: pre-wrap; }
+.detail-block .request-card__status { display: inline-block; margin: 0; }
+
+.request-actions { width: 100%; }
+.request-actions-row { display: flex; gap: var(--spacing-sm); width: 100%; }
+.request-actions-row .btn { flex: 1; padding: var(--spacing-sm) var(--spacing-md); }
 </style>
 
