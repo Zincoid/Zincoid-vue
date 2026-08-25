@@ -325,9 +325,9 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .request-card__avatar-placeholder { width: 40px; height: 40px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--weight-medium); flex-shrink: 0; }
 .request-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; }
 .request-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; }
-.request-card__type { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; white-space: nowrap; }
+.request-card__type { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; white-space: nowrap; line-height: 1.3; margin-top: 2px; }
 .request-card__type-name { flex-shrink: 0; }
-.request-card__reason { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.request-card__reason { font-size: var(--text-xs); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
 .request-card__meta { font-family: var(--font-mono); color: var(--color-primary); flex-shrink: 0; }
 .request-card__time { font-size: var(--text-xs); color: var(--color-text-tertiary, var(--color-text-secondary)); flex-shrink: 0; }
 .request-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
