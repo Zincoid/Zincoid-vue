@@ -8,6 +8,7 @@ import { useConfirm } from '@/composables/useConfirm'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 
 const router = useRouter()
@@ -76,8 +77,13 @@ function statusLabel(s) {
 <template>
   <div class="access-page">
     <div class="page-header">
-      <h2 class="page-header__title">## {{ t('personal.accessTab') }}<span class="cursor">_</span></h2>
-      <p class="page-header__subtitle">{{ t('access.desc') }}</p>
+      <div class="page-header__text">
+        <h2 class="page-header__title">## {{ t('personal.accessTab') }}<span class="cursor">_</span></h2>
+        <p class="page-header__subtitle">{{ t('access.desc') }}</p>
+      </div>
+      <button class="page-refresh" :class="{ 'page-refresh--loading': loading }" :disabled="loading" @click="fetchAll">
+        <SvgIcon name="refresh" :size="18" />
+      </button>
     </div>
 
     <SliderSelect
@@ -176,8 +182,26 @@ function statusLabel(s) {
 </template>
 
 <style scoped>
-.access-page .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); }
+.access-page .page-header { padding-top: var(--spacing-xs); margin-bottom: var(--spacing-xl); display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); }
 .access-page .page-header__subtitle { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.page-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.page-refresh:hover:not(:disabled) { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-bg); }
+.page-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-refresh--loading svg { animation: page-spin 1s linear infinite; }
+@keyframes page-spin { to { transform: rotate(360deg); } }
 .access-tabs { margin-bottom: var(--spacing-2xl); }
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
