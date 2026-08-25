@@ -118,6 +118,9 @@ async function loadList(pageNum) {
     listPages.value = data.pages || 1
     listTotal.value = data.total || 0
     listPage.value = pageNum
+    if (!tracks.value.length && !playing.value) {
+      currentTrack.value = listTracks.value[0] || null
+    }
   } catch (e) {
     if (e?.response?.status !== 401) error.value = getMessage(e, 'walkman.loadFailed')
   } finally {
