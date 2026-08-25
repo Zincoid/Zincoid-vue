@@ -6,8 +6,10 @@ export function useMention() {
   const mentionActive = ref(false)
   const mentionPos = ref({ top: 0, left: 0 })
   let searchTimer = null
+  let searchSeq = 0
 
   function onInput(textarea) {
+    const seq = ++searchSeq
     const value = textarea.value
     const cursor = textarea.selectionStart
     const beforeCursor = value.substring(0, cursor)
@@ -29,6 +31,7 @@ export function useMention() {
     clearTimeout(searchTimer)
     searchTimer = setTimeout(() => {
       userAPI.getList(1, 10, null, partial || null).then(res => {
+        if (seq !== searchSeq) return
         const records = res.data?.data?.records || []
         if (records.length > 0) {
           suggestions.value = records
@@ -58,6 +61,8 @@ export function useMention() {
   }
 
   function close() {
+    searchSeq++
+    clearTimeout(searchTimer)
     mentionActive.value = false
     suggestions.value = []
   }
