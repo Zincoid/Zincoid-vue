@@ -526,7 +526,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 
 @media (max-width: 640px) {
   .modal {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-2xl);
     max-height: 92vh;
     display: flex;
     flex-direction: column;
