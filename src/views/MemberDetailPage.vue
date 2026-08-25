@@ -280,7 +280,7 @@ function typeLabel(type) {
         <div class="setting-block">
           <h4 class="setting-block__title">{{ t('user.musicRequestTitle') }}</h4>
           <p class="setting-block__desc">{{ t('user.musicRequestDesc') }}</p>
-          <button class="btn btn--primary btn--full" :disabled="musicSending" @click="sendMusicRequest">
+          <button class="btn btn--primary btn--full setting-block__btn" :disabled="musicSending" @click="sendMusicRequest">
             <SvgIcon name="audio" :size="16" />
             {{ t('user.musicRequestSend') }}
           </button>
@@ -456,6 +456,7 @@ function typeLabel(type) {
 .setting-block:last-child { margin-bottom: 0; }
 .setting-block__title { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); margin-bottom: var(--spacing-xs); }
 .setting-block__desc { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.setting-block__btn { font-size: var(--text-xs); padding: var(--spacing-xs) var(--spacing-lg); }
 .setting-block--empty {
   border-style: dashed;
   min-height: 80px;
