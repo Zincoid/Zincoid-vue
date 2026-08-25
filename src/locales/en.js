@@ -290,7 +290,7 @@ export default {
     resolvedSent: 'Resolved Requests',
     noRequests: 'No requests.',
     waitingAdmin: 'Awaiting admin',
-    adminPending: 'Admin request: Pending',
+    adminPending: 'Admin request: Awaiting admin',
     handledBy: 'Handled by {name}',
     adminHandledBy: 'Admin request: Handled by {name}',
     fromLabel: 'From: ',
