@@ -82,10 +82,12 @@ export default {
   user: {
     title: 'Members',
     setting: 'Setting',
+    musicRequestTitle: 'Music Request',
     musicRequestDesc: 'Send a music request to this user. Once approved, they will randomly share one of their private tracks with you.',
     musicRequestSend: 'Send Music Request',
     musicRequestSuccess: 'Music request sent',
     musicRequestFailed: 'Failed to send music request',
+    moreComing: 'More features coming soon...',
     subtitle: 'All members',
     empty: 'No members found.',
     searchPlaceholder: 'Search username or nickname...',

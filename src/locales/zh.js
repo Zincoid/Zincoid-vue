@@ -82,10 +82,12 @@ export default {
   user: {
     title: '成员',
     setting: '设置',
+    musicRequestTitle: '音乐请求',
     musicRequestDesc: '向对方发送一个音乐请求，对方同意后将随机分享一首私有音乐给你。',
     musicRequestSend: '发送音乐请求',
     musicRequestSuccess: '音乐请求已发送',
     musicRequestFailed: '音乐请求发送失败',
+    moreComing: '更多功能敬请期待...',
     subtitle: '所有成员',
     empty: '暂无成员。',
     searchPlaceholder: '搜索用户名或昵称...',

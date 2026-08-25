@@ -274,12 +274,16 @@ function typeLabel(type) {
             <SvgIcon name="close" :size="16" />
           </button>
         </h3>
-        <p class="modal__desc">{{ t('user.musicRequestDesc') }}</p>
-        <div class="modal__actions">
+        <div class="setting-block">
+          <h4 class="setting-block__title">{{ t('user.musicRequestTitle') }}</h4>
+          <p class="setting-block__desc">{{ t('user.musicRequestDesc') }}</p>
           <button class="btn btn--primary btn--full" :disabled="musicSending" @click="sendMusicRequest">
             <SvgIcon name="audio" :size="16" />
             {{ t('user.musicRequestSend') }}
           </button>
+        </div>
+        <div class="setting-block setting-block--empty">
+          <p class="setting-block__desc setting-block__desc--center">{{ t('user.moreComing') }}</p>
         </div>
       </div>
     </div>
@@ -439,6 +443,24 @@ function typeLabel(type) {
 .modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
 .modal__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
 .modal__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); }
+
+.setting-block {
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+.setting-block:last-child { margin-bottom: 0; }
+.setting-block__title { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); margin-bottom: var(--spacing-xs); }
+.setting-block__desc { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.setting-block--empty {
+  border-style: dashed;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.setting-block__desc--center { margin-bottom: 0; text-align: center; }
 .modal-enter-active, .modal-leave-active { transition: opacity .2s ease; }
 .modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
 .modal-enter-from, .modal-leave-to { opacity: 0; }
