@@ -837,7 +837,7 @@ onMounted(async () => {
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 12px;
+  height: 10px;
   flex-shrink: 0;
   margin-right: 2px;
 }
