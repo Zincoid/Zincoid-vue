@@ -659,7 +659,7 @@ onMounted(async () => {
 .walkman__name {
   font-size: 11px;
   color: var(--color-text-heading);
-  max-width: 110px;
+  width: 110px;
   overflow: hidden;
   white-space: nowrap;
   font-family: var(--font-mono);
