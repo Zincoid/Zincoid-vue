@@ -404,7 +404,7 @@ watch(done, (v) => {
 
 .stats-chart {
   width: 100%;
-  height: 260px;
+  height: 320px;
 }
 
 @media (max-width: 900px) {
