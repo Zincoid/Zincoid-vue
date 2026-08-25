@@ -26,6 +26,11 @@ const volume = ref(0.25)
 const muted = ref(false)
 const playMode = ref('order')
 const PLAY_MODES = ['order', 'shuffle', 'single']
+const playSource = ref('list')
+const playScope = ref(null)
+const playPage = ref(1)
+const playPages = ref(1)
+const playTotal = ref(0)
 
 const listTracks = ref([])
 const listPage = ref(1)
@@ -108,22 +113,27 @@ async function loadList(pageNum) {
       ? await musicAPI.list(pageNum, listSize.value)
       : await musicAPI.listUser(pageNum, listSize.value)
     const data = res.data?.data || {}
-    const records = data.records || []
-    listTracks.value = records
-    tracks.value = records
+    listTracks.value = data.records || []
     listPages.value = data.pages || 1
     listTotal.value = data.total || 0
     listPage.value = pageNum
-    if (currentTrack.value) {
-      currentIndex.value = records.findIndex(t => t.id === currentTrack.value.id)
-    } else if (tracks.value.length) {
-      currentIndex.value = 0
-    }
   } catch (e) {
     if (e?.response?.status !== 401) error.value = getMessage(e, 'walkman.loadFailed')
   } finally {
     listLoading.value = false
   }
+}
+
+async function loadPlayList(pageNum) {
+  const scope = playScope.value || 'public'
+  const res = scope === 'public'
+    ? await musicAPI.list(pageNum, listSize.value)
+    : await musicAPI.listUser(pageNum, listSize.value)
+  const data = res.data?.data || {}
+  tracks.value = data.records || []
+  playPages.value = data.pages || 1
+  playTotal.value = data.total || 0
+  playPage.value = pageNum
 }
 
 function toggleList() {
@@ -134,12 +144,18 @@ function toggleList() {
 }
 
 function playListTrack(track) {
-  let idx = tracks.value.findIndex(t => t.id === track.id)
-  if (idx === -1) {
-    tracks.value = [...tracks.value, track]
-    idx = tracks.value.length - 1
+  tracks.value = listTracks.value
+  playScope.value = musicScope.value
+  playPage.value = listPage.value
+  playPages.value = listPages.value
+  playTotal.value = listTotal.value
+  const idx = tracks.value.findIndex(t => t.id === track.id)
+  if (idx >= 0) {
+    playTrack(idx)
+    return
   }
-  playTrack(idx)
+  tracks.value = [...tracks.value, track]
+  playTrack(tracks.value.length - 1)
 }
 
 function toggleTrack(track) {
@@ -152,6 +168,7 @@ function toggleTrack(track) {
 
 function playTrack(index) {
   if (index < 0 || index >= tracks.value.length) return
+  playSource.value = 'list'
   currentIndex.value = index
   currentTrack.value = tracks.value[index]
   nextTick(() => audioRef.value.play())
@@ -159,7 +176,11 @@ function playTrack(index) {
 
 function toggle() {
   if (!currentTrack.value) {
-    if (tracks.value.length) playTrack(0)
+    if (tracks.value.length) {
+      playTrack(0)
+    } else if (listTracks.value.length) {
+      playListTrack(listTracks.value[0])
+    }
     return
   }
   if (audioRef.value.paused) {
@@ -174,10 +195,10 @@ function cycleMode() {
 }
 
 async function shuffleNext() {
-  if (listTotal.value < 2) return false
-  const idx = Math.floor(Math.random() * listTotal.value)
-  const page = Math.min(Math.floor(idx / listSize.value) + 1, listPages.value)
-  if (page !== listPage.value) await loadList(page)
+  if (playTotal.value < 2) return false
+  const idx = Math.floor(Math.random() * playTotal.value)
+  const page = Math.min(Math.floor(idx / listSize.value) + 1, playPages.value)
+  if (page !== playPage.value) await loadPlayList(page)
   if (!tracks.value.length) return false
   let i = idx % listSize.value
   if (i >= tracks.value.length) i = tracks.value.length - 1
@@ -188,24 +209,26 @@ async function shuffleNext() {
 
 async function next() {
   if (!tracks.value.length) return
+  if (playSource.value === 'external') return
   if (playMode.value === 'shuffle' && await shuffleNext()) return
   if (currentIndex.value < tracks.value.length - 1) {
     playTrack(currentIndex.value + 1)
     return
   }
-  const target = listPage.value < listPages.value ? listPage.value + 1 : 1
-  await loadList(target)
+  const target = playPage.value < playPages.value ? playPage.value + 1 : 1
+  await loadPlayList(target)
   if (tracks.value.length) playTrack(0)
 }
 
 async function prev() {
   if (!tracks.value.length) return
+  if (playSource.value === 'external') return
   if (currentIndex.value > 0) {
     playTrack(currentIndex.value - 1)
     return
   }
-  const target = listPage.value > 1 ? listPage.value - 1 : listPages.value
-  await loadList(target)
+  const target = playPage.value > 1 ? playPage.value - 1 : playPages.value
+  await loadPlayList(target)
   if (tracks.value.length) playTrack(tracks.value.length - 1)
 }
 
@@ -255,6 +278,7 @@ watch(musicScope, () => {
 
 watch(external, (track) => {
   if (!track?.url) return
+  playSource.value = 'external'
   currentTrack.value = { id: -1, fileName: track.name, url: track.url }
   currentIndex.value = -1
   docked.value = false
@@ -325,8 +349,8 @@ onMounted(async () => {
   listSize.value = parseInt(getConfig('page_size', '10'))
   if (audioRef.value) audioRef.value.volume = volume.value
   await loadList(1)
-  if (!currentTrack.value && tracks.value.length) {
-    currentTrack.value = tracks.value[0]
+  if (!currentTrack.value && listTracks.value.length) {
+    currentTrack.value = listTracks.value[0]
   }
 })
 </script>
