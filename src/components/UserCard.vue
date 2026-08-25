@@ -235,7 +235,7 @@ async function handleDelete() {
   white-space: nowrap;
 }
 .user-card:hover .user-card__active--scroll .user-card__active-inner {
-  animation: user-card-marquee 10s linear infinite;
+  animation: user-card-marquee 5s linear infinite;
 }
 @keyframes user-card-marquee {
   0%, 10% { transform: translateX(0); }
