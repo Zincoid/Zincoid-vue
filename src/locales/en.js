@@ -301,8 +301,6 @@ export default {
     createdLabel: 'Created',
     handledLabel: 'Handled',
     handlerLabel: 'Handler',
-    deleteConfirm: 'Delete this request?',
-    deleteDone: 'Deleted',
     deleteFailed: 'Delete failed'
   },
   manage: {

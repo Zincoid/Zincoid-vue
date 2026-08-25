@@ -92,7 +92,6 @@ async function handleRequest(r, access) {
 
 async function handleRevoke(r) {
   if (handlingId.value) return
-  if (!await confirm(t('request.deleteConfirm'))) return
   rpData.value.records = rpData.value.records.filter(x => x.id !== r.id)
   rrData.value.records = rrData.value.records.filter(x => x.id !== r.id)
   spData.value.records = spData.value.records.filter(x => x.id !== r.id)

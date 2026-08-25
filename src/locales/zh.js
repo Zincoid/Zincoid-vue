@@ -301,8 +301,6 @@ export default {
     createdLabel: '提交时间',
     handledLabel: '处理时间',
     handlerLabel: '处理人',
-    deleteConfirm: '确定删除此请求？',
-    deleteDone: '已删除',
     deleteFailed: '删除失败'
   },
   manage: {
