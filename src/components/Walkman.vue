@@ -135,13 +135,11 @@ async function loadPlayList(pageNum) {
   playPages.value = data.pages || 1
   playTotal.value = data.total || 0
   playPage.value = pageNum
-  listTracks.value = tracks.value
-  listPages.value = playPages.value
-  listTotal.value = playTotal.value
-  listPage.value = playPage.value
-  if (musicScope.value !== scope) {
-    scopeSyncing = true
-    musicScope.value = scope
+  if (musicScope.value === scope) {
+    listTracks.value = tracks.value
+    listPages.value = playPages.value
+    listTotal.value = playTotal.value
+    listPage.value = playPage.value
   }
 }
 
@@ -186,8 +184,19 @@ function playTrack(index) {
 
 function scrollToActive() {
   nextTick(() => {
-    const el = listScrollRef.value?.querySelector('.walkman__track--active')
-    el?.scrollIntoView({ block: 'nearest' })
+    const container = listScrollRef.value
+    const el = container?.querySelector('.walkman__track--active')
+    if (!container || !el) return
+    const cRect = container.getBoundingClientRect()
+    const eRect = el.getBoundingClientRect()
+    const gap = 4
+    const top = eRect.top - cRect.top
+    const bottom = top + eRect.height + gap
+    if (top < 0) {
+      container.scrollTop += top
+    } else if (bottom > cRect.height) {
+      container.scrollTop += bottom - cRect.height
+    }
   })
 }
 
@@ -305,13 +314,7 @@ watch(volume, v => {
   if (audioRef.value) audioRef.value.volume = v
 })
 
-let scopeSyncing = false
-
 watch(musicScope, () => {
-  if (scopeSyncing) {
-    scopeSyncing = false
-    return
-  }
   loadList(1)
 })
 
