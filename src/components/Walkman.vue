@@ -22,11 +22,14 @@ const duration = ref(0)
 const error = ref('')
 const volume = ref(0.25)
 const muted = ref(false)
+const playMode = ref('order')
+const PLAY_MODES = ['order', 'shuffle', 'single']
 
 const listTracks = ref([])
 const listPage = ref(1)
 const listPages = ref(1)
 const listSize = ref(10)
+const listTotal = ref(0)
 const listLoading = ref(false)
 const musicScope = ref('public')
 
@@ -107,6 +110,7 @@ async function loadList(pageNum) {
     listTracks.value = records
     tracks.value = records
     listPages.value = data.pages || 1
+    listTotal.value = data.total || 0
     listPage.value = pageNum
     if (currentTrack.value) {
       currentIndex.value = records.findIndex(t => t.id === currentTrack.value.id)
@@ -163,8 +167,26 @@ function toggle() {
   }
 }
 
+function cycleMode() {
+  playMode.value = PLAY_MODES[(PLAY_MODES.indexOf(playMode.value) + 1) % PLAY_MODES.length]
+}
+
+async function shuffleNext() {
+  if (listTotal.value < 2) return false
+  const idx = Math.floor(Math.random() * listTotal.value)
+  const page = Math.min(Math.floor(idx / listSize.value) + 1, listPages.value)
+  if (page !== listPage.value) await loadList(page)
+  if (!tracks.value.length) return false
+  let i = idx % listSize.value
+  if (i >= tracks.value.length) i = tracks.value.length - 1
+  if (i === currentIndex.value && tracks.value.length > 1) i = (i + 1) % tracks.value.length
+  playTrack(i)
+  return true
+}
+
 async function next() {
   if (!tracks.value.length) return
+  if (playMode.value === 'shuffle' && await shuffleNext()) return
   if (currentIndex.value < tracks.value.length - 1) {
     playTrack(currentIndex.value + 1)
     return
@@ -209,6 +231,15 @@ function onLoadedMetadata() {
 }
 
 function onEnded() {
+  if (playMode.value === 'single') {
+    audioRef.value.currentTime = 0
+    audioRef.value.play()
+    return
+  }
+  if (playMode.value === 'shuffle') {
+    shuffleNext()
+    return
+  }
   next()
 }
 
@@ -340,6 +371,11 @@ onMounted(async () => {
             </button>
             <button class="walkman__btn" :class="{ 'walkman__btn--active': listOpen }" :title="t('walkman.list')" @click="toggleList">
               <SvgIcon name="list" :size="13" />
+            </button>
+            <button class="walkman__btn" @click="cycleMode">
+              <SvgIcon v-if="playMode === 'shuffle'" name="shuffle" :size="13" />
+              <SvgIcon v-else-if="playMode === 'single'" name="repeat-1" :size="13" />
+              <SvgIcon v-else name="repeat" :size="13" />
             </button>
           </div>
           <div class="walkman__volume">
