@@ -318,7 +318,15 @@ watch(volume, v => {
 })
 
 watch(musicScope, () => {
-  loadList(1)
+  loadList(1).then(() => {
+    if (musicScope.value === playScope.value && tracks.value.length) {
+      listTracks.value = tracks.value
+      listPages.value = playPages.value
+      listTotal.value = playTotal.value
+      listPage.value = playPage.value
+      scrollToActive()
+    }
+  })
 })
 
 watch(external, (track) => {
