@@ -422,15 +422,18 @@ function formatSize(bytes) {
                 <span class="detail-label">{{ t('request.musicLabel') }}</span>
                 <span class="detail-value">{{ t('request.musicPending') }}</span>
               </div>
-              <div v-if="musicUrl(detail)" class="detail-actions">
-                <button class="btn btn--outline" @click="playInWalkman">
-                  <SvgIcon name="audio" :size="14" />
-                  {{ t('request.playInWalkman') }}
-                </button>
-                <a class="btn btn--outline" :href="musicUrl(detail)" :download="musicName(detail)">
-                  <SvgIcon name="download" :size="14" />
-                  {{ t('request.musicDownload') }}
-                </a>
+              <div v-if="musicUrl(detail)" class="detail-row detail-row--center">
+                <span class="detail-label">{{ t('request.operationLabel') }}</span>
+                <span class="detail-value detail-actions">
+                  <button class="btn btn--outline" @click="playInWalkman">
+                    <SvgIcon name="audio" :size="12" />
+                    {{ t('request.playInWalkman') }}
+                  </button>
+                  <a class="btn btn--outline btn--download" :href="musicUrl(detail)" :download="musicName(detail)">
+                    <SvgIcon name="download" :size="12" />
+                    {{ t('request.musicDownload') }}
+                  </a>
+                </span>
               </div>
             </template>
           </div>
@@ -575,11 +578,14 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .detail-block { display: flex; flex-direction: column; gap: var(--spacing-sm); padding: var(--spacing-lg) var(--spacing-sm); margin: 0 var(--spacing-xs); border-bottom: 1px solid var(--color-border-light); }
 .detail-block:nth-last-child(2) { border-bottom: none; }
 .detail-row { display: flex; align-items: flex-start; gap: var(--spacing-2xl); font-size: var(--text-sm); }
+.detail-row--center { align-items: center; }
 .detail-label { color: var(--color-text-secondary); flex-shrink: 0; width: 64px; }
 .detail-value { color: var(--color-text-heading); flex: 1; min-width: 0; word-break: break-word; }
 .detail-value--wrap { white-space: pre-wrap; }
-.detail-actions { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
-.detail-actions .btn { flex: 1; padding: var(--spacing-xs) var(--spacing-md); }
+.detail-actions { display: flex; gap: var(--spacing-sm); }
+.detail-actions .btn { flex: 1; padding: 4px var(--spacing-sm); font-size: var(--text-xs); white-space: nowrap; }
+.detail-actions .btn svg { flex-shrink: 0; }
+.detail-actions .btn--download:hover { border-color: #16a34a; color: #16a34a; }
 .detail-block .request-card__status { display: inline-block; margin: 0; }
 
 .request-actions { width: 100%; }
