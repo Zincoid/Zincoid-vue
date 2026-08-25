@@ -508,6 +508,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 .music-list { display: flex; flex-direction: column; gap: var(--spacing-xs); max-height: 320px; overflow-y: auto; padding-right: var(--spacing-xs); }
 .music-list::-webkit-scrollbar { width: 4px; }
 .music-list::-webkit-scrollbar-thumb { background: var(--color-border); }
+.music-list::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 .music-list__empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--text-sm); }
 .music-item { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
 .music-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); color: var(--color-text-heading); font-family: var(--font-mono); }
