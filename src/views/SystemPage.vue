@@ -8,7 +8,9 @@ import { useI18n } from '@/composables/useI18n'
 import { siteName } from '@/composables/useConfig'
 import { useThemeStore } from '@/stores/theme'
 import { useLocaleStore } from '@/stores/locale'
-import { healthAPI, statAPI } from '@/api'
+import { useError } from '@/composables/useError'
+import { useToast } from '@/composables/useToast'
+import { healthAPI, statAPI, requestAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
@@ -17,6 +19,39 @@ echarts.use([LineChart, BarChart, GridComponent, TooltipComponent, CanvasRendere
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const localeStore = useLocaleStore()
+const { getMessage } = useError()
+const { toast } = useToast()
+
+const reportOpen = ref(false)
+const reportContent = ref('')
+const reportError = ref('')
+const reportSubmitting = ref(false)
+
+function openReport() {
+  reportContent.value = ''
+  reportError.value = ''
+  reportOpen.value = true
+}
+
+function closeReport() {
+  reportOpen.value = false
+}
+
+async function submitReport() {
+  const content = reportContent.value.trim()
+  if (!content) return
+  reportSubmitting.value = true
+  reportError.value = ''
+  try {
+    await requestAPI.create(-1, 'REPORT', JSON.stringify({ content }))
+    toast(t('system.reportSuccess'), 'success')
+    reportOpen.value = false
+  } catch (err) {
+    reportError.value = getMessage(err, 'system.reportFailed')
+  } finally {
+    reportSubmitting.value = false
+  }
+}
 
 const developer = 'Zincoid'
 const buildVersion = document.querySelector('meta[name="version"]')?.content || '-'
@@ -298,6 +333,42 @@ watch(done, (v) => {
           </div>
         </div>
       </section>
+      <section class="section">
+        <h3>{{ t('system.report') }}</h3>
+        <p class="system-report-desc">{{ t('system.reportDesc') }}</p>
+        <button class="btn btn--primary" @click="openReport">
+          <SvgIcon name="send" :size="16" />
+          {{ t('system.reportSubmit') }}
+        </button>
+      </section>
+
+      <Transition name="modal">
+        <div v-if="reportOpen" class="modal-overlay" @click.self="closeReport">
+          <div class="modal">
+            <h3 class="modal__title">
+              <span>{{ t('system.reportTitle') }}</span>
+              <button class="modal__close" :title="t('common.close')" @click="closeReport">
+                <SvgIcon name="close" :size="16" />
+              </button>
+            </h3>
+            <p class="modal__desc">{{ t('system.reportDesc') }}</p>
+            <p v-if="reportError" class="msg msg--error">{{ reportError }}</p>
+            <textarea
+                v-model="reportContent"
+                class="field__input report-content"
+                rows="5"
+                maxlength="500"
+                :placeholder="t('system.reportPlaceholder')"
+            ></textarea>
+            <div class="modal__actions">
+              <button class="btn btn--primary btn--full" :disabled="reportSubmitting || !reportContent.trim()" @click="submitReport">
+                <SvgIcon name="send" :size="16" />
+                {{ t('system.reportSubmit') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </template>
   </div>
 </template>
@@ -356,6 +427,39 @@ watch(done, (v) => {
 
 .section { margin-top: var(--spacing-3xl); }
 .section h3 { margin-bottom: var(--spacing-lg); }
+
+.system-report-desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); max-width: 640px; }
+
+.report-content {
+  width: 100%;
+  resize: vertical;
+  min-height: 96px;
+}
+
+.modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
+.modal { position: relative; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); max-width: 480px; width: 100%; padding: var(--spacing-2xl); max-height: 80vh; overflow-y: auto; }
+.modal__title { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
+.modal__desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); }
+.modal__actions { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border-light); }
+.modal-enter-active, .modal-leave-active { transition: opacity .2s ease; }
+.modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .modal, .modal-leave-to .modal { transform: scale(0.95); }
 
 .stats-layout {
   display: grid;

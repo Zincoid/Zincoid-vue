@@ -282,6 +282,7 @@ export default {
     waitingAdmin: '待管理员处理',
     handledBy: '由 {name} 处理',
     storageExtension: '存储扩容',
+    report: '报告',
     reasonLabel: '原因：',
     remove: '移除',
     deleteConfirm: '确定删除此请求？',
@@ -417,7 +418,14 @@ export default {
     systemTime: '系统时间',
     stats: '统计数据',
     statsDaily: '日访问量（近7日）',
-    statsApis: '接口调用（近7日）'
+    statsApis: '接口调用（近7日）',
+    report: '报告问题',
+    reportDesc: '向管理员提交一份报告，说明遇到的问题或反馈意见，管理员处理后会在请求页面看到结果。',
+    reportTitle: '提交报告',
+    reportPlaceholder: '请描述要报告的内容...',
+    reportSubmit: '提交报告',
+    reportSuccess: '报告已提交',
+    reportFailed: '报告提交失败'
   },
   auth: {
     login: '登录',

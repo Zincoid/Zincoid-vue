@@ -282,6 +282,7 @@ export default {
     waitingAdmin: 'Awaiting admin',
     handledBy: 'Handled by {name}',
     storageExtension: 'Storage Expansion',
+    report: 'Report',
     reasonLabel: 'Reason: ',
     remove: 'Remove',
     deleteConfirm: 'Delete this request?',
@@ -417,7 +418,14 @@ export default {
     systemTime: 'System time',
     stats: 'Statistics',
     statsDaily: 'Daily visits (last 7 days)',
-    statsApis: 'Top APIs (last 7 days)'
+    statsApis: 'Top APIs (last 7 days)',
+    report: 'Report',
+    reportDesc: 'Submit a report to the administrator describing issues or feedback. The result will appear in the requests page after it is handled.',
+    reportTitle: 'Submit Report',
+    reportPlaceholder: 'Describe what you want to report...',
+    reportSubmit: 'Submit Report',
+    reportSuccess: 'Report submitted',
+    reportFailed: 'Failed to submit report'
   },
   auth: {
     login: 'Login',
