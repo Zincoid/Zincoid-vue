@@ -8,6 +8,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import { useError } from '@/composables/useError'
+import { useConfirm } from '@/composables/useConfirm'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
 import RepoCard from '@/components/RepoCard.vue'
@@ -24,6 +25,7 @@ const themeStore = useThemeStore()
 const auth = useAuthStore()
 const { toast } = useToast()
 const { getMessage } = useError()
+const { confirm } = useConfirm()
 
 const settingsOpen = ref(false)
 const musicSending = ref(false)
@@ -33,6 +35,7 @@ function openSettings() {
 }
 
 async function sendMusicRequest() {
+  if (!await confirm(t('user.musicRequestConfirm'))) return
   musicSending.value = true
   try {
     await requestAPI.create(userId.value, 'MUSIC_REQUEST')
