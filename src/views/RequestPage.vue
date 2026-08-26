@@ -190,9 +190,9 @@ function isAdminRequest(r) {
 
 function sentUserLabel(r) {
   if (isAdminRequest(r)) {
-    return r.receiverName
-      ? t('request.adminHandledBy', { name: r.receiverName })
-      : t('request.adminPending')
+    return t('request.adminLabel') + (r.receiverName
+      ? t('request.handledBy', { name: r.receiverName })
+      : t('request.awaitingHandle'))
   }
   return t('request.toLabel') + (r.receiverName || t('request.waitingAdmin'))
 }
