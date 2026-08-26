@@ -437,7 +437,7 @@ watch(done, (v) => {
 .section { margin-top: var(--spacing-3xl); }
 .section h3 { margin-bottom: var(--spacing-lg); }
 
-.system-report-desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); max-width: 640px; }
+.system-report-desc { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-lg); max-width: 100%; }
 
 .report-content {
   width: 100%;
