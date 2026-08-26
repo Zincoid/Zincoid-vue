@@ -290,7 +290,7 @@ export default {
     resolvedSent: '已处理的请求',
     noRequests: '暂无请求。',
     waitingAdmin: '待管理员处理',
-    adminLabel: '管理请求：',
+    adminLabel: '送至管理：',
     awaitingHandle: '等待处理中',
     handledBy: '由 {name} 处理',
     fromLabel: '来自：',
