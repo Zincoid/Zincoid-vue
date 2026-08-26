@@ -2,7 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
 export const useThemeStore = defineStore('theme', () => {
-  const theme = ref(localStorage.getItem('theme') === 'dark' ? 'dark' : 'light')
+  const saved = localStorage.getItem('theme')
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  const theme = ref(saved ? saved : (systemDark ? 'dark' : 'light'))
   document.documentElement.setAttribute('data-theme', theme.value)
 
   watch(theme, (val) => {
