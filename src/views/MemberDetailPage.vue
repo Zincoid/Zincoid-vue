@@ -29,6 +29,13 @@ const { confirm } = useConfirm()
 
 const settingsOpen = ref(false)
 const musicSending = ref(false)
+const overlayDown = ref(false)
+
+function onOverlayClick() {
+  if (!overlayDown.value) return
+  overlayDown.value = false
+  settingsOpen.value = false
+}
 
 function openSettings() {
   settingsOpen.value = true
@@ -269,7 +276,7 @@ function typeLabel(type) {
   </FabContainer>
 
   <Transition name="modal">
-    <div v-if="settingsOpen" class="modal-overlay" @click.self="settingsOpen = false">
+    <div v-if="settingsOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
       <div class="modal">
         <h3 class="modal__title">
           <span>{{ t('user.setting') }}</span>

@@ -101,6 +101,7 @@ function typeLabel(type) {
 
 // ── Create modal ──
 const showCreate = ref(false)
+const overlayDown = ref(false)
 const createForm = ref({ name: '', description: '', type: null, url: '', tags: '', coverImage: '', visibility: 0 })
 const createError = ref('')
 const creating = ref(false)
@@ -216,7 +217,7 @@ async function createRepo() {
     <!-- Create modal -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
+        <div v-if="showCreate" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, showCreate = false)">
           <div class="modal">
             <h3 class="modal__title">{{ t('repo.new') }}</h3>
             <div class="fields">

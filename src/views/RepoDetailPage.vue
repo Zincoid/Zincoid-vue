@@ -413,6 +413,7 @@ async function onDrop(id, e) {
 
 // ── Edit modal ──
 const showEdit = ref(false)
+const overlayDown = ref(false)
 const editForm = ref({ name: '', description: '', type: 0, url: '', tags: '', coverImage: '' })
 const editError = ref('')
 const saving = ref(false)
@@ -714,7 +715,7 @@ async function saveEdit() {
       <!-- Edit modal -->
       <Teleport to="body">
         <Transition name="modal">
-          <div v-if="showEdit" class="modal-overlay" @click.self="showEdit = false">
+          <div v-if="showEdit" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, showEdit = false)">
             <div class="modal">
               <h3 class="modal__title">{{ t('common.edit') }}</h3>
               <div class="fields">

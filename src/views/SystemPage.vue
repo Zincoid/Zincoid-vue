@@ -27,6 +27,13 @@ const reportTitle = ref('')
 const reportContent = ref('')
 const reportError = ref('')
 const reportSubmitting = ref(false)
+const overlayDown = ref(false)
+
+function onOverlayClick() {
+  if (!overlayDown.value) return
+  overlayDown.value = false
+  reportOpen.value = false
+}
 
 function openReport() {
   reportTitle.value = ''
@@ -346,7 +353,7 @@ watch(done, (v) => {
       </section>
 
       <Transition name="modal">
-        <div v-if="reportOpen" class="modal-overlay" @click.self="closeReport">
+        <div v-if="reportOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
           <div class="modal">
             <h3 class="modal__title">
               <span>{{ t('system.reportTitle') }}</span>

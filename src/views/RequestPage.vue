@@ -31,6 +31,13 @@ const loadingDone = ref(false)
 const handlingId = ref(null)
 const detail = ref(null)
 const detailReceived = ref(false)
+const overlayDown = ref(false)
+
+function onOverlayClick() {
+  if (!overlayDown.value) return
+  overlayDown.value = false
+  detail.value = null
+}
 
 const tabOptions = computed(() => [
   { value: 'received', label: t('request.received') },
@@ -396,7 +403,7 @@ function formatSize(bytes) {
     </template>
 
     <Transition name="modal">
-      <div v-if="detail" class="modal-overlay" @click.self="detail = null">
+      <div v-if="detail" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('request.detailTitle') }}</span>

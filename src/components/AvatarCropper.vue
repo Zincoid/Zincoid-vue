@@ -12,6 +12,14 @@ const props = defineProps({
 
 const emit = defineEmits(['crop', 'close'])
 
+const overlayDown = ref(false)
+
+function onOverlayClick() {
+  if (!overlayDown.value) return
+  overlayDown.value = false
+  emit('close')
+}
+
 const workspaceRef = ref(null)
 const imgEl = ref(null)
 const imgNatural = ref({ w: 0, h: 0 })
@@ -238,7 +246,7 @@ watch(dragging, (v) => {
 
 <template>
   <Teleport to="body">
-    <div v-if="visible" class="cropper-overlay" @click.self="close">
+    <div v-if="visible" class="cropper-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
       <div class="cropper-modal">
         <h3 class="cropper-title">{{ t('common.cropAvatar') }}</h3>
 

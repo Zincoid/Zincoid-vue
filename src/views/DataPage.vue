@@ -167,6 +167,13 @@ const reqUnit = ref('GB')
 const reqReason = ref('')
 const reqSubmitting = ref(false)
 const reqError = ref('')
+const overlayDown = ref(false)
+
+function onOverlayClick(close) {
+  if (!overlayDown.value) return
+  overlayDown.value = false
+  close()
+}
 
 const REQUEST_CAPACITY_UNITS = { MB: 1024 * 1024, GB: 1024 * 1024 * 1024, TB: 1024 * 1024 * 1024 * 1024 }
 
@@ -291,7 +298,7 @@ async function submitRequest() {
     </section>
 
     <Transition name="modal">
-      <div v-if="reqOpen" class="modal-overlay" @click.self="closeRequest">
+      <div v-if="reqOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeRequest)">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('data.requestCapacityTitle') }}</span>
@@ -320,7 +327,7 @@ async function submitRequest() {
     </Transition>
 
     <Transition name="modal">
-      <div v-if="musicOpen" class="modal-overlay" @click.self="closeMusicManage">
+      <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeMusicManage)">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('data.musicManageTitle') }}</span>

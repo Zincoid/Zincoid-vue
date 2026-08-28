@@ -287,6 +287,7 @@ async function runRecordsCleanup() {
 }
 
 const musicOpen = ref(false)
+const overlayDown = ref(false)
 const musicTracks = ref([])
 const musicPage = ref(1)
 const musicPages = ref(1)
@@ -760,7 +761,7 @@ onBeforeUnmount(stopStream)
     </section>
 
     <Transition name="modal">
-      <div v-if="musicOpen" class="modal-overlay" @click.self="closeMusicManage">
+      <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, closeMusicManage())">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('manage.musicManageTitle') }}</span>
