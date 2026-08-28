@@ -402,15 +402,16 @@ function formatSize(bytes) {
 
     </template>
 
-    <Transition name="modal">
-      <div v-if="detail" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
-        <div class="modal">
-          <h3 class="modal__title">
-            <span>{{ t('request.detailTitle') }}</span>
-            <button class="modal__close" @click="detail = null">
-              <SvgIcon name="close" :size="16" />
-            </button>
-          </h3>
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="detail" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
+          <div class="modal">
+            <h3 class="modal__title">
+              <span>{{ t('request.detailTitle') }}</span>
+              <button class="modal__close" @click="detail = null">
+                <SvgIcon name="close" :size="16" />
+              </button>
+            </h3>
 
           <div class="detail-sender" @click="router.push(`/members/${detail.senderId}`)">
             <img v-if="detail.senderAvatar" :src="detail.senderAvatar" class="detail-avatar" />
@@ -522,7 +523,8 @@ function formatSize(bytes) {
           </div>
         </div>
       </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

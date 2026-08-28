@@ -760,8 +760,9 @@ onBeforeUnmount(stopStream)
       </div>
     </section>
 
-    <Transition name="modal">
-      <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, closeMusicManage())">
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, closeMusicManage())">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('manage.musicManageTitle') }}</span>
@@ -802,7 +803,8 @@ onBeforeUnmount(stopStream)
           </div>
         </div>
       </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

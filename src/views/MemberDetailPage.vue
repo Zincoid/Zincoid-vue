@@ -275,8 +275,9 @@ function typeLabel(type) {
     </button>
   </FabContainer>
 
-  <Transition name="modal">
-    <div v-if="settingsOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="settingsOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
       <div class="modal">
         <h3 class="modal__title">
           <span>{{ t('user.setting') }}</span>
@@ -298,6 +299,7 @@ function typeLabel(type) {
       </div>
     </div>
   </Transition>
+  </Teleport>
 </template>
 
 <style scoped>

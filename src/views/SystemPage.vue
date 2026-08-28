@@ -352,8 +352,9 @@ watch(done, (v) => {
         </button>
       </section>
 
-      <Transition name="modal">
-        <div v-if="reportOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
+      <Teleport to="body">
+        <Transition name="modal">
+          <div v-if="reportOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick">
           <div class="modal">
             <h3 class="modal__title">
               <span>{{ t('system.reportTitle') }}</span>
@@ -385,6 +386,7 @@ watch(done, (v) => {
           </div>
         </div>
       </Transition>
+      </Teleport>
     </template>
   </div>
 </template>

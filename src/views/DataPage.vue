@@ -297,8 +297,9 @@ async function submitRequest() {
       </button>
     </section>
 
-    <Transition name="modal">
-      <div v-if="reqOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeRequest)">
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="reqOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeRequest)">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('data.requestCapacityTitle') }}</span>
@@ -324,10 +325,12 @@ async function submitRequest() {
           </div>
         </div>
       </div>
-    </Transition>
+      </Transition>
+    </Teleport>
 
-    <Transition name="modal">
-      <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeMusicManage)">
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="onOverlayClick(closeMusicManage)">
         <div class="modal">
           <h3 class="modal__title">
             <span>{{ t('data.musicManageTitle') }}</span>
@@ -368,7 +371,8 @@ async function submitRequest() {
           </div>
         </div>
       </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
