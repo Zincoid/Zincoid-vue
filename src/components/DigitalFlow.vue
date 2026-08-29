@@ -202,7 +202,10 @@ onUnmounted(() => {
 <style scoped>
 .digital-flow {
   position: fixed;
-  inset: 0;
+  top: calc(var(--navbar-height) - 8px);
+  left: 0;
+  right: 0;
+  bottom: 32px;
   z-index: 0;
   pointer-events: none;
 }
