@@ -54,7 +54,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
           <SvgIcon name="eye" :size="14" />
           {{ repo.viewCount || 0 }}
         </span>
-        <span v-if="repo.itemCount" class="repo-card__views">
+        <span v-if="(repo.type === 1 || repo.type === 2) && repo.itemCount != null" class="repo-card__views">
           <SvgIcon name="package" :size="14" />
           {{ repo.itemCount }}
         </span>
