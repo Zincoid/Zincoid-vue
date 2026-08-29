@@ -432,6 +432,7 @@ th {
 
 .page-content {
   flex: 1;
+  min-height: 100vh;
   padding-top: var(--navbar-height);
   padding-bottom: var(--spacing-4xl);
   position: relative;
