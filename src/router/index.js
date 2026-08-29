@@ -48,7 +48,7 @@ const routes = [
       },
       {
         path: 'data',
-        name: 'DataManagement',
+        name: 'Data',
         component: () => import('@/views/DataPage.vue'),
         meta: { requiresAuth: true, title: 'Data' }
       },
