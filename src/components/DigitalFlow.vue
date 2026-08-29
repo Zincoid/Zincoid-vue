@@ -205,7 +205,7 @@ onUnmounted(() => {
   top: calc(var(--navbar-height) - 8px);
   left: 0;
   right: 0;
-  bottom: 32px;
+  bottom: 0;
   z-index: 0;
   pointer-events: none;
 }
