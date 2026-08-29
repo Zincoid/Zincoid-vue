@@ -49,10 +49,16 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
     </div>
   </div>
     <div class="repo-card__footer">
-      <span class="repo-card__views">
-        <SvgIcon name="eye" :size="14" />
-        {{ repo.viewCount || 0 }}
-      </span>
+      <div class="repo-card__footer-left">
+        <span class="repo-card__views">
+          <SvgIcon name="eye" :size="14" />
+          {{ repo.viewCount || 0 }}
+        </span>
+        <span v-if="repo.itemCount" class="repo-card__views">
+          <SvgIcon name="package" :size="14" />
+          {{ repo.itemCount }}
+        </span>
+      </div>
       <div class="repo-card__right">
       <span class="repo-card__stat">
         <SvgIcon name="chat" :size="14" />
@@ -125,6 +131,11 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
   margin: 0 var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
   border-top: 1px solid var(--color-border-light);
+}
+.repo-card__footer-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 .repo-card__views, .repo-card__stat {
   display: inline-flex;
