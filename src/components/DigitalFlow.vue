@@ -172,8 +172,9 @@ function resize() {
 }
 
 function onMouseMove(e) {
-  mouseX = e.clientX
-  mouseY = e.clientY
+  const rect = canvasRef.value?.getBoundingClientRect()
+  mouseX = e.clientX - (rect?.left || 0)
+  mouseY = e.clientY - (rect?.top || 0)
 }
 
 onMounted(() => {
