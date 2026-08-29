@@ -197,6 +197,7 @@ export default {
     file: 'File',
     empty: 'No repos yet.',
     emptyItems: 'No items yet.',
+    itemsRemaining: '({count} left)',
     deleteConfirm: 'Delete this repo?',
     new: 'New',
     name: 'Name',

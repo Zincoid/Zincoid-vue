@@ -236,6 +236,7 @@ export default {
     file: '文件',
     empty: '暂无仓库。',
     emptyItems: '暂无内容。',
+    itemsRemaining: '（剩余 {count}）',
     deleteConfirm: '确定删除这个仓库？',
     new: '新建',
     name: '名称',

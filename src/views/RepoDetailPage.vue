@@ -47,6 +47,7 @@ let itemsVersion = 0
 const itemsPage = ref(1)
 const itemsPages = ref(1)
 const itemsTotal = ref(0)
+const itemsRemaining = computed(() => Math.max(0, itemsTotal.value - (repo.value?.items?.length || 0)))
 const itemsLoadingMore = ref(false)
 const itemsSize = parseInt(getConfig('page_size', '10'))
 
@@ -592,6 +593,7 @@ async function saveEdit() {
                   <template v-else>
                     <SvgIcon name="chevron-down" :size="20" />
                     <span>{{ t('common.loadMore') }}</span>
+                    <span class="load-more-cube__remaining">{{ t('repo.itemsRemaining', { count: itemsRemaining }) }}</span>
                   </template>
                 </button>
                 <div v-else class="item-card"
@@ -659,6 +661,7 @@ async function saveEdit() {
               <template v-else>
                 <SvgIcon name="chevron-down" :size="16" />
                 <span>{{ t('common.loadMore') }}</span>
+                <span class="load-more-cube__remaining">{{ t('repo.itemsRemaining', { count: itemsRemaining }) }}</span>
               </template>
             </button>
           </div>
@@ -1007,6 +1010,7 @@ async function saveEdit() {
   border-radius: 50%;
   animation: item-card-spin 0.8s linear infinite;
 }
+.load-more-cube__remaining { font-size: var(--text-xs); color: inherit; }
 
 .item-row--load-more {
   justify-content: center;
