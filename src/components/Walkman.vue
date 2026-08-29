@@ -11,7 +11,7 @@ import SliderSelect from '@/components/SliderSelect.vue'
 const { t } = useI18n()
 const { getMessage } = useError()
 const { load: loadConfig, get: getConfig } = useConfig()
-const { external } = useWalkman()
+const { external, registerAudio, isPlaying } = useWalkman()
 
 const open = ref(false)
 const listOpen = ref(false)
@@ -397,10 +397,17 @@ function onFabClick() {
   }
 }
 
+watch(playing, (v) => {
+  isPlaying.value = v
+})
+
 onMounted(async () => {
   await loadConfig()
   listSize.value = parseInt(getConfig('page_size', '10'))
-  if (audioRef.value) audioRef.value.volume = volume.value
+  if (audioRef.value) {
+    audioRef.value.volume = volume.value
+    registerAudio(audioRef.value)
+  }
   await loadList(1)
   if (!currentTrack.value && listTracks.value.length) {
     currentTrack.value = listTracks.value[0]
