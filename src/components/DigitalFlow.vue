@@ -1,3 +1,10 @@
+<script>
+let ctx = null
+let analyser = null
+let analyserForEl = null
+let freqData = null
+</script>
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useWalkman } from '@/composables/useWalkman'
@@ -20,11 +27,6 @@ let timer = null
 let mouseX = -9999
 let mouseY = -9999
 let lastTime = 0
-
-let ctx = null
-let analyser = null
-let analyserForEl = null
-let freqData = null
 
 function ensureAnalyser() {
   const el = audioEl.value
