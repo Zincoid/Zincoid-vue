@@ -119,7 +119,7 @@ function tick(now) {
   if (spectrum) {
     const bins = freqData.length
     const centerX = w / 2
-    const maxBarLen = (centerX - 8) * 0.4
+    const maxBarLen = (centerX - 8) * 0.5
     for (const cell of cells) {
       const isLeft = cell.x < centerX
       const edgeDist = isLeft ? cell.x : w - cell.x
