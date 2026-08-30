@@ -4,6 +4,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
 import { useWalkman } from '@/composables/useWalkman'
+import { useAuthStore } from '@/stores/auth'
 import { musicAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -12,6 +13,20 @@ const { t } = useI18n()
 const { getMessage } = useError()
 const { load: loadConfig, get: getConfig } = useConfig()
 const { external, registerAudio, isPlaying } = useWalkman()
+const auth = useAuthStore()
+
+const tipDismissed = ref(localStorage.getItem('walkmanTipDismissed') === '1')
+const tipNeeded = computed(() => auth.isLoggedIn && !tipDismissed.value)
+const tipNoMore = ref(false)
+const tipSeen = ref(false)
+
+function dismissTip() {
+  if (tipNoMore.value) localStorage.setItem('walkmanTipDismissed', '1')
+  tipDismissed.value = true
+  docked.value = true
+  posX.value = 0
+  open.value = false
+}
 
 const open = ref(false)
 const listOpen = ref(false)
@@ -46,14 +61,16 @@ const scopeOptions = computed(() => [
 ])
 
 const navbarH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 64
-const posX = ref(0)
+const posX = ref(tipNeeded.value ? 16 : 0)
 const posY = ref(navbarH + 16)
 const dragging = ref(false)
-const docked = ref(true)
+const docked = ref(!tipNeeded.value)
 let dragStart = null
 let moved = false
 let wasDocked = false
 let suppressClick = false
+
+const tipVisible = computed(() => tipNeeded.value && !tipSeen.value && !open.value && !docked.value)
 
 const audioRef = ref(null)
 const listScrollRef = ref(null)
@@ -388,6 +405,7 @@ function onFabClick() {
   }
   if (open.value) {
     open.value = false
+    tipSeen.value = true
     if (posX.value <= 20) {
       docked.value = true
       posX.value = 0
@@ -441,6 +459,16 @@ onMounted(async () => {
       <span v-else-if="playing" class="walkman__eq"><i></i><i></i><i></i></span>
       <SvgIcon v-else name="audio" :size="20" />
     </button>
+    <Transition name="walkman-pop">
+      <div v-if="tipVisible" class="walkman__tip">
+        <span class="walkman__tip-text">{{ t('walkman.tipText') }}</span>
+        <label class="walkman__tip-option">
+          <input v-model="tipNoMore" type="checkbox" />
+          {{ t('walkman.tipNoMore') }}
+        </label>
+        <button class="btn btn--primary walkman__tip-btn" @click="dismissTip">{{ t('common.confirm') }}</button>
+      </div>
+    </Transition>
     <Transition name="walkman-pop">
       <div v-if="open" class="walkman__dock">
         <div class="walkman__panel">
@@ -604,6 +632,42 @@ onMounted(async () => {
   0% { transform: scale(0.5); border-width: 1px; opacity: 0.5; }
   100% { transform: scale(1.0); border-width: 5px; opacity: 0; }
 }
+
+.walkman__tip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 0;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 2;
+}
+.walkman__tip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 21px;
+  border: 6px solid transparent;
+  border-right-color: var(--color-border);
+}
+.walkman__tip::after {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 22px;
+  border: 5px solid transparent;
+  border-right-color: var(--color-surface);
+}
+.walkman__tip-text { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; }
+.walkman__tip-option { display: flex; align-items: center; gap: var(--spacing-xs); font-size: var(--text-xs); color: var(--color-text-secondary); cursor: pointer; user-select: none; }
+.walkman__tip-option input { cursor: pointer; }
+.walkman__tip-btn { align-self: flex-end; padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); }
 
 .walkman__eq {
   display: flex;
