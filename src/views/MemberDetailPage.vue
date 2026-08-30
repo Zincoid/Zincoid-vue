@@ -427,7 +427,8 @@ function typeLabel(type) {
 .tab-content { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 
 .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--spacing-md); }
-.repo-grid > * { cursor: pointer; }
+.repo-grid > * { display: flex; cursor: pointer; }
+.repo-grid > * > * { flex: 1; }
 
 .pin-fab--settings:hover {
   border-color: #16a34a;
