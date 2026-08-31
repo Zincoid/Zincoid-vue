@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { userAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -12,12 +12,20 @@ const emit = defineEmits(['update:modelValue'])
 
 const { t } = useI18n()
 
+const root = ref(null)
 const query = ref('')
 const results = ref([])
 const open = ref(false)
 const selected = ref(null)
 let searchTimer = null
 let seq = 0
+
+function onDocClick(e) {
+  if (!root.value?.contains(e.target)) open.value = false
+}
+
+onMounted(() => document.addEventListener('click', onDocClick))
+onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
 watch(() => props.modelValue, async (v) => {
   if (v == null) {
@@ -64,7 +72,7 @@ function clearUser() {
 </script>
 
 <template>
-  <div class="user-select" :class="{ 'user-select--open': open }">
+  <div ref="root" class="user-select" :class="{ 'user-select--open': open }">
     <template v-if="selected">
       <div class="user-select__chosen">
         <img v-if="selected.avatar" :src="selected.avatar" class="user-select__avatar" />

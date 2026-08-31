@@ -262,7 +262,7 @@ export default {
     transferConfirm: '确定要转让该仓库？转让后你将不再是所有者。',
     transferSuccess: '转让请求已发送',
     transferFailed: '转让请求发送失败',
-    transferIdInvalid: '请输入有效的用户 ID',
+    transferIdInvalid: '请选择要转让的用户',
     transferSelf: '不能转让给自己',
     restrictedHint: '访问此仓库需要授权',
     noDesc: '暂无简介',

@@ -223,7 +223,7 @@ export default {
     transferConfirm: 'Transfer this repo? You will no longer own it.',
     transferSuccess: 'Transfer request sent',
     transferFailed: 'Failed to send transfer request',
-    transferIdInvalid: 'Enter a valid user ID',
+    transferIdInvalid: 'Please select a user to transfer to',
     transferSelf: 'Cannot transfer to yourself',
     restrictedHint: 'Authorization required to access this repo',
     noDesc: 'No description',
