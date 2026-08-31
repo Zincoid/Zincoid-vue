@@ -7,7 +7,7 @@ import { useToast } from '@/composables/useToast'
 import { useAuthStore } from '@/stores/auth'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
-import { repoAPI, fileAPI, commentAPI } from '@/api'
+import { repoAPI, fileAPI, commentAPI, requestAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -41,6 +41,48 @@ const commentPage = ref(1)
 const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
+
+// ── Transfer modal ──
+const settingsOpen = ref(false)
+const transferOverlayDown = ref(false)
+const transferId = ref('')
+const transferring = ref(false)
+const transferError = ref('')
+
+function onTransferOverlayClick() {
+  if (!transferOverlayDown.value) return
+  transferOverlayDown.value = false
+  settingsOpen.value = false
+}
+
+function openSettings() {
+  transferId.value = ''
+  transferError.value = ''
+  settingsOpen.value = true
+}
+
+async function sendTransfer() {
+  const target = Number(transferId.value.trim())
+  if (!transferId.value.trim() || !Number.isInteger(target) || target <= 0) {
+    transferError.value = t('repo.transferIdInvalid')
+    return
+  }
+  if (target === auth.user?.id) {
+    transferError.value = t('repo.transferSelf')
+    return
+  }
+  if (!await confirm(t('repo.transferConfirm'))) return
+  transferring.value = true
+  try {
+    await requestAPI.create(target, 'REPO_TRANSFER', JSON.stringify({ repo: repo.value.id }))
+    toast(t('repo.transferSuccess'), 'success')
+    settingsOpen.value = false
+  } catch (err) {
+    toast(getMessage(err, 'repo.transferFailed'), 'error')
+  } finally {
+    transferring.value = false
+  }
+}
 
 // ── Items pagination (load more pattern) ──
 let itemsVersion = 0
@@ -789,6 +831,10 @@ async function saveEdit() {
       <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
     </label>
 
+    <button v-if="repo && isOwner()" class="pin-fab pin-fab--settings" :title="t('user.setting')" @click="openSettings">
+      <SvgIcon name="settings" :size="20" />
+    </button>
+
     <div class="like-fab">
       <LikeButton
           :targetType="4"
@@ -804,6 +850,39 @@ async function saveEdit() {
       <SvgIcon name="back-arrow" :size="20" />
     </button>
   </FabContainer>
+
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="settingsOpen" class="modal-overlay" @mousedown.self="transferOverlayDown = true" @click="onTransferOverlayClick">
+        <div class="modal">
+          <h3 class="modal__title">
+            <span>{{ t('user.setting') }}</span>
+            <button class="modal__close" @click="settingsOpen = false">
+              <SvgIcon name="close" :size="16" />
+            </button>
+          </h3>
+          <div class="setting-block">
+            <h4 class="setting-block__title">{{ t('repo.transferTitle') }}</h4>
+            <p class="setting-block__desc">{{ t('repo.transferDesc') }}</p>
+            <input
+              v-model="transferId"
+              type="text"
+              class="field__input setting-block__input"
+              :placeholder="t('repo.transferIdPlaceholder')"
+            />
+            <p v-if="transferError" class="setting-block__error">{{ transferError }}</p>
+            <button class="btn btn--primary btn--full setting-block__btn" :disabled="transferring" @click="sendTransfer">
+              <SvgIcon name="fork" :size="16" />
+              {{ t('repo.transferSend') }}
+            </button>
+          </div>
+          <div class="setting-block setting-block--empty">
+            <p class="setting-block__desc setting-block__desc--center">{{ t('user.moreComing') }}</p>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -1055,7 +1134,22 @@ async function saveEdit() {
 /* ── Modal ── */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: var(--spacing-xl); }
 .modal { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); max-width: 480px; width: 100%; padding: var(--spacing-2xl); }
-.modal__title { font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__title { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-lg); margin-bottom: var(--spacing-xl); }
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.modal__close:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
 .modal .fields { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .modal .field__textarea { min-height: 60px; }
 .modal .field__hint { font-size: var(--text-xs); color: var(--color-text-secondary); margin-top: 2px; }
@@ -1073,4 +1167,30 @@ async function saveEdit() {
 .modal-enter-active .modal, .modal-leave-active .modal { transition: transform .2s ease; }
 .modal-enter-from, .modal-leave-to { opacity: 0; }
 .modal-enter-from .modal, .modal-leave-to .modal { transform: scale(0.95); }
+
+/* ── Settings modal ── */
+.pin-fab--settings:hover {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+.setting-block {
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+.setting-block:last-child { margin-bottom: 0; }
+.setting-block__title { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); margin-bottom: var(--spacing-xs); }
+.setting-block__desc { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; margin-bottom: var(--spacing-md); }
+.setting-block__input { width: 100%; margin-bottom: var(--spacing-sm); }
+.setting-block__error { font-size: var(--text-xs); color: var(--color-danger); margin-bottom: var(--spacing-sm); }
+.setting-block__btn { font-size: var(--text-xs); padding: var(--spacing-xs) var(--spacing-lg); }
+.setting-block--empty {
+  border-style: dashed;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.setting-block__desc--center { margin-bottom: 0; text-align: center; }
 </style>

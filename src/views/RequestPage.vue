@@ -156,6 +156,17 @@ const TYPE_VIEWS = {
     meta(r) {
       return musicName(r)
     }
+  },
+  3: {
+    labelKey: 'request.repoTransfer',
+    meta(r) {
+      try {
+        const meta = JSON.parse(r.meta || '{}')
+        return meta.repo != null ? `#${meta.repo}` : ''
+      } catch {
+        return ''
+      }
+    }
   }
 }
 
@@ -466,6 +477,12 @@ function formatSize(bytes) {
                     {{ t('request.musicDownload') }}
                   </a>
                 </span>
+              </div>
+            </template>
+            <template v-else-if="detail.type === 3">
+              <div class="detail-row">
+                <span class="detail-label">{{ t('request.repoLabel') }}</span>
+                <span class="detail-value">{{ requestMeta(detail) }}</span>
               </div>
             </template>
           </div>
