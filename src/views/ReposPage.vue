@@ -177,13 +177,21 @@ async function createRepo() {
     </div>
 
     <div class="repo-search">
-      <input
-        v-model="keyword"
-        type="text"
-        class="field__input repo-search__input"
-        :placeholder="t('repo.searchPlaceholder')"
-        @input="onSearchInput"
-      />
+      <div class="repo-search__box">
+        <input
+          v-model="keyword"
+          type="text"
+          class="field__input repo-search__input"
+          :placeholder="t('repo.searchPlaceholder')"
+          @input="onSearchInput"
+        />
+        <SliderSelect
+          class="repo-search-mode"
+          :model-value="tagged"
+          :options="searchModeOptions"
+          @update:model-value="switchSearchMode"
+        />
+      </div>
     </div>
 
     <div class="type-tabs">
@@ -195,12 +203,6 @@ async function createRepo() {
         :style="activeType === tab.value ? { color: tab.color, borderColor: tab.color, background: tab.color + '18' } : {}"
         @click="switchType(tab.value)"
       >{{ t(`repo.${tab.key}`) }}</button>
-      <SliderSelect
-        class="repo-search-mode"
-        :model-value="tagged"
-        :options="searchModeOptions"
-        @update:model-value="switchSearchMode"
-      />
     </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -296,9 +298,15 @@ async function createRepo() {
 .header .btn { flex-shrink: 0; }
 
 .repo-search { margin-bottom: var(--spacing-xl); }
-.repo-search__input { width: 100%; }
+.repo-search__box { position: relative; }
+.repo-search__input { width: 100%; padding-right: 150px; }
 
-.repo-search-mode { margin-left: auto; flex-shrink: 0; }
+.repo-search-mode {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 .type-tabs {
   display: flex;
