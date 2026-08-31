@@ -218,7 +218,7 @@ export default {
     transfer: 'Transfer',
     transferTitle: 'Transfer Repo',
     transferDesc: 'Transfer ownership of this repo to another user.',
-    transferIdPlaceholder: 'Enter user ID',
+    transferIdPlaceholder: 'Enter username or nickname',
     transferSend: 'Send Transfer',
     transferConfirm: 'Transfer this repo? You will no longer own it.',
     transferSuccess: 'Transfer request sent',

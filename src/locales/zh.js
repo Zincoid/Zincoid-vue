@@ -257,7 +257,7 @@ export default {
     transfer: '转让',
     transferTitle: '转让仓库',
     transferDesc: '将该仓库的所有权转让给指定用户。',
-    transferIdPlaceholder: '输入用户 ID',
+    transferIdPlaceholder: '输入用户名或昵称',
     transferSend: '发起转让',
     transferConfirm: '确定要转让该仓库？转让后你将不再是所有者。',
     transferSuccess: '转让请求已发送',
