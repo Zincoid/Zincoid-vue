@@ -267,19 +267,19 @@ function typeLabel(type) {
 
   <FabContainer>
     <button
-      v-if="auth.isLoggedIn && userId !== auth.user?.id"
-      class="pin-fab pin-fab--settings"
-      :title="t('user.setting')"
-      @click="openSettings">
-      <SvgIcon name="settings" :size="20" />
-    </button>
-    <button
       v-if="tab !== 'repos'"
       class="pin-fab"
       :class="{ 'pin-fab--active': isPinned }"
       :title="isPinned ? t('common.unpin') : t('common.pin')"
       @click="togglePinned">
       <SvgIcon :name="isPinned ? 'pin-off' : 'pin'" :size="20" />
+    </button>
+    <button
+      v-if="auth.isLoggedIn && userId !== auth.user?.id"
+      class="pin-fab pin-fab--settings"
+      :title="t('user.setting')"
+      @click="openSettings">
+      <SvgIcon name="settings" :size="20" />
     </button>
     <button class="back-fab" :title="t('common.goBack')" @click="$router.back()">
       <SvgIcon name="back-arrow" :size="20" />
@@ -443,8 +443,8 @@ function typeLabel(type) {
 .repo-grid > * > * { flex: 1; }
 
 .pin-fab--settings:hover {
-  border-color: #16a34a;
-  color: #16a34a;
+  border-color: #ca8a04;
+  color: #ca8a04;
 }
 
 /* ── Settings modal ── */
