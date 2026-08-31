@@ -208,10 +208,14 @@ function clearUser() {
   overflow-y: auto;
   padding: var(--spacing-xs);
   scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.35) transparent;
 }
-.user-select__dropdown::-webkit-scrollbar { width: 4px; }
-.user-select__dropdown::-webkit-scrollbar-track { margin: 6px 0; }
-.user-select__dropdown::-webkit-scrollbar-thumb { background: var(--color-border); }
+.user-select__dropdown::-webkit-scrollbar { width: 6px; }
+.user-select__dropdown::-webkit-scrollbar-track { background: transparent; }
+.user-select__dropdown::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.35);
+  border-radius: var(--rounded-full);
+}
 .user-select__dropdown::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .user-select__option {
