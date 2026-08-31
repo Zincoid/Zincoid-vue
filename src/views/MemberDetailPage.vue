@@ -88,6 +88,7 @@ const moments = ref([])
 const articles = ref([])
 const repos = ref([])
 const repoType = ref(null)
+const repoUpdated = ref(false)
 const tab = ref('moments')
 const loading = ref(true)
 const loadingDone = ref(false)
@@ -145,7 +146,7 @@ async function fetchArticles() {
 
 async function fetchRepos() {
   tabLoading.value = true
-  const { data } = await repoAPI.getByUser(userId.value, rPage.value, pageSize.value, repoType.value)
+  const { data } = await repoAPI.getByUser(userId.value, rPage.value, pageSize.value, repoType.value, repoUpdated.value)
   repos.value = data.data.records || []
   rPages.value = data.data.pages || 1
   rTotal.value = data.data.total || 0
@@ -154,6 +155,12 @@ async function fetchRepos() {
 
 function switchRepoType(type) {
   repoType.value = type
+  rPage.value = 1
+  fetchRepos()
+}
+
+function switchRepoSort() {
+  repoUpdated.value = !repoUpdated.value
   rPage.value = 1
   fetchRepos()
 }
@@ -227,6 +234,10 @@ function typeLabel(type) {
         <button class="tab-filter" :class="{ 'tab-filter--active': repoType === 0 }" :style="repoType === 0 ? { color: typeColors[0], borderColor: typeColors[0], background: typeColors[0] + '18' } : {}" @click="switchRepoType(0)">{{ t('repo.code') }}</button>
         <button class="tab-filter" :class="{ 'tab-filter--active': repoType === 1 }" :style="repoType === 1 ? { color: typeColors[1], borderColor: typeColors[1], background: typeColors[1] + '18' } : {}" @click="switchRepoType(1)">{{ t('repo.media') }}</button>
         <button class="tab-filter" :class="{ 'tab-filter--active': repoType === 2 }" :style="repoType === 2 ? { color: typeColors[2], borderColor: typeColors[2], background: typeColors[2] + '18' } : {}" @click="switchRepoType(2)">{{ t('repo.file') }}</button>
+        <button class="tab-filter tab-filter--sort" @click="switchRepoSort">
+          <SvgIcon name="clock" :size="12" />
+          <span>{{ repoUpdated ? t('repo.byUpdated') : t('repo.byCreated') }}</span>
+        </button>
       </div>
     </div>
 
@@ -421,6 +432,7 @@ function typeLabel(type) {
 }
 
 .tab-filter { padding: 2px var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); border: 1px solid var(--color-border); border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
+.tab-filter--sort { display: inline-flex; align-items: center; gap: 6px; }
 .tab-filter:hover { color: var(--color-text-heading); border-color: var(--color-text-secondary); }
 .tab-filter--active { color: var(--color-primary); border-color: var(--color-primary); background: var(--color-primary-light); }
 

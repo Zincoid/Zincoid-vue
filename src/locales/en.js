@@ -210,6 +210,8 @@ export default {
     searchPlaceholder: 'Search repos...',
     byName: 'BY NAME',
     byTag: 'BY TAG',
+    byCreated: 'By Created',
+    byUpdated: 'By Updated',
     requestAccess: 'Authorize',
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',

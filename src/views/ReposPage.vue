@@ -27,6 +27,7 @@ const typeTabs = [
 const activeType = ref(null)
 const keyword = ref('')
 const tagged = ref(false)
+const updated = ref(false)
 let searchTimer = null
 
 const searchModeOptions = computed(() => [
@@ -58,7 +59,7 @@ async function fetchRepos() {
   loadingDone.value = false
   try {
     const kw = keyword.value.trim() || null
-    const res = await repoAPI.getList(page.value, pageSize.value, tagged.value, activeType.value, kw)
+    const res = await repoAPI.getList(page.value, pageSize.value, tagged.value, activeType.value, kw, updated.value)
     const data = res.data.data
     repos.value = data.records ?? []
     pages.value = data.pages ?? 1
@@ -85,6 +86,12 @@ function switchType(type) {
 function switchSearchMode(enabled) {
   if (tagged.value === enabled) return
   tagged.value = enabled
+  page.value = 1
+  fetchRepos()
+}
+
+function switchSort() {
+  updated.value = !updated.value
   page.value = 1
   fetchRepos()
 }
@@ -177,21 +184,21 @@ async function createRepo() {
     </div>
 
     <div class="repo-search">
-      <div class="repo-search__box">
-        <input
-          v-model="keyword"
-          type="text"
-          class="field__input repo-search__input"
-          :placeholder="t('repo.searchPlaceholder')"
-          @input="onSearchInput"
-        />
-        <SliderSelect
-          class="repo-search-mode"
-          :model-value="tagged"
-          :options="searchModeOptions"
-          @update:model-value="switchSearchMode"
-        />
-      </div>
+        <div class="repo-search__box">
+          <input
+            v-model="keyword"
+            type="text"
+            class="field__input repo-search__input"
+            :placeholder="t('repo.searchPlaceholder')"
+            @input="onSearchInput"
+          />
+          <SliderSelect
+            class="repo-search-mode"
+            :model-value="tagged"
+            :options="searchModeOptions"
+            @update:model-value="switchSearchMode"
+          />
+        </div>
     </div>
 
     <div class="type-tabs">
@@ -203,6 +210,14 @@ async function createRepo() {
         :style="activeType === tab.value ? { color: tab.color, borderColor: tab.color, background: tab.color + '18' } : {}"
         @click="switchType(tab.value)"
       >{{ t(`repo.${tab.key}`) }}</button>
+      <button
+        type="button"
+        class="repo-search-sort"
+        @click="switchSort"
+      >
+        <SvgIcon name="clock" :size="12" />
+        <span>{{ updated ? t('repo.byUpdated') : t('repo.byCreated') }}</span>
+      </button>
     </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -307,6 +322,24 @@ async function createRepo() {
   top: 50%;
   transform: translateY(-50%);
 }
+
+.repo-search-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.repo-search-sort:hover { color: var(--color-text-heading); border-color: var(--color-text-secondary); }
 
 .type-tabs {
   display: flex;

@@ -249,6 +249,8 @@ export default {
     searchPlaceholder: '搜索仓库...',
     byName: '按名称',
     byTag: '按标签',
+    byCreated: '按创建时间',
+    byUpdated: '按更新时间',
     requestAccess: '授权',
     requestAccessConfirm: '确定要申请访问此仓库？',
     requestAccessSent: '申请已发送',
