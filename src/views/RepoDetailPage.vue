@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useConfig } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
 import { repoAPI, fileAPI, commentAPI, requestAPI } from '@/api'
-import { formatDate } from '@/utils/format'
+import { formatDate, relativeDate } from '@/utils/format'
 import MediaViewer from '@/components/MediaViewer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import LikeButton from '@/components/LikeButton.vue'
@@ -32,6 +32,17 @@ const { load: loadConfig, get: getConfig } = useConfig()
 const origin = location.origin
 const repo = ref(null)
 const shareUrl = computed(() => repo.value ? `${origin}${route.path}` : '')
+
+const relUpdate = computed(() => {
+  const r = repo.value
+  if (!r?.updatedAt || r.updatedAt === r.createdAt) return null
+  return relativeDate(r.updatedAt)
+})
+
+function agoUnitLabel(unit, value) {
+  const base = { min: 'common.minAgo', hour: 'common.hourAgo', day: 'common.dayAgo', month: 'common.monthAgo', year: 'common.yearAgo' }[unit]
+  return t(value === 1 ? base + '1' : base)
+}
 const loading = ref(true)
 const loadingDone = ref(false)
 const likeLiked = ref(false)
@@ -561,7 +572,7 @@ async function saveEdit() {
               <span class="author-nickname">{{ repo.userNickname }}</span>
             </router-link>
             <div class="repo-meta__right">
-              <span class="repo-date">{{ formatDate(repo.createdAt) }}</span>
+              <span class="repo-date">{{ formatDate(repo.createdAt) }}<template v-if="relUpdate"> · {{ t('repo.updated') }} {{ relUpdate.value }} {{ agoUnitLabel(relUpdate.unit, relUpdate.value) }}</template></span>
               <span class="repo-views">
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
