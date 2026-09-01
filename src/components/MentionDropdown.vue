@@ -44,7 +44,6 @@ const scrollEl = ref(null)
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
   box-shadow: inset 0 0 0 1px var(--color-border);
-  padding: 4px;
   min-width: 200px;
 }
 .mention-dropdown__item {
