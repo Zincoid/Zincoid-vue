@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 defineProps({
   maxHeight: { type: String, default: '' },
@@ -8,6 +8,22 @@ defineProps({
 defineEmits(['scroll'])
 
 const body = ref(null)
+let observer = null
+
+function updateScrollState() {
+  const el = body.value
+  if (!el) return
+  const scrolling = el.scrollHeight > el.clientHeight + 1
+  el.classList.toggle('scroll-thin--noscroll', !scrolling)
+}
+
+onMounted(() => {
+  updateScrollState()
+  observer = new MutationObserver(updateScrollState)
+  observer.observe(body.value, { childList: true, subtree: true })
+})
+onBeforeUnmount(() => observer?.disconnect())
+
 defineExpose({ body })
 </script>
 

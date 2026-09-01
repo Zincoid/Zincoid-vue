@@ -464,6 +464,7 @@ th {
 .scroll-thin::-webkit-scrollbar-track { margin: 6px 0; }
 .scroll-thin::-webkit-scrollbar-thumb { background: var(--color-border); }
 .scroll-thin::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
+.scroll-thin--noscroll { border-right: 0; }
 
 /* ── Textarea resize handle ── */
 textarea::-webkit-scrollbar-corner {
