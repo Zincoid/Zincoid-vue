@@ -225,7 +225,7 @@ async function createRepo() {
       <p v-if="repos.length === 0" class="empty-state">{{ t('repo.empty') }}</p>
       <div v-else class="repo-grid">
         <router-link v-for="repo in repos" :key="repo.id" :to="`/repos/${repo.id}`">
-          <RepoCard :repo="repo" />
+          <RepoCard :repo="repo" :sort-updated="updated" />
         </router-link>
       </div>
       <Pagination :page="page" :pages="pages" :total="total" :size="pageSize" @change="onPageChange" />

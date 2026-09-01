@@ -257,7 +257,7 @@ function typeLabel(type) {
       <LoadingSpinner :visible="tabLoading" />
       <div v-if="repos.length" class="repo-grid">
         <div v-for="repo in repos" :key="repo.id" @click="router.push(`/repos/${repo.id}`)">
-          <RepoCard :repo="repo" :show-user="false" />
+          <RepoCard :repo="repo" :show-user="false" :sort-updated="repoUpdated" />
         </div>
       </div>
       <p v-if="!tabLoading && !repos.length" class="empty-state">{{ t('repo.empty') }}</p>

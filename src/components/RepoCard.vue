@@ -9,7 +9,8 @@ const auth = useAuthStore()
 
 defineProps({
   repo: { type: Object, required: true },
-  showUser: { type: Boolean, default: true }
+  showUser: { type: Boolean, default: true },
+  sortUpdated: { type: Boolean, default: false }
 })
 
 const typeLabels = { 0: 'repo.code', 1: 'repo.media', 2: 'repo.file' }
@@ -36,9 +37,9 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
           <span v-else class="repo-card__avatar-placeholder">{{ repo.userNickname[0] }}</span>
           <span class="repo-card__nickname">{{ repo.userNickname }}</span>
         </div>
-        <span class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
+        <span class="repo-card__date">{{ formatDate(sortUpdated ? repo.updatedAt : repo.createdAt) }}</span>
       </div>
-      <span v-else class="repo-card__date">{{ formatDate(repo.createdAt) }}</span>
+      <span v-else class="repo-card__date">{{ formatDate(sortUpdated ? repo.updatedAt : repo.createdAt) }}</span>
       <h3 class="repo-card__name">{{ repo.name }}</h3>
       <p class="repo-card__desc">{{ repo.description || t('repo.noDesc') }}</p>
       <div class="repo-card__tags">
