@@ -36,7 +36,9 @@ const shareUrl = computed(() => repo.value ? `${origin}${route.path}` : '')
 const relUpdate = computed(() => {
   const r = repo.value
   if (!r?.updatedAt || r.updatedAt === r.createdAt) return null
-  return relativeDate(r.updatedAt)
+  const rel = relativeDate(r.updatedAt)
+  if (!rel) return t('repo.updated') + ' ' + t('common.justNow')
+  return t('repo.updated') + ' ' + rel.value + ' ' + agoUnitLabel(rel.unit, rel.value)
 })
 
 function agoUnitLabel(unit, value) {
@@ -572,7 +574,7 @@ async function saveEdit() {
               <span class="author-nickname">{{ repo.userNickname }}</span>
             </router-link>
             <div class="repo-meta__right">
-              <span class="repo-date">{{ formatDate(repo.createdAt) }}<template v-if="relUpdate"> · {{ t('repo.updated') }} {{ relUpdate.value }} {{ agoUnitLabel(relUpdate.unit, relUpdate.value) }}</template></span>
+              <span class="repo-date">{{ formatDate(repo.createdAt) }}<template v-if="relUpdate"> · {{ relUpdate }}</template></span>
               <span class="repo-views">
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
