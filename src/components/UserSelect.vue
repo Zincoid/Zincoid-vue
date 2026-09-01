@@ -97,22 +97,24 @@ function clearUser() {
     />
     <Transition name="dropdown">
       <div v-if="open && !selected" class="user-select__dropdown" @mousedown.prevent>
-        <button
-          v-for="u in results"
-          :key="u.id"
-          type="button"
-          class="user-select__option"
-          @click="pick(u)"
-        >
-          <img v-if="u.avatar" :src="u.avatar" class="user-select__avatar" />
-          <span v-else class="user-select__avatar user-select__avatar--placeholder">{{ (u.nickname || '?')[0].toUpperCase() }}</span>
-          <span class="user-select__info">
-            <span class="user-select__name">{{ u.nickname }}</span>
-            <span class="user-select__username">@{{ u.username }}</span>
-          </span>
-        </button>
-        <p v-if="query.trim() && !results.length" class="user-select__empty">{{ t('common.noResults') }}</p>
-        <p v-else-if="!query.trim()" class="user-select__empty">{{ t('common.typeToSearch') }}</p>
+        <div class="user-select__list">
+          <button
+            v-for="u in results"
+            :key="u.id"
+            type="button"
+            class="user-select__option"
+            @click="pick(u)"
+          >
+            <img v-if="u.avatar" :src="u.avatar" class="user-select__avatar" />
+            <span v-else class="user-select__avatar user-select__avatar--placeholder">{{ (u.nickname || '?')[0].toUpperCase() }}</span>
+            <span class="user-select__info">
+              <span class="user-select__name">{{ u.nickname }}</span>
+              <span class="user-select__username">@{{ u.username }}</span>
+            </span>
+          </button>
+          <p v-if="query.trim() && !results.length" class="user-select__empty">{{ t('common.noResults') }}</p>
+          <p v-else-if="!query.trim()" class="user-select__empty">{{ t('common.typeToSearch') }}</p>
+        </div>
       </div>
     </Transition>
   </div>
@@ -204,19 +206,18 @@ function clearUser() {
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-md);
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.user-select__list {
   max-height: 280px;
   overflow-y: auto;
   padding: var(--spacing-xs);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(128, 128, 128, 0.35) transparent;
+  border-right: 4px solid transparent;
 }
-.user-select__dropdown::-webkit-scrollbar { width: 6px; }
-.user-select__dropdown::-webkit-scrollbar-track { background: transparent; }
-.user-select__dropdown::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.35);
-  border-radius: var(--rounded-full);
-}
-.user-select__dropdown::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
+.user-select__list::-webkit-scrollbar { width: 4px; }
+.user-select__list::-webkit-scrollbar-track { margin: 6px 0; }
+.user-select__list::-webkit-scrollbar-thumb { background: var(--color-border); }
+.user-select__list::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .user-select__option {
   display: flex;
