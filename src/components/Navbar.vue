@@ -9,6 +9,7 @@ import { useConfig, siteBrand } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
 import { notificationAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const router = useRouter()
@@ -310,7 +311,7 @@ function closeMenu() {
           </button>
         </div>
       </div>
-      <div class="navbar__notif-dropdown-body">
+      <ScrollArea class="navbar__notif-dropdown-body" :padding="'var(--spacing-md) var(--spacing-sm) var(--spacing-md) var(--spacing-md)'">
         <LoadingSpinner :visible="notifLoading" @done="notifLoadingDone = true" />
         <template v-if="notifLoadingDone">
           <p v-if="notifications.length === 0" class="navbar__notif-empty">{{ t('notification.empty') }}</p>
@@ -366,7 +367,7 @@ function closeMenu() {
             @click="loadMore"
           >{{ notifLoadingMore ? t('common.loading') : t('common.loadMore') }}</button>
         </template>
-      </div>
+      </ScrollArea>
     </div>
     </Transition>
     <Transition name="notif-fade">
@@ -748,18 +749,8 @@ function closeMenu() {
 
 .navbar__notif-dropdown-body {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--spacing-md) var(--spacing-sm) var(--spacing-md) var(--spacing-md);
-  border-right: 4px solid transparent;
+  min-height: 0;
 }
-.navbar__notif-dropdown-body::-webkit-scrollbar { width: 4px; }
-.navbar__notif-dropdown-body::-webkit-scrollbar-track {
-  margin: 6px 0;
-}
-.navbar__notif-dropdown-body::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-}
-.navbar__notif-dropdown-body::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .navbar__notif-empty {
   text-align: center;

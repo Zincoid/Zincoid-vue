@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth'
 import { musicAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -204,7 +205,7 @@ function playTrack(index) {
 
 function scrollToActive() {
   nextTick(() => {
-    const container = listScrollRef.value
+    const container = listScrollRef.value?.body
     const el = container?.querySelector('.walkman__track--active')
     if (!container || !el) return
     const cRect = container.getBoundingClientRect()
@@ -524,32 +525,34 @@ onMounted(async () => {
             <div class="walkman__list-head">
               <SliderSelect v-model="musicScope" :options="scopeOptions" fill />
             </div>
-            <div ref="listScrollRef" v-if="listTracks.length" class="walkman__list-scroll">
-              <div
-                  v-for="tr in listTracks"
-                  :key="tr.id"
-                  class="walkman__track"
-                  :class="{ 'walkman__track--active': tr.id === currentTrack?.id }"
-                  @click="playListTrack(tr)"
-              >
-                <span v-if="tr.id === currentTrack?.id && playing" class="walkman__track-eq"><i></i><i></i><i></i></span>
-                <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
-                <button
-                    class="walkman__track-play"
-                    @click.stop="toggleTrack(tr)"
+            <ScrollArea ref="listScrollRef" v-if="listTracks.length" :max-height="'128px'">
+              <div class="walkman__list-inner">
+                <div
+                    v-for="tr in listTracks"
+                    :key="tr.id"
+                    class="walkman__track"
+                    :class="{ 'walkman__track--active': tr.id === currentTrack?.id }"
+                    @click="playListTrack(tr)"
                 >
-                  <SvgIcon :name="tr.id === currentTrack?.id && playing ? 'pause' : 'play'" :size="10" />
-                </button>
-                <a
-                    class="walkman__track-download"
-                    :href="tr.url"
-                    :download="tr.fileName"
-                    @click.stop
-                >
-                  <SvgIcon name="download" :size="12" />
-                </a>
+                  <span v-if="tr.id === currentTrack?.id && playing" class="walkman__track-eq"><i></i><i></i><i></i></span>
+                  <span class="walkman__track-name">{{ displayName(tr.fileName) }}</span>
+                  <button
+                      class="walkman__track-play"
+                      @click.stop="toggleTrack(tr)"
+                  >
+                    <SvgIcon :name="tr.id === currentTrack?.id && playing ? 'pause' : 'play'" :size="10" />
+                  </button>
+                  <a
+                      class="walkman__track-download"
+                      :href="tr.url"
+                      :download="tr.fileName"
+                      @click.stop
+                  >
+                    <SvgIcon name="download" :size="12" />
+                  </a>
+                </div>
               </div>
-            </div>
+            </ScrollArea>
             <div v-else class="walkman__list-empty">
               <template v-if="musicScope === 'private'">
                 <span>{{ t('walkman.emptyGoPrefix') }}</span>
@@ -878,19 +881,11 @@ onMounted(async () => {
 .walkman__list-head :deep(.slider-select__btn--active:hover) { color: #db2777; }
 .walkman__list-head :deep(.slider-select__btn:hover) { color: var(--color-text-heading); }
 
-.walkman__list-scroll {
-  max-height: 128px;
-  overflow-y: auto;
+.walkman__list-inner {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  padding: var(--spacing-xs);
-  border-right: 4px solid transparent;
 }
-.walkman__list-scroll::-webkit-scrollbar { width: 4px; }
-.walkman__list-scroll::-webkit-scrollbar-track { margin: 6px 0; }
-.walkman__list-scroll::-webkit-scrollbar-thumb { background: var(--color-border); }
-.walkman__list-scroll::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .walkman__track {
   position: relative;

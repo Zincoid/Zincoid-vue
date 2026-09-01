@@ -455,6 +455,16 @@ th {
   background: rgba(128, 128, 128, 0.55);
 }
 
+/* ── Thin custom scrollbar (shared by dropdowns/lists) ── */
+.scroll-thin {
+  overflow-y: auto;
+  border-right: 4px solid transparent;
+}
+.scroll-thin::-webkit-scrollbar { width: 4px; }
+.scroll-thin::-webkit-scrollbar-track { margin: 6px 0; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--color-border); }
+.scroll-thin::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
+
 /* ── Textarea resize handle ── */
 textarea::-webkit-scrollbar-corner {
   background: transparent;

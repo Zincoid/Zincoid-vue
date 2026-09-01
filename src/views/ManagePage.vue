@@ -7,6 +7,7 @@ import { useToast } from '@/composables/useToast'
 import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
 
@@ -414,7 +415,7 @@ async function downloadLog() {
 }
 
 function onLogScroll() {
-  const el = logBodyEl.value
+  const el = logBodyEl.value?.body
   if (!el) return
   autoScroll = el.scrollTop + el.clientHeight >= el.scrollHeight - 30
 }
@@ -434,7 +435,7 @@ async function toggleLogs() {
       if (logEntries.value.length > logMax) logEntries.value.splice(0, logEntries.value.length - logMax)
       if (autoScroll) {
         nextTick(() => {
-          const el = logBodyEl.value
+          const el = logBodyEl.value?.body
           if (el) el.scrollTop = el.scrollHeight
         })
       }
@@ -498,16 +499,18 @@ onBeforeUnmount(stopStream)
             {{ t('manage.logClear') }}
           </button>
         </div>
-        <div class="log-viewer__body" ref="logBodyEl" @scroll="onLogScroll">
-          <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logEmpty') }}</p>
-          <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
-            <span class="log-line__time">{{ entry.timestamp }}</span>
-            <span class="log-line__level">{{ entry.level }}</span>
-            <span class="log-line__logger">{{ entry.logger }}:</span>
-            <span class="log-line__msg">{{ entry.message }}</span>
-            <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
+        <ScrollArea ref="logBodyEl" class="log-viewer__body" :max-height="'420px'" :padding="'var(--spacing-lg)'" @scroll="onLogScroll">
+          <div class="log-viewer__content">
+            <p v-if="!logEntries.length" class="log-empty">{{ t('manage.logEmpty') }}</p>
+            <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
+              <span class="log-line__time">{{ entry.timestamp }}</span>
+              <span class="log-line__level">{{ entry.level }}</span>
+              <span class="log-line__logger">{{ entry.logger }}:</span>
+              <span class="log-line__msg">{{ entry.message }}</span>
+              <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </div>
     </section>
 
@@ -773,22 +776,24 @@ onBeforeUnmount(stopStream)
           <input ref="musicFileInput" type="file" accept="audio/*" multiple class="hidden-input" @change="handleMusicUpload" />
           <p v-if="musicMessage" class="msg msg--success">{{ musicMessage }}</p>
           <p v-if="musicError" class="msg msg--error">{{ musicError }}</p>
-          <div class="music-list">
-            <div v-if="musicLoading && !musicTracks.length" class="music-list__empty">{{ t('manage.musicLoading') }}</div>
-            <div v-else-if="!musicTracks.length" class="music-list__empty">{{ t('manage.musicEmpty') }}</div>
-            <div v-for="tr in musicTracks" :key="tr.id" class="music-item">
-              <span class="music-item__name">{{ tr.fileName }}</span>
-              <span class="music-item__size">{{ formatSize(tr.fileSize) }}</span>
-              <span class="music-item__ops">
-                <a class="music-item__download" :href="tr.url" :download="tr.fileName" :title="t('common.download')">
-                  <SvgIcon name="download" :size="14" />
-                </a>
-                <button class="music-item__del" :disabled="musicDeleting === tr.id" :title="t('manage.musicDelete')" @click="handleMusicDelete(tr)">
-                  <SvgIcon name="trash" :size="14" />
-                </button>
-              </span>
+          <ScrollArea :max-height="'320px'">
+            <div class="music-list">
+              <div v-if="musicLoading && !musicTracks.length" class="music-list__empty">{{ t('manage.musicLoading') }}</div>
+              <div v-else-if="!musicTracks.length" class="music-list__empty">{{ t('manage.musicEmpty') }}</div>
+              <div v-for="tr in musicTracks" :key="tr.id" class="music-item">
+                <span class="music-item__name">{{ tr.fileName }}</span>
+                <span class="music-item__size">{{ formatSize(tr.fileSize) }}</span>
+                <span class="music-item__ops">
+                  <a class="music-item__download" :href="tr.url" :download="tr.fileName" :title="t('common.download')">
+                    <SvgIcon name="download" :size="14" />
+                  </a>
+                  <button class="music-item__del" :disabled="musicDeleting === tr.id" :title="t('manage.musicDelete')" @click="handleMusicDelete(tr)">
+                    <SvgIcon name="trash" :size="14" />
+                  </button>
+                </span>
+              </div>
             </div>
-          </div>
+          </ScrollArea>
           <div class="music-pager">
             <button class="music-pager__btn" :disabled="musicPage <= 1 || musicLoading" @click="fetchMusicList(musicPage - 1)">&#8249;</button>
             <span class="music-pager__info">{{ musicPage }} / {{ musicPages }}</span>
@@ -967,10 +972,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 .log-status { font-size: var(--text-xs); color: var(--color-text-secondary); }
 .log-viewer__head .btn { font-size: var(--text-xs); }
 .log-status--on { color: var(--color-success); }
-.log-viewer__body { max-height: 420px; overflow-y: auto; padding: var(--spacing-lg); border-right: 4px solid transparent; font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
-.log-viewer__body::-webkit-scrollbar { width: 4px; }
-.log-viewer__body::-webkit-scrollbar-track { margin: 6px 0; }
-.log-viewer__body::-webkit-scrollbar-thumb { background: var(--color-border); }
+.log-viewer__content { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; }
 .log-empty { color: var(--color-text-secondary); padding: var(--spacing-md) 0; }
 .log-line { display: flex; flex-wrap: wrap; gap: 0 var(--spacing-sm); white-space: pre-wrap; word-break: break-all; }
 .log-line__time { color: var(--color-text-secondary); flex-shrink: 0; }
@@ -1019,10 +1021,7 @@ h3 { margin-bottom: var(--spacing-lg); }
 
 .hidden-input { display: none; }
 .music-total { font-size: var(--text-xs); color: var(--color-text-secondary); }
-.music-list { display: flex; flex-direction: column; gap: var(--spacing-xs); max-height: 320px; overflow-y: auto; padding-right: var(--spacing-xs); }
-.music-list::-webkit-scrollbar { width: 4px; }
-.music-list::-webkit-scrollbar-thumb { background: var(--color-border); }
-.music-list::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
+.music-list { display: flex; flex-direction: column; gap: var(--spacing-xs); }
 .music-list__empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--text-sm); }
 .music-item { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
 .music-item__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-sm); color: var(--color-text-heading); font-family: var(--font-mono); }

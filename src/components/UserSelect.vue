@@ -3,6 +3,7 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { userAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 
 const props = defineProps({
   modelValue: { type: Number, default: null },
@@ -97,7 +98,7 @@ function clearUser() {
     />
     <Transition name="dropdown">
       <div v-if="open && !selected" class="user-select__dropdown" @mousedown.prevent>
-        <div class="user-select__list">
+        <ScrollArea :max-height="'280px'">
           <button
             v-for="u in results"
             :key="u.id"
@@ -114,7 +115,7 @@ function clearUser() {
           </button>
           <p v-if="query.trim() && !results.length" class="user-select__empty">{{ t('common.noResults') }}</p>
           <p v-else-if="!query.trim()" class="user-select__empty">{{ t('common.typeToSearch') }}</p>
-        </div>
+        </ScrollArea>
       </div>
     </Transition>
   </div>
@@ -137,7 +138,7 @@ function clearUser() {
 }
 .user-select__chosen:hover { border-color: var(--color-text-secondary); }
 
-.user-select__input { width: 100%; box-sizing: border-box; }
+.user-select__input { width: 100%; box-sizing: border-box; padding: 4px var(--spacing-md); font-size: var(--text-sm); }
 
 .user-select__avatar {
   width: 28px;
@@ -205,19 +206,8 @@ function clearUser() {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-md);
-  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
-.user-select__list {
-  max-height: 280px;
-  overflow-y: auto;
-  padding: var(--spacing-xs);
-  border-right: 4px solid transparent;
-}
-.user-select__list::-webkit-scrollbar { width: 4px; }
-.user-select__list::-webkit-scrollbar-track { margin: 6px 0; }
-.user-select__list::-webkit-scrollbar-thumb { background: var(--color-border); }
-.user-select__list::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 
 .user-select__option {
   display: flex;

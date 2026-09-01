@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref } from 'vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 
 const props = defineProps({
   suggestions: { type: Array, default: () => [] },
@@ -8,15 +9,6 @@ const props = defineProps({
 const emit = defineEmits(['select'])
 
 const scrollEl = ref(null)
-const hasScrollbar = ref(false)
-
-watch(() => props.suggestions, () => {
-  nextTick(() => {
-    if (scrollEl.value) {
-      hasScrollbar.value = scrollEl.value.scrollHeight > scrollEl.value.clientHeight
-    }
-  })
-}, { immediate: true })
 </script>
 
 <template>
@@ -26,7 +18,7 @@ watch(() => props.suggestions, () => {
       class="mention-dropdown"
       :style="{ top: pos.top + 'px', left: pos.left + 'px' }"
     >
-      <div ref="scrollEl" class="mention-dropdown__scroll" :class="{ 'mention-dropdown__scroll--bar': hasScrollbar }">
+      <ScrollArea ref="scrollEl" :max-height="'180px'">
         <div
           v-for="user in suggestions"
           :key="user.id"
@@ -38,7 +30,7 @@ watch(() => props.suggestions, () => {
           <span class="mention-dropdown__name">{{ user.nickname }}</span>
           <span class="mention-dropdown__username">@{{ user.username }}</span>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   </Teleport>
 </template>
@@ -55,19 +47,6 @@ watch(() => props.suggestions, () => {
   padding: 4px;
   min-width: 200px;
 }
-.mention-dropdown__scroll {
-  max-height: 180px;
-  overflow-y: auto;
-}
-.mention-dropdown__scroll--bar {
-  padding-right: 4px;
-}
-.mention-dropdown__scroll::-webkit-scrollbar { width: 4px; }
-.mention-dropdown__scroll::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 2px;
-}
-.mention-dropdown__scroll::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.55); }
 .mention-dropdown__item {
   display: flex;
   align-items: center;
