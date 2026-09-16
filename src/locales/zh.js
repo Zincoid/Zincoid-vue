@@ -386,6 +386,7 @@ export default {
     moment: '动态',
     article: '文章',
     comment: '评论',
+    like: '点赞',
     notification: '通知',
     repo: '仓库',
     repoItem: '仓库条目',

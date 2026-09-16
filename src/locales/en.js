@@ -386,6 +386,7 @@ export default {
     moment: 'Moments',
     article: 'Articles',
     comment: 'Comments',
+    like: 'Likes',
     notification: 'Notifications',
     repo: 'Repos',
     repoItem: 'Repo Items',
