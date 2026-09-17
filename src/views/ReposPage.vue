@@ -368,7 +368,7 @@ async function createRepo() {
   gap: var(--spacing-xl);
 }
 .repo-grid > * { display: flex; }
-.repo-grid > * > * { flex: 1; }
+.repo-grid > * > * { flex: 1; min-width: 0; }
 
 .repo-card__cover {
   position: relative;

@@ -440,7 +440,7 @@ function typeLabel(type) {
 
 .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--spacing-md); }
 .repo-grid > * { display: flex; cursor: pointer; }
-.repo-grid > * > * { flex: 1; }
+.repo-grid > * > * { flex: 1; min-width: 0; }
 
 .pin-fab--settings:hover {
   border-color: #ca8a04;
