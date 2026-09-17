@@ -103,7 +103,7 @@
 /* ── Dark Theme ── */
 [data-theme="dark"] {
   --color-bg: #0f1117;
-  --color-bg-alt: #1a1d27;
+  --color-bg-alt: #20232f;
   --color-surface: #1a1d27;
   --color-border: #2e303a;
   --color-border-light: #23252f;
