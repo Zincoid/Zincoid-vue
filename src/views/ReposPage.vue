@@ -370,19 +370,6 @@ async function createRepo() {
 .repo-grid > * { display: flex; }
 .repo-grid > * > * { flex: 1; }
 
-.repo-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-  overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-.repo-card:hover {
-  border-color: var(--color-card-hover);
-  transform: scale(1.02);
-  box-shadow: 0 0 0 0.5px var(--color-card-hover);
-}
-
 .repo-card__cover {
   position: relative;
   height: 160px;

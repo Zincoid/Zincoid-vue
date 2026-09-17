@@ -18,7 +18,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 </script>
 
 <template>
-  <div class="repo-card">
+  <div class="repo-card spin-edge">
     <div class="repo-card__cover">
       <img v-if="repo.coverThumb" :src="repo.coverThumb" alt="" loading="lazy" />
       <div v-else class="repo-card__cover-placeholder">
@@ -79,21 +79,20 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .repo-card:hover {
-  border-color: var(--color-card-hover);
   transform: scale(1.02);
-  box-shadow: 0 0 0 0.5px var(--color-card-hover);
 }
 
 .repo-card__cover {
   position: relative;
   height: 160px;
   background: var(--color-bg-alt);
+  overflow: hidden;
+  border-radius: var(--rounded-lg) var(--rounded-lg) 0 0;
   display: flex;
   align-items: center;
   justify-content: center;

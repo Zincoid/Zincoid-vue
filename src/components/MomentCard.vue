@@ -56,7 +56,7 @@ function goUser(e) {
 </script>
 
 <template>
-  <article class="moment-card" @click="goDetail">
+  <article class="moment-card spin-edge" @click="goDetail">
     <div class="moment-card__header">
       <div class="moment-card__user" @click="goUser">
         <img
@@ -148,9 +148,7 @@ function goUser(e) {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .moment-card:hover {
-  border-color: var(--color-card-hover);
   transform: scale(1.02);
-  box-shadow: 0 0 0 0.5px var(--color-card-hover);
 }
 
 .moment-card__header {

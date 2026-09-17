@@ -16,7 +16,7 @@ function goDetail(id) {
 </script>
 
 <template>
-  <article class="article-card" @click="goDetail(article.id)">
+  <article class="article-card spin-edge" @click="goDetail(article.id)">
     <div v-if="article.coverThumb" class="article-card__cover">
       <img :src="article.coverThumb" alt="" loading="lazy" />
     </div>
@@ -51,14 +51,11 @@ function goDetail(id) {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
-  overflow: hidden;
   cursor: pointer;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .article-card:hover {
-  border-color: var(--color-card-hover);
   transform: scale(1.02);
-  box-shadow: 0 0 0 0.5px var(--color-card-hover);
 }
 
 .article-card__cover {
@@ -66,6 +63,8 @@ function goDetail(id) {
   width: 140px;
   min-height: 100px;
   border-right: 1px solid var(--color-border);
+  border-radius: 0 var(--rounded-lg) var(--rounded-lg) 0;
+  overflow: hidden;
   padding: var(--spacing-sm);
   display: flex;
   align-items: center;

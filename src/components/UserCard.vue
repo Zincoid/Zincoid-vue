@@ -74,7 +74,7 @@ async function handleDelete() {
 </script>
 
 <template>
-  <div class="user-card" @click="goDetail">
+  <div class="user-card spin-edge" @click="goDetail">
     <img
       v-if="user.avatar"
       :src="user.avatar"
@@ -132,8 +132,7 @@ async function handleDelete() {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 .user-card:hover {
-  border-color: var(--color-card-hover);
-  box-shadow: var(--shadow-lg), 0 0 0 0.5px var(--color-card-hover);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-5px);
 }
 

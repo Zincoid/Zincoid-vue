@@ -616,3 +616,25 @@ textarea::-webkit-scrollbar-corner {
 .like-fab .like-btn span {
   display: none;
 }
+
+/* Rotating gradient edge on card hover */
+@property --edge-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes edge-spin { to { --edge-angle: 360deg; } }
+.spin-edge { position: relative; --edge-glow: #ec66a6; }
+[data-theme="dark"] .spin-edge { --edge-glow: #f472b6; }
+.spin-edge::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from var(--edge-angle), var(--edge-glow) 0deg, transparent 70deg, transparent 290deg, var(--edge-glow) 360deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+.spin-edge:hover::after { opacity: 1; filter: drop-shadow(0 0 5px var(--edge-glow)); animation: edge-spin 2.5s linear infinite; }
