@@ -35,6 +35,7 @@ const notifPages = ref(1)
 const notifTotal = ref(0)
 const notifLoadingMore = ref(false)
 let notifVersion = 0
+let unreadTimer = null
 
 function fetchUnreadCount() {
   if (!auth.isLoggedIn) return
@@ -92,8 +93,16 @@ function alignNotificationsTail() {
 }
 
 watch(() => auth.isLoggedIn, (val) => {
-  if (val) fetchUnreadCount()
+  clearInterval(unreadTimer)
+  if (val) {
+    fetchUnreadCount()
+    unreadTimer = setInterval(fetchUnreadCount, 60000)
+  }
 }, { immediate: true })
+
+watch(() => router.currentRoute.value.fullPath, () => {
+  if (auth.isLoggedIn && !notifOpen.value) fetchUnreadCount()
+})
 
 function toggleNotif() {
   notifOpen.value = !notifOpen.value
