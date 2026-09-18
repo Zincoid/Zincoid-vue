@@ -4,14 +4,18 @@ import { useAuthStore } from '@/stores/auth'
 import { formatDate } from '@/utils/format'
 import SvgIcon from '@/components/SvgIcon.vue'
 
+import { computed } from 'vue'
+
 const { t } = useI18n()
 const auth = useAuthStore()
 
-defineProps({
+const props = defineProps({
   repo: { type: Object, required: true },
   showUser: { type: Boolean, default: true },
   sortUpdated: { type: Boolean, default: false }
 })
+
+const noAccess = computed(() => props.repo.visibility === 2 && props.repo.restricted)
 
 const typeLabels = { 0: 'repo.code', 1: 'repo.media', 2: 'repo.file' }
 const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
@@ -20,9 +24,9 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 <template>
   <div class="repo-card spin-edge">
     <div class="repo-card__cover">
-      <img v-if="repo.coverThumb" :src="repo.coverThumb" alt="" loading="lazy" />
+      <img v-if="repo.coverThumb && !noAccess" :src="repo.coverThumb" alt="" loading="lazy" />
       <div v-else class="repo-card__cover-placeholder">
-        <SvgIcon name="folder" :size="32" />
+        <SvgIcon :name="noAccess ? 'lock' : 'folder'" :size="32" />
       </div>
       <div class="repo-card__badges">
         <span v-if="repo.visibility === 1" class="repo-card__visibility-badge">{{ t('visibility.private') }}</span>
