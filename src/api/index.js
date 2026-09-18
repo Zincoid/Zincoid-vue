@@ -186,7 +186,7 @@ export const repoAPI = {
   getByUser: (userId, page = 1, size = 10, type, updated) => api.get(`/repos/public/user/${userId}`, { params: { page, size, type, updated } }),
   getDetail: (id) => api.get(`/repos/public/${id}`),
   getItems: (id, page = 1, size = 10) => api.get(`/repos/public/${id}/items`, { params: { page, size } }),
-  addItem: (repoId, data) => api.post(`/repos/${repoId}/items`, data),
+  addItem: (repoId, fileId) => api.post(`/repos/${repoId}/items`, null, { params: { fileId } }),
   deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
   swapItems: (repoId, from, to) => api.put(`/repos/${repoId}/items/sort`, null, { params: { from, to } }),
   requestAccess: (repoId) => api.post(`/repos/${repoId}/access`),

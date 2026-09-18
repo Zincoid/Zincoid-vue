@@ -321,7 +321,7 @@ async function handleItemFiles(e) {
           uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
         }
       })
-      const { data: itemData } = await repoAPI.addItem(repo.value.id, { fileId: fileData.data.id, name: files[i].name })
+      const { data: itemData } = await repoAPI.addItem(repo.value.id, fileData.data.id)
       itemsTotal.value += 1
       itemsPages.value = Math.ceil(itemsTotal.value / itemsSize)
       if (itemsPage.value * itemsSize >= itemsTotal.value) {
