@@ -228,7 +228,7 @@ export default {
     transferSelf: 'Cannot transfer to yourself',
     contributorsTitle: 'Contributors',
     contributorDesc: 'Contributors can add and manage items in this repo.',
-    applyContributor: 'Apply as Contributor',
+    applyContributor: 'Join Contribution',
     applyContributorConfirm: 'Apply to contribute to this repo?',
     applyContributorSent: 'Request sent',
     leaveContributor: 'Leave Contribution',

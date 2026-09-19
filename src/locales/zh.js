@@ -267,7 +267,7 @@ export default {
     transferSelf: '不能转让给自己',
     contributorsTitle: '贡献者',
     contributorDesc: '贡献者可以在仓库中添加和管理条目。',
-    applyContributor: '申请成为贡献者',
+    applyContributor: '加入贡献',
     applyContributorConfirm: '确定要申请为该仓库贡献？',
     applyContributorSent: '申请已发送',
     leaveContributor: '退出贡献',
