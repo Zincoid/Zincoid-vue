@@ -1016,6 +1016,7 @@ async function saveEdit() {
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }
 .repo-contrib { display: flex; align-items: center; gap: 10px; }
+.recent-likers + .repo-contrib::before, .like-btn + .repo-contrib::before { content: ''; width: 1px; height: 16px; background: var(--color-border); }
 .repo-contrib__btn {
   display: inline-flex;
   align-items: center;

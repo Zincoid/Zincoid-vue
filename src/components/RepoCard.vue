@@ -113,7 +113,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__contributing-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #7c3aed; background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
 [data-theme="dark"] .repo-card__type-badge,
 [data-theme="dark"] .repo-card__visibility-badge { background: rgba(46,48,58,0.9); }
-[data-theme="dark"] .repo-card__contributing-badge { background: rgba(124, 58, 237, 0.22); color: #a78bfa; }
+[data-theme="dark"] .repo-card__contributing-badge { background: rgba(46,48,58,0.9); color: #a78bfa; }
 
 .repo-card__body { padding: var(--spacing-lg); display: flex; flex-direction: column; flex: 1; }
 
