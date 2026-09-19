@@ -126,8 +126,8 @@ function goNotification(n) {
   }
   if (n.relatedType === 5) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'system'; return }
   if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
-  if (n.relatedType === 8) { router.push('/personal/access'); return }
-  if (n.relatedType === 9 || n.relatedType === 10) { router.push(`/repos/${n.relatedId}`); return }
+  if (n.relatedType === 8 || n.relatedType === 12) { router.push('/personal/access'); return }
+  if (n.relatedType === 9 || n.relatedType === 10 || n.relatedType === 13 || n.relatedType === 14) { router.push(`/repos/${n.relatedId}`); return }
   if (n.relatedType === 11) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'request'; return }
   if (n.targetType === 3) {
     router.push('/chats')
@@ -342,15 +342,21 @@ function closeMenu() {
                   : n.relatedType === 7
                     ? t('notification.registered')
                     : n.relatedType === 8
-                      ? t('notification.accessRequest')
+                      ? t('notification.viewerRequest')
                     : n.relatedType === 9
-                      ? t('notification.accessGranted')
+                      ? t('notification.viewerGranted')
                       : n.relatedType === 10
-                        ? t('notification.accessRejected')
-                        : n.relatedType === 11
-                          ? t('notification.request')
-                          : n.relatedType === 6
-                            ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : t('notification.likedArticle'))
+                        ? t('notification.viewerRejected')
+                        : n.relatedType === 12
+                          ? t('notification.contributorRequest')
+                          : n.relatedType === 13
+                            ? t('notification.contributorGranted')
+                            : n.relatedType === 14
+                              ? t('notification.contributorRejected')
+                              : n.relatedType === 11
+                                ? t('notification.request')
+                                : n.relatedType === 6
+                                  ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : t('notification.likedArticle'))
                     : n.relatedType === 2
                       ? t('notification.mentionedMoment')
                       : n.relatedType === 3
