@@ -774,6 +774,24 @@ async function saveEdit() {
                 <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
               </router-link>
             </div>
+            <div v-if="repo.contributorCount" class="repo-contrib">
+              <button class="repo-contrib__btn" :title="t('repo.contributorsTitle')" @click.stop="settingsOpen = true">
+                <SvgIcon name="handshake" :size="16" />
+                <span>{{ repo.contributorCount }}</span>
+              </button>
+              <div v-if="repo.recentContributors?.length" class="recent-likers repo-contrib__avatars">
+                <router-link
+                  v-for="c in repo.recentContributors"
+                  :key="c.userId"
+                  :to="`/members/${c.userId}`"
+                  class="recent-liker-link"
+                  :title="c.nickname"
+                >
+                  <img v-if="c.avatar" :src="c.avatar" class="recent-liker-avatar" alt="" />
+                  <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (c.nickname || 'U')[0] }}</span>
+                </router-link>
+              </div>
+            </div>
           </div>
           <div class="detail__actions-right">
             <ShareButton
@@ -997,6 +1015,22 @@ async function saveEdit() {
 .recent-likers { display: flex; align-items: center; }
 .recent-liker-link { display: flex; line-height: 0; }
 .recent-liker-link + .recent-liker-link { margin-left: -8px; }
+.repo-contrib { display: flex; align-items: center; gap: 10px; }
+.repo-contrib__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-full);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+.repo-contrib__btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
 .recent-liker-avatar {
   width: 28px;
   height: 28px;

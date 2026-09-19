@@ -234,7 +234,7 @@ export default {
     leaveContributor: 'Leave Contribution',
     contributing: 'Contributing',
     leaveContributorConfirm: 'Leave as a contributor of this repo?',
-    restrictedHint: 'Authorization required to access this repo',
+    restrictedHint: 'Access required to view this repo',
     noDesc: 'No description',
     noTags: 'No tags',
     views: 'views',

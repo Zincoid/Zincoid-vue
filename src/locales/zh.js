@@ -273,7 +273,7 @@ export default {
     leaveContributor: '退出贡献',
     contributing: '贡献中',
     leaveContributorConfirm: '确定要退出该仓库的贡献？',
-    restrictedHint: '访问此仓库需要授权',
+    restrictedHint: '查看此仓库需要授权',
     noDesc: '暂无简介',
     noTags: '暂无标签',
     views: '次浏览',
