@@ -917,13 +917,13 @@ async function saveEdit() {
               <div class="setting-block__actions">
                 <button class="btn btn--outline setting-block__btn" :disabled="transferring" @click="transferConfirming = false">{{ t('common.cancel') }}</button>
                 <button class="btn btn--primary setting-block__btn" :disabled="transferring" @click="sendTransfer">
-                  <SvgIcon name="fork" :size="16" />
+                  <SvgIcon name="fork" :size="12" />
                   {{ t('common.confirm') }}
                 </button>
               </div>
             </template>
             <button v-else class="btn btn--primary btn--full setting-block__btn" @click="sendTransfer">
-              <SvgIcon name="fork" :size="16" />
+              <SvgIcon name="fork" :size="12" />
               {{ t('repo.transferSend') }}
             </button>
           </div>
