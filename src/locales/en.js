@@ -233,7 +233,7 @@ export default {
     applyContributorSent: 'Request sent',
     leaveContributor: 'Leave Contribution',
     contributing: 'Contributing',
-    contribHint: 'Contributors: apply in the repo settings',
+    contribHint: 'Contributors: join or leave in the repo settings',
     leaveContributorConfirm: 'Leave as a contributor of this repo?',
     restrictedHint: 'Access required to view this repo',
     noDesc: 'No description',
