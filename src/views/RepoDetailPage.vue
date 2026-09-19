@@ -769,6 +769,7 @@ async function saveEdit() {
                   :key="liker.userId"
                   :to="`/members/${liker.userId}`"
                   class="recent-liker-link"
+                  :title="liker.nickname"
               >
                 <img v-if="liker.avatar" :src="liker.avatar" class="recent-liker-avatar" alt="" />
                 <span v-else class="recent-liker-avatar recent-liker-placeholder">{{ (liker.nickname || 'U')[0] }}</span>
