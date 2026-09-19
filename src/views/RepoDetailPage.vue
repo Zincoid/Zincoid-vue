@@ -64,6 +64,29 @@ const transferring = ref(false)
 const transferError = ref('')
 const transferConfirming = ref(false)
 
+// ── Contributor apply / leave ──
+async function applyContributor() {
+  if (!await confirm(t('repo.applyContributorConfirm'))) return
+  try {
+    await repoAPI.applyContributor(repo.value.id)
+    toast(t('repo.applyContributorSent'), 'success')
+    settingsOpen.value = false
+  } catch (err) {
+    toast(getMessage(err, 'common.failed'), 'error')
+  }
+}
+
+async function leaveContributor() {
+  if (!await confirm(t('repo.leaveContributorConfirm'))) return
+  try {
+    await repoAPI.leaveContributor(repo.value.id)
+    if (repo.value) repo.value.contributed = false
+    settingsOpen.value = false
+  } catch (err) {
+    toast(getMessage(err, 'common.failed'), 'error')
+  }
+}
+
 function onTransferOverlayClick() {
   if (!transferOverlayDown.value) return
   transferOverlayDown.value = false
@@ -206,7 +229,8 @@ function typeLabel(type) {
 }
 
 const isOwner = () => auth.user?.id === repo.value?.userId
-const canEdit = () => isOwner() || auth.isAdmin
+const canManage = () => isOwner() || auth.isAdmin
+const canEdit = () => isOwner() || repo.value?.contributed
 
 // ── Media viewer ──
 const viewerSrc = ref('')
@@ -578,7 +602,7 @@ async function saveEdit() {
               <span class="repo-views">
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
-              <div v-if="canEdit()" class="repo-actions">
+              <div v-if="canManage()" class="repo-actions">
                 <button class="link-muted" @click="openEdit">
                   <SvgIcon name="edit" />
                   {{ t('common.edit') }}
@@ -844,7 +868,7 @@ async function saveEdit() {
   </div>
 
   <FabContainer>
-    <label v-if="repo && !repo.restricted && isOwner() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
+    <label v-if="repo && !repo.restricted && canEdit() && repo.type !== 0" class="upload-fab" :title="t('article.upload')">
       <SvgIcon name="upload" :size="20" />
       <input :accept="repo.type === 1 ? 'image/*,video/*,audio/*' : '*/*'" type="file" multiple class="hidden-input" @change="handleItemFiles" />
     </label>
@@ -860,7 +884,7 @@ async function saveEdit() {
       />
     </div>
 
-    <button v-if="repo && isOwner()" class="pin-fab pin-fab--settings" :title="t('user.setting')" @click="openSettings">
+    <button v-if="repo && auth.isLoggedIn" class="pin-fab pin-fab--settings" :title="t('user.setting')" @click="openSettings">
       <SvgIcon name="settings" :size="20" />
     </button>
 
@@ -879,7 +903,7 @@ async function saveEdit() {
               <SvgIcon name="close" :size="16" />
             </button>
           </h3>
-          <div class="setting-block">
+          <div v-if="isOwner()" class="setting-block">
             <h4 class="setting-block__title">{{ t('repo.transferTitle') }}</h4>
             <p class="setting-block__desc">{{ t('repo.transferDesc') }}</p>
             <template v-if="transferConfirming">
@@ -901,6 +925,18 @@ async function saveEdit() {
             <button v-else class="btn btn--primary btn--full setting-block__btn" @click="sendTransfer">
               <SvgIcon name="fork" :size="16" />
               {{ t('repo.transferSend') }}
+            </button>
+          </div>
+          <div v-else class="setting-block">
+            <h4 class="setting-block__title">{{ t('repo.contributorsTitle') }}</h4>
+            <p class="setting-block__desc">{{ t('repo.contributorDesc') }}</p>
+            <button v-if="repo.contributed" class="btn btn--outline btn--full setting-block__btn setting-block__btn--leave" @click="leaveContributor">
+              <SvgIcon name="logout" :size="16" />
+              {{ t('repo.leaveContributor') }}
+            </button>
+            <button v-else class="btn btn--primary btn--full setting-block__btn" @click="applyContributor">
+              <SvgIcon name="login" :size="16" />
+              {{ t('repo.applyContributor') }}
             </button>
           </div>
           <div class="setting-block setting-block--empty">
@@ -1214,6 +1250,7 @@ async function saveEdit() {
 .setting-block__confirm { font-size: var(--text-xs); color: var(--color-text-secondary); margin-bottom: var(--spacing-sm); }
 .setting-block__actions { display: flex; gap: var(--spacing-sm); justify-content: flex-end; }
 .setting-block__btn { font-size: var(--text-xs); padding: var(--spacing-xs) var(--spacing-lg); }
+.setting-block__btn--leave:hover { color: var(--color-danger); border-color: var(--color-danger); background: rgba(220, 38, 38, 0.08); }
 .setting-block--empty {
   border-style: dashed;
   min-height: 80px;

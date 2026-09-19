@@ -189,11 +189,13 @@ export const repoAPI = {
   addItem: (repoId, fileId) => api.post(`/repos/${repoId}/items`, null, { params: { fileId } }),
   deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
   swapItems: (repoId, from, to) => api.put(`/repos/${repoId}/items/sort`, null, { params: { from, to } }),
-  requestAccess: (repoId) => api.post(`/repos/${repoId}/access`),
-  getAccessList: (path, page = 1, size = 10) => api.get(`/repos${path}`, { params: { page, size } }),
-  _get: (path) => api.get(`/repos${path}`),
-  _put: (path) => api.put(`/repos${path}`),
-  _delete: (path) => api.delete(`/repos${path}`)
+  requestAccess: (repoId) => api.post(`/repos/access/${repoId}/viewers`),
+  applyContributor: (repoId) => api.post(`/repos/access/${repoId}/contributors`),
+  leaveContributor: (repoId) => api.delete(`/repos/access/${repoId}/contributors`),
+  getAccessList: (path, page = 1, size = 10, role) => api.get(`/repos/access${path}`, { params: { page, size, role } }),
+  _get: (path) => api.get(`/repos/access${path}`),
+  _put: (path) => api.put(`/repos/access${path}`),
+  _delete: (path) => api.delete(`/repos/access${path}`)
 }
 
 // ── Notifications ──

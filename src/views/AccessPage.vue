@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { repoAPI } from '@/api'
@@ -25,6 +25,13 @@ const tabOptions = computed(() => [
   { value: 'sent', label: t('access.sent') }
 ])
 
+const roleFilter = ref('viewer')
+const roleOptions = computed(() => [
+  { value: 'viewer', label: t('access.viewer') },
+  { value: 'contributor', label: t('access.contributor') }
+])
+const roleValue = computed(() => roleFilter.value === 'contributor' ? 1 : 0)
+
 const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const rpData = ref({ records: [], pages: 1, total: 0, page: 1 })
@@ -46,25 +53,32 @@ async function fetchAll() {
   }
 }
 
-async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/pending', p, pageSize); spData.value = data.data }
-async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/access/sent/resolved', p, pageSize); srData.value = data.data }
-async function fetchRP(p = 1) { const { data } = await repoAPI.getAccessList('/access/received/pending', p, pageSize); rpData.value = data.data }
-async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/access/received/resolved', p, pageSize); rrData.value = data.data }
+async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/sent/pending', p, pageSize, roleValue.value); spData.value = data.data }
+async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/sent/resolved', p, pageSize, roleValue.value); srData.value = data.data }
+async function fetchRP(p = 1) { const { data } = await repoAPI.getAccessList('/received/pending', p, pageSize, roleValue.value); rpData.value = data.data }
+async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/received/resolved', p, pageSize, roleValue.value); rrData.value = data.data }
+
+watch(roleFilter, () => { fetchAll() })
 
 function repoNameOf(a) { return a.repoName || `#${a.repoId}` }
 function userNameOf(a) { return a.userNickname || `User#${a.userId}` }
 
 async function approve(id) {
   if (!await confirm(t('access.approveConfirm'))) return
-  await repoAPI._put(`/access/${id}/approve`); fetchRP(); fetchRR()
+  await repoAPI._put(`/${id}/approve`); fetchRP(); fetchRR()
 }
 async function rejectAccess(id) {
   if (!await confirm(t('access.rejectConfirm'))) return
-  await repoAPI._put(`/access/${id}/reject`); fetchRP(); fetchRR()
+  await repoAPI._put(`/${id}/reject`); fetchRP(); fetchRR()
 }
 async function revoke(id) {
   if (!await confirm(t('access.revokeConfirm'))) return
-  await repoAPI._delete(`/access/${id}`); fetchRR()
+  await repoAPI._delete(`/${id}`); fetchRR()
+}
+
+async function leaveContribution(repoId) {
+  if (!await confirm(t('repo.leaveContributorConfirm'))) return
+  await repoAPI.leaveContributor(repoId); fetchSR()
 }
 
 function statusLabel(s) {
@@ -86,12 +100,19 @@ function statusLabel(s) {
       </button>
     </div>
 
-    <SliderSelect
-      class="access-tabs"
-      :model-value="activeTab"
-      :options="tabOptions"
-      @update:model-value="activeTab = $event"
-    />
+    <div class="access-filters">
+      <SliderSelect
+        :model-value="activeTab"
+        :options="tabOptions"
+        fill
+        @update:model-value="activeTab = $event"
+      />
+      <SliderSelect
+        :model-value="roleFilter"
+        :options="roleOptions"
+        @update:model-value="roleFilter = $event"
+      />
+    </div>
 
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <template v-if="loadingDone">
@@ -170,6 +191,9 @@ function statusLabel(s) {
                 <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
+                <button v-if="a.access === 1 && a.role === 1" class="access-card__btn access-card__btn--leave" @click.stop="leaveContribution(a.repoId)">
+                  <SvgIcon name="logout" :size="12" /> {{ t('access.leave') }}
+                </button>
               </div>
             </div>
             <Pagination :page="srData.pages > 0 ? (srData.page || 1) : 1" :pages="srData.pages" :total="srData.total" :size="pageSize" @change="p => fetchSR(p)" />
@@ -202,7 +226,8 @@ function statusLabel(s) {
 .page-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 .page-refresh--loading svg { animation: page-spin 1s linear infinite; }
 @keyframes page-spin { to { transform: rotate(360deg); } }
-.access-tabs { margin-bottom: var(--spacing-2xl); }
+.access-filters { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-2xl); }
+.access-filters > :last-child { flex: 0 0 220px; }
 .section { margin-bottom: var(--spacing-2xl); }
 h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-md); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
@@ -229,6 +254,8 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__btn--allow:hover { background: rgba(22,163,74,0.08); }
 .access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
 .access-card__btn--remove:hover { color: #d97706; border-color: #d97706; background: rgba(217, 119, 6, 0.08); }
+.access-card__btn--leave { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); display: inline-flex; align-items: center; gap: 4px; }
+.access-card__btn--leave:hover { color: #fff; background: #dc2626; border-color: #dc2626; }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>
