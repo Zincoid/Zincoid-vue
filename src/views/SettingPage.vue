@@ -84,40 +84,44 @@ async function resetConfig() {
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <template v-if="loadingDone">
       <div class="system__list">
-        <div class="system__item">
-          <div class="system__info">
-            <span class="system__label">{{ t('setting.receiveEmail') }}</span>
-            <span class="system__desc">{{ t('setting.receiveEmailDesc') }}</span>
-          </div>
-          <ToggleSwitch
-            :model-value="receiveEmail"
-            :disabled="saving"
-            @update:model-value="saveConfig({ receiveEmail: $event })"
-          />
-        </div>
-        <div v-if="receiveEmail" class="system__sub">
-          <div class="system__item">
+        <div class="system__item system__item--group">
+          <div class="system__row">
             <div class="system__info">
-              <span class="system__label">{{ t('setting.receiveEmailSys') }}</span>
-              <span class="system__desc">{{ t('setting.receiveEmailSysDesc') }}</span>
+              <span class="system__label">{{ t('setting.receiveEmail') }}</span>
+              <span class="system__desc">{{ t('setting.receiveEmailDesc') }}</span>
             </div>
             <ToggleSwitch
-              :model-value="receiveEmailSys"
+              :model-value="receiveEmail"
               :disabled="saving"
-              @update:model-value="saveConfig({ receiveEmailSys: $event })"
+              @update:model-value="saveConfig({ receiveEmail: $event })"
             />
           </div>
-          <div class="system__item">
-            <div class="system__info">
-              <span class="system__label">{{ t('setting.receiveEmailRepoAccess') }}</span>
-              <span class="system__desc">{{ t('setting.receiveEmailRepoAccessDesc') }}</span>
+          <template v-if="receiveEmail">
+            <div class="system__sub">
+              <div class="system__item">
+                <div class="system__info">
+                  <span class="system__label">{{ t('setting.receiveEmailSys') }}</span>
+                  <span class="system__desc">{{ t('setting.receiveEmailSysDesc') }}</span>
+                </div>
+                <ToggleSwitch
+                  :model-value="receiveEmailSys"
+                  :disabled="saving"
+                  @update:model-value="saveConfig({ receiveEmailSys: $event })"
+                />
+              </div>
+              <div class="system__item">
+                <div class="system__info">
+                  <span class="system__label">{{ t('setting.receiveEmailRepoAccess') }}</span>
+                  <span class="system__desc">{{ t('setting.receiveEmailRepoAccessDesc') }}</span>
+                </div>
+                <ToggleSwitch
+                  :model-value="receiveEmailRepoAccess"
+                  :disabled="saving"
+                  @update:model-value="saveConfig({ receiveEmailRepoAccess: $event })"
+                />
+              </div>
             </div>
-            <ToggleSwitch
-              :model-value="receiveEmailRepoAccess"
-              :disabled="saving"
-              @update:model-value="saveConfig({ receiveEmailRepoAccess: $event })"
-            />
-          </div>
+          </template>
         </div>
       <div class="system__item">
         <div class="system__info">
@@ -142,9 +146,12 @@ async function resetConfig() {
 .system .page-header__subtitle { font-size: var(--text-sm); }
 .system { padding-bottom: var(--spacing-4xl); }
 .system__list { display: flex; flex-direction: column; gap: var(--spacing-lg); }
-.system__sub { display: flex; flex-direction: column; gap: var(--spacing-lg); padding-left: var(--spacing-xl); position: relative; }
-.system__sub::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; background: var(--color-border); }
 .system__item { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-lg); }
+.system__item--group { display: block; padding: 0; }
+.system__row { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-lg); }
+.system__sub { display: flex; flex-direction: column; gap: var(--spacing-lg); padding-left: var(--spacing-2xl); padding-right: var(--spacing-lg); padding-bottom: var(--spacing-lg); position: relative; }
+.system__sub::before { content: ''; position: absolute; left: var(--spacing-lg); top: 8px; bottom: calc(var(--spacing-lg) + 8px); width: 2px; background: var(--color-border); }
+.system__sub .system__item { padding: var(--spacing-lg); border-radius: var(--rounded-lg); }
 .system__info { display: flex; flex-direction: column; gap: 2px; }
 .system__label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
 .system__desc { font-size: var(--text-xs); color: var(--color-text-secondary); }
