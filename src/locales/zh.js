@@ -459,7 +459,7 @@ export default {
     receiveEmailSys: '系统相关',
     receiveEmailSysDesc: '接收系统邮件，包括管理公告',
     receiveEmailRepoAccess: '仓库授权',
-    receiveEmailRepoAccessDesc: '接收仓库访问申请被批准时通知',
+    receiveEmailRepoAccessDesc: '接收仓库授权被批准时通知',
     loadFailed: '加载设置失败',
     saveFailed: '保存设置失败',
     resetConfig: '重置个人设置',
