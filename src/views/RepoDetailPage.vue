@@ -775,9 +775,10 @@ async function saveEdit() {
               </router-link>
             </div>
             <div v-if="repo.contributorCount" class="repo-contrib">
-              <button class="repo-contrib__btn" :title="t('repo.contributorsTitle')" @click.stop="settingsOpen = true">
+              <button class="repo-contrib__btn">
                 <SvgIcon name="handshake" :size="16" />
                 <span>{{ repo.contributorCount }}</span>
+                <span class="repo-contrib__tip">{{ t('repo.contribHint') }}</span>
               </button>
               <div v-if="repo.recentContributors?.length" class="recent-likers repo-contrib__avatars">
                 <router-link
@@ -1031,7 +1032,25 @@ async function saveEdit() {
   transition: all var(--transition-fast);
   line-height: 1;
 }
-.repo-contrib__btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-light); }
+.repo-contrib__btn:hover { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-bg); }
+.repo-contrib__btn { position: relative; }
+.repo-contrib__tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 50%;
+  transform: translateX(50%);
+  display: none;
+  padding: 4px 10px;
+  border-radius: var(--rounded-sm);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  z-index: 20;
+}
+.repo-contrib__btn:hover .repo-contrib__tip { display: block; }
 .recent-liker-avatar {
   width: 28px;
   height: 28px;
