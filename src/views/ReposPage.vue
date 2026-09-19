@@ -4,6 +4,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
+import { useAuthStore } from '@/stores/auth'
 import { repoAPI, fileAPI } from '@/api'
 import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -16,6 +17,7 @@ const { t } = useI18n()
 const { getMessage } = useError()
 const { toast } = useToast()
 const { load: loadConfig, get: getConfig } = useConfig()
+const auth = useAuthStore()
 
 const typeTabs = [
   { key: 'all', value: null, color: '#6b7280' },
@@ -177,7 +179,7 @@ async function createRepo() {
         <h1 class="page-header__title"># {{ t('repo.pageTitle') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('repo.placeholder') }}</p>
       </div>
-      <button class="btn btn--primary" @click="showCreate = true">
+      <button v-if="auth.isLoggedIn" class="btn btn--primary" @click="showCreate = true">
         <SvgIcon name="plus" />
         {{ t('repo.new') }}
       </button>
