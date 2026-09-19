@@ -255,7 +255,7 @@ watch(likeLiked, (liked) => {
               <SvgIcon :name="article.isPinned ? 'pin-off' : 'pin'" :size="16" />
               {{ article.isPinned ? t('common.unpin') : t('common.pin') }}
             </button>
-            <router-link :to="`/articles/${article.id}/edit`" class="link-muted">
+            <router-link v-if="auth.user?.id === article.userId" :to="`/articles/${article.id}/edit`" class="link-muted">
               <SvgIcon name="edit" />
               {{ t('common.edit') }}
             </router-link>

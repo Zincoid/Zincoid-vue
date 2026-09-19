@@ -603,7 +603,7 @@ async function saveEdit() {
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
               <div v-if="canManage()" class="repo-actions">
-                <button class="link-muted" @click="openEdit">
+                <button v-if="isOwner()" class="link-muted" @click="openEdit">
                   <SvgIcon name="edit" />
                   {{ t('common.edit') }}
                 </button>

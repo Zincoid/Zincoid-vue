@@ -288,7 +288,7 @@ watch(likeLiked, (liked) => {
             <SvgIcon :name="moment.isPinned ? 'pin-off' : 'pin'" :size="16" />
             {{ moment.isPinned ? t('common.unpin') : t('common.pin') }}
           </button>
-          <button v-if="!editing" class="link-muted" @click="startEdit">
+          <button v-if="auth.user?.id === moment.userId && !editing" class="link-muted" @click="startEdit">
             <SvgIcon name="edit" />
             {{ t('common.edit') }}
           </button>
