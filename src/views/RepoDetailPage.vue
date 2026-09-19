@@ -917,13 +917,13 @@ async function saveEdit() {
               <div class="setting-block__actions">
                 <button class="btn btn--outline setting-block__btn" :disabled="transferring" @click="transferConfirming = false">{{ t('common.cancel') }}</button>
                 <button class="btn btn--primary setting-block__btn" :disabled="transferring" @click="sendTransfer">
-                  <SvgIcon name="fork" :size="12" />
+                  <SvgIcon name="fork" :size="14" />
                   {{ t('common.confirm') }}
                 </button>
               </div>
             </template>
             <button v-else class="btn btn--primary btn--full setting-block__btn" @click="sendTransfer">
-              <SvgIcon name="fork" :size="12" />
+              <SvgIcon name="fork" :size="14" />
               {{ t('repo.transferSend') }}
             </button>
           </div>
@@ -931,11 +931,11 @@ async function saveEdit() {
             <h4 class="setting-block__title">{{ t('repo.contributorsTitle') }}</h4>
             <p class="setting-block__desc">{{ t('repo.contributorDesc') }}</p>
             <button v-if="repo.contributed" class="btn btn--outline btn--full setting-block__btn setting-block__btn--leave" @click="leaveContributor">
-              <SvgIcon name="logout" :size="12" />
+              <SvgIcon name="logout" :size="14" />
               {{ t('repo.leaveContributor') }}
             </button>
             <button v-else class="btn btn--primary btn--full setting-block__btn" @click="applyContributor">
-              <SvgIcon name="login" :size="12" />
+              <SvgIcon name="login" :size="14" />
               {{ t('repo.applyContributor') }}
             </button>
           </div>
