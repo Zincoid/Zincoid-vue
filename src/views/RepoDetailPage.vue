@@ -589,6 +589,7 @@ async function saveEdit() {
           <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
           <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
           <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
+          <span v-if="repo.contributed" class="contributing-badge">{{ t('repo.contributing') }}</span>
           <h1 class="repo-title">{{ repo.name }}</h1>
 
           <div class="repo-meta">
@@ -957,6 +958,7 @@ async function saveEdit() {
 .type-badge--media { color: #db2777; background: rgba(219, 39, 119, 0.1); }
 .type-badge--file { color: #2563eb; background: rgba(37, 99, 235, 0.1); }
 .visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
+.contributing-badge { display: inline-block; font-size: var(--text-xs); color: #7c3aed; background: rgba(124, 58, 237, 0.1); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
 .repo-title { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); line-height: 1.3; }
 
 .repo-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); font-size: var(--text-sm); color: var(--color-text-secondary); flex-wrap: wrap; }

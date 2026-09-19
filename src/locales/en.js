@@ -232,6 +232,7 @@ export default {
     applyContributorConfirm: 'Apply to contribute to this repo?',
     applyContributorSent: 'Request sent',
     leaveContributor: 'Leave Contribution',
+    contributing: 'Contributing',
     leaveContributorConfirm: 'Leave as a contributor of this repo?',
     restrictedHint: 'Authorization required to access this repo',
     noDesc: 'No description',

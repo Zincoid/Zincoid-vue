@@ -271,6 +271,7 @@ export default {
     applyContributorConfirm: '确定要申请为该仓库贡献？',
     applyContributorSent: '申请已发送',
     leaveContributor: '退出贡献',
+    contributing: '贡献中',
     leaveContributorConfirm: '确定要退出该仓库的贡献？',
     restrictedHint: '访问此仓库需要授权',
     noDesc: '暂无简介',
