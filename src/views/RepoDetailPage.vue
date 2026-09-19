@@ -928,7 +928,7 @@ async function saveEdit() {
               {{ t('repo.transferSend') }}
             </button>
           </div>
-          <div v-else class="setting-block">
+          <div v-else-if="repo.type !== 0" class="setting-block">
             <h4 class="setting-block__title">{{ t('repo.contributorsTitle') }}</h4>
             <p class="setting-block__desc">{{ t('repo.contributorDesc') }}</p>
             <button v-if="repo.contributed" class="btn btn--outline btn--full setting-block__btn setting-block__btn--leave" @click="leaveContributor">
@@ -957,7 +957,7 @@ async function saveEdit() {
 .type-badge--code { color: #16a34a; background: rgba(22, 163, 74, 0.1); }
 .type-badge--media { color: #db2777; background: rgba(219, 39, 119, 0.1); }
 .type-badge--file { color: #2563eb; background: rgba(37, 99, 235, 0.1); }
-.visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
+.visibility-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); margin-right: var(--spacing-sm); }
 .contributing-badge { display: inline-block; font-size: var(--text-xs); color: #7c3aed; background: rgba(124, 58, 237, 0.1); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); }
 .repo-title { font-size: var(--text-4xl); margin-bottom: var(--spacing-lg); line-height: 1.3; }
 
