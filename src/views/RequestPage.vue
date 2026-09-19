@@ -40,8 +40,8 @@ function onOverlayClick() {
 }
 
 const tabOptions = computed(() => [
-  { value: 'received', label: t('request.received') },
-  { value: 'sent', label: t('request.sent') }
+  { value: 'received', label: t('request.received'), icon: 'download' },
+  { value: 'sent', label: t('request.sent'), icon: 'send' }
 ])
 
 const rpData = ref({ records: [], pages: 1, total: 0, page: 1 })

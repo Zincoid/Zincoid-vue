@@ -21,8 +21,8 @@ const loading = ref(true)
 const loadingDone = ref(false)
 
 const tabOptions = computed(() => [
-  { value: 'received', label: t('access.received') },
-  { value: 'sent', label: t('access.sent') }
+  { value: 'received', label: t('access.received'), icon: 'download' },
+  { value: 'sent', label: t('access.sent'), icon: 'send' }
 ])
 
 const roleFilter = ref('viewer')
