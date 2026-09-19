@@ -71,7 +71,7 @@ function isActive(opt) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 6px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);

@@ -931,11 +931,11 @@ async function saveEdit() {
             <h4 class="setting-block__title">{{ t('repo.contributorsTitle') }}</h4>
             <p class="setting-block__desc">{{ t('repo.contributorDesc') }}</p>
             <button v-if="repo.contributed" class="btn btn--outline btn--full setting-block__btn setting-block__btn--leave" @click="leaveContributor">
-              <SvgIcon name="logout" :size="16" />
+              <SvgIcon name="logout" :size="12" />
               {{ t('repo.leaveContributor') }}
             </button>
             <button v-else class="btn btn--primary btn--full setting-block__btn" @click="applyContributor">
-              <SvgIcon name="login" :size="16" />
+              <SvgIcon name="login" :size="12" />
               {{ t('repo.applyContributor') }}
             </button>
           </div>

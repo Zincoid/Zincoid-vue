@@ -75,12 +75,6 @@ async function revoke(id) {
   if (!await confirm(t('access.revokeConfirm'))) return
   await repoAPI._delete(`/${id}`); fetchRR()
 }
-
-async function leaveContribution(repoId) {
-  if (!await confirm(t('repo.leaveContributorConfirm'))) return
-  await repoAPI.leaveContributor(repoId); fetchSR()
-}
-
 function statusLabel(s) {
   if (s === 0) return t('access.pending')
   if (s === 1) return t('access.approved')
@@ -191,9 +185,6 @@ function statusLabel(s) {
                 <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button v-if="a.access === 1 && a.role === 1" class="access-card__btn access-card__btn--leave" @click.stop="leaveContribution(a.repoId)">
-                  <SvgIcon name="logout" :size="12" /> {{ t('access.leave') }}
-                </button>
               </div>
             </div>
             <Pagination :page="srData.pages > 0 ? (srData.page || 1) : 1" :pages="srData.pages" :total="srData.total" :size="pageSize" @change="p => fetchSR(p)" />
@@ -254,8 +245,6 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__btn--allow:hover { background: rgba(22,163,74,0.08); }
 .access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
 .access-card__btn--remove:hover { color: #d97706; border-color: #d97706; background: rgba(217, 119, 6, 0.08); }
-.access-card__btn--leave { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); display: inline-flex; align-items: center; gap: 4px; }
-.access-card__btn--leave:hover { color: #fff; background: #dc2626; border-color: #dc2626; }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>
