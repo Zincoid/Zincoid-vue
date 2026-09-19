@@ -545,6 +545,7 @@ export default {
     'You can only edit your own moments': '只能编辑自己的动态',
     'You can only edit your own articles': '只能编辑自己的文章',
     'You can only edit your own repos': '只能编辑自己的仓库',
+    'You can only delete your own items': '只能删除自己的条目',
     'No permission to delete this moment': '无权删除此动态',
     'No permission to delete this article': '无权删除此文章',
     'No permission to delete this repo': '无权删除此仓库',

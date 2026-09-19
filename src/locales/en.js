@@ -545,6 +545,7 @@ export default {
     'You can only edit your own moments': 'You can only edit your own moments',
     'You can only edit your own articles': 'You can only edit your own articles',
     'You can only edit your own repos': 'You can only edit your own repos',
+    'You can only delete your own items': 'You can only delete your own items',
     'No permission to delete this moment': 'No permission to delete this moment',
     'No permission to delete this article': 'No permission to delete this article',
     'No permission to delete this repo': 'No permission to delete this repo',
