@@ -496,10 +496,10 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
     <Transition name="walkman-pop">
       <div v-if="tipVisible" class="walkman__tip">
         <span class="walkman__tip-text">{{ t('walkman.tipText') }}{{ t('walkman.tipAutoPlayPrefix') }}<RouterLink to="/personal/setting" class="walkman__tip-link">{{ t('setting.pageTitle') }}</RouterLink>{{ t('walkman.tipAutoPlaySuffix') }}</span>
-        <label class="walkman__tip-option">
+        <span class="walkman__tip-option">
           <input v-model="tipNoMore" type="checkbox" />
           {{ t('walkman.tipNoMore') }}
-        </label>
+        </span>
         <button class="btn btn--primary walkman__tip-btn" @click="dismissTip">{{ t('common.confirm') }}</button>
       </div>
     </Transition>
@@ -608,6 +608,8 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
 
 <style scoped>
 .walkman {
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #6b7280;
   position: fixed;
   left: var(--spacing-md);
   top: 80px;
@@ -742,7 +744,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-md);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.7);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
@@ -750,8 +752,10 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   white-space: nowrap;
 }
 [data-theme="dark"] .walkman__panel {
-  background: rgba(26, 29, 39, 0.6);
+  background: rgba(26, 29, 39, 0.7);
 }
+
+[data-theme="dark"] .walkman { --color-text-secondary: #6b7280; --color-text-tertiary: #4b5563; }
 
 .walkman-pop-enter-active,
 .walkman-pop-leave-active {
@@ -838,10 +842,11 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   border: none;
   border-radius: var(--rounded-full);
   background: transparent;
-  color: var(--color-text-secondary);
+  color: #4b5563;
   cursor: pointer;
   transition: color var(--transition-fast), background var(--transition-fast);
 }
+[data-theme="dark"] .walkman__btn { color: var(--color-text-secondary); }
 .walkman__btn:hover { color: var(--color-text-heading); background: var(--color-bg-alt); }
 .walkman__btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .walkman__btn--toggle {
@@ -888,7 +893,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   margin-top: -10px;
   margin-left: 10px;
   width: calc(100% - 20px);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.7);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
@@ -896,7 +901,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   overflow: hidden;
 }
 [data-theme="dark"] .walkman__list {
-  background: rgba(26, 29, 39, 0.6);
+  background: rgba(26, 29, 39, 0.7);
 }
 
 .walkman__list-head {
@@ -1035,8 +1040,9 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   align-items: center;
   justify-content: space-between;
   height: 27px;
-  padding: 0 var(--spacing-sm);
-  border-top: 1px solid var(--color-border-light);
+  margin: 0 var(--spacing-sm);
+  padding: 0 2px;
+  border-top: 1px solid var(--color-border);
 }
 
 .walkman__page-btn {
