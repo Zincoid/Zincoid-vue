@@ -952,7 +952,7 @@ async function saveEdit() {
       />
     </div>
 
-    <button v-if="repo && canManage()" class="pin-fab pin-fab--access" :title="t('repo.accessFabTitle')" @click="openAccess">
+    <button v-if="repo && isOwner()" class="pin-fab pin-fab--access" :title="t('repo.accessFabTitle')" @click="openAccess">
       <SvgIcon name="key" :size="20" />
     </button>
 
