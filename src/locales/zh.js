@@ -256,6 +256,7 @@ export default {
     requestAccessConfirm: '确定要申请访问此仓库？',
     requestAccessSent: '申请已发送',
     transfer: '转让',
+    accessFabTitle: '授权管理',
     transferTitle: '转让仓库',
     transferDesc: '将该仓库的所有权转让给指定用户。',
     transferIdPlaceholder: '输入用户名或昵称',

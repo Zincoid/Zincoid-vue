@@ -217,6 +217,7 @@ export default {
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',
     transfer: 'Transfer',
+    accessFabTitle: 'Access',
     transferTitle: 'Transfer Repo',
     transferDesc: 'Transfer ownership of this repo to another user.',
     transferIdPlaceholder: 'Enter username or nickname',

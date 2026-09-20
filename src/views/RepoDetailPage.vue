@@ -59,6 +59,51 @@ const commentSize = ref(10)
 // ── Transfer modal ──
 const settingsOpen = ref(false)
 const transferOverlayDown = ref(false)
+
+// ── Access management modal ──
+const accessOpen = ref(false)
+const accessLoading = ref(false)
+const accessRole = ref('viewer')
+const accessPageSize = 10
+const apData = ref({ records: [], pages: 1, total: 0, page: 1 })
+const arData = ref({ records: [], pages: 1, total: 0, page: 1 })
+
+async function fetchAccessPending(p = 1) {
+  const { data } = await repoAPI.getAccessList('/received/pending', p, accessPageSize, accessRole.value === 'contributor' ? 1 : 0, Number(route.params.id))
+  apData.value = data.data
+}
+async function fetchAccessResolved(p = 1) {
+  const { data } = await repoAPI.getAccessList('/received/resolved', p, accessPageSize, accessRole.value === 'contributor' ? 1 : 0, Number(route.params.id))
+  arData.value = data.data
+}
+async function openAccess() {
+  accessOpen.value = true
+  accessLoading.value = true
+  try { await Promise.all([fetchAccessPending(1), fetchAccessResolved(1)]) } catch { /* ignore */ } finally { accessLoading.value = false }
+}
+watch(accessRole, () => {
+  accessLoading.value = true
+  Promise.all([fetchAccessPending(1), fetchAccessResolved(1)]).catch(() => {}).finally(() => { accessLoading.value = false })
+})
+
+async function accessApprove(id) {
+  if (!await confirm(t('access.approveConfirm'))) return
+  await repoAPI._put(`/${id}/approve`); fetchAccessPending(); fetchAccessResolved()
+}
+async function accessReject(id) {
+  if (!await confirm(t('access.rejectConfirm'))) return
+  await repoAPI._put(`/${id}/reject`); fetchAccessPending(); fetchAccessResolved()
+}
+async function accessRevoke(id) {
+  if (!await confirm(t('access.revokeConfirm'))) return
+  await repoAPI._delete(`/${id}`); fetchAccessResolved()
+}
+function accessUser(a) { return a.userNickname || `User#${a.userId}` }
+function accessStatus(s) {
+  if (s === 0) return t('access.pending')
+  if (s === 1) return t('access.approved')
+  return t('access.rejected')
+}
 const transferId = ref(null)
 const transferring = ref(false)
 const transferError = ref('')
@@ -906,6 +951,10 @@ async function saveEdit() {
       />
     </div>
 
+    <button v-if="repo && canManage()" class="pin-fab pin-fab--access" :title="t('repo.accessFabTitle')" @click="openAccess">
+      <SvgIcon name="key" :size="20" />
+    </button>
+
     <button v-if="repo && auth.isLoggedIn" class="pin-fab pin-fab--settings" :title="t('user.setting')" @click="openSettings">
       <SvgIcon name="settings" :size="20" />
     </button>
@@ -964,6 +1013,68 @@ async function saveEdit() {
           <div class="setting-block setting-block--empty">
             <p class="setting-block__desc setting-block__desc--center">{{ t('user.moreComing') }}</p>
           </div>
+        </div>
+      </div>
+     </Transition>
+  </Teleport>
+
+  <!-- Access management modal -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="accessOpen" class="modal-overlay" @mousedown.self="accessOpen = false">
+        <div class="modal modal--access">
+          <button class="modal__close" @click="accessOpen = false"><SvgIcon name="close" :size="16" /></button>
+          <h3 class="modal__title">{{ t('repo.accessFabTitle') }}</h3>
+          <div class="modal--access__filters">
+            <SliderSelect
+              :model-value="accessRole"
+              :options="[{ value: 'viewer', label: t('access.viewer') }, { value: 'contributor', label: t('access.contributor') }]"
+              @update:model-value="accessRole = $event"
+            />
+          </div>
+          <LoadingSpinner :visible="accessLoading" />
+          <template v-if="!accessLoading">
+            <div class="modal--access__section" v-if="apData.records.length">
+              <h4>{{ t('access.pendingAuthorizations') }}</h4>
+              <div class="access-list">
+                <div v-for="a in apData.records" :key="a.id" class="access-card">
+                  <div class="access-card__left">
+                    <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
+                    <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
+                    <div class="access-card__info">
+                      <span class="access-card__user">{{ accessUser(a) }}</span>
+                    </div>
+                  </div>
+                  <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
+                  <span class="access-card__status pending">{{ accessStatus(a.access) }}</span>
+                  <div class="access-card__actions">
+                    <button class="access-card__btn access-card__btn--reject" @click="accessReject(a.id)">{{ t('access.reject') }}</button>
+                    <button class="access-card__btn access-card__btn--allow" @click="accessApprove(a.id)">{{ t('access.approve') }}</button>
+                  </div>
+                </div>
+              </div>
+              <Pagination :page="apData.pages > 0 ? (apData.page || 1) : 1" :pages="apData.pages" :total="apData.total" :size="accessPageSize" @change="p => fetchAccessPending(p)" />
+            </div>
+            <div class="modal--access__section" v-if="arData.records.length">
+              <h4>{{ t('access.resolvedAuthorizations') }}</h4>
+              <div class="access-list">
+                <div v-for="a in arData.records" :key="a.id" class="access-card">
+                  <div class="access-card__left">
+                    <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
+                    <span v-else class="access-card__avatar-placeholder">{{ (a.userNickname || '?')[0] }}</span>
+                    <div class="access-card__info">
+                      <span class="access-card__user">{{ accessUser(a) }}</span>
+                    </div>
+                  </div>
+                  <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
+                  <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ accessStatus(a.access) }}</span>
+                  <button class="access-card__btn access-card__btn--remove" @click="accessRevoke(a.id)">{{ t('access.revoke') }}</button>
+                </div>
+              </div>
+              <Pagination :page="arData.pages > 0 ? (arData.page || 1) : 1" :pages="arData.pages" :total="arData.total" :size="accessPageSize" @change="p => fetchAccessResolved(p)" />
+            </div>
+            <p v-if="!apData.records.length && !arData.records.length" class="modal--access__empty">{{ t('access.noAuthorizations') }}</p>
+          </template>
         </div>
       </div>
     </Transition>
@@ -1034,6 +1145,34 @@ async function saveEdit() {
   line-height: 1;
 }
 .repo-contrib__btn:hover { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-bg); }
+.pin-fab--access { border-color: #a78bfa; color: #7c3aed; opacity: 1; }
+.pin-fab--access:hover { border-color: #8b5cf6; color: #7c3aed; }
+.modal--access { max-width: 640px; height: 620px; display: flex; flex-direction: column; gap: var(--spacing-md); overflow-y: auto; }
+.modal--access__filters { flex-shrink: 0; }
+.modal--access__section h4 { font-size: var(--text-xs); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.modal--access__empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-xl) 0; }
+.modal--access__section :deep(.pagination) { margin-top: var(--spacing-sm); }
+.modal--access .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.modal--access .access-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); cursor: default; transition: border-color var(--transition-fast); }
+.modal--access .access-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
+.modal--access .access-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: default; }
+.modal--access .access-card__avatar { width: 36px; height: 36px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0; }
+.modal--access .access-card__avatar-placeholder { width: 36px; height: 36px; border-radius: var(--rounded-full); background: var(--color-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--text-sm); font-weight: var(--weight-medium); flex-shrink: 0; }
+.modal--access .access-card__info { display: flex; flex-direction: column; overflow: hidden; gap: 1px; min-width: 0; }
+.modal--access .access-card__user { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-text-heading); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.modal--access .access-card__time { font-size: var(--text-xs); color: var(--color-text-secondary); flex-shrink: 0; }
+.modal--access .access-card__status { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); flex-shrink: 0; font-weight: var(--weight-medium); }
+.modal--access .access-card__status.pending { color: #d97706; background: var(--color-warning-bg); }
+.modal--access .access-card__status.approved { color: #16a34a; background: rgba(22,163,74,0.1); }
+.modal--access .access-card__status.rejected { color: #dc2626; background: rgba(220,38,38,0.1); }
+.modal--access .access-card__actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
+.modal--access .access-card__btn { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
+.modal--access .access-card__btn--reject { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
+.modal--access .access-card__btn--reject:hover { background: rgba(220,38,38,0.08); }
+.modal--access .access-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); }
+.modal--access .access-card__btn--allow:hover { background: rgba(22,163,74,0.08); }
+.modal--access .access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
+.modal--access .access-card__btn--remove:hover { color: var(--color-warning); border-color: var(--color-warning); background: var(--color-warning-bg); }
 .repo-contrib__btn { position: relative; }
 .repo-contrib__tip {
   position: absolute;
