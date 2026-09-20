@@ -704,7 +704,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
 }
 .walkman__tip-text { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; }
 .walkman__tip-link { color: var(--color-primary); text-decoration: underline; }
-.walkman__tip-option { display: flex; align-items: center; gap: var(--spacing-xs); font-size: var(--text-xs); color: var(--color-text-secondary); cursor: pointer; user-select: none; }
+.walkman__tip-option { display: flex; align-items: center; gap: var(--spacing-xs); font-size: var(--text-xs); color: var(--color-text-secondary); cursor: default; user-select: none; }
 .walkman__tip-option input { cursor: pointer; }
 .walkman__tip-btn { align-self: flex-end; padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); }
 
