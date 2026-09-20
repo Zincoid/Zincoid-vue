@@ -20,6 +20,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 import UserSelect from '@/components/UserSelect.vue'
 import UploadProgress from '@/components/UploadProgress.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import ScrollArea from '@/components/ScrollArea.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -64,7 +65,7 @@ const transferOverlayDown = ref(false)
 const accessOpen = ref(false)
 const accessLoading = ref(false)
 const accessRole = ref('viewer')
-const accessPageSize = 10
+const accessPageSize = parseInt(getConfig('page_size', '10'))
 const apData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const arData = ref({ records: [], pages: 1, total: 0, page: 1 })
 
@@ -1040,6 +1041,7 @@ async function saveEdit() {
             <div class="modal--access__section" v-if="apData.records.length">
               <h4>{{ t('access.pendingAuthorizations') }}</h4>
               <div class="access-list">
+                <ScrollArea>
                 <div v-for="a in apData.records" :key="a.id" class="access-card">
                   <div class="access-card__left">
                     <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
@@ -1055,12 +1057,14 @@ async function saveEdit() {
                     <button class="access-card__btn access-card__btn--allow" @click="accessApprove(a.id)">{{ t('access.approve') }}</button>
                   </div>
                 </div>
+                </ScrollArea>
               </div>
               <Pagination :page="apData.pages > 0 ? (apData.page || 1) : 1" :pages="apData.pages" :total="apData.total" :size="accessPageSize" @change="p => fetchAccessPending(p)" />
             </div>
             <div class="modal--access__section" v-if="arData.records.length">
               <h4>{{ t('access.resolvedAuthorizations') }}</h4>
               <div class="access-list">
+                <ScrollArea>
                 <div v-for="a in arData.records" :key="a.id" class="access-card">
                   <div class="access-card__left">
                     <img v-if="a.userAvatar" :src="a.userAvatar" class="access-card__avatar" />
@@ -1073,6 +1077,7 @@ async function saveEdit() {
                   <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ accessStatus(a.access) }}</span>
                   <button class="access-card__btn access-card__btn--remove" @click="accessRevoke(a.id)">{{ t('access.revoke') }}</button>
                 </div>
+                </ScrollArea>
               </div>
               <Pagination :page="arData.pages > 0 ? (arData.page || 1) : 1" :pages="arData.pages" :total="arData.total" :size="accessPageSize" @change="p => fetchAccessResolved(p)" />
             </div>
@@ -1152,11 +1157,16 @@ async function saveEdit() {
 .pin-fab--access:hover { border-color: #7c3aed; color: #7c3aed; }
 .modal--access { display: flex; flex-direction: column; height: 620px; max-width: 640px; }
 .modal--access__filters { flex-shrink: 0; margin-bottom: var(--spacing-md); }
-.modal--access__body { flex: 1; min-height: 0; overflow-y: auto; margin: 0 calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1); padding: 0 var(--spacing-2xl) var(--spacing-lg); }
-.modal--access__section h4 { font-size: var(--text-xs); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.modal--access__body { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0 calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1); padding: 0 var(--spacing-2xl) var(--spacing-lg); }
+.modal--access__section { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-bottom: var(--spacing-md); }
+.modal--access__section h4 { flex-shrink: 0; font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.modal--access__section :deep(.scroll-area) { flex: 1; min-height: 0; }
+.modal--access__section .access-list { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.modal--access__section :deep(.scroll-area__body) { width: 100%; }
+.modal--access__section .pagination { flex-shrink: 0; margin-top: var(--spacing-sm); }
 .modal--access__empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-xl) 0; }
-.modal--access__section :deep(.pagination) { margin-top: var(--spacing-sm); }
-.modal--access .access-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.modal--access .access-list { display: flex; flex-direction: column; }
+.modal--access .access-list :deep(.access-card + .access-card) { margin-top: var(--spacing-sm); }
 .modal--access .access-card { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); cursor: default; transition: border-color var(--transition-fast); }
 .modal--access .access-card:hover { border-color: var(--color-border); background: var(--color-bg-alt); }
 .modal--access .access-card__left { display: flex; align-items: center; gap: var(--spacing-md); flex: 1; min-width: 0; cursor: default; }
