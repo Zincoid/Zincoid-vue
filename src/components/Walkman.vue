@@ -54,7 +54,10 @@ const listPages = ref(1)
 const listSize = ref(10)
 const listTotal = ref(0)
 const listLoading = ref(false)
-const musicScope = ref('public')
+const savedState = (() => {
+  try { return JSON.parse(localStorage.getItem('walkmanState') || 'null') } catch { return null }
+})() || {}
+const musicScope = ref(savedState.browse?.scope === 'private' ? 'private' : 'public')
 
 const scopeOptions = computed(() => [
   { value: 'public', label: t('walkman.public'), icon: 'members' },
@@ -423,14 +426,36 @@ watch(playing, (v) => {
 onMounted(async () => {
   await loadConfig()
   listSize.value = parseInt(getConfig('page_size', '10'))
+  if (typeof savedState.volume === 'number') volume.value = savedState.volume
+  if (savedState.mode && PLAY_MODES.includes(savedState.mode)) playMode.value = savedState.mode
   if (audioRef.value) {
     audioRef.value.volume = volume.value
     registerAudio(audioRef.value)
   }
-  await loadList(1)
+  await loadList(savedState.browse?.page || 1)
   if (!currentTrack.value && listTracks.value.length) {
     currentTrack.value = listTracks.value[0]
   }
+  if (savedState.queue?.scope === 'private' || savedState.queue?.scope === 'public') {
+    playScope.value = savedState.queue.scope
+    if (savedState.track?.url) {
+      await loadPlayList(savedState.queue.page || 1)
+      currentTrack.value = savedState.track
+      currentIndex.value = tracks.value.findIndex(t => t.id === savedState.track.id)
+    }
+  }
+})
+
+watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage], () => {
+  try {
+    localStorage.setItem('walkmanState', JSON.stringify({
+      mode: playMode.value,
+      volume: volume.value,
+      browse: { scope: musicScope.value, page: listPage.value },
+      queue: { scope: playScope.value, page: playPage.value },
+      track: currentTrack.value
+    }))
+  } catch {}
 })
 </script>
 
