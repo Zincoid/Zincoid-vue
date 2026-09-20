@@ -54,7 +54,12 @@ const listPages = ref(1)
 const listSize = ref(10)
 const listTotal = ref(0)
 const listLoading = ref(false)
-const musicScope = ref('public')
+const musicScope = ref((() => {
+  try {
+    const s = JSON.parse(localStorage.getItem('walkmanState') || 'null')
+    return s?.scope === 'user' || s?.scope === 'public' ? s.scope : 'public'
+  } catch { return 'public' }
+})())
 
 const scopeOptions = computed(() => [
   { value: 'public', label: t('walkman.public'), icon: 'members' },
@@ -350,9 +355,9 @@ function restoreSavedTrack() {
   }
 }
 
-watch([currentTrack, playMode, volume], () => {
+watch([currentTrack, playMode, volume, musicScope], () => {
   try {
-    localStorage.setItem('walkmanState', JSON.stringify({ mode: playMode.value, volume: volume.value, track: currentTrack.value }))
+    localStorage.setItem('walkmanState', JSON.stringify({ mode: playMode.value, volume: volume.value, scope: musicScope.value, track: currentTrack.value }))
   } catch {}
 })
 
