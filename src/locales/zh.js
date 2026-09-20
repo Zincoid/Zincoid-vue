@@ -622,6 +622,8 @@ export default {
   walkman: {
     empty: '暂无曲目',
     tipText: '点击按钮展开播放器，可切换公共/私有曲目、播放控制与下载；拖动按钮可移动位置。',
+    tipAutoPlayPrefix: '登录自动播放可在',
+    tipAutoPlaySuffix: '中关闭',
     tipNoMore: '不再提醒',
     play: '播放',
     pause: '暂停',

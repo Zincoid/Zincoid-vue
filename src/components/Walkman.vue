@@ -495,7 +495,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
     </button>
     <Transition name="walkman-pop">
       <div v-if="tipVisible" class="walkman__tip">
-        <span class="walkman__tip-text">{{ t('walkman.tipText') }}</span>
+        <span class="walkman__tip-text">{{ t('walkman.tipText') }} {{ t('walkman.tipAutoPlayPrefix') }}<RouterLink to="/setting" class="walkman__tip-link">{{ t('setting.pageTitle') }}</RouterLink>{{ t('walkman.tipAutoPlaySuffix') }}</span>
         <label class="walkman__tip-option">
           <input v-model="tipNoMore" type="checkbox" />
           {{ t('walkman.tipNoMore') }}
@@ -701,6 +701,7 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   border-right-color: var(--color-surface);
 }
 .walkman__tip-text { font-size: var(--text-xs); color: var(--color-text-secondary); line-height: 1.6; }
+.walkman__tip-link { color: var(--color-primary); text-decoration: underline; }
 .walkman__tip-option { display: flex; align-items: center; gap: var(--spacing-xs); font-size: var(--text-xs); color: var(--color-text-secondary); cursor: pointer; user-select: none; }
 .walkman__tip-option input { cursor: pointer; }
 .walkman__tip-btn { align-self: flex-end; padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-xs); }
