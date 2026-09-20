@@ -1023,8 +1023,10 @@ async function saveEdit() {
     <Transition name="modal">
       <div v-if="accessOpen" class="modal-overlay" @mousedown.self="accessOpen = false">
         <div class="modal modal--access">
-          <button class="modal__close" @click="accessOpen = false"><SvgIcon name="close" :size="16" /></button>
-          <h3 class="modal__title">{{ t('repo.accessFabTitle') }}</h3>
+          <h3 class="modal__title">
+            <span>{{ t('repo.accessFabTitle') }}</span>
+            <button class="modal__close" @click="accessOpen = false"><SvgIcon name="close" :size="16" /></button>
+          </h3>
           <div class="modal--access__filters">
             <SliderSelect
               :model-value="accessRole"
@@ -1032,8 +1034,9 @@ async function saveEdit() {
               @update:model-value="accessRole = $event"
             />
           </div>
-          <LoadingSpinner :visible="accessLoading" />
-          <template v-if="!accessLoading">
+          <div class="modal--access__body">
+            <LoadingSpinner :visible="accessLoading" />
+            <template v-if="!accessLoading">
             <div class="modal--access__section" v-if="apData.records.length">
               <h4>{{ t('access.pendingAuthorizations') }}</h4>
               <div class="access-list">
@@ -1074,7 +1077,8 @@ async function saveEdit() {
               <Pagination :page="arData.pages > 0 ? (arData.page || 1) : 1" :pages="arData.pages" :total="arData.total" :size="accessPageSize" @change="p => fetchAccessResolved(p)" />
             </div>
             <p v-if="!apData.records.length && !arData.records.length" class="modal--access__empty">{{ t('access.noAuthorizations') }}</p>
-          </template>
+            </template>
+          </div>
         </div>
       </div>
     </Transition>
@@ -1145,10 +1149,10 @@ async function saveEdit() {
   line-height: 1;
 }
 .repo-contrib__btn:hover { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-bg); }
-.pin-fab--access { border-color: #a78bfa; color: #7c3aed; opacity: 1; }
-.pin-fab--access:hover { border-color: #8b5cf6; color: #7c3aed; }
-.modal--access { max-width: 640px; height: 620px; display: flex; flex-direction: column; gap: var(--spacing-md); overflow-y: auto; }
-.modal--access__filters { flex-shrink: 0; }
+.pin-fab--access:hover { border-color: #7c3aed; color: #7c3aed; }
+.modal--access { display: flex; flex-direction: column; height: 620px; max-width: 640px; }
+.modal--access__filters { flex-shrink: 0; margin-bottom: var(--spacing-md); }
+.modal--access__body { flex: 1; min-height: 0; overflow-y: auto; margin: 0 calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1); padding: 0 var(--spacing-2xl) var(--spacing-lg); }
 .modal--access__section h4 { font-size: var(--text-xs); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .modal--access__empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-xl) 0; }
 .modal--access__section :deep(.pagination) { margin-top: var(--spacing-sm); }
