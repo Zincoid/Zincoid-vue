@@ -534,10 +534,18 @@ function closeMenu() {
   height: 100%;
 }
 
+.navbar__links .navbar__item {
+  line-height: 1;
+}
+
 .navbar__actions {
   display: flex;
   height: 100%;
   margin-left: auto;
+}
+
+.navbar__actions .navbar__item {
+  line-height: 1;
 }
 
 .navbar__item {
