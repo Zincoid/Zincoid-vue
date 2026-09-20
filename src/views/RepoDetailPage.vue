@@ -1038,7 +1038,7 @@ async function saveEdit() {
           <div class="modal--access__body">
             <LoadingSpinner :visible="accessLoading" />
             <template v-if="!accessLoading">
-            <div class="modal--access__section" v-if="apData.records.length">
+            <div class="modal--access__section modal--access__section--pending" v-if="apData.records.length">
               <h4>{{ t('access.pendingAuthorizations') }}</h4>
               <div class="access-list">
                 <ScrollArea>
@@ -1155,10 +1155,11 @@ async function saveEdit() {
 }
 .repo-contrib__btn:hover { border-color: var(--color-warning); color: var(--color-warning); background: var(--color-warning-bg); }
 .pin-fab--access:hover { border-color: #7c3aed; color: #7c3aed; }
-.modal--access { display: flex; flex-direction: column; height: 620px; max-width: 640px; }
+.modal--access { display: flex; flex-direction: column; height: 620px; max-width: 760px; }
 .modal--access__filters { flex-shrink: 0; margin-bottom: var(--spacing-md); }
 .modal--access__body { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0 calc(var(--spacing-2xl) * -1) calc(var(--spacing-2xl) * -1); padding: 0 var(--spacing-2xl) var(--spacing-lg); }
-.modal--access__section { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-bottom: var(--spacing-md); }
+.modal--access__section { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; margin-bottom: var(--spacing-md); }
+.modal--access__section--pending { flex: 0 0 27.5%; margin-bottom: var(--spacing-md); }
 .modal--access__section h4 { flex-shrink: 0; font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .modal--access__section :deep(.scroll-area) { flex: 1; min-height: 0; }
 .modal--access__section .access-list { flex: 1; min-height: 0; display: flex; flex-direction: column; }
