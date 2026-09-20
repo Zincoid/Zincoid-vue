@@ -132,8 +132,8 @@ function statusLabel(s) {
                 <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
                 <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
                 <div class="access-card__actions" @click.stop>
-                  <button class="access-card__btn access-card__btn--reject" @click="rejectAccess(a.id)">{{ t('access.reject') }}</button>
-                  <button class="access-card__btn access-card__btn--allow" @click="approve(a.id)">{{ t('access.approve') }}</button>
+                  <button class="access-card__btn access-card__btn--reject" :title="t('access.reject')" @click="rejectAccess(a.id)"><SvgIcon name="close" :size="14" /></button>
+                  <button class="access-card__btn access-card__btn--allow" :title="t('access.approve')" @click="approve(a.id)"><SvgIcon name="check" :size="14" /></button>
                 </div>
               </div>
             </div>
@@ -153,7 +153,7 @@ function statusLabel(s) {
                 </div>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button class="access-card__btn access-card__btn--remove" @click.stop="revoke(a.id)">{{ t('access.revoke') }}</button>
+                <button class="access-card__btn access-card__btn--del" :title="t('access.revoke')" @click.stop="revoke(a.id)"><SvgIcon name="trash" :size="14" /></button>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
@@ -237,14 +237,14 @@ h3 { font-size: var(--text-sm); font-weight: var(--weight-medium); margin-bottom
 .access-card__status.pending { color: #d97706; background: rgba(217,119,6,0.1); }
 .access-card__status.approved { color: #16a34a; background: rgba(22,163,74,0.1); }
 .access-card__status.rejected { color: #dc2626; background: rgba(220,38,38,0.1); }
-.access-card__actions { display: flex; gap: var(--spacing-sm); flex-shrink: 0; }
-.access-card__btn { padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: var(--weight-medium); border: none; border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
-.access-card__btn--reject { color: #dc2626; border: 1px solid rgba(220,38,38,0.3); }
-.access-card__btn--reject:hover { background: rgba(220,38,38,0.08); }
-.access-card__btn--allow { color: #16a34a; border: 1px solid rgba(22,163,74,0.3); }
-.access-card__btn--allow:hover { background: rgba(22,163,74,0.08); }
-.access-card__btn--remove { color: var(--color-text-secondary); background: transparent; border: 1px solid var(--color-border); }
-.access-card__btn--remove:hover { color: #d97706; border-color: #d97706; background: rgba(217, 119, 6, 0.08); }
+.access-card__actions { display: flex; gap: 0; flex-shrink: 0; align-items: center; }
+.access-card__btn { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; flex-shrink: 0; overflow: hidden; border: none; border-radius: var(--rounded-full); background: transparent; color: var(--color-text-secondary); cursor: pointer; margin-right: var(--spacing-sm); transition: width var(--transition-fast), opacity var(--transition-fast), margin var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
+.access-card:not(:hover) .access-card__btn--reject,
+.access-card:not(:hover) .access-card__btn--allow { width: 0; margin-right: 0; opacity: 0; }
+.access-card__btn--reject:hover { color: #dc2626; background: rgba(220,38,38,0.1); }
+.access-card__btn--allow:hover { color: #16a34a; background: rgba(22,163,74,0.1); }
+.access-card__btn--del:hover { color: var(--color-warning); background: var(--color-warning-bg); }
+.access-card__actions > :last-child { margin-right: 0; }
 .empty { text-align: center; font-size: var(--text-sm); color: var(--color-text-secondary); padding: var(--spacing-3xl) 0; }
 .section :deep(.pagination) { margin-top: var(--spacing-md); }
 </style>
