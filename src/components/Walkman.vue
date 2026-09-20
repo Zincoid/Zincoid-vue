@@ -5,7 +5,7 @@ import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
 import { useWalkman } from '@/composables/useWalkman'
 import { useAuthStore } from '@/stores/auth'
-import { musicAPI } from '@/api'
+import { musicAPI, userAPI } from '@/api'
 import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
 import ScrollArea from '@/components/ScrollArea.vue'
@@ -443,6 +443,14 @@ onMounted(async () => {
       currentTrack.value = savedState.track
       currentIndex.value = tracks.value.findIndex(t => t.id === savedState.track.id)
     }
+  }
+  if (auth.isLoggedIn) {
+    try {
+      const { data } = await userAPI.getUserConfig()
+      if (data.code === 200 && data.data.autoPlayMusic !== false && currentTrack.value && playSource.value !== 'external') {
+        nextTick(() => audioRef.value.play()).catch(() => {})
+      }
+    } catch {}
   }
 })
 

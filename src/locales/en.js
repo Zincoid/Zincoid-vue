@@ -461,6 +461,8 @@ export default {
     receiveEmailSysDesc: 'Receive system emails, including administrator announcements',
     receiveEmailRepoAccess: 'Repo access',
     receiveEmailRepoAccessDesc: 'Receive notification emails when repo access are approved',
+    autoPlayMusic: 'Auto-play walkman',
+    autoPlayMusicDesc: 'Automatically play the walkman after login',
     loadFailed: 'Failed to load settings',
     saveFailed: 'Failed to save settings',
     resetConfig: 'Reset Configuration',

@@ -18,6 +18,7 @@ const saving = ref(false)
 const receiveEmail = ref(false)
 const receiveEmailSys = ref(false)
 const receiveEmailRepoAccess = ref(true)
+const autoPlayMusic = ref(true)
 
 onMounted(async () => {
   try {
@@ -26,6 +27,7 @@ onMounted(async () => {
       receiveEmail.value = data.data.receiveEmail
       receiveEmailSys.value = data.data.receiveEmailSys
       receiveEmailRepoAccess.value = data.data.receiveEmailRepoAccess
+      autoPlayMusic.value = data.data.autoPlayMusic !== false
     }
   } catch (e) {
     handle(e, 'setting.loadFailed')
@@ -40,6 +42,7 @@ async function saveConfig(partial) {
     receiveEmail: receiveEmail.value,
     receiveEmailSys: receiveEmailSys.value,
     receiveEmailRepoAccess: receiveEmailRepoAccess.value,
+    autoPlayMusic: autoPlayMusic.value,
     ...partial
   }
   try {
@@ -47,6 +50,7 @@ async function saveConfig(partial) {
     receiveEmail.value = payload.receiveEmail
     receiveEmailSys.value = payload.receiveEmailSys
     receiveEmailRepoAccess.value = payload.receiveEmailRepoAccess
+    autoPlayMusic.value = payload.autoPlayMusic
   } catch (e) {
     handle(e, 'setting.saveFailed')
   } finally {
@@ -61,11 +65,13 @@ async function resetConfig() {
     await userAPI.updateUserConfig({
       receiveEmail: true,
       receiveEmailSys: false,
-      receiveEmailRepoAccess: true
+      receiveEmailRepoAccess: true,
+      autoPlayMusic: true
     })
     receiveEmail.value = true
     receiveEmailSys.value = false
     receiveEmailRepoAccess.value = true
+    autoPlayMusic.value = true
   } catch (e) {
     handle(e, 'setting.saveFailed')
   } finally {
@@ -123,6 +129,17 @@ async function resetConfig() {
             </div>
           </template>
         </div>
+      <div class="system__item">
+        <div class="system__info">
+          <span class="system__label">{{ t('setting.autoPlayMusic') }}</span>
+          <span class="system__desc">{{ t('setting.autoPlayMusicDesc') }}</span>
+        </div>
+        <ToggleSwitch
+          :model-value="autoPlayMusic"
+          :disabled="saving"
+          @update:model-value="saveConfig({ autoPlayMusic: $event })"
+        />
+      </div>
       <div class="system__item">
         <div class="system__info">
           <span class="system__label">{{ t('setting.resetConfig') }}</span>
