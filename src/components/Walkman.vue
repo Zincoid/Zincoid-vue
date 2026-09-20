@@ -136,9 +136,8 @@ async function loadList(pageNum) {
     listPages.value = data.pages || 1
     listTotal.value = data.total || 0
     listPage.value = pageNum
-    if (!currentTrack.value) {
-      const saved = restoreSavedTrack()
-      if (!saved) currentTrack.value = listTracks.value[0] || null
+    if (!tracks.value.length && !playing.value) {
+      currentTrack.value = listTracks.value[0] || null
     }
   } catch (e) {
     if (e?.response?.status !== 401) error.value = getMessage(e, 'walkman.loadFailed')
@@ -334,26 +333,6 @@ function onEnded() {
 
 watch(volume, v => {
   if (audioRef.value) audioRef.value.volume = v
-})
-
-function restoreSavedTrack() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('walkmanState') || 'null')
-    if (!saved?.track?.url) return null
-    if (!PLAY_MODES.includes(saved.mode)) saved.mode = 'shuffle'
-    playMode.value = saved.mode
-    if (typeof saved.volume === 'number' && saved.volume >= 0 && saved.volume <= 1) volume.value = saved.volume
-    currentTrack.value = saved.track
-    return true
-  } catch {
-    return null
-  }
-}
-
-watch([currentTrack, playMode, volume], () => {
-  try {
-    localStorage.setItem('walkmanState', JSON.stringify({ mode: playMode.value, volume: volume.value, track: currentTrack.value }))
-  } catch {}
 })
 
 watch(musicScope, () => {
