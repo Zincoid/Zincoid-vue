@@ -638,3 +638,11 @@ textarea::-webkit-scrollbar-corner {
   pointer-events: none;
 }
 .spin-edge:hover::after { opacity: 1; filter: drop-shadow(0 0 5px var(--edge-glow)); animation: edge-spin 2.5s linear infinite; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+

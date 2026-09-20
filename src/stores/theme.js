@@ -12,8 +12,29 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.setAttribute('data-theme', val)
   })
 
-  function toggleTheme() {
-    theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  function applyTheme(val) {
+    theme.value = val
+  }
+
+  function toggleTheme(event) {
+    const next = theme.value === 'dark' ? 'light' : 'dark'
+    const doc = document
+    if (!event || typeof doc.startViewTransition !== 'function' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      applyTheme(next)
+      return
+    }
+    const x = event.clientX ?? innerWidth / 2
+    const y = event.clientY ?? innerHeight / 2
+    const endRadius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+    const transition = doc.startViewTransition(() => {
+      applyTheme(next)
+    })
+    transition.ready.then(() => {
+      doc.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`] },
+        { duration: 500, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' }
+      )
+    })
   }
 
   return { theme, toggleTheme }

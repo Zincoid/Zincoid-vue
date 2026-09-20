@@ -279,7 +279,7 @@ function closeMenu() {
             <SvgIcon name="login" class="navbar__signin-icon" />
             {{ t('nav.signIn') }}
           </router-link>
-          <button class="navbar__item navbar__lang-btn navbar__theme-btn navbar__lang-btn--desktop" @click="theme.toggleTheme()">
+          <button class="navbar__item navbar__lang-btn navbar__theme-btn navbar__lang-btn--desktop" @click="theme.toggleTheme($event)">
             <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__signin-icon" />
             <span class="navbar__label">{{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}</span>
           </button>
@@ -293,7 +293,7 @@ function closeMenu() {
             <SvgIcon name="lang" class="navbar__nav-icon" />
             {{ t('nav.lang') }}
           </button>
-          <button class="navbar__item" @click="theme.toggleTheme()">
+          <button class="navbar__item" @click="theme.toggleTheme($event)">
             <SvgIcon :name="theme.theme === 'dark' ? 'sun' : 'moon'" class="navbar__nav-icon" />
             {{ theme.theme === 'dark' ? t('nav.light') : t('nav.dark') }}
           </button>
