@@ -622,7 +622,7 @@ export default {
   walkman: {
     empty: 'No tracks',
     tipText: 'Click the button to expand the player: switch public/private tracks, playback controls and downloads; drag the button to move it.',
-    tipAutoPlayPrefix: ' Auto-play on login can be disabled in',
+    tipAutoPlayPrefix: ' Auto-play on login can be disabled in ',
     tipAutoPlaySuffix: '.',
     tipNoMore: "Don't show again",
     play: 'Play',
