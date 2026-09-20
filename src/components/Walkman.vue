@@ -153,7 +153,7 @@ async function loadList(pageNum) {
 }
 
 async function loadPlayList(pageNum) {
-  const scope = playScope.value || 'public'
+  const scope = playScope.value || musicScope.value
   const res = scope === 'public'
     ? await musicAPI.list(pageNum, listSize.value)
     : await musicAPI.listUser(pageNum, listSize.value)
@@ -275,7 +275,10 @@ function ensurePlayList() {
 }
 
 async function next() {
-  ensurePlayList()
+  if (!tracks.value.length) {
+    if (playScope.value) await loadPlayList(1)
+    else ensurePlayList()
+  }
   if (!tracks.value.length) return
   if (playSource.value === 'external') return
   if (playMode.value === 'shuffle' && await shuffleNext()) return
@@ -289,7 +292,10 @@ async function next() {
 }
 
 async function prev() {
-  ensurePlayList()
+  if (!tracks.value.length) {
+    if (playScope.value) await loadPlayList(1)
+    else ensurePlayList()
+  }
   if (!tracks.value.length) return
   if (playSource.value === 'external') return
   if (currentIndex.value > 0) {
@@ -348,6 +354,7 @@ function restoreSavedTrack() {
     if (!PLAY_MODES.includes(saved.mode)) saved.mode = 'shuffle'
     playMode.value = saved.mode
     if (typeof saved.volume === 'number' && saved.volume >= 0 && saved.volume <= 1) volume.value = saved.volume
+    playScope.value = saved.scope === 'user' || saved.scope === 'public' ? saved.scope : 'public'
     currentTrack.value = saved.track
     return true
   } catch {
@@ -355,9 +362,9 @@ function restoreSavedTrack() {
   }
 }
 
-watch([currentTrack, playMode, volume, musicScope], () => {
+watch([currentTrack, playMode, volume, playScope, musicScope], () => {
   try {
-    localStorage.setItem('walkmanState', JSON.stringify({ mode: playMode.value, volume: volume.value, scope: musicScope.value, track: currentTrack.value }))
+    localStorage.setItem('walkmanState', JSON.stringify({ mode: playMode.value, volume: volume.value, scope: playScope.value || musicScope.value, track: currentTrack.value }))
   } catch {}
 })
 
@@ -1027,6 +1034,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   height: 27px;
+  margin: 0 var(--spacing-sm);
   padding: 0 var(--spacing-sm);
   border-top: 1px solid var(--color-border-light);
 }
