@@ -1075,7 +1075,7 @@ async function saveEdit() {
                   </div>
                   <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                   <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ accessStatus(a.access) }}</span>
-                  <button class="access-card__btn access-card__btn--del access-card__btn--icon" :title="t('access.revoke')" @click="accessRevoke(a.id)"><SvgIcon name="trash" :size="14" /></button>
+                  <button class="access-card__btn access-card__btn--del access-card__btn--icon" :title="t('access.revoke')" @click="accessRevoke(a.id)"><SvgIcon name="revoke" :size="14" /></button>
                 </div>
                 </ScrollArea>
               </div>

@@ -153,7 +153,7 @@ function statusLabel(s) {
                 </div>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
                 <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
-                <button class="access-card__btn access-card__btn--del" :title="t('access.revoke')" @click.stop="revoke(a.id)"><SvgIcon name="trash" :size="14" /></button>
+                <button class="access-card__btn access-card__btn--del" :title="t('access.revoke')" @click.stop="revoke(a.id)"><SvgIcon name="revoke" :size="14" /></button>
               </div>
             </div>
             <Pagination :page="rrData.pages > 0 ? (rrData.page || 1) : 1" :pages="rrData.pages" :total="rrData.total" :size="pageSize" @change="p => fetchRR(p)" />
