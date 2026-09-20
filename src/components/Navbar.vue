@@ -429,7 +429,6 @@ function closeMenu() {
 }
 [data-theme="dark"] .navbar {
   background: rgba(26, 29, 39, 0.6);
-  border-bottom-color: rgba(46, 48, 58, 0.5);
 }
 
 .navbar__inner {
@@ -1128,7 +1127,7 @@ function closeMenu() {
     margin-left: 0;
     padding-bottom: var(--spacing-xs);
     margin-bottom: var(--spacing-xs);
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    border-bottom: 1px solid var(--color-border);
     align-items: stretch;
   }
 
