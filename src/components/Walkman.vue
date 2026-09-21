@@ -683,7 +683,6 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
-  box-shadow: var(--shadow-lg);
   z-index: 2;
 }
 .walkman__tip::before {
