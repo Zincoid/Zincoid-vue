@@ -28,12 +28,7 @@ const BAR_RATIO_DEFAULT = 0.25
 async function loadBarRatio() {
   try {
     const { data } = await configAPI.get()
-    const configs = data?.data
-    const entry = Array.isArray(configs)
-      ? configs.find(c => c?.configKey === BAR_RATIO_KEY)
-      : (Array.isArray(configs?.configs) ? configs.configs.find(c => c?.configKey === BAR_RATIO_KEY) : null)
-    const raw = entry?.configValue
-    const parsed = raw != null ? Number(raw) : NaN
+    const parsed = Number(data?.data?.[BAR_RATIO_KEY] ?? data?.data?.audio_spectrum_ratio)
     if (Number.isFinite(parsed) && parsed > 0 && parsed <= 1) barRatio = parsed
   } catch { /* keep default */ }
 }
