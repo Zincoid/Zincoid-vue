@@ -55,12 +55,12 @@ function buildCells() {
 
   for (let x = 4; x < centerX - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.16 + Math.random() * 0.10 })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.30 + Math.random() * 0.18 })
     }
   }
   for (let x = centerX + 4; x < w - 4; x += CELL_W) {
     for (let y = CELL_H; y < h - 4; y += CELL_H) {
-      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.16 + Math.random() * 0.10 })
+      cells.push({ x, y, v: randomChar(), next: Math.random() * 4, alpha: 0.30 + Math.random() * 0.18 })
     }
   }
 }
@@ -101,7 +101,7 @@ function tick(now) {
       cell.v = randomChar()
       cell.next = speed * (0.1 + Math.random() * 0.3)
       // Sudden jump in brightness on change
-      cell.alpha = 0.14 + factor * 0.42 + Math.random() * 0.05
+      cell.alpha = 0.26 + factor * 0.5 + Math.random() * 0.1
     }
   }
 
@@ -129,7 +129,7 @@ function tick(now) {
       const barLen = m * maxBarLen
       if (edgeDist > barLen) continue
       const ratio = 1 - edgeDist / Math.max(barLen, 1)
-      const alpha = 0.12 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.85
+      const alpha = 0.18 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.9
       const r = Math.round(baseR + (219 - baseR) * m)
       const g = Math.round(baseG + (39 - baseG) * m)
       const b = Math.round(baseB + (119 - baseB) * m)
@@ -211,7 +211,7 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-@media (max-width: 1275px) {
+@media (max-width: 857px) {
   .digital-flow {
     display: none;
   }
