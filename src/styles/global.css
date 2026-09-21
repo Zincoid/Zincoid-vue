@@ -375,7 +375,7 @@ th {
   position: relative;
 }
 .header:has(.page-header) .btn--primary {
-  margin-right: calc(var(--spacing-lg) + 24px);
+  margin-right: var(--spacing-xl);
   position: relative;
   z-index: 1;
 }

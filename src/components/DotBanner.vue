@@ -24,7 +24,9 @@ function render() {
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
   c.globalAlpha = isDark ? 0.55 : 0.45
-  c.fillStyle = getComputedStyle(canvas).color
+  c.fillStyle = isDark
+    ? getComputedStyle(canvas).color
+    : 'rgb(236, 79, 160)'
   const dot = 4.5
   const pitch = 8
   const cols = Math.max(1, Math.floor((w - dot - 2) / pitch)) + 1
