@@ -26,20 +26,34 @@ function render() {
   c.globalAlpha = isDark ? 0.55 : 0.45
   c.fillStyle = isDark
     ? getComputedStyle(canvas).color
-    : 'rgb(217, 45, 32)'
+    : 'rgb(34, 122, 74)'
   const dot = 4.5
   const pitch = 8
   const cols = Math.max(1, Math.floor((w - dot - 2) / pitch)) + 1
   const rows = Math.max(1, Math.floor((h - dot - 2) / pitch)) + 1
   const startX = w - dot - (cols - 1) * pitch
   const startY = Math.round((h - dot - (rows - 1) * pitch) / 2)
+  // skip dots hidden behind the trailing 新建 button
+  const excluded = []
+  const canvasRect = canvas.getBoundingClientRect()
+  parent.querySelectorAll('.btn--primary').forEach(btn => {
+    const r = btn.getBoundingClientRect()
+    excluded.push({
+      x1: r.left - canvasRect.left - 2,
+      y1: r.top - canvasRect.top - 2,
+      x2: r.right - canvasRect.left + 2,
+      y2: r.bottom - canvasRect.top + 2
+    })
+  })
+
   for (let col = 0; col < cols; col++) {
     const p = 0.08 + (col / Math.max(cols - 1, 1)) * 0.85
     for (let row = 0; row < rows; row++) {
       if (Math.random() >= p) continue
       const x = startX + col * pitch
       const y = startY + row * pitch
-      c.globalAlpha = (isDark ? 0.55 : 0.65) + Math.random() * 0.35
+      const faded = excluded.some(e => x + dot > e.x1 && x < e.x2 && y + dot > e.y1 && y < e.y2)
+      c.globalAlpha = faded ? 0.25 : (isDark ? 0.55 : 0.65) + Math.random() * 0.35
       c.fillRect(x, y, dot, dot)
     }
   }
