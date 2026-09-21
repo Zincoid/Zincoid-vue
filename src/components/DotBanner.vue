@@ -118,7 +118,7 @@ watch(() => props.seed, render)
   top: var(--spacing-2xl);
   right: 0;
   bottom: var(--spacing-2xl);
-  width: 460px;
+  width: 550px;
   height: calc(100% - var(--spacing-2xl) * 2);
   pointer-events: none;
   color: var(--color-accent);
