@@ -16,7 +16,7 @@ const canvasRef = ref(null)
 let animationId = null
 
 const FONT_SIZE = 12
-const CELL_W = 18
+const CELL_W = 15
 const CELL_H = 17
 const MARGIN_WIDTH = 140
 const HOT_RADIUS = 100
@@ -120,7 +120,7 @@ function tick(now) {
 
   // Draw
   ctx2d.clearRect(0, 0, w, h)
-  ctx2d.font = `${FONT_SIZE}px "Courier New", monospace`
+  ctx2d.font = `bold ${FONT_SIZE}px "Courier New", monospace`
   ctx2d.textAlign = 'center'
   ctx2d.textBaseline = 'middle'
 
@@ -143,9 +143,9 @@ function tick(now) {
       if (edgeDist > barLen) continue
       const ratio = 1 - edgeDist / Math.max(barLen, 1)
       const alpha = Math.min(1, (0.18 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.9) * (isDark ? 1 : 1.3))
-      const r = isDark ? Math.round(baseR + (219 - baseR) * m) : Math.round(236 - (236 - 219) * m)
-      const g = isDark ? Math.round(baseG + (39 - baseG) * m) : Math.round(120 + (39 - 120) * m)
-      const b = isDark ? Math.round(baseB + (119 - baseB) * m) : Math.round(160 + (119 - 160) * m)
+      const r = isDark ? Math.round(baseR + (156 - baseR) * m) : Math.round(148 - 20 * m)
+      const g = isDark ? Math.round(baseG + (163 - baseG) * m) : Math.round(155 - 23 * m)
+      const b = isDark ? Math.round(baseB + (175 - baseB) * m) : Math.round(163 - 27 * m)
       ctx2d.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`
       ctx2d.fillText(cell.v, cell.x, cell.y)
     }
