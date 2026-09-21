@@ -60,6 +60,18 @@ function onThemeChange() {
   render()
 }
 
+let timer = null
+
+function startShuffle() {
+  clearInterval(timer)
+  timer = setInterval(render, 250)
+}
+
+function stopShuffle() {
+  clearInterval(timer)
+  timer = null
+}
+
 onMounted(() => {
   ro2 = new MutationObserver(onThemeChange)
   ro2.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
@@ -69,9 +81,11 @@ onMounted(() => {
   })
   ro.observe(canvasRef.value?.parentElement)
   render()
+  startShuffle()
 })
 
 onUnmounted(() => {
+  stopShuffle()
   ro?.disconnect()
   ro2?.disconnect()
   clearTimeout(render._t)
