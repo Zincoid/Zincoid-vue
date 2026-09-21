@@ -8,6 +8,7 @@ let freqData = null
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useWalkman } from '@/composables/useWalkman'
+import { configAPI } from '@/api'
 
 const { audioEl, isPlaying } = useWalkman()
 
@@ -19,6 +20,23 @@ const CELL_W = 18
 const CELL_H = 17
 const MARGIN_WIDTH = 140
 const HOT_RADIUS = 100
+
+let barRatio = 0.25
+const BAR_RATIO_KEY = 'audio_spectrum_ratio'
+const BAR_RATIO_DEFAULT = 0.25
+
+async function loadBarRatio() {
+  try {
+    const { data } = await configAPI.get()
+    const configs = data?.data
+    const entry = Array.isArray(configs)
+      ? configs.find(c => c?.configKey === BAR_RATIO_KEY)
+      : (Array.isArray(configs?.configs) ? configs.configs.find(c => c?.configKey === BAR_RATIO_KEY) : null)
+    const raw = entry?.configValue
+    const parsed = raw != null ? Number(raw) : NaN
+    if (Number.isFinite(parsed) && parsed > 0 && parsed <= 1) barRatio = parsed
+  } catch { /* keep default */ }
+}
 
 const CHARS = '0123456789ABCDEF'
 
@@ -119,7 +137,7 @@ function tick(now) {
   if (spectrum) {
     const bins = freqData.length
     const centerX = w / 2
-    const maxBarLen = (centerX - 8) * 0.2
+    const maxBarLen = (centerX - 8) * barRatio
     for (const cell of cells) {
       const isLeft = cell.x < centerX
       const edgeDist = isLeft ? cell.x : w - cell.x
@@ -186,6 +204,7 @@ onMounted(() => {
     timer = setTimeout(resize, 300)
   })
   window.addEventListener('mousemove', onMouseMove)
+  loadBarRatio()
 })
 
 onUnmounted(() => {
