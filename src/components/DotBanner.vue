@@ -53,7 +53,7 @@ function render() {
       const x = startX + col * pitch
       const y = startY + row * pitch
       const faded = excluded.some(e => x + dot > e.x1 && x < e.x2 && y + dot > e.y1 && y < e.y2)
-      c.globalAlpha = faded ? 0.25 : (isDark ? 0.55 : 0.65) + Math.random() * 0.35
+      c.globalAlpha = faded ? 0 : (isDark ? 0.55 : 0.65) + Math.random() * 0.35
       c.fillRect(x, y, dot, dot)
     }
   }
