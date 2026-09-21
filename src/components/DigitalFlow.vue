@@ -16,7 +16,7 @@ const canvasRef = ref(null)
 let animationId = null
 
 const FONT_SIZE = 12
-const CELL_W = 18
+const CELL_W = 15
 const CELL_H = 17
 const MARGIN_WIDTH = 140
 const HOT_RADIUS = 100
@@ -120,7 +120,7 @@ function tick(now) {
 
   // Draw
   ctx2d.clearRect(0, 0, w, h)
-  ctx2d.font = `${FONT_SIZE}px "Courier New", monospace`
+  ctx2d.font = `bold ${FONT_SIZE}px "Courier New", monospace`
   ctx2d.textAlign = 'center'
   ctx2d.textBaseline = 'middle'
 
