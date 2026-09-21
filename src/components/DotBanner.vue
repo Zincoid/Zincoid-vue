@@ -26,7 +26,7 @@ function render() {
   c.globalAlpha = isDark ? 0.55 : 0.45
   c.fillStyle = isDark
     ? getComputedStyle(canvas).color
-    : 'rgb(34, 122, 74)'
+    : 'rgb(217, 45, 32)'
   const dot = 4.5
   const pitch = 8
   const cols = Math.max(1, Math.floor((w - dot - 2) / pitch)) + 1
@@ -39,7 +39,7 @@ function render() {
       if (Math.random() >= p) continue
       const x = startX + col * pitch
       const y = startY + row * pitch
-      c.globalAlpha = (isDark ? 0.55 : 0.45) + Math.random() * 0.35
+      c.globalAlpha = (isDark ? 0.55 : 0.65) + Math.random() * 0.35
       c.fillRect(x, y, dot, dot)
     }
   }
