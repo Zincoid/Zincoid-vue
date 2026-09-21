@@ -653,9 +653,9 @@ watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage
   width: 2px;
   height: 20px;
   border-radius: var(--rounded-full);
-  background: rgba(219, 39, 119, 0.55);
+  background: rgba(219, 39, 119, 0.75);
 }
-.walkman__fab--docked:hover .walkman__fab-dock-icon { background: #db2777; }
+.walkman__fab--docked:hover .walkman__fab-dock-icon { background: rgba(219, 39, 119, 0.95); }
 .walkman__fab--dragging { cursor: grabbing; }
 .walkman__fab--playing::after {
   content: '';
