@@ -35,14 +35,13 @@ function render() {
   const startY = Math.round((h - dot - (rows - 1) * pitch) / 2)
   // skip dots hidden behind the trailing 新建 button
   const excluded = []
-  const canvasRect = canvas.getBoundingClientRect()
   parent.querySelectorAll('.btn--primary').forEach(btn => {
-    const r = btn.getBoundingClientRect()
+    // offsetLeft/Top are layout px relative to the positioned .header — immune to html zoom
     excluded.push({
-      x1: r.left - canvasRect.left - 2,
-      y1: r.top - canvasRect.top - 2,
-      x2: r.right - canvasRect.left + 2,
-      y2: r.bottom - canvasRect.top + 2
+      x1: btn.offsetLeft - canvas.offsetLeft - 2,
+      y1: btn.offsetTop - canvas.offsetTop - 2,
+      x2: btn.offsetLeft + btn.offsetWidth - canvas.offsetLeft + 2,
+      y2: btn.offsetTop + btn.offsetHeight - canvas.offsetTop + 2
     })
   })
 
@@ -122,5 +121,10 @@ watch(() => props.seed, render)
   height: calc(100% - var(--spacing-2xl) * 2);
   pointer-events: none;
   color: var(--color-accent);
+}
+@media (max-width: 857px) {
+  .dot-banner {
+    width: 400px;
+  }
 }
 </style>
