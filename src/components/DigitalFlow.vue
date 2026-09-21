@@ -142,7 +142,7 @@ function tick(now) {
       const barLen = m * maxBarLen
       if (edgeDist > barLen) continue
       const ratio = 1 - edgeDist / Math.max(barLen, 1)
-      const alpha = Math.min(1, (0.18 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.9) * (isDark ? 1 : 1.3))
+      const alpha = Math.min(1, (0.10 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.45) * (isDark ? 1 : 0.9))
       const r = isDark ? Math.round(baseR + (156 - baseR) * m) : Math.round(148 - 20 * m)
       const g = isDark ? Math.round(baseG + (163 - baseG) * m) : Math.round(155 - 23 * m)
       const b = isDark ? Math.round(baseB + (175 - baseB) * m) : Math.round(163 - 27 * m)
