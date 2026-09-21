@@ -112,9 +112,9 @@ function tick(now) {
   ctx2d.textBaseline = 'middle'
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-  const baseR = isDark ? 75 : 17
-  const baseG = isDark ? 85 : 24
-  const baseB = isDark ? 99 : 39
+  const baseR = isDark ? 75 : 107
+  const baseG = isDark ? 85 : 114
+  const baseB = isDark ? 99 : 128
 
   if (spectrum) {
     const bins = freqData.length
@@ -129,10 +129,10 @@ function tick(now) {
       const barLen = m * maxBarLen
       if (edgeDist > barLen) continue
       const ratio = 1 - edgeDist / Math.max(barLen, 1)
-      const alpha = 0.18 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.9
-      const r = Math.round(baseR + (219 - baseR) * m)
-      const g = Math.round(baseG + (39 - baseG) * m)
-      const b = Math.round(baseB + (119 - baseB) * m)
+      const alpha = Math.min(1, (0.18 + Math.pow(ratio, 0.7) * Math.pow(m, 0.6) * 0.9) * (isDark ? 1 : 1.3))
+      const r = isDark ? Math.round(baseR + (219 - baseR) * m) : Math.round(236 - (236 - 219) * m)
+      const g = isDark ? Math.round(baseG + (39 - baseG) * m) : Math.round(120 + (39 - 120) * m)
+      const b = isDark ? Math.round(baseB + (119 - baseB) * m) : Math.round(160 + (119 - 160) * m)
       ctx2d.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`
       ctx2d.fillText(cell.v, cell.x, cell.y)
     }
@@ -141,7 +141,7 @@ function tick(now) {
       if (cell.x < MARGIN_WIDTH || cell.x > w - MARGIN_WIDTH) {
         ctx2d.fillStyle = isDark
           ? `rgba(75,85,99,${cell.alpha.toFixed(3)})`
-          : `rgba(17,24,39,${cell.alpha.toFixed(3)})`
+          : `rgba(107,114,128,${cell.alpha.toFixed(3)})`
         ctx2d.fillText(cell.v, cell.x, cell.y)
       }
     }
