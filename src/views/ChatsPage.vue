@@ -180,9 +180,11 @@ function openPreview(src) {
 
 <template>
   <div class="chats container">
-    <div class="page-header">
-      <h1 class="page-header__title"># {{ t('chat.title') }}<span class="cursor">_</span></h1>
-      <p class="page-header__subtitle">{{ t('chat.subtitle') }}</p>
+    <div class="header">
+      <div class="page-header">
+        <h1 class="page-header__title"># {{ t('chat.title') }}<span class="cursor">_</span></h1>
+        <p class="page-header__subtitle">{{ t('chat.subtitle') }}</p>
+      </div>
     </div>
 
     <div class="chat-box" ref="chatEl">

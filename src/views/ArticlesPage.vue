@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import DotBanner from '@/components/DotBanner.vue'
 import { useConfig } from '@/composables/useConfig'
 import { articleAPI } from '@/api'
 import ArticleCard from '@/components/ArticleCard.vue'
@@ -52,6 +53,7 @@ function onPageChange(p) {
 <template>
   <div class="article-list container">
     <div class="header">
+      <DotBanner />
       <div class="page-header">
         <h1 class="page-header__title"># {{ t('article.title') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('article.subtitle') }}</p>

@@ -78,9 +78,11 @@ function removeUser(id) {
 
 <template>
   <div class="user-list container">
-    <div class="page-header">
-      <h1 class="page-header__title"># {{ t('user.title') }}<span class="cursor">_</span></h1>
-      <p class="page-header__subtitle">{{ t('user.subtitle') }}</p>
+    <div class="header">
+      <div class="page-header">
+        <h1 class="page-header__title"># {{ t('user.title') }}<span class="cursor">_</span></h1>
+        <p class="page-header__subtitle">{{ t('user.subtitle') }}</p>
+      </div>
     </div>
 
     <div class="user-search">

@@ -51,9 +51,11 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="personal container">
-    <div class="page-header">
-      <h1 class="page-header__title"># {{ t('personal.pageTitle') }}<span class="cursor">_</span></h1>
-      <p class="page-header__subtitle">{{ t('personal.subtitle') }}</p>
+    <div class="header">
+      <div class="page-header">
+        <h1 class="page-header__title"># {{ t('personal.pageTitle') }}<span class="cursor">_</span></h1>
+        <p class="page-header__subtitle">{{ t('personal.subtitle') }}</p>
+      </div>
     </div>
 
     <div class="personal-layout">

@@ -211,7 +211,7 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-@media (max-width: 857px) {
+@media (max-width: 1275px) {
   .digital-flow {
     display: none;
   }

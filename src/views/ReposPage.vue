@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '@/composables/useI18n'
+import DotBanner from '@/components/DotBanner.vue'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
@@ -175,6 +176,7 @@ async function createRepo() {
 <template>
   <div class="repos container">
     <div class="header">
+      <DotBanner />
       <div class="page-header">
         <h1 class="page-header__title"># {{ t('repo.pageTitle') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('repo.placeholder') }}</p>

@@ -371,6 +371,14 @@ th {
   padding-top: var(--spacing-2xl);
   margin-bottom: var(--spacing-2xl);
 }
+.header:has(.page-header) {
+  position: relative;
+}
+.header:has(.page-header) .btn--primary {
+  margin-right: calc(var(--spacing-lg) + 24px);
+  position: relative;
+  z-index: 1;
+}
 .page-header__title {
   margin-bottom: 0;
 }
@@ -495,13 +503,13 @@ textarea::-webkit-scrollbar-corner {
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
+@media (max-width: 857px) {
   html {
-    zoom: 0.6;
+    zoom: 0.75;
   }
 
   body, #app {
-    min-height: 166.67vh;
+    min-height: 133.33vh;
   }
 
   :root {

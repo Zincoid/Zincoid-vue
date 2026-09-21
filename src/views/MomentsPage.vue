@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import DotBanner from '@/components/DotBanner.vue'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
@@ -148,6 +149,7 @@ async function submitMoment() {
 <template>
   <div class="timeline container">
     <div class="header">
+      <DotBanner />
       <div class="page-header">
         <h1 class="page-header__title"># {{ t('moment.title') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('moment.subtitle') }}</p>
