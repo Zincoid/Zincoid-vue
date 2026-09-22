@@ -248,6 +248,7 @@ function closeMenu() {
               <SvgIcon v-else-if="link.icon === 'repos'" name="fork" class="navbar__nav-icon" />
               <span class="navbar__label">{{ link.label }}</span>
             </router-link>
+            <span v-if="link.icon === 'repos'" class="navbar__nav-divider"></span>
           </li>
         </ul>
 
@@ -536,6 +537,19 @@ function closeMenu() {
 
 .navbar__links .navbar__item {
   line-height: 1;
+}
+
+.navbar__nav-divider {
+  width: 1px;
+  align-self: center;
+  height: 18px;
+  margin: 0 calc(var(--spacing-md) - 2px);
+  background: var(--color-border);
+}
+.navbar__links li {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .navbar__actions {
@@ -1036,6 +1050,7 @@ function closeMenu() {
 }
 
 @media (max-width: 857px) {
+  .navbar__nav-divider { display: none; }
   .navbar__links .navbar__item {
     min-width: auto;
     padding: var(--spacing-sm) var(--spacing-md);
