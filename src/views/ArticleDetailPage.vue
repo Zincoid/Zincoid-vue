@@ -17,7 +17,69 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 import hljs from 'highlight.js/lib/common'
-import 'highlight.js/styles/github-dark.css'
+import lightCss from 'highlight.js/styles/github.css?raw'
+import darkCss from 'highlight.js/styles/github-dark.css?raw'
+
+function injectCodeStyles() {
+  const inject = (id, css, theme) => {
+    if (document.getElementById(id)) return
+    const el = document.createElement('style')
+    el.id = id
+    const clean = css.replace(/\/\*[\s\S]*?\*\//g, '')
+    el.textContent = clean.replace(
+      /(^|[}{])\s*([^{}@]+?)\s*\{/g,
+      (m, prev, sel) =>
+        `${prev}${sel.split(',').map(s => `html[data-theme="${theme}"] .article-body ${s.trim()}`).join(',')}{`
+    )
+    el.textContent += `html[data-theme="${theme}"] .article-body pre code.hljs{background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--rounded-md)}`
+    document.head.appendChild(el)
+  }
+  inject('hljs-article-light', lightCss, 'light')
+  inject('hljs-article-dark', darkCss, 'dark')
+}
+
+let lnReady = false
+async function ensureLineNumbers() {
+  if (lnReady) return
+  window.hljs = hljs
+  try { await import('highlightjs-line-numbers.js/dist/highlightjs-line-numbers.min.js') } catch (e) { console.warn('line-numbers plugin failed', e) }
+  lnReady = true
+}
+
+async function highlightArticleCode() {
+  await ensureLineNumbers()
+  document.querySelectorAll('.article-body pre code').forEach(block => {
+    hljs.highlightElement(block)
+    if (lnReady) window.hljs.lineNumbersBlock(block)
+    addLangLabel(block)
+  })
+}
+
+function langLabel(cls) {
+  const lang = cls.replace('language-', '')
+  const names = {
+    java: 'Java', python: 'Python', py: 'Python', cpp: 'C++', 'c++': 'C++',
+    c: 'C', csharp: 'C#', 'c-sharp': 'C#', cs: 'C#',
+    js: 'JavaScript', javascript: 'JavaScript', ts: 'TypeScript', typescript: 'TypeScript',
+    bash: 'Bash', sh: 'Shell', shell: 'Shell', zsh: 'Shell', sql: 'SQL', json: 'JSON',
+    xml: 'XML', html: 'HTML', css: 'CSS', go: 'Go', golang: 'Go', rust: 'Rust', rs: 'Rust',
+    kotlin: 'Kotlin', kt: 'Kotlin', yaml: 'YAML', yml: 'YAML', md: 'Markdown', plaintext: 'Text',
+    diff: 'Diff', dockerfile: 'Dockerfile', makefile: 'Makefile', ini: 'INI',
+    markdown: 'Markdown', objectivec: 'Objective-C', php: 'PHP', ruby: 'Ruby', scala: 'Scala'
+  }
+  return names[lang] || lang.charAt(0).toUpperCase() + lang.slice(1)
+}
+
+function addLangLabel(block) {
+  const pre = block.parentElement
+  if (!pre || pre.querySelector('.code-lang-label')) return
+  const cls = [...block.classList].find(c => c.startsWith('language-'))
+  if (!cls) return
+  const label = document.createElement('span')
+  label.className = 'code-lang-label'
+  label.textContent = langLabel(cls)
+  pre.appendChild(label)
+}
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -141,7 +203,8 @@ watch(loadingDone, async (done) => {
   if (!done || tocDone) return
   tocDone = true
   await nextTick()
-  document.querySelectorAll('.article-body pre code').forEach(block => hljs.highlightElement(block))
+  injectCodeStyles()
+  await highlightArticleCode()
   injectHeadingIds()
   setupScrollSpy()
 })
@@ -364,7 +427,12 @@ watch(likeLiked, (liked) => {
 .article-body :deep(ul), .article-body :deep(ol) { padding-left: var(--spacing-xl); margin-bottom: var(--spacing-lg); }
 .article-body :deep(li) { margin-bottom: var(--spacing-xs); }
 .article-body :deep(img) { max-width: 100%; border-radius: var(--rounded-md); margin: var(--spacing-lg) 0; }
-.article-body :deep(pre) { margin: var(--spacing-lg) 0; }
+.article-body :deep(pre) { margin: var(--spacing-lg) 0; position: relative; padding: 0; background: none; border: none; border-radius: var(--rounded-md); overflow-x: auto; }
+.article-body :deep(.hljs-ln) { border-collapse: collapse; width: 100%; margin: 0; }
+.article-body :deep(.hljs-ln td) { vertical-align: top; padding: 0; border: none; text-align: left; }
+.article-body :deep(.hljs-ln-numbers) { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; text-align: right; padding: 0 1.4em 0 1em; color: color-mix(in srgb, currentColor 35%, transparent); font-variant-numeric: tabular-nums; min-width: 3ch; }
+.article-body :deep(.hljs-ln-code) { white-space: pre; padding-right: 1em; }
+.article-body :deep(.code-lang-label) { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); z-index: 1; padding: 2px 10px; font-size: 11px; line-height: 1.6; font-family: var(--font-mono, monospace); border-radius: var(--rounded-full, 999px); background: var(--color-bg-alt); color: var(--color-text-secondary); border: 1px solid var(--color-border); pointer-events: none; }
 
 .article-actions { display: flex; gap: var(--spacing-sm); align-items: center; }
 .detail__actions-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-2xl); }
