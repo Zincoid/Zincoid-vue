@@ -967,9 +967,6 @@ function closeMenu() {
     padding: 0 var(--spacing-lg);
     gap: 0;
   }
-  .navbar__links .navbar__item:not(.navbar__item--active) {
-    border-bottom: none;
-  }
   .navbar__links .navbar__nav-icon {
     margin-right: 0;
   }
@@ -1010,9 +1007,6 @@ function closeMenu() {
     min-width: auto;
     padding: 0 var(--spacing-lg);
     gap: 0;
-  }
-  html:lang(en) .navbar__links .navbar__item:not(.navbar__item--active) {
-    border-bottom: none;
   }
   html:lang(en) .navbar__links .navbar__nav-icon {
     margin-right: 0;
