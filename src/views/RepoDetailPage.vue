@@ -65,7 +65,7 @@ const transferOverlayDown = ref(false)
 const accessOpen = ref(false)
 const accessLoading = ref(false)
 const accessRole = ref('viewer')
-const accessPageSize = parseInt(getConfig('page_size', '10'))
+let accessPageSize = 10
 const apData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const arData = ref({ records: [], pages: 1, total: 0, page: 1 })
 
@@ -178,7 +178,7 @@ const itemsPages = ref(1)
 const itemsTotal = ref(0)
 const itemsRemaining = computed(() => Math.max(0, itemsTotal.value - (repo.value?.items?.length || 0)))
 const itemsLoadingMore = ref(false)
-const itemsSize = parseInt(getConfig('page_size', '10'))
+let itemsSize = 10
 
 async function fetchItems(page) {
   const version = ++itemsVersion
@@ -242,6 +242,9 @@ function onWindowResize() {
 
 onMounted(async () => {
   await loadConfig()
+  accessPageSize = parseInt(getConfig('page_size', '10'))
+  itemsSize = parseInt(getConfig('page_size', '10'))
+  commentSize.value = parseInt(getConfig('page_size', '10'))
   fetchRepo()
   updateGridCols()
   window.addEventListener('resize', onWindowResize)
