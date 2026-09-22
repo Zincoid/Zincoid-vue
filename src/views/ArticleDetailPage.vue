@@ -16,6 +16,7 @@ import FabContainer from '@/components/FabContainer.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
+import hljs from 'highlight.js/lib/common'
 import 'highlight.js/styles/github-dark.css'
 
 const { t } = useI18n()
@@ -140,6 +141,7 @@ watch(loadingDone, async (done) => {
   if (!done || tocDone) return
   tocDone = true
   await nextTick()
+  document.querySelectorAll('.article-body pre code').forEach(block => hljs.highlightElement(block))
   injectHeadingIds()
   setupScrollSpy()
 })
