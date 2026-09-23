@@ -118,8 +118,7 @@ function removeUser(id) {
 
 <style scoped>
 .user-list { padding-bottom: var(--spacing-4xl); }
-/* above the user-card crosshair overlay (z 150) so lines never cover it */
-.user-search { margin-bottom: var(--spacing-xl); position: relative; z-index: 160; }
+.user-search { margin-bottom: var(--spacing-xl); }
 .user-search__input { width: 100%; }
 .user-section { margin-bottom: var(--spacing-2xl); }
 .user-section__title { font-size: var(--text-lg); font-weight: var(--weight-medium); margin-bottom: var(--spacing-lg); color: var(--color-text-heading); padding-left: var(--spacing-md); border-left: 4px solid; }
