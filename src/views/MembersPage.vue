@@ -100,7 +100,7 @@ function removeUser(id) {
       <div v-if="admins.length" class="user-section">
         <h2 class="user-section__title user-section__title--admin">{{ t('user.admin') }}</h2>
         <div class="user-grid">
-          <UserCard v-for="u in admins" :key="u.id" :user="u" admin @update:user="updateUser" @delete:user="removeUser" />
+          <UserCard v-for="u in admins" :key="u.id" :user="u" @update:user="updateUser" @delete:user="removeUser" />
         </div>
       </div>
       <div v-if="users.length" class="user-section">
