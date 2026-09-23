@@ -87,7 +87,7 @@ function handleUpload(e) {
 async function handleCrop(blob) {
   try {
     const file = new File([blob], 'avatar.png', { type: 'image/png' })
-    const { data } = await fileAPI.upload(file, 2, auth.user.id)
+    const { data } = await fileAPI.upload(file)
     profile.value.avatar = data.data.url
     message.value = ''
     error.value = ''

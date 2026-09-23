@@ -389,7 +389,7 @@ async function handleItemFiles(e) {
     for (let i = 0; i < files.length; i++) {
       uploadState.value.currentFile = i + 1
       uploadState.value.currentProgress = 0
-      const { data: fileData } = await fileAPI.upload(files[i], null, null, (e) => {
+      const { data: fileData } = await fileAPI.upload(files[i], (e) => {
         if (e.total) {
           uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
         }

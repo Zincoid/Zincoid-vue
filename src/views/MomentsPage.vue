@@ -111,7 +111,7 @@ async function submitMoment() {
       const file = newImageFiles.value[i]
       let uploadData
       try {
-        const { data } = await fileAPI.upload(file, null, null, (e) => {
+        const { data } = await fileAPI.upload(file, (e) => {
           if (e.total) {
             uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
           }

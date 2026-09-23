@@ -88,7 +88,7 @@ async function save() {
     } else if (coverFile.value) {
       let uploadData
       try {
-        const { data } = await fileAPI.upload(coverFile.value, null, null, (e) => {
+        const { data } = await fileAPI.upload(coverFile.value, (e) => {
           if (e.total) {
             uploadState.value.currentFile = 1
             uploadState.value.currentProgress = Math.round((e.loaded / e.total) * 100)
