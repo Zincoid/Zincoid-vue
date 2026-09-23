@@ -58,7 +58,7 @@ function onPageChange(p) {
         <h1 class="page-header__title"># {{ t('article.title') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('article.subtitle') }}</p>
       </div>
-      <router-link v-if="auth.isLoggedIn" to="/articles/new" class="btn btn--primary">
+      <router-link v-if="auth.isLoggedIn" to="/articles/new" class="btn btn--primary btn--white">
           <SvgIcon name="plus" />
           {{ t('article.new') }}
         </router-link>

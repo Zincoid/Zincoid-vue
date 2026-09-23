@@ -179,6 +179,25 @@ th {
 [data-theme="dark"] .btn--primary:hover {
   border-color: #4b5563;
 }
+/* list-page create buttons (light: white fill, dark-mode button's border treatment) */
+.btn--white {
+  background: var(--color-white);
+  color: #111827;
+  border-color: #d1d5db;
+}
+.btn--white:hover {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #9ca3af;
+}
+[data-theme="dark"] .btn--white {
+  background: #111827;
+  color: #fff;
+}
+[data-theme="dark"] .btn--white:hover {
+  background: #1f2937;
+  color: #fff;
+}
 .btn--outline {
   border-color: var(--color-border);
   color: var(--color-text);

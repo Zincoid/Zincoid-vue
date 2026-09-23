@@ -181,7 +181,7 @@ async function createRepo() {
         <h1 class="page-header__title"># {{ t('repo.pageTitle') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('repo.placeholder') }}</p>
       </div>
-      <button v-if="auth.isLoggedIn" class="btn btn--primary" @click="showCreate = true">
+      <button v-if="auth.isLoggedIn" class="btn btn--primary btn--white" @click="showCreate = true">
         <SvgIcon name="plus" />
         {{ t('repo.new') }}
       </button>

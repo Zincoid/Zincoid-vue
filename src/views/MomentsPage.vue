@@ -154,7 +154,7 @@ async function submitMoment() {
         <h1 class="page-header__title"># {{ t('moment.title') }}<span class="cursor">_</span></h1>
         <p class="page-header__subtitle">{{ t('moment.subtitle') }}</p>
       </div>
-      <button v-if="auth.isLoggedIn" class="btn btn--primary" @click="showEditor = !showEditor">
+      <button v-if="auth.isLoggedIn" class="btn btn--primary btn--white" @click="showEditor = !showEditor">
         <SvgIcon v-if="!showEditor" name="plus" />
         <SvgIcon v-else name="close" />
         {{ showEditor ? t('common.cancel') : t('moment.new') }}
