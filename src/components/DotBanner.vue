@@ -38,10 +38,10 @@ function render() {
   parent.querySelectorAll('.btn--primary').forEach(btn => {
     // offsetLeft/Top are layout px relative to the positioned .header — immune to html zoom
     excluded.push({
-      x1: btn.offsetLeft - canvas.offsetLeft - 2,
-      y1: btn.offsetTop - canvas.offsetTop - 2,
-      x2: btn.offsetLeft + btn.offsetWidth - canvas.offsetLeft + 2,
-      y2: btn.offsetTop + btn.offsetHeight - canvas.offsetTop + 2
+      x1: btn.offsetLeft - canvas.offsetLeft - 1,
+      y1: btn.offsetTop - canvas.offsetTop - 1,
+      x2: btn.offsetLeft + btn.offsetWidth - canvas.offsetLeft + 1,
+      y2: btn.offsetTop + btn.offsetHeight - canvas.offsetTop + 1
     })
   })
 
