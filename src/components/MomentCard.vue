@@ -56,7 +56,7 @@ function goUser(e) {
 </script>
 
 <template>
-  <article class="moment-card spin-edge" @click="goDetail">
+  <article class="moment-card" @click="goDetail">
     <div class="moment-card__header">
       <div class="moment-card__user" @click="goUser">
         <img

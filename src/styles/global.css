@@ -625,7 +625,7 @@ textarea::-webkit-scrollbar-corner {
   display: none;
 }
 
-/* Rotating gradient edge on card hover */
+/* Rotating gradient edge on card hover (members page) */
 @property --edge-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 @keyframes edge-spin { to { --edge-angle: 360deg; } }
 .spin-edge { position: relative; --edge-glow: #ec66a6; }
@@ -683,12 +683,15 @@ textarea::-webkit-scrollbar-corner {
 }
 /* multi-column grids: same hairline, but in multi-column layout the items
    right of the first one would draw a stray line at the container's top edge.
-   Clipping the container trims those; the 2px padding (cancelled by margin)
-   keeps the clip edge clear of the spin-edge hover glow. */
+   Clipping the container trims those. */
 .moments-grid,
 .user-grid,
 .repo-grid {
   overflow: hidden;
+}
+/* user-grid cards keep the spin-edge hover glow — the 2px padding (cancelled
+   by margin) keeps the clip edge clear of it */
+.user-grid {
   padding: 2px;
   margin: -2px;
 }

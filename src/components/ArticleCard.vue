@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
 import { formatDate } from '@/utils/format'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 defineProps({
   article: { type: Object, required: true }
@@ -16,7 +17,7 @@ function goDetail(id) {
 </script>
 
 <template>
-  <article class="article-card spin-edge" @click="goDetail(article.id)">
+  <article class="article-card" @click="goDetail(article.id)">
     <div v-if="article.coverThumb" class="article-card__cover">
       <img :src="article.coverThumb" alt="" loading="lazy" />
     </div>
@@ -42,6 +43,9 @@ function goDetail(id) {
         </div>
       </div>
     </div>
+    <span class="article-card__go">
+      <SvgIcon name="arrow-right" :size="18" />
+    </span>
   </article>
 </template>
 
@@ -49,6 +53,27 @@ function goDetail(id) {
 .article-card {
   display: flex;
   cursor: pointer;
+  position: relative;
+  transition: padding-right var(--transition-fast);
+}
+.article-card:hover {
+  padding-right: var(--spacing-xl);
+}
+
+.article-card__go {
+  position: absolute;
+  right: var(--spacing-md);
+  top: 50%;
+  display: flex;
+  color: var(--color-text-secondary);
+  opacity: 0;
+  transform: translate(8px, -50%);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  pointer-events: none;
+}
+.article-card:hover .article-card__go {
+  opacity: 1;
+  transform: translate(0, -50%);
 }
 
 .article-card__cover {

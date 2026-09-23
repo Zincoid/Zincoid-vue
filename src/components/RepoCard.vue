@@ -22,7 +22,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 </script>
 
 <template>
-  <div class="repo-card spin-edge">
+  <div class="repo-card">
     <div class="repo-card__cover">
       <img v-if="repo.coverThumb && !noAccess" :src="repo.coverThumb" alt="" loading="lazy" />
       <div v-else class="repo-card__cover-placeholder">
