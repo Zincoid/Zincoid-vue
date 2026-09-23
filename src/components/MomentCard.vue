@@ -254,25 +254,22 @@ function goUser(e) {
 
 .moment-card__medias {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
   border-radius: var(--rounded-md);
   overflow: hidden;
 }
-@media (max-width: 600px) {
-  .moment-card__medias {
-    grid-template-columns: 1fr;
-  }
-}
 .moment-card__media {
   width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
   border-radius: var(--rounded-md);
   cursor: pointer;
 }
 .moment-card__video-thumb {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1;
   background: #000;
   overflow: hidden;
   cursor: pointer;
@@ -308,7 +305,7 @@ function goUser(e) {
   margin-left: 3px;
 }
 .moment-card__audio-thumb {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1;
   background: var(--color-bg-alt);
   display: flex;
   align-items: center;
