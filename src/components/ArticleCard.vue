@@ -197,7 +197,7 @@ function goDetail(id) {
   white-space: nowrap;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 857px) {
   .article-card {
     flex-direction: column;
   }
@@ -206,7 +206,6 @@ function goDetail(id) {
     min-height: auto;
     aspect-ratio: 16/9;
     border-right: none;
-    border-bottom: 1px solid var(--color-border);
   }
 }
 </style>

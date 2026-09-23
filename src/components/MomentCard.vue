@@ -133,9 +133,6 @@ function goUser(e) {
         :count="moment.likeCount"
       />
     </div>
-    <span class="moment-card__go">
-      <SvgIcon name="arrow-right" :size="18" />
-    </span>
   </article>
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
@@ -145,27 +142,6 @@ function goUser(e) {
 .moment-card {
   padding: var(--spacing-xl);
   cursor: pointer;
-  position: relative;
-}
-
-.moment-card__go {
-  position: absolute;
-  right: var(--spacing-xs);
-  top: 50%;
-  display: flex;
-  color: var(--color-text-secondary);
-  opacity: 0;
-  transform: translate(8px, -50%);
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
-  pointer-events: none;
-}
-.moment-card:hover .moment-card__go {
-  opacity: 1;
-  transform: translate(0, -50%);
-}
-/* touch / mobile layout: no hover effect at all */
-@media (hover: none), (max-width: 857px) {
-  .moment-card__go { display: none; }
 }
 
 .moment-card__header {
