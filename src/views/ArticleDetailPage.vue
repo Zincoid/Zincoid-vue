@@ -31,7 +31,7 @@ function injectCodeStyles() {
       (m, prev, sel) =>
         `${prev}${sel.split(',').map(s => `html[data-theme="${theme}"] .article-body ${s.trim()}`).join(',')}{`
     )
-    el.textContent += `html[data-theme="${theme}"] .article-body pre code.hljs{background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:var(--rounded-md)}`
+    el.textContent += `html[data-theme="${theme}"] .article-body pre code.hljs{background:${theme === 'dark' ? '#1a1d27' : 'var(--color-bg-alt)'};border-radius:var(--rounded-md)}`
     document.head.appendChild(el)
   }
   inject('hljs-article-light', lightCss, 'light')

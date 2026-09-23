@@ -83,6 +83,33 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card {
   display: flex;
   flex-direction: column;
+  position: relative;
+  --lock-color: #ec66a6;
+}
+[data-theme="dark"] .repo-card {
+  --lock-color: #2952cc;
+}
+/* Lock-on corner brackets on hover */
+.repo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  background:
+    linear-gradient(var(--lock-color), var(--lock-color)) top left / var(--spacing-lg) 3px no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) top left / 3px var(--spacing-lg) no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) top right / var(--spacing-lg) 3px no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) top right / 3px var(--spacing-lg) no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) bottom left / var(--spacing-lg) 3px no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) bottom left / 3px var(--spacing-lg) no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) bottom right / var(--spacing-lg) 3px no-repeat,
+    linear-gradient(var(--lock-color), var(--lock-color)) bottom right / 3px var(--spacing-lg) no-repeat;
+}
+.repo-card:hover::before {
+  opacity: 1;
 }
 
 .repo-card__cover {

@@ -75,6 +75,11 @@ function goDetail(id) {
   opacity: 1;
   transform: translate(0, -50%);
 }
+/* touch / mobile layout: no hover effect at all */
+@media (hover: none), (max-width: 857px) {
+  .article-card__go { display: none; }
+  .article-card:hover { padding-right: 0; }
+}
 
 .article-card__cover {
   flex-shrink: 0;

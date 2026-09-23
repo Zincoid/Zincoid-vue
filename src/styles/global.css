@@ -629,7 +629,7 @@ textarea::-webkit-scrollbar-corner {
 @property --edge-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 @keyframes edge-spin { to { --edge-angle: 360deg; } }
 .spin-edge { position: relative; --edge-glow: #ec66a6; }
-[data-theme="dark"] .spin-edge { --edge-glow: #f472b6; }
+[data-theme="dark"] .spin-edge { --edge-glow: #2952cc; }
 .spin-edge::after {
   content: '';
   position: absolute;
