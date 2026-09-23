@@ -430,7 +430,7 @@ async function handleDelete() {
   opacity: 0;
   transition: opacity var(--transition-fast);
 }
-.user-crosshair--on { opacity: 0.1; }
+.user-crosshair--on { opacity: 0.2; }
 /* one half-line per side: the wrapper pivots on the avatar, the bar draws in
    from the screen edge toward the avatar center */
 .user-crosshair__seg {
