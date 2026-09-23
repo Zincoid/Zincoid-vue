@@ -634,7 +634,7 @@ textarea::-webkit-scrollbar-corner {
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: inherit;
+  border-radius: var(--rounded-lg);
   padding: 2px;
   background: conic-gradient(from var(--edge-angle), var(--edge-glow) 0deg, transparent 70deg, transparent 290deg, var(--edge-glow) 360deg);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -646,6 +646,64 @@ textarea::-webkit-scrollbar-corner {
   pointer-events: none;
 }
 .spin-edge:hover::after { opacity: 1; filter: drop-shadow(0 0 5px var(--edge-glow)); animation: edge-spin 2.5s linear infinite; }
+
+/* ── List dividers (owned by the list container, not the cards) ── */
+/* Hairline floats in the middle of the row gap (half the gap above and below),
+   drawn as a container-ruled ::before so standalone cards stay clean.
+   Each offset is half of that container's own gap. */
+.articles-list > * + *,
+.timeline-list > * + *,
+.moments-grid > * + *,
+.tab-content > * + *,
+.user-grid > * + *,
+.repo-grid > * + * {
+  position: relative;
+}
+.articles-list > * + *::before,
+.timeline-list > * + *::before,
+.moments-grid > * + *::before,
+.tab-content > * + *::before,
+.user-grid > * + *::before,
+.repo-grid > * + *::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-border);
+  pointer-events: none;
+}
+/* single-column lists: between rows, no line at the ends */
+.articles-list > * + *::before,
+.timeline-list > * + *::before,
+.tab-content > * + *::before {
+  top: calc(-0.5 * var(--spacing-lg)); /* gap lg */
+}
+.section__card .articles-list > * + *::before {
+  top: calc(-0.5 * var(--spacing-md)); /* HomePage gap md */
+}
+/* multi-column grids: same hairline, but in multi-column layout the items
+   right of the first one would draw a stray line at the container's top edge.
+   Clipping the container trims those; the 2px padding (cancelled by margin)
+   keeps the clip edge clear of the spin-edge hover glow. */
+.moments-grid,
+.user-grid,
+.repo-grid {
+  overflow: hidden;
+  padding: 2px;
+  margin: -2px;
+}
+.moments-grid > * + *::before {
+  top: calc(-0.5 * var(--spacing-md)); /* gap md */
+}
+.user-grid > * + *::before {
+  top: calc(-0.5 * var(--spacing-lg)); /* gap lg */
+}
+.repo-grid > * + *::before {
+  top: calc(-0.5 * var(--spacing-xl)); /* ReposPage gap xl */
+}
+.tab-content .repo-grid > * + *::before {
+  top: calc(-0.5 * var(--spacing-md)); /* MemberDetail gap md */
+}
 
 ::view-transition-old(root),
 ::view-transition-new(root) {

@@ -125,15 +125,7 @@ async function handleDelete() {
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
   cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-.user-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-5px);
 }
 
 .user-card__avatar {

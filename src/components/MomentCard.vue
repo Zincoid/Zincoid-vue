@@ -140,15 +140,8 @@ function goUser(e) {
 
 <style scoped>
 .moment-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
   padding: var(--spacing-xl);
   cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-.moment-card:hover {
-  transform: scale(1.02);
 }
 
 .moment-card__header {

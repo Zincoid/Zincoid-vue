@@ -48,22 +48,13 @@ function goDetail(id) {
 <style scoped>
 .article-card {
   display: flex;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
   cursor: pointer;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-.article-card:hover {
-  transform: scale(1.02);
 }
 
 .article-card__cover {
   flex-shrink: 0;
   width: 140px;
   min-height: 100px;
-  border-right: 1px solid var(--color-border);
-  border-radius: 0 var(--rounded-lg) var(--rounded-lg) 0;
   overflow: hidden;
   padding: var(--spacing-sm);
   display: flex;
