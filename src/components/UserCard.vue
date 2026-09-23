@@ -126,6 +126,10 @@ async function handleDelete() {
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
   cursor: pointer;
+  transition: margin var(--transition-fast);
+}
+.user-card:hover {
+  margin-block: var(--spacing-md);
 }
 
 .user-card__avatar {
