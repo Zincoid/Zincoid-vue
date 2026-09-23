@@ -128,6 +128,12 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
   margin: var(--spacing-md);
   height: calc(160px - 2 * var(--spacing-md));
 }
+/* touch / mobile layout: no hover effect at all */
+@media (hover: none), (max-width: 857px) {
+  .repo-card:hover::before { opacity: 0; }
+  .repo-card:hover .repo-card__cover { margin: 0; height: 160px; }
+  .repo-card:hover .repo-card__footer::before { left: calc(-1 * var(--spacing-md)); right: calc(-1 * var(--spacing-md)); }
+}
 .repo-card__cover img { width: 100%; height: 100%; object-fit: cover; }
 .repo-card__cover-placeholder { display: flex; align-items: center; justify-content: center; }
 [data-theme="dark"] .repo-card__cover { background: #13151c; }

@@ -295,6 +295,13 @@ function goUser(e) {
   background: var(--color-border);
 }
 
+/* touch / mobile layout: no hover effect at all */
+@media (hover: none), (max-width: 857px) {
+  .moment-card__user:hover { opacity: 1; }
+  .moment-card__video-thumb:hover .moment-card__play-icon { background: rgba(255, 255, 255, 0.25); }
+  .moment-card__audio-thumb:hover { background: var(--color-bg-alt); }
+}
+
 .moment-card__footer {
   display: flex;
   align-items: center;
