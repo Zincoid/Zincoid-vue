@@ -720,6 +720,9 @@ textarea::-webkit-scrollbar-corner {
 .user-grid > * + *::before {
   top: calc(-0.5 * var(--spacing-lg)); /* gap lg */
 }
+/* user page: hovering anything inside the grid (cards or the divider gaps)
+   hides all divider lines */
+.user-grid:hover > *::before { opacity: 0; }
 .repo-grid > * + *::before {
   top: calc(-0.5 * var(--spacing-xl)); /* ReposPage gap xl */
 }
