@@ -19,7 +19,8 @@ const { toast } = useToast()
 const auth = useAuthStore()
 
 const props = defineProps({
-  user: { type: Object, required: true }
+  user: { type: Object, required: true },
+  admin: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['update:user', 'delete:user'])
@@ -74,7 +75,7 @@ async function handleDelete() {
 </script>
 
 <template>
-  <div class="user-card spin-edge" @click="goDetail">
+  <div class="user-card" :class="{ 'spin-edge': admin }" @click="goDetail">
     <img
       v-if="user.avatar"
       :src="user.avatar"
