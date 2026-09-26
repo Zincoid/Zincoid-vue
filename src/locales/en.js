@@ -17,7 +17,8 @@ export default {
     recentRepos: 'Recent Repos',
     random: 'Random',
     shuffle: 'Shuffle',
-    viewAll: 'View all →'
+    viewAll: 'View all →',
+    hotWords: 'Hot Topics'
   },
   moment: {
     title: 'Moments',

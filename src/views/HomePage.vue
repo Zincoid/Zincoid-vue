@@ -10,6 +10,7 @@ import ArticleCard from '@/components/ArticleCard.vue'
 import RepoCard from '@/components/RepoCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import HomeHotWords from '@/components/HomeHotWords.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -54,6 +55,91 @@ const sqCols = ref(20)
 const sqRows = ref(12)
 let animTimer = null
 const heroRef = ref(null)
+
+// ── Sticky-shrink hero ──
+// Full-screen on load; scrolling drives --hero-p (0→1) which lerps the hero
+// height (viewport → compact) and the inner scale. Seamless-dock math:
+// wrapper is exactly one viewport tall and the shrink distance is V − F, so
+// the content below stays glued to the hero's bottom edge and the hero
+// unpins exactly at p = 1.
+const heroScrollRef = ref(null)
+const heroInnerRef = ref(null)
+let heroRaf = 0
+let heroVh = 0        // full hero height, layout px
+let heroFinalH = 288  // compact hero height, layout px (measured on mobile)
+let lastVw = 0
+let dropColorGreen = '#3fb950'
+let dropColorBlue = '#58a6ff'
+
+function heroZoom() {
+  return parseFloat(getComputedStyle(document.documentElement).zoom) || 1
+}
+
+function measureHero() {
+  // html{zoom:0.75} (<=857px): layout px paint at 0.75x, so divide to make
+  // the hero fill the visual screen (same trick as body's min-height).
+  heroVh = window.innerHeight / heroZoom()
+  // Compact height: on desktop the band is 288px; on mobile the stacked
+  // layout is content-height + padding — measure it so overflow:hidden
+  // never clips (offsetHeight ignores the scale transform).
+  const inner = heroInnerRef.value
+  const heroEl = heroScrollRef.value?.querySelector('.hero-terminal')
+  const cs = heroEl ? getComputedStyle(heroEl) : null
+  const padY = cs ? parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0
+  heroFinalH = Math.max(288, (inner ? inner.offsetHeight : 0) + padY)
+}
+
+function updateHeroProgress() {
+  heroRaf = 0
+  const el = heroScrollRef.value
+  if (!el || el.classList.contains('hero-scroll--static')) return
+  // getBoundingClientRect keeps progress in visual px — consistent across zoom
+  const rect = el.getBoundingClientRect()
+  const dist = Math.max(1, rect.height - heroFinalH * heroZoom())
+  const p = Math.min(1, Math.max(0, -rect.top / dist))
+  el.style.setProperty('--hero-p', String(p))
+  el.style.setProperty('--hero-vh', heroVh + 'px')
+  el.style.setProperty('--hero-final-h', heroFinalH + 'px')
+}
+
+function onHeroScroll() {
+  if (!heroRaf) heroRaf = requestAnimationFrame(updateHeroProgress)
+}
+
+function onHeroResize() {
+  // Width-only: height changes are the mobile URL bar collapsing — chasing
+  // them makes the hero breathe while scrolling.
+  const vw = document.documentElement.clientWidth
+  if (vw !== lastVw) {
+    lastVw = vw
+    measureHero()
+    updateHeroProgress()
+  }
+}
+
+function startHeroScroll() {
+  if (!heroScrollRef.value) return
+  lastVw = document.documentElement.clientWidth
+  measureHero()
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduceMotion) {
+    // Skip the scroll journey entirely: render the compact final state.
+    heroScrollRef.value.classList.add('hero-scroll--static')
+    heroScrollRef.value.style.setProperty('--hero-p', '1')
+    heroScrollRef.value.style.setProperty('--hero-final-h', heroFinalH + 'px')
+  } else {
+    updateHeroProgress()
+    window.addEventListener('scroll', onHeroScroll, { passive: true })
+    window.addEventListener('resize', onHeroResize)
+  }
+}
+
+function stopHeroScroll() {
+  cancelAnimationFrame(heroRaf)
+  window.removeEventListener('scroll', onHeroScroll)
+  window.removeEventListener('resize', onHeroResize)
+}
+
 const squares = reactive([
   { x: 0, y: 0, cls: 'hero-terminal__sq--red' },
   { x: 0, y: 0, cls: 'hero-terminal__sq--green' },
@@ -113,7 +199,7 @@ function stepRaindrop() {
   // Spawn
   const spawnRate = heavy ? 0.9 : 0.35
   if (Math.random() < spawnRate) {
-    const color = Math.random() < 0.3 ? '#3fb950' : '#58a6ff'
+    const color = Math.random() < 0.3 ? dropColorGreen : dropColorBlue
     drops.push({ x: Math.floor(Math.random() * sqCols.value), y: -1, color, age: 0 })
   }
 
@@ -201,6 +287,13 @@ onMounted(() => {
   })
   if (heroRef.value) observer.observe(heroRef.value)
 
+  // Terminal palette (single source of truth for JS-painted raindrop colors)
+  const cs = getComputedStyle(document.documentElement)
+  dropColorGreen = cs.getPropertyValue('--terminal-green').trim() || dropColorGreen
+  dropColorBlue = cs.getPropertyValue('--terminal-accent').trim() || dropColorBlue
+
+  startHeroScroll()
+
   onUnmounted(() => {
     clearInterval(animTimer)
     observer.disconnect()
@@ -287,6 +380,9 @@ function terminalCycle() {
 
 watch(() => locale.locale, () => {
   startTyping()
+  // subtitle/terminal text length can change the mobile compact height
+  measureHero()
+  onHeroScroll()
 })
 
 onMounted(async () => {
@@ -329,76 +425,82 @@ onMounted(async () => {
   } finally {
     loading.value = false
     terminalCycle()
+    // content height may have changed (mobile compact height)
+    measureHero()
+    onHeroScroll()
   }
 })
 onUnmounted(() => {
   clearInterval(terminalCycleTimer)
   clearTimeout(terminalPauseTimer)
   clearInterval(animTimer)
+  stopHeroScroll()
 })
 </script>
 
 <template>
   <div class="home">
-    <!-- Hero + Terminal -->
-    <section class="hero-terminal" ref="heroRef" style="position:relative;overflow:hidden">
-      <template v-if="animationType === 'squares'">
-        <div
-          v-for="(sq, i) in squares"
-          :key="i"
-          :class="['hero-terminal__sq', 'hero-terminal__sq--square', sq.cls]"
-          :style="{
-            left: sq.x * GRID + 'px',
-            top: sq.y * GRID + 'px'
-          }"
-        ></div>
-      </template>
-      <template v-else-if="animationType !== 'squares'">
-        <div
-          v-for="(d, i) in drops"
-          :key="'d'+i"
-          class="hero-terminal__sq hero-terminal__sq--drop"
-          :style="{
-            left: d.x * GRID + 'px',
-            top: d.y * GRID + 'px',
-            background: d.color,
-            borderColor: d.color
-          }"
-        ></div>
-        <div
-          v-for="(c, i) in rippleCells"
-          :key="c.key || ('r'+i)"
-          class="hero-terminal__sq hero-terminal__sq--ripple"
-          :style="{
-            left: c.x * GRID + 'px',
-            top: c.y * GRID + 'px',
-            background: c.color,
-            borderColor: c.color,
-            opacity: c.opacity
-          }"
-        ></div>
-      </template>
-      <div class="hero-terminal__inner container-wide">
-        <div class="hero-terminal__brand">
-          <h1 class="hero-terminal__title">
-            {{ siteBrand.main }}<span v-if="siteBrand.suffix" class="hero-terminal__title--light">{{ siteBrand.suffix }}</span>
-          </h1>
-          <p class="hero-terminal__subtitle">{{ typed }} <span class="cursor cursor--square">▌</span></p>
-        </div>
-        <div class="hero-terminal__cli">
-          <pre class="terminal__text"><span class="terminal__line"><span class="terminal__prompt">$</span> ssh zincoid-website</span>
+    <!-- Hero + Terminal (sticky-shrink: full-screen → compact band) -->
+    <div class="hero-scroll" ref="heroScrollRef">
+      <section class="hero-terminal" ref="heroRef">
+        <template v-if="animationType === 'squares'">
+          <div
+            v-for="(sq, i) in squares"
+            :key="i"
+            :class="['hero-terminal__sq', 'hero-terminal__sq--square', sq.cls]"
+            :style="{
+              left: sq.x * GRID + 'px',
+              top: sq.y * GRID + 'px'
+            }"
+          ></div>
+        </template>
+        <template v-else-if="animationType !== 'squares'">
+          <div
+            v-for="(d, i) in drops"
+            :key="'d'+i"
+            class="hero-terminal__sq hero-terminal__sq--drop"
+            :style="{
+              left: d.x * GRID + 'px',
+              top: d.y * GRID + 'px',
+              background: d.color,
+              borderColor: d.color
+            }"
+          ></div>
+          <div
+            v-for="(c, i) in rippleCells"
+            :key="c.key || ('r'+i)"
+            class="hero-terminal__sq hero-terminal__sq--ripple"
+            :style="{
+              left: c.x * GRID + 'px',
+              top: c.y * GRID + 'px',
+              background: c.color,
+              borderColor: c.color,
+              opacity: c.opacity
+            }"
+          ></div>
+        </template>
+        <div class="hero-terminal__inner container-wide" ref="heroInnerRef">
+          <div class="hero-terminal__brand">
+            <h1 class="hero-terminal__title">
+              {{ siteBrand.main }}<span v-if="siteBrand.suffix" class="hero-terminal__title--light">{{ siteBrand.suffix }}</span>
+            </h1>
+            <p class="hero-terminal__subtitle">{{ typed }} <span class="cursor cursor--square">▌</span></p>
+          </div>
+          <div class="hero-terminal__cli">
+            <pre class="terminal__text"><span class="terminal__line"><span class="terminal__prompt">$</span> ssh zincoid-website</span>
 <span class="terminal__line"><span class="terminal__dim">&gt; authenticating...</span></span>
 <span class="terminal__line"><span class="terminal__prompt">$</span> whoami</span>
 <span class="terminal__line"><span class="terminal__dim">&gt; {{ auth.user?.nickname || 'visitor' }}</span></span>
 <span class="terminal__line"><span class="terminal__prompt">$</span> {{ terminalTyped }}<span class="terminal__cursor">_</span></span>
 <span v-if="terminalOutput" class="terminal__line"><span class="terminal__dim">&gt; {{ terminalOutput }}</span></span></pre>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
     <!-- Featured Random -->
-    <div v-if="featured" class="featured container-wide">
-      <div class="featured__card">
+    <section v-if="featured" class="featured">
+      <div class="container-wide">
         <div class="featured__header">
           <h2 class="featured__title"># {{ t('home.random') }}<span class="cursor">_</span></h2>
           <button class="featured__refresh" @click="refreshFeatured">
@@ -412,53 +514,52 @@ onUnmounted(() => {
           <RepoCard :repo="featured" />
         </router-link>
       </div>
-    </div>
+    </section>
+
+    <!-- Hot words (reserved slot) — section chrome owned by the home page -->
+    <section class="hotwords">
+      <HomeHotWords />
+    </section>
 
     <!-- Recent Moments, Articles & Repos -->
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
     <div v-if="loadingDone" class="recent-grid container-wide">
       <!-- Moments -->
       <section class="section">
-        <div class="section__card">
-          <div class="section__header">
-            <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
-            <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
-          </div>
-          <div class="moments-grid" v-if="moments.length">
-            <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
-          </div>
-          <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
+        <div class="section__header">
+          <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
+          <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
         </div>
+        <div class="moments-grid" v-if="moments.length">
+          <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
+        </div>
+        <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
       </section>
 
       <!-- Articles & Repos -->
       <div class="recent-col">
         <section class="section">
-          <div class="section__card">
-            <div class="section__header">
-              <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
-              <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
-            </div>
-            <div class="articles-list" v-if="articles.length">
-              <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
-            </div>
-            <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
+          <div class="section__header">
+            <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
+            <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
           </div>
+          <div class="articles-list" v-if="articles.length">
+            <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
+          </div>
+          <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
         </section>
 
         <section class="section">
-          <div class="section__card">
-            <div class="section__header">
-              <h2 class="section__title"># {{ t('home.recentRepos') }}<span class="cursor">_</span></h2>
-              <router-link to="/repos" class="section__more">{{ t('home.viewAll') }}</router-link>
-            </div>
-            <div class="repo-grid" v-if="repos.length">
-              <router-link v-for="repo in repos" :key="repo.id" :to="`/repos/${repo.id}`">
-                <RepoCard :repo="repo" />
-              </router-link>
-            </div>
-            <p v-else-if="!loading" class="empty-state">{{ t('repo.empty') }}</p>
+          <div class="section__header">
+            <h2 class="section__title"># {{ t('home.recentRepos') }}<span class="cursor">_</span></h2>
+            <router-link to="/repos" class="section__more">{{ t('home.viewAll') }}</router-link>
           </div>
+          <div class="repo-grid" v-if="repos.length">
+            <router-link v-for="repo in repos" :key="repo.id" :to="`/repos/${repo.id}`">
+              <RepoCard :repo="repo" />
+            </router-link>
+          </div>
+          <p v-else-if="!loading" class="empty-state">{{ t('repo.empty') }}</p>
         </section>
       </div>
     </div>
@@ -486,20 +587,20 @@ onUnmounted(() => {
   border-radius: 0;
 }
 .hero-terminal__sq--red {
-  background: rgba(255, 51, 51, 0.25);
-  border-color: rgba(255, 51, 51, 0.25);
+  background: var(--terminal-red-soft);
+  border-color: var(--terminal-red-soft);
 }
 .hero-terminal__sq--green {
-  background: rgba(63, 185, 80, 0.25);
-  border-color: rgba(63, 185, 80, 0.25);
+  background: var(--terminal-green-soft);
+  border-color: var(--terminal-green-soft);
 }
 .hero-terminal__sq--blue {
-  background: rgba(88, 166, 255, 0.25);
-  border-color: rgba(88, 166, 255, 0.25);
+  background: var(--terminal-blue-soft);
+  border-color: var(--terminal-blue-soft);
 }
 .hero-terminal__sq--drop {
-  background: #58a6ff;
-  border-color: #58a6ff;
+  background: var(--terminal-accent);
+  border-color: var(--terminal-accent);
   opacity: 0.7;
   border-radius: 0 !important;
   transition: none !important;
@@ -511,18 +612,36 @@ onUnmounted(() => {
   border-radius: 0 !important;
 }
 
-/* Hero + Terminal */
+/* Hero + Terminal — sticky-shrink wrapper.
+   Seamless-dock math: wrapper is one viewport tall (--hero-vh) and the shrink
+   distance is V − F, so the content below stays glued to the hero's bottom
+   edge throughout and the hero unpins exactly at --hero-p = 1. */
+.hero-scroll {
+  --hero-p: 0;
+  --hero-vh: 100vh;
+  --hero-final-h: 288px;
+  position: relative;
+  height: var(--hero-vh);
+  /* bleed under the fixed navbar for the full-screen feel */
+  margin-top: calc(-1 * var(--navbar-height));
+}
+.hero-scroll--static {
+  /* prefers-reduced-motion: no scroll journey, straight to compact state */
+  height: auto;
+}
 .hero-terminal {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
   background:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-    #0d1117;
+    linear-gradient(var(--terminal-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--terminal-grid-line) 1px, transparent 1px),
+    var(--terminal-bg);
   background-size: 24px 24px;
   background-position: 0 -1px;
   display: flex;
   align-items: center;
-  height: 288px;
-  margin-bottom: var(--spacing-3xl);
+  height: calc(var(--hero-vh) + var(--hero-p) * (var(--hero-final-h) - var(--hero-vh)));
 }
 .hero-terminal__inner {
   position: relative;
@@ -531,7 +650,10 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3xl);
-  padding: 0 calc(24px + max(0px, min(56px, calc(56px - (100vw - 1000px) / 2))));
+  /* scale up while full-screen; nudge down while docked so content clears the navbar */
+  transform: scale(calc(1 + 0.22 * (1 - var(--hero-p))))
+    translateY(calc(var(--hero-p) * var(--navbar-height) / 2));
+  transform-origin: center;
 }
 .hero-terminal__brand {
   flex: 1;
@@ -540,17 +662,17 @@ onUnmounted(() => {
 .hero-terminal__title {
   font-size: clamp(2rem, 6vw, 3.5rem);
   font-weight: var(--weight-bold);
-  color: #f0f6fc;
+  color: var(--terminal-text);
   letter-spacing: -0.03em;
   margin: 0;
 }
 .hero-terminal__title--light {
   font-weight: var(--weight-light);
-  color: #8b949e;
+  color: var(--terminal-text-dim);
 }
 .hero-terminal__subtitle {
   font-size: var(--text-base);
-  color: #8b949e;
+  color: var(--terminal-text-dim);
   margin-top: var(--spacing-xs);
 }
 .hero-terminal__cli {
@@ -561,49 +683,57 @@ onUnmounted(() => {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: 1.9;
-  color: #c9d1d9;
+  color: var(--terminal-text-base);
   background: none;
   border: none;
   padding: 0;
   margin: 0;
 }
 .terminal__prompt {
-  color: #58a6ff;
+  color: var(--terminal-accent);
 }
 .terminal__dim {
-  color: #8b949e;
+  color: var(--terminal-text-dim);
 }
 .terminal__link {
-  color: #8b949e;
+  color: var(--terminal-text-dim);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 .terminal__link:hover {
-  color: #c9d1d9;
+  color: var(--terminal-text-base);
   text-decoration: underline;
 }
 .terminal__cursor {
   display: inline-block;
   animation: blink 1s step-end infinite;
-  color: #58a6ff;
+  color: var(--terminal-accent);
 }
 @keyframes blink {
   50% { opacity: 0; }
 }
 
-/* Sections */
-.featured {
-  margin-bottom: var(--spacing-3xl);
+/* Sections — frameless editorial: thin top rule + large titles + whitespace.
+   .featured and .hotwords are full-width wrappers, so their rules bleed to the
+   screen edges (the first one seals the hero); .section sits in the grid
+   columns, so the same declaration gives a column-width rule there. */
+.featured,
+.section,
+.hotwords {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-3xl);
+  margin-bottom: var(--spacing-4xl);
 }
 .featured__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
 }
 .featured__title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-medium);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
   margin-bottom: 0;
 }
 .featured__refresh {
@@ -617,27 +747,12 @@ onUnmounted(() => {
 .featured__refresh:hover {
   background: var(--color-bg-alt);
 }
-.featured__card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-  padding: var(--spacing-2xl);
-}
 .featured__repo {
   display: block;
   color: inherit;
   text-decoration: none;
 }
 
-.section {
-  margin-bottom: var(--spacing-3xl);
-}
-.section__card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-  padding: var(--spacing-2xl);
-}
 .section__header {
   display: flex;
   justify-content: space-between;
@@ -645,8 +760,9 @@ onUnmounted(() => {
   margin-bottom: var(--spacing-xl);
 }
 .section__title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-medium);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
 }
 .section__more {
   font-size: var(--text-sm);
@@ -673,21 +789,27 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
   }
-  .section {
-    margin-bottom: var(--spacing-xl);
+  .featured,
+  .section,
+  .hotwords {
+    margin-bottom: var(--spacing-3xl);
   }
 }
 
 @media (max-width: 857px) {
+  /* html{zoom:0.75}: a bare 100vh paints at 75% of the screen — match the
+     body min-height trick until JS overrides --hero-vh with measured px */
+  .hero-scroll {
+    --hero-vh: 133.333vh;
+  }
   .hero-terminal__inner {
     flex-direction: column;
     text-align: center;
   }
+  /* height is var-driven (JS measures the compact content height);
+     padding feeds that measurement */
   .hero-terminal {
-    height: auto;
-    min-height: 288px;
     padding: 48px 0;
-    overflow: hidden;
   }
   .hero-terminal__cli {
     overflow-x: auto;
@@ -706,7 +828,7 @@ onUnmounted(() => {
 .articles-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .repo-grid {
@@ -720,10 +842,6 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .moments-grid {
     grid-template-columns: 1fr;
-  }
-  .section__card {
-    padding: var(--spacing-lg);
-    border-radius: var(--rounded-md);
   }
 }
 

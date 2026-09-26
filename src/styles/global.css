@@ -515,7 +515,7 @@ textarea::-webkit-scrollbar-corner {
   animation: blink 1s step-end infinite;
 }
 .cursor--square {
-  color: #3fb950;
+  color: var(--terminal-green);
 }
 @keyframes blink {
   50% { opacity: 0; }
@@ -696,9 +696,6 @@ textarea::-webkit-scrollbar-corner {
 .timeline-list > * + *::before,
 .tab-content > * + *::before {
   top: calc(-0.5 * var(--spacing-lg)); /* gap lg */
-}
-.section__card .articles-list > * + *::before {
-  top: calc(-0.5 * var(--spacing-md)); /* HomePage gap md */
 }
 /* multi-column grids: same hairline, but in multi-column layout the items
    right of the first one would draw a stray line at the container's top edge.

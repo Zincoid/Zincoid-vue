@@ -17,7 +17,8 @@ export default {
     recentRepos: '最新仓库',
     random: '随机',
     shuffle: '换一个',
-    viewAll: '查看全部 →'
+    viewAll: '查看全部 →',
+    hotWords: '近期热词'
   },
   moment: {
     title: '动态',

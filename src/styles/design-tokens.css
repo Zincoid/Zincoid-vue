@@ -98,6 +98,19 @@
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
   --transition-slow: 400ms ease;
+
+  /* ── Terminal palette (hero) ── */
+  /* Intentionally dark in both themes — the hero is a terminal metaphor, not page chrome */
+  --terminal-bg: #0d1117;
+  --terminal-grid-line: rgba(255, 255, 255, 0.03);
+  --terminal-text: #f0f6fc;
+  --terminal-text-base: #c9d1d9;
+  --terminal-text-dim: #8b949e;
+  --terminal-accent: #58a6ff;
+  --terminal-green: #3fb950;
+  --terminal-red-soft: rgba(255, 51, 51, 0.25);
+  --terminal-green-soft: rgba(63, 185, 80, 0.25);
+  --terminal-blue-soft: rgba(88, 166, 255, 0.25);
 }
 
 /* ── Dark Theme ── */
