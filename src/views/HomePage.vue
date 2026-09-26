@@ -3,6 +3,7 @@ import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useLocaleStore } from '@/stores/locale'
+import { useThemeStore } from '@/stores/theme'
 import { momentAPI, articleAPI, userAPI, configAPI, repoAPI } from '@/api'
 import { siteBrand } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
@@ -15,6 +16,7 @@ import HomeHotWords from '@/components/HomeHotWords.vue'
 const { t } = useI18n()
 const auth = useAuthStore()
 const locale = useLocaleStore()
+const themeStore = useThemeStore()
 const moments = ref([])
 const articles = ref([])
 const repos = ref([])
@@ -70,6 +72,14 @@ let heroFinalH = 288  // compact hero height, layout px (measured on mobile)
 let lastVw = 0
 let dropColorGreen = '#3fb950'
 let dropColorBlue = '#58a6ff'
+
+// Raindrop colors are painted via inline styles, so they can't follow CSS
+// vars — read the terminal palette tokens and refresh on theme change.
+function readTerminalColors() {
+  const cs = getComputedStyle(document.documentElement)
+  dropColorGreen = cs.getPropertyValue('--terminal-green').trim() || dropColorGreen
+  dropColorBlue = cs.getPropertyValue('--terminal-accent').trim() || dropColorBlue
+}
 
 function heroZoom() {
   return parseFloat(getComputedStyle(document.documentElement).zoom) || 1
@@ -288,9 +298,7 @@ onMounted(() => {
   if (heroRef.value) observer.observe(heroRef.value)
 
   // Terminal palette (single source of truth for JS-painted raindrop colors)
-  const cs = getComputedStyle(document.documentElement)
-  dropColorGreen = cs.getPropertyValue('--terminal-green').trim() || dropColorGreen
-  dropColorBlue = cs.getPropertyValue('--terminal-accent').trim() || dropColorBlue
+  readTerminalColors()
 
   startHeroScroll()
 
@@ -384,6 +392,9 @@ watch(() => locale.locale, () => {
   measureHero()
   onHeroScroll()
 })
+
+// terminal palette follows light/dark — repaint the JS-driven raindrop colors
+watch(() => themeStore.theme, readTerminalColors)
 
 onMounted(async () => {
   try {

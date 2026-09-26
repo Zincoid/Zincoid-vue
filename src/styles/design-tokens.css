@@ -100,14 +100,14 @@
   --transition-slow: 400ms ease;
 
   /* ── Terminal palette (hero) ── */
-  /* Intentionally dark in both themes — the hero is a terminal metaphor, not page chrome */
-  --terminal-bg: #0d1117;
-  --terminal-grid-line: rgba(255, 255, 255, 0.03);
-  --terminal-text: #f0f6fc;
-  --terminal-text-base: #c9d1d9;
-  --terminal-text-dim: #8b949e;
-  --terminal-accent: #58a6ff;
-  --terminal-green: #3fb950;
+  /* Theme-aware terminal: white by day, dark by night */
+  --terminal-bg: #ffffff;
+  --terminal-grid-line: rgba(0, 0, 0, 0.045);
+  --terminal-text: #1f2328;
+  --terminal-text-base: #3d444d;
+  --terminal-text-dim: #656d76;
+  --terminal-accent: #0969da;
+  --terminal-green: #1a7f37;
   --terminal-red-soft: rgba(255, 51, 51, 0.25);
   --terminal-green-soft: rgba(63, 185, 80, 0.25);
   --terminal-blue-soft: rgba(88, 166, 255, 0.25);
@@ -132,4 +132,13 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+
+  /* Terminal palette: dark at night */
+  --terminal-bg: #0d1117;
+  --terminal-grid-line: rgba(255, 255, 255, 0.03);
+  --terminal-text: #f0f6fc;
+  --terminal-text-base: #c9d1d9;
+  --terminal-text-dim: #8b949e;
+  --terminal-accent: #58a6ff;
+  --terminal-green: #3fb950;
 }
