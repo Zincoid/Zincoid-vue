@@ -13,6 +13,7 @@ import RepoCard from '@/components/RepoCard.vue'
 import Pagination from '@/components/Pagination.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
+import FabContainer from '@/components/FabContainer.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -31,6 +32,7 @@ const activeType = ref(null)
 const keyword = ref('')
 const tagged = ref(false)
 const updated = ref(false)
+const pinnedFirst = ref(false)
 let searchTimer = null
 
 const searchModeOptions = computed(() => [
@@ -62,7 +64,7 @@ async function fetchRepos() {
   loadingDone.value = false
   try {
     const kw = keyword.value.trim() || null
-    const res = await repoAPI.getList(page.value, pageSize.value, tagged.value, activeType.value, kw, updated.value)
+    const res = await repoAPI.getList(page.value, pageSize.value, tagged.value, activeType.value, kw, updated.value, pinnedFirst.value)
     const data = res.data.data
     repos.value = data.records ?? []
     pages.value = data.pages ?? 1
@@ -307,6 +309,17 @@ async function createRepo() {
       </Transition>
     </Teleport>
   </div>
+
+  <FabContainer>
+    <button
+      class="pin-fab"
+      :class="{ 'pin-fab--active': pinnedFirst }"
+      :title="pinnedFirst ? t('common.unpin') : t('common.pin')"
+      @click="pinnedFirst = !pinnedFirst; page = 1; fetchRepos()"
+    >
+      <SvgIcon :name="pinnedFirst ? 'pin-off' : 'pin'" :size="20" />
+    </button>
+  </FabContainer>
 </template>
 
 <style scoped>

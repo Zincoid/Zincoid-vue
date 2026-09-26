@@ -320,6 +320,17 @@ function mediaType(url) {
   return 'image'
 }
 
+// ── Pin ──
+async function togglePin() {
+  try {
+    const api = repo.value.isPinned ? repoAPI.unpin : repoAPI.pin
+    await api(repo.value.id)
+    repo.value.isPinned = !repo.value.isPinned
+  } catch (err) {
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
+  }
+}
+
 // ── Delete ──
 async function deleteRepo() {
   if (!await confirm(t('repo.deleteConfirm'))) return
@@ -635,11 +646,14 @@ async function saveEdit() {
       <LoadingSpinner :visible="loading" @done="loadingDone = true" />
       <template v-if="loadingDone && repo">
         <div class="repo-header">
-          <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
-          <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
-          <span v-if="repo.contributed" class="contributing-badge">{{ t('repo.contributing') }}</span>
-          <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
-          <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
+          <div class="repo-header__badges">
+            <span class="type-badge" :class="{ 'type-badge--code': repo.type === 0, 'type-badge--media': repo.type === 1, 'type-badge--file': repo.type === 2 }">{{ typeLabel(repo.type) }}</span>
+            <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
+            <span v-if="repo.contributed" class="contributing-badge">{{ t('repo.contributing') }}</span>
+            <span v-if="repo.visibility === 1" class="visibility-badge">{{ t('visibility.private') }}</span>
+            <span v-if="repo.visibility === 2" class="visibility-badge visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
+            <span v-if="repo.isPinned" class="pin-badge">{{ t('repo.pinned') }}</span>
+          </div>
           <h1 class="repo-title">{{ repo.name }}</h1>
 
           <div class="repo-meta">
@@ -654,6 +668,10 @@ async function saveEdit() {
                 {{ repo.viewCount || 0 }} {{ t('repo.views') }}
               </span>
               <div v-if="canManage()" class="repo-actions">
+                <button v-if="auth.isAdmin" class="link-pin" @click="togglePin">
+                  <SvgIcon :name="repo.isPinned ? 'pin-off' : 'pin'" :size="16" />
+                  {{ repo.isPinned ? t('common.unpin') : t('common.pin') }}
+                </button>
                 <button v-if="isOwner()" class="link-muted" @click="openEdit">
                   <SvgIcon name="edit" />
                   {{ t('common.edit') }}
@@ -1097,6 +1115,8 @@ async function saveEdit() {
 .repo-detail { padding-bottom: var(--spacing-4xl); }
 
 .repo-header { padding-top: var(--spacing-2xl); margin-bottom: var(--spacing-2xl); }
+.repo-header__badges { display: flex; align-items: center; flex-wrap: wrap; }
+.pin-badge { display: inline-block; font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-light); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-left: auto; margin-bottom: var(--spacing-sm); }
 .type-badge { display: inline-block; font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); margin-bottom: var(--spacing-sm); margin-right: var(--spacing-sm); }
 .type-badge--code { color: #16a34a; background: rgba(22, 163, 74, 0.1); }
 .type-badge--media { color: #db2777; background: rgba(219, 39, 119, 0.1); }

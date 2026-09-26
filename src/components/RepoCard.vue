@@ -28,6 +28,7 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
       <div v-else class="repo-card__cover-placeholder">
         <SvgIcon :name="noAccess ? 'lock' : 'folder'" :size="32" />
       </div>
+      <span v-if="repo.isPinned" class="repo-card__pin">{{ t('repo.pinned') }}</span>
       <div class="repo-card__badges">
         <span v-if="repo.visibility === 1" class="repo-card__visibility-badge">{{ t('visibility.private') }}</span>
         <span v-if="repo.visibility === 2" class="repo-card__visibility-badge repo-card__visibility-badge--restricted">{{ repo.restricted ? `${t('visibility.restricted')} · ${t('visibility.unauthorized')}` : `${t('visibility.restricted')} · ${t(auth.isAdmin ? 'visibility.admin' : 'visibility.authorized')}` }}</span>
@@ -142,9 +143,12 @@ const typeColors = { 0: '#16a34a', 1: '#db2777', 2: '#2563eb' }
 .repo-card__type-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
 .repo-card__visibility-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-text-secondary); background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
 .repo-card__contributing-badge { padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: #7c3aed; background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
+.repo-card__pin { position: absolute; top: var(--spacing-md); left: var(--spacing-md); padding: 2px var(--spacing-sm); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-primary); background: rgba(255,255,255,0.85); border-radius: var(--rounded-full); }
 [data-theme="dark"] .repo-card__type-badge,
-[data-theme="dark"] .repo-card__visibility-badge { background: rgba(46,48,58,0.9); }
+[data-theme="dark"] .repo-card__visibility-badge,
+[data-theme="dark"] .repo-card__pin { background: rgba(46,48,58,0.9); }
 [data-theme="dark"] .repo-card__contributing-badge { background: rgba(46,48,58,0.9); color: #a78bfa; }
+[data-theme="dark"] .repo-card__pin { color: #58a6ff; }
 
 .repo-card__body { padding: var(--spacing-lg); display: flex; flex-direction: column; flex: 1; }
 

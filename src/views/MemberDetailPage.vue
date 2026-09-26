@@ -96,8 +96,9 @@ const notFound = ref(false)
 const banned = ref(false)
 const pinnedMoments = ref(false)
 const pinnedArticles = ref(false)
+const pinnedRepos = ref(false)
 
-const isPinned = computed(() => (tab.value === 'moments' && pinnedMoments.value) || (tab.value === 'articles' && pinnedArticles.value))
+const isPinned = computed(() => (tab.value === 'moments' && pinnedMoments.value) || (tab.value === 'articles' && pinnedArticles.value) || (tab.value === 'repos' && pinnedRepos.value))
 const tabLoading = ref(false)
 
 const mPage = ref(1); const mPages = ref(1); const mTotal = ref(0)
@@ -146,7 +147,7 @@ async function fetchArticles() {
 
 async function fetchRepos() {
   tabLoading.value = true
-  const { data } = await repoAPI.getByUser(userId.value, rPage.value, pageSize.value, repoType.value, repoUpdated.value)
+  const { data } = await repoAPI.getByUser(userId.value, rPage.value, pageSize.value, repoType.value, repoUpdated.value, pinnedRepos.value)
   repos.value = data.data.records || []
   rPages.value = data.data.pages || 1
   rTotal.value = data.data.total || 0
@@ -178,6 +179,10 @@ function togglePinned() {
     pinnedArticles.value = !pinnedArticles.value
     aPage.value = 1
     fetchArticles()
+  } else if (tab.value === 'repos') {
+    pinnedRepos.value = !pinnedRepos.value
+    rPage.value = 1
+    fetchRepos()
   }
 }
 
@@ -267,7 +272,6 @@ function typeLabel(type) {
 
   <FabContainer>
     <button
-      v-if="tab !== 'repos'"
       class="pin-fab"
       :class="{ 'pin-fab--active': isPinned }"
       :title="isPinned ? t('common.unpin') : t('common.pin')"

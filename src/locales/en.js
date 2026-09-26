@@ -239,6 +239,7 @@ export default {
     restrictedHint: 'Access required to view this repo',
     noDesc: 'No description',
     noTags: 'No tags',
+    pinned: 'Pinned',
     views: 'views',
   },
   data: {
@@ -562,6 +563,7 @@ export default {
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',
     'Only founder can unpin articles': 'Only admin can unpin articles',
+    'Admin permission required': 'Admin permission required',
     'Internal server error': 'Internal server error',
     'Invalid or expired verification code': 'Invalid or expired verification code',
     'Email already registered': 'Email already registered',

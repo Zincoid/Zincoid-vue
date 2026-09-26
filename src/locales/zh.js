@@ -278,6 +278,7 @@ export default {
     restrictedHint: '查看此仓库需要授权',
     noDesc: '暂无简介',
     noTags: '暂无标签',
+    pinned: '置顶',
     views: '次浏览',
   },
   access: {
@@ -562,6 +563,7 @@ export default {
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',
     'Only founder can unpin articles': '仅管理员可取消置顶文章',
+    'Admin permission required': '需要管理员权限',
     'Internal server error': '服务器内部错误',
     'Invalid or expired verification code': '验证码错误或已过期',
     'Email already registered': '邮箱已被注册',
