@@ -7,6 +7,7 @@ import { momentAPI, articleAPI, userAPI, configAPI, repoAPI } from '@/api'
 import { siteBrand } from '@/composables/useConfig'
 import MomentCard from '@/components/MomentCard.vue'
 import ArticleCard from '@/components/ArticleCard.vue'
+import RepoCard from '@/components/RepoCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
@@ -27,13 +28,22 @@ const subtitleText = computed(() => {
   return locale.locale === 'zh' ? configMap.value['site_desc_zh'] : configMap.value['site_desc_en']
 })
 
+const randomSources = [
+  { type: 'moment', get: () => momentAPI.getRandom() },
+  { type: 'article', get: () => articleAPI.getRandom() },
+  { type: 'repo', get: () => repoAPI.getRandom() }
+]
+
+function pickRandomSource() {
+  return randomSources[Math.floor(Math.random() * randomSources.length)]
+}
+
 async function refreshFeatured() {
   try {
-    const api = Math.random() < 0.5 ? momentAPI.getRandom : articleAPI.getRandom
-    const res = await api()
+    const source = pickRandomSource()
+    const res = await source.get()
     if (res.data.data) {
-      const type = res.config.url.includes('moments') ? 'moment' : 'article'
-      featured.value = { ...res.data.data, _type: type }
+      featured.value = { ...res.data.data, _type: source.type }
     }
   } catch (e) { console.error(e) }
 }
@@ -285,14 +295,14 @@ watch(() => locale.locale, () => {
 
 onMounted(async () => {
   try {
-    const randomAPI = Math.random() < 0.5 ? momentAPI.getRandom() : articleAPI.getRandom()
+    const randomSource = pickRandomSource()
     const [mRes, aRes, mtRes, atRes, uRes, rRes, rpRes, cfgRes] = await Promise.all([
       momentAPI.getHomeFeed(5),
       articleAPI.getHomeFeed(5),
       momentAPI.getTimeline(1, 1),
       articleAPI.getList(1, 1),
       userAPI.getList(1, 1),
-      randomAPI,
+      randomSource.get(),
       repoAPI.getList(1, 1),
       configAPI.get()
     ])
@@ -303,8 +313,7 @@ onMounted(async () => {
     counts.value.members = uRes.data.data.total || 0
     counts.value.repos = rpRes.data.data.total || 0
     if (rRes.data.data) {
-      const type = rRes.config.url.includes('moments') ? 'moment' : 'article'
-      featured.value = { ...rRes.data.data, _type: type }
+      featured.value = { ...rRes.data.data, _type: randomSource.type }
     }
     const cfgs = cfgRes.data.data || {}
     for (const [key, value] of Object.entries(cfgs)) {
@@ -400,7 +409,10 @@ onUnmounted(() => {
           </button>
         </div>
         <MomentCard v-if="featured._type === 'moment'" :moment="featured" />
-        <ArticleCard v-else :article="featured" />
+        <ArticleCard v-else-if="featured._type === 'article'" :article="featured" />
+        <router-link v-else :to="`/repos/${featured.id}`" class="featured__repo">
+          <RepoCard :repo="featured" />
+        </router-link>
       </div>
     </div>
 
@@ -628,6 +640,11 @@ onUnmounted(() => {
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-lg);
   padding: var(--spacing-2xl);
+}
+.featured__repo {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .section {
