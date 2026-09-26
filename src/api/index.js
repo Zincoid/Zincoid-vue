@@ -185,6 +185,7 @@ export const repoAPI = {
   getList: (page = 1, size = 10, tagged, type, keyword, updated, pinned) => api.get('/repos/public', { params: { page, size, tagged, type, keyword, updated, pinned } }),
   getByUser: (userId, page = 1, size = 10, type, updated, pinned) => api.get(`/repos/public/user/${userId}`, { params: { page, size, type, updated, pinned } }),
   getRandom: () => api.get('/repos/public/random'),
+  getHomeFeed: (size = 10) => api.get('/repos/public/home', { params: { size } }),
   getDetail: (id) => api.get(`/repos/public/${id}`),
   getItems: (id, page = 1, size = 10) => api.get(`/repos/public/${id}/items`, { params: { page, size } }),
   addItem: (repoId, fileId) => api.post(`/repos/${repoId}/items`, null, { params: { fileId } }),

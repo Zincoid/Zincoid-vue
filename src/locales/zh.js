@@ -14,6 +14,7 @@ export default {
   home: {
     recentMoments: '最新动态',
     recentArticles: '最新文章',
+    recentRepos: '最新仓库',
     random: '随机',
     shuffle: '换一个',
     viewAll: '查看全部 →'

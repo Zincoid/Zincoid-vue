@@ -14,6 +14,7 @@ export default {
   home: {
     recentMoments: 'Recent Moments',
     recentArticles: 'Recent Articles',
+    recentRepos: 'Recent Repos',
     random: 'Random',
     shuffle: 'Shuffle',
     viewAll: 'View all →'

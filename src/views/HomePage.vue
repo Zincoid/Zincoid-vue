@@ -16,13 +16,13 @@ const auth = useAuthStore()
 const locale = useLocaleStore()
 const moments = ref([])
 const articles = ref([])
+const repos = ref([])
 const featured = ref(null)
 const loading = ref(true)
 const loadingDone = ref(false)
 const typed = ref('')
 const typingDone = ref(false)
 let typingTimer = null
-const collapsed = ref(null) // 'moments' | 'articles' | null
 const configMap = ref({})
 const subtitleText = computed(() => {
   return locale.locale === 'zh' ? configMap.value['site_desc_zh'] : configMap.value['site_desc_en']
@@ -201,13 +201,9 @@ onMounted(() => {
   })
   if (heroRef.value) observer.observe(heroRef.value)
 
-  const mq = window.matchMedia('(max-width: 1200px)')
-  const onMqChange = (e) => { if (e.matches) collapsed.value = null }
-  mq.addEventListener('change', onMqChange)
   onUnmounted(() => {
     clearInterval(animTimer)
     observer.disconnect()
-    mq.removeEventListener('change', onMqChange)
   })
 })
 
@@ -296,9 +292,10 @@ watch(() => locale.locale, () => {
 onMounted(async () => {
   try {
     const randomSource = pickRandomSource()
-    const [mRes, aRes, mtRes, atRes, uRes, rRes, rpRes, cfgRes] = await Promise.all([
+    const [mRes, aRes, rhRes, mtRes, atRes, uRes, rRes, rpRes, cfgRes] = await Promise.all([
       momentAPI.getHomeFeed(5),
       articleAPI.getHomeFeed(5),
+      repoAPI.getHomeFeed(5),
       momentAPI.getTimeline(1, 1),
       articleAPI.getList(1, 1),
       userAPI.getList(1, 1),
@@ -308,6 +305,7 @@ onMounted(async () => {
     ])
     moments.value = mRes.data.data || []
     articles.value = aRes.data.data || []
+    repos.value = rhRes.data.data || []
     counts.value.moments = mtRes.data.data.total || 0
     counts.value.articles = atRes.data.data.total || 0
     counts.value.members = uRes.data.data.total || 0
@@ -416,55 +414,30 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Recent Moments & Articles -->
+    <!-- Recent Moments, Articles & Repos -->
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
-    <div
-      v-if="loadingDone"
-      class="recent-grid container-wide"
-      :class="{
-        'recent-grid--collapse-left': collapsed === 'moments',
-        'recent-grid--collapse-right': collapsed === 'articles'
-      }"
-    >
+    <div v-if="loadingDone" class="recent-grid container-wide">
       <!-- Moments -->
-      <template v-if="collapsed !== 'moments'">
-        <section class="section">
-          <div class="section__card">
-            <div class="section__header">
-              <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
-              <div class="section__header-actions">
-                <button class="section__collapse-btn" @click="collapsed = 'moments'" title="Collapse">
-                  <SvgIcon name="chevron-right" :size="14" />
-                </button>
-                <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
-              </div>
-            </div>
-            <div class="moments-grid" v-if="moments.length">
-              <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
-            </div>
-            <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
+      <section class="section">
+        <div class="section__card">
+          <div class="section__header">
+            <h2 class="section__title"># {{ t('home.recentMoments') }}<span class="cursor">_</span></h2>
+            <router-link to="/moments" class="section__more">{{ t('home.viewAll') }}</router-link>
           </div>
-        </section>
-      </template>
-      <template v-else>
-        <div class="collapsed-sidebar" @click="collapsed = null">
-          <span class="collapsed-sidebar__label"># {{ t('home.recentMoments') }}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="moments-grid" v-if="moments.length">
+            <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
+          </div>
+          <p v-else-if="!loading" class="empty-state">{{ t('moment.empty') }}</p>
         </div>
-      </template>
+      </section>
 
-      <!-- Articles -->
-      <template v-if="collapsed !== 'articles'">
+      <!-- Articles & Repos -->
+      <div class="recent-col">
         <section class="section">
           <div class="section__card">
             <div class="section__header">
               <h2 class="section__title"># {{ t('home.recentArticles') }}<span class="cursor">_</span></h2>
-              <div class="section__header-actions">
-                <button class="section__collapse-btn" @click="collapsed = 'articles'" title="Collapse">
-                  <SvgIcon name="chevron-right" :size="14" />
-                </button>
-                <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
-              </div>
+              <router-link to="/articles" class="section__more">{{ t('home.viewAll') }}</router-link>
             </div>
             <div class="articles-list" v-if="articles.length">
               <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
@@ -472,13 +445,22 @@ onUnmounted(() => {
             <p v-else-if="!loading" class="empty-state">{{ t('article.empty') }}</p>
           </div>
         </section>
-      </template>
-      <template v-else>
-        <div class="collapsed-sidebar" @click="collapsed = null">
-          <span class="collapsed-sidebar__label"># {{ t('home.recentArticles') }}</span>
-          <SvgIcon name="chevron-right" :size="16" />
-        </div>
-      </template>
+
+        <section class="section">
+          <div class="section__card">
+            <div class="section__header">
+              <h2 class="section__title"># {{ t('home.recentRepos') }}<span class="cursor">_</span></h2>
+              <router-link to="/repos" class="section__more">{{ t('home.viewAll') }}</router-link>
+            </div>
+            <div class="repo-grid" v-if="repos.length">
+              <router-link v-for="repo in repos" :key="repo.id" :to="`/repos/${repo.id}`">
+                <RepoCard :repo="repo" />
+              </router-link>
+            </div>
+            <p v-else-if="!loading" class="empty-state">{{ t('repo.empty') }}</p>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -683,76 +665,13 @@ onUnmounted(() => {
   grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
   gap: var(--spacing-2xl);
   align-items: start;
-
 }
-.recent-grid--collapse-left {
-  grid-template-columns: 36px 1fr;
-}
-.recent-grid--collapse-right {
-  grid-template-columns: 1fr 36px;
-}
-
-.section__header-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-.section__collapse-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--rounded-full);
-  color: var(--color-text-secondary);
-  transition: all var(--transition-fast);
-}
-.section__collapse-btn:hover {
-  background: var(--color-bg-alt);
-  color: var(--color-text-heading);
-}
-
-.collapsed-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-lg) var(--spacing-xs);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  min-height: 120px;
-}
-.collapsed-sidebar:hover {
-  border-color: var(--color-card-hover);
-  color: var(--color-card-hover);
-}
-.collapsed-sidebar__label {
-  writing-mode: vertical-rl;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  color: var(--color-text-secondary);
-  letter-spacing: 0.1em;
-}
+.recent-col { min-width: 0; }
 
 @media (max-width: 1200px) {
   .recent-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
-  }
-  .recent-grid--collapse-left,
-  .recent-grid--collapse-right {
-    grid-template-columns: 1fr;
-  }
-  .section__collapse-btn {
-    display: none;
-  }
-  .collapsed-sidebar {
-    display: none;
   }
   .section {
     margin-bottom: var(--spacing-xl);
@@ -789,6 +708,14 @@ onUnmounted(() => {
   flex-direction: column;
   gap: var(--spacing-md);
 }
+
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-xl);
+}
+.repo-grid > * { display: flex; }
+.repo-grid > * > * { flex: 1; min-width: 0; }
 
 @media (max-width: 768px) {
   .moments-grid {
