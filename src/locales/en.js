@@ -18,7 +18,7 @@ export default {
     random: 'Random',
     shuffle: 'Shuffle',
     viewAll: 'View all →',
-    hotWords: 'Hot Topics'
+    hotWords: 'Recent Topics'
   },
   moment: {
     title: 'Moments',

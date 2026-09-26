@@ -66,6 +66,18 @@ const heroRef = ref(null)
 // unpins exactly at p = 1.
 const heroScrollRef = ref(null)
 const heroInnerRef = ref(null)
+// Block mouse cursor: the hero's pointer is the subtitle's trailing ▌ glyph
+// rendered as real text (same font/size, scales with the hero like the rest of
+// the copy). A fixed-size cursor image can't do that — it stays the same pixel
+// size under zoom/HiDPI and looks thinner than the glyph.
+const heroCursorEl = ref(null)
+const heroCursorOn = ref(false)
+function onHeroPointerMove(e) {
+  const el = heroCursorEl.value
+  if (!el) return
+  el.style.setProperty('--mx', e.clientX + 'px')
+  el.style.setProperty('--my', e.clientY + 'px')
+}
 let heroRaf = 0
 let heroVh = 0        // full hero height, layout px
 let heroFinalH = 480  // compact hero height, layout px (floor; measured on mobile)
@@ -454,7 +466,10 @@ onUnmounted(() => {
   <div class="home">
     <!-- Hero + Terminal (sticky-shrink: full-screen → compact band) -->
     <div class="hero-scroll" ref="heroScrollRef">
-      <section class="hero-terminal" ref="heroRef">
+      <section class="hero-terminal" ref="heroRef"
+        @mousemove="onHeroPointerMove"
+        @mouseenter="heroCursorOn = true; onHeroPointerMove($event)"
+        @mouseleave="heroCursorOn = false">
         <template v-if="animationType === 'squares'">
           <div
             v-for="(sq, i) in squares"
@@ -511,6 +526,13 @@ onUnmounted(() => {
         <div class="hero-terminal__scroll-hint" aria-hidden="true">
           <SvgIcon name="chevron-down" :size="20" />
         </div>
+        <!-- block mouse cursor (mirrors the subtitle's ▌ caret) -->
+        <span
+          ref="heroCursorEl"
+          class="hero-block-cursor cursor"
+          :class="{ 'hero-block-cursor--on': heroCursorOn }"
+          aria-hidden="true"
+        >▌</span>
       </section>
     </div>
 
@@ -658,6 +680,30 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   height: calc(var(--hero-vh) + var(--hero-p) * (var(--hero-final-h) - var(--hero-vh)));
+  cursor: none;
+}
+/* The hero's pointer: the subtitle's ▌ caret itself, in terminal blue.
+   Rendered as text so it matches the glyph exactly and scales with the hero
+   (fixed-size cursor images don't scale and looked thinner than the glyph). */
+.hero-block-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1;
+  color: var(--terminal-accent);
+  /* visibility, not opacity — the .cursor blink animation owns opacity */
+  visibility: hidden;
+  /* --mx/--my set per mousemove; scale matches the hero inner's full-screen zoom */
+  transform: translate(calc(var(--mx, -100px) - 3px), calc(var(--my, -100px) - 8px))
+    scale(calc(1 + 0.22 * (1 - var(--hero-p))));
+  transform-origin: center;
+}
+.hero-block-cursor--on {
+  visibility: visible;
 }
 .hero-terminal__inner {
   position: relative;
