@@ -68,7 +68,7 @@ const heroScrollRef = ref(null)
 const heroInnerRef = ref(null)
 let heroRaf = 0
 let heroVh = 0        // full hero height, layout px
-let heroFinalH = 288  // compact hero height, layout px (measured on mobile)
+let heroFinalH = 480  // compact hero height, layout px (floor; measured on mobile)
 let lastVw = 0
 let dropColorGreen = '#3fb950'
 let dropColorBlue = '#58a6ff'
@@ -89,14 +89,15 @@ function measureHero() {
   // html{zoom:0.75} (<=857px): layout px paint at 0.75x, so divide to make
   // the hero fill the visual screen (same trick as body's min-height).
   heroVh = window.innerHeight / heroZoom()
-  // Compact height: on desktop the band is 288px; on mobile the stacked
-  // layout is content-height + padding — measure it so overflow:hidden
-  // never clips (offsetHeight ignores the scale transform).
+  // Compact height: 480px floor on every screen. Content height is still
+  // measured (mobile stacked layout + padding) so overflow:hidden never
+  // clips — the floor only raises the band, never shrinks it below content.
   const inner = heroInnerRef.value
   const heroEl = heroScrollRef.value?.querySelector('.hero-terminal')
   const cs = heroEl ? getComputedStyle(heroEl) : null
   const padY = cs ? parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0
-  heroFinalH = Math.max(288, (inner ? inner.offsetHeight : 0) + padY)
+  // never let the floor exceed the full height (very short windows)
+  heroFinalH = Math.min(heroVh, Math.max(480, (inner ? inner.offsetHeight : 0) + padY))
 }
 
 function updateHeroProgress() {
@@ -506,6 +507,10 @@ onUnmounted(() => {
 <span v-if="terminalOutput" class="terminal__line"><span class="terminal__dim">&gt; {{ terminalOutput }}</span></span></pre>
           </div>
         </div>
+        <!-- scroll hint (fades out as the hero shrinks) -->
+        <div class="hero-terminal__scroll-hint" aria-hidden="true">
+          <SvgIcon name="chevron-down" :size="20" />
+        </div>
       </section>
     </div>
 
@@ -630,7 +635,7 @@ onUnmounted(() => {
 .hero-scroll {
   --hero-p: 0;
   --hero-vh: 100vh;
-  --hero-final-h: 288px;
+  --hero-final-h: 480px;
   position: relative;
   height: var(--hero-vh);
   /* bleed under the fixed navbar for the full-screen feel */
@@ -688,6 +693,29 @@ onUnmounted(() => {
 }
 .hero-terminal__cli {
   flex-shrink: 0;
+}
+
+/* Scroll hint — bobbing chevron at the hero's bottom edge, gone by the time
+   the hero is half-shrunk (and hidden entirely in the reduced-motion state) */
+.hero-terminal__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: var(--spacing-xl);
+  transform: translateX(-50%);
+  color: var(--terminal-text-dim);
+  opacity: calc(1 - var(--hero-p) * 2);
+  pointer-events: none;
+  z-index: 2;
+  animation: hint-bob 1.6s ease-in-out infinite;
+}
+@keyframes hint-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-terminal__scroll-hint {
+    animation: none;
+  }
 }
 
 .terminal__text {
