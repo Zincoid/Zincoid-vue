@@ -111,6 +111,9 @@
   --terminal-red-soft: rgba(255, 51, 51, 0.25);
   --terminal-green-soft: rgba(63, 185, 80, 0.25);
   --terminal-blue-soft: rgba(88, 166, 255, 0.25);
+
+  /* Block mouse cursor (▌) over terminal areas — pink */
+  --cursor-block: #d1287a;
 }
 
 /* ── Dark Theme ── */
@@ -141,4 +144,7 @@
   --terminal-text-dim: #8b949e;
   --terminal-accent: #58a6ff;
   --terminal-green: #3fb950;
+
+  /* Block mouse cursor (▌) over terminal areas — pink */
+  --cursor-block: #f778ba;
 }

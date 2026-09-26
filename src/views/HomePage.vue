@@ -73,6 +73,10 @@ const heroInnerRef = ref(null)
 const heroCursorEl = ref(null)
 const heroCursorOn = ref(false)
 function onHeroPointerMove(e) {
+  // show on move too: mouseenter never fires if the pointer is already over
+  // the hero when the page loads — without this the glyph stays hidden while
+  // cursor:none is active and the pointer is invisible
+  heroCursorOn.value = true
   const el = heroCursorEl.value
   if (!el) return
   el.style.setProperty('--mx', e.clientX + 'px')
@@ -468,7 +472,7 @@ onUnmounted(() => {
     <div class="hero-scroll" ref="heroScrollRef">
       <section class="hero-terminal" ref="heroRef"
         @mousemove="onHeroPointerMove"
-        @mouseenter="heroCursorOn = true; onHeroPointerMove($event)"
+        @mouseenter="onHeroPointerMove"
         @mouseleave="heroCursorOn = false">
         <template v-if="animationType === 'squares'">
           <div
@@ -529,8 +533,8 @@ onUnmounted(() => {
         <!-- block mouse cursor (mirrors the subtitle's ▌ caret) -->
         <span
           ref="heroCursorEl"
-          class="hero-block-cursor cursor"
-          :class="{ 'hero-block-cursor--on': heroCursorOn }"
+          class="cursor cursor--mouse"
+          :class="{ 'cursor--mouse-on': heroCursorOn }"
           aria-hidden="true"
         >▌</span>
       </section>
@@ -681,29 +685,6 @@ onUnmounted(() => {
   align-items: center;
   height: calc(var(--hero-vh) + var(--hero-p) * (var(--hero-final-h) - var(--hero-vh)));
   cursor: none;
-}
-/* The hero's pointer: the subtitle's ▌ caret itself, in terminal blue.
-   Rendered as text so it matches the glyph exactly and scales with the hero
-   (fixed-size cursor images don't scale and looked thinner than the glyph). */
-.hero-block-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  pointer-events: none;
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: 1;
-  color: var(--terminal-accent);
-  /* visibility, not opacity — the .cursor blink animation owns opacity */
-  visibility: hidden;
-  /* --mx/--my set per mousemove; scale matches the hero inner's full-screen zoom */
-  transform: translate(calc(var(--mx, -100px) - 3px), calc(var(--my, -100px) - 8px))
-    scale(calc(1 + 0.22 * (1 - var(--hero-p))));
-  transform-origin: center;
-}
-.hero-block-cursor--on {
-  visibility: visible;
 }
 .hero-terminal__inner {
   position: relative;

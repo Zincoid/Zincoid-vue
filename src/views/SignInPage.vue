@@ -56,6 +56,22 @@ const GRID = 24
 const cells = ref([]) // flat array of {x, y} for alive cells
 const leftPanel = ref(null)
 
+// Block mouse cursor (same ▌ caret as the home hero) over the terminal panel.
+// See .cursor--mouse in global.css — the glyph follows the pointer so it
+// matches the terminal carets and the theme exactly.
+const mouseCursorEl = ref(null)
+const mouseCursorOn = ref(false)
+function onLeftPointerMove(e) {
+  // show on move too: mouseenter never fires if the pointer is already over
+  // the panel when the page loads — without this the glyph stays hidden while
+  // cursor:none is active and the pointer is invisible
+  mouseCursorOn.value = true
+  const el = mouseCursorEl.value
+  if (!el) return
+  el.style.setProperty('--mx', e.clientX + 'px')
+  el.style.setProperty('--my', e.clientY + 'px')
+}
+
 let grid = []       // 2D number[][] for computation (grid[y][x])
 let cols = 0
 let rows = 0
@@ -234,7 +250,14 @@ function switchTo(path) {
 
 <template>
   <div class="auth-split">
-    <div class="auth-split__left" :class="{ 'auth-split__left--register': !isLogin }" ref="leftPanel">
+    <div
+      class="auth-split__left"
+      :class="{ 'auth-split__left--register': !isLogin }"
+      ref="leftPanel"
+      @mousemove="onLeftPointerMove"
+      @mouseenter="onLeftPointerMove"
+      @mouseleave="mouseCursorOn = false"
+    >
       <div
         v-for="(cell, i) in cells"
         :key="i"
@@ -261,6 +284,13 @@ function switchTo(path) {
 <span v-if="step === 2" class="auth-terminal__line"><span class="auth-terminal__prompt">$</span> <span class="auth-terminal__cursor">_</span></span></pre>
         </div>
       </div>
+      <!-- block mouse cursor (mirrors the terminal's ▌ carets) -->
+      <span
+        ref="mouseCursorEl"
+        class="cursor cursor--mouse"
+        :class="{ 'cursor--mouse-on': mouseCursorOn }"
+        aria-hidden="true"
+      >▌</span>
     </div>
 
     <div class="auth-split__right">
@@ -351,10 +381,12 @@ function switchTo(path) {
 .auth-split__left {
   flex: 0 0 585px;
   max-width: 52%;
+  /* Theme-aware terminal: white by day, dark by night (same --terminal-*
+     palette as the home hero) */
   background:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-    #0d1117;
+    linear-gradient(var(--terminal-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--terminal-grid-line) 1px, transparent 1px),
+    var(--terminal-bg);
   background-size: 24px 24px;
   display: flex;
   align-items: center;
@@ -362,7 +394,8 @@ function switchTo(path) {
   padding: var(--spacing-3xl);
   position: relative;
   overflow: hidden;
-  border-right: 1px solid #30363d;
+  border-right: 1px solid var(--color-border);
+  cursor: none;
 }
 
 .auth-split__sq {
@@ -370,12 +403,12 @@ function switchTo(path) {
   width: 20px;
   height: 20px;
   margin: 2px;
-  background: rgba(88, 166, 255, 0.05);
+  background: color-mix(in srgb, var(--terminal-accent) 6%, transparent);
   pointer-events: none;
   z-index: 1;
 }
 .auth-split__left--register .auth-split__sq {
-  background: rgba(63, 185, 80, 0.05);
+  background: color-mix(in srgb, var(--terminal-green) 6%, transparent);
 }
 
 .auth-brand {
@@ -388,7 +421,7 @@ function switchTo(path) {
   font-family: var(--font-mono);
   font-size: clamp(0.35rem, 1vw, 0.7rem);
   line-height: 1.25;
-  color: #58a6ff;
+  color: var(--terminal-accent);
   text-align: center;
   background: none;
   border: none;
@@ -398,14 +431,14 @@ function switchTo(path) {
   transition: color 0.3s ease;
 }
 .auth-brand__ascii--register {
-  color: #3fb950;
+  color: var(--terminal-green);
 }
 
 .auth-terminal__text {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   line-height: 1.9;
-  color: #c9d1d9;
+  color: var(--terminal-text-base);
   background: none;
   border: none;
   padding: 0;
@@ -413,15 +446,15 @@ function switchTo(path) {
   text-align: left;
 }
 .auth-terminal__prompt {
-  color: #58a6ff;
+  color: var(--terminal-accent);
 }
 .auth-terminal__dim {
-  color: #8b949e;
+  color: var(--terminal-text-dim);
 }
 .auth-terminal__cursor {
   display: inline-block;
   animation: blink 1s step-end infinite;
-  color: #58a6ff;
+  color: var(--terminal-accent);
 }
 @keyframes blink {
   50% { opacity: 0; }
@@ -549,7 +582,7 @@ function switchTo(path) {
     max-width: none;
     padding: var(--spacing-lg) var(--spacing-xl);
     border-right: none;
-    border-bottom: 1px solid #30363d;
+    border-bottom: 1px solid var(--color-border);
   }
   .auth-brand {
     display: flex;
