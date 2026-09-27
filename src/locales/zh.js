@@ -18,7 +18,7 @@ export default {
     random: '随机',
     shuffle: '换一个',
     viewAll: '查看全部 →',
-    hotWords: '近期热词'
+    recentComments: '近期评论'
   },
   moment: {
     title: '动态',

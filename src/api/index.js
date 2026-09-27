@@ -102,6 +102,7 @@ export const commentAPI = {
     getArticle: (articleId, page = 1, size = 10) => api.get(`/comments/public/article/${articleId}`, { params: { page, size } }),
     getRepo: (repoId, page = 1, size = 10) => api.get(`/comments/public/repo/${repoId}`, { params: { page, size } }),
     getReplies: (parentId) => api.get(`/comments/public/replies/${parentId}`),
+    getHomeFeed: (size = 15) => api.get('/comments/public/home', { params: { size } }),
   delete: (commentId) => api.delete(`/comments/${commentId}`)
 }
 

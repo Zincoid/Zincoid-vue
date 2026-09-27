@@ -11,7 +11,7 @@ import ArticleCard from '@/components/ArticleCard.vue'
 import RepoCard from '@/components/RepoCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
-import HomeHotWords from '@/components/HomeHotWords.vue'
+import HomeRecentComments from '@/components/HomeRecentComments.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -558,10 +558,9 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Hot words (reserved slot) — section chrome owned by the home page -->
-    <section class="hotwords">
-      <HomeHotWords />
-    </section>
+    <!-- Recent comments (danmaku) — chrome owned by the component so it can
+         hide itself when there are no comments -->
+    <HomeRecentComments />
 
     <!-- Recent Moments, Articles & Repos -->
     <LoadingSpinner :visible="loading" @done="loadingDone = true" />
@@ -780,12 +779,11 @@ onUnmounted(() => {
 }
 
 /* Sections — frameless editorial: thin top rule + large titles + whitespace.
-   .featured and .hotwords are full-width wrappers, so their rules bleed to the
-   screen edges (the first one seals the hero); .section sits in the grid
-   columns, so the same declaration gives a column-width rule there. */
+   .featured is a full-width wrapper, so its rule bleeds to the screen edges
+   (it seals the hero); .section sits in the grid columns, so the same
+   declaration gives a column-width rule there. */
 .featured,
-.section,
-.hotwords {
+.section {
   border-top: 1px solid var(--color-border);
   padding-top: var(--spacing-3xl);
   margin-bottom: var(--spacing-4xl);
@@ -856,8 +854,7 @@ onUnmounted(() => {
     gap: var(--spacing-lg);
   }
   .featured,
-  .section,
-  .hotwords {
+  .section {
     margin-bottom: var(--spacing-3xl);
   }
 }
