@@ -133,12 +133,16 @@ function clearUser() {
   border-radius: var(--rounded-md);
   background: var(--color-surface);
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
   transition: border-color var(--transition-fast);
 }
 .user-select__chosen:hover { border-color: var(--color-text-secondary); }
 
-.user-select__input { width: 100%; box-sizing: border-box; padding: 4px var(--spacing-md); font-size: var(--text-sm); }
+/* stock .field__input metrics (no compact overrides) so the box lines up
+   with sibling form fields and matches the chosen chip's height; height:100%
+   fills the row when the root is stretched by a flex parent */
+.user-select__input { width: 100%; height: 100%; box-sizing: border-box; }
 
 .user-select__avatar {
   width: 28px;
