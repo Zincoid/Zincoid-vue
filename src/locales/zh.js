@@ -470,7 +470,6 @@ export default {
     permListEmpty: '暂无授权记录',
     permListFailed: '加载授权列表失败',
     permGrantedBy: '由 @{name} 授予',
-    permRevoke: '撤回',
     permRevokeConfirm: '确定要撤回该授权吗？',
     permRevokeSuccess: '授权已撤回',
     permRevokeFailed: '撤回失败'

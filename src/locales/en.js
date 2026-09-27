@@ -470,7 +470,6 @@ export default {
     permListEmpty: 'No grants yet',
     permListFailed: 'Failed to load permission list',
     permGrantedBy: 'granted by @{name}',
-    permRevoke: 'Revoke',
     permRevokeConfirm: 'Revoke this permission?',
     permRevokeSuccess: 'Permission revoked',
     permRevokeFailed: 'Failed to revoke permission'

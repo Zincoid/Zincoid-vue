@@ -182,7 +182,7 @@ async function handlePermGrant() {
     permMessage.value = t('manage.permGrantSuccess')
     permGrantOpen.value = false
     setTimeout(() => permMessage.value = '', 2000)
-    fetchPermList(permPage.value)
+    if (permManageOpen.value) fetchPermList(permPage.value)
   } catch (err) {
     permError.value = getMessage(err, 'manage.permGrantFailed')
   } finally {
@@ -200,6 +200,15 @@ const permListDone = ref(false)
 const permRevoking = ref(null)
 const permFilterUserId = ref(null)
 const permFilterType = ref(null)
+
+// the manage panel is collapsed by default — the list is only queried when
+// the admin actually expands it (and refreshed on each expand)
+const permManageOpen = ref(false)
+
+function togglePermManage() {
+  permManageOpen.value = !permManageOpen.value
+  if (permManageOpen.value) fetchPermList(permPage.value)
+}
 
 async function fetchPermList(p = 1) {
   permListLoading.value = true
@@ -249,7 +258,6 @@ onMounted(async () => {
   musicSize.value = parseInt(getConfig('page_size', '10'))
   permSize.value = parseInt(getConfig('page_size', '10'))
   await fetchDisk()
-  fetchPermList()
 })
 
 const diskLoading = ref(false)
@@ -881,19 +889,28 @@ onBeforeUnmount(stopStream)
             </div>
           </div>
         </div>
-        <button v-if="!permGrantOpen" class="btn btn--warning" @click="openPermGrant">
+        <button v-if="!permGrantOpen" class="btn btn--success" @click="openPermGrant">
           <SvgIcon name="key" />
           {{ t('manage.permGrantOpen') }}
         </button>
       </div>
 
-      <!-- manage existing grants, with user / permission filters -->
-      <div class="perm-manage">
-        <div class="perm-manage__head">
-          <div class="tool-info">
-            <span class="tool-label">{{ t('manage.permManage') }}</span>
-            <span class="tool-desc">{{ t('manage.permManageDesc') }}</span>
-          </div>
+      <!-- manage existing grants — collapsed by default so entering the page
+           doesn't query the list; Capacity-Update style: the side button
+           opens it, a ghost cancel (side button hides while open) closes it.
+           The cancel/filters bar shares the label row; the list wraps onto a
+           full-width second line of the same tool-item -->
+      <div class="tool-item perm-manage-item" :class="{ 'tool-item--open': permManageOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.permManage') }}</span>
+          <span class="tool-desc">{{ t('manage.permManageDesc') }}</span>
+        </div>
+        <button v-if="!permManageOpen" class="btn btn--warning" @click="togglePermManage">
+          <SvgIcon name="settings" />
+          {{ t('manage.permManage') }}
+        </button>
+        <div v-else class="perm-manage__bar">
+          <button class="btn btn--ghost" @click="togglePermManage">{{ t('common.cancel') }}</button>
           <div class="perm-manage__filters">
             <UserSelect v-model="permFilterUserId" class="perm-user" :placeholder="t('manage.permFilterUser')" />
             <select v-model="permFilterType" class="field__input capacity-select perm-select">
@@ -902,26 +919,25 @@ onBeforeUnmount(stopStream)
             </select>
           </div>
         </div>
-        <div class="perm-list">
-          <div v-if="!permListDone" class="perm-list__empty">{{ t('manage.permListLoading') }}</div>
-          <template v-else>
-            <div v-if="!permRows.length" class="perm-list__empty">{{ t('manage.permListEmpty') }}</div>
-            <div v-for="row in permRows" :key="row.id" class="perm-item">
-              <img v-if="row.userAvatar" :src="row.userAvatar" class="perm-item__avatar" />
-              <span v-else class="perm-item__avatar perm-item__avatar--placeholder">{{ (row.username || '?')[0].toUpperCase() }}</span>
-              <span class="perm-item__user">@{{ row.username }}</span>
-              <span class="perm-item__tag">{{ permLabel(row.perm) }}</span>
-              <span class="perm-item__meta">
-                {{ formatDate(row.createdAt) }}<template v-if="row.grantedByUsername"> · {{ t('manage.permGrantedBy', { name: row.grantedByUsername }) }}</template>
-              </span>
-              <button class="btn btn--danger btn--sm perm-item__revoke" :disabled="permRevoking === row.id" @click="handlePermRevoke(row)">
-                <SvgIcon name="revoke" :size="14" />
-                {{ t('manage.permRevoke') }}
-              </button>
-            </div>
-          </template>
+        <div v-if="permManageOpen" class="perm-manage">
+          <div class="perm-list">
+            <div v-if="!permListDone" class="perm-list__empty">{{ t('manage.permListLoading') }}</div>
+            <template v-else>
+              <div v-if="!permRows.length" class="perm-list__empty">{{ t('manage.permListEmpty') }}</div>
+              <div v-for="row in permRows" :key="row.id" class="perm-item">
+                <img v-if="row.userAvatar" :src="row.userAvatar" class="perm-item__avatar" />
+                <span v-else class="perm-item__avatar perm-item__avatar--placeholder">{{ (row.username || '?')[0].toUpperCase() }}</span>
+                <span class="perm-item__user">@{{ row.username }}</span>
+                <span class="perm-item__tag">{{ permLabel(row.perm) }}</span>
+                <span class="perm-item__meta">
+                  {{ formatDate(row.createdAt) }}<template v-if="row.grantedByUsername"> · {{ t('manage.permGrantedBy', { name: row.grantedByUsername }) }}</template>
+                </span>
+                <button class="perm-item__revoke" :title="t('access.revoke')" :disabled="permRevoking === row.id" @click="handlePermRevoke(row)"><SvgIcon name="revoke" :size="14" /></button>
+              </div>
+            </template>
+          </div>
+          <Pagination v-if="permTotal" :page="permPage" :pages="permPages" :total="permTotal" :size="permSize" @change="fetchPermList" />
         </div>
-        <Pagination v-if="permTotal" :page="permPage" :pages="permPages" :total="permTotal" :size="permSize" @change="fetchPermList" />
       </div>
     </section>
 
@@ -1064,17 +1080,16 @@ h3 { margin-bottom: var(--spacing-lg); }
 /* ── Permission grant + manage ── */
 .perm-user { flex: 1; min-width: 140px; }
 .perm-select { width: 150px; }
-.perm-manage {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-}
-.perm-manage__head { display: flex; align-items: center; gap: var(--spacing-lg); flex-wrap: wrap; }
-.perm-manage__filters { display: flex; align-items: center; gap: var(--spacing-sm); flex-shrink: 0; }
+/* expanded manage panel lives inside .tool-info of the toggle tool-item */
+/* the manage tool-item wraps: the cancel/filters bar shares the label row
+   (right side, where the side button sits when closed) and the list drops
+   onto a full-width second line of the same tool-item */
+.perm-manage-item { flex-wrap: wrap; }
+.perm-manage__bar { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; margin-left: auto; flex-shrink: 0; }
+.perm-manage__filters { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; }
 .perm-manage__filters .perm-user { width: 220px; flex: 0 0 auto; }
-.perm-list { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg); }
+.perm-manage { flex: 0 0 100%; width: 100%; }
+.perm-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .perm-list__empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--text-sm); }
 .perm-item { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
 .perm-item__avatar { width: 32px; height: 32px; border-radius: var(--rounded-full); object-fit: cover; flex-shrink: 0; }
@@ -1082,7 +1097,10 @@ h3 { margin-bottom: var(--spacing-lg); }
 .perm-item__user { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); flex-shrink: 0; max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .perm-item__tag { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); background: var(--color-primary-bg); color: var(--color-primary); font-weight: var(--weight-medium); flex-shrink: 0; white-space: nowrap; }
 .perm-item__meta { flex: 1; min-width: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.perm-item__revoke { flex-shrink: 0; margin-left: auto; }
+/* icon-only revoke — mirrors the access page's revoke action */
+.perm-item__revoke { display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; flex-shrink: 0; border: none; border-radius: var(--rounded-full); background: transparent; color: var(--color-text-secondary); cursor: pointer; margin-left: auto; transition: color var(--transition-fast), background var(--transition-fast); }
+.perm-item__revoke:hover { color: var(--color-warning); background: var(--color-warning-bg); }
+.perm-item__revoke:disabled { opacity: 0.5; cursor: not-allowed; }
 .perm-manage :deep(.pagination) { margin-top: var(--spacing-md); }
 .tool-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .tool-item .btn { margin-left: auto; }
