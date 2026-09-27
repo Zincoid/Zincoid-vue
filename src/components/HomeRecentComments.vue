@@ -99,6 +99,12 @@ onUnmounted(() => {
           :title="formatDate(b.c.createdAt)"
           @animationend="onFlyEnd(b)"
         >
+          <!-- avatar mirrors CommentSection: image when present, else the
+               nickname's first letter on a primary circle -->
+          <span class="recent-comments__avatar" aria-hidden="true">
+            <img v-if="b.c.userAvatar" :src="b.c.userAvatar" alt="" />
+            <span v-else>{{ (b.c.userNickname || 'U')[0] }}</span>
+          </span>
           <span class="recent-comments__nick">{{ b.c.userNickname }}</span>
           <span v-if="b.c.parentUsername" class="recent-comments__reply">@{{ b.c.parentUsername }}</span>
           <span class="recent-comments__sep">：</span>
@@ -156,7 +162,8 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--spacing-xs);
   max-width: min(320px, 80%);
-  padding: 0 var(--spacing-md);
+  /* asymmetric: the avatar hugs the left edge a little */
+  padding: 0 var(--spacing-md) 0 var(--spacing-sm);
   border-radius: var(--rounded-full);
   background: var(--color-bg-alt);
   color: var(--color-text);
@@ -178,6 +185,26 @@ a.recent-comments__item:hover {
 .recent-comments__track:hover .recent-comments__item,
 .recent-comments__track:focus-within .recent-comments__item {
   animation-play-state: paused;
+}
+
+.recent-comments__avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rounded-full);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-primary);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+}
+.recent-comments__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .recent-comments__nick {
