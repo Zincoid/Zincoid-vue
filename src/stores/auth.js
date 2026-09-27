@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authAPI, userAPI } from '@/api'
 import router from '@/router'
+import { usePermission } from '@/composables/usePermission'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || '')
@@ -16,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.data.user
     localStorage.setItem('token', data.data.token)
     localStorage.setItem('user', JSON.stringify(data.data.user))
+    usePermission().refresh() // warm the permission cache for later checks
     return data.data
   }
 
@@ -25,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.data.user
     localStorage.setItem('token', data.data.token)
     localStorage.setItem('user', JSON.stringify(data.data.user))
+    usePermission().refresh() // warm the permission cache for later checks
     return data.data
   }
 
@@ -51,6 +54,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    usePermission().reset() // next login re-fetches its own permissions
     router.push('/')
   }
 

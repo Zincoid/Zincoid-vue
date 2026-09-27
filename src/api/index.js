@@ -125,6 +125,14 @@ export const likeAPI = {
   getStatus: (targetType, targetId) => api.get(`/likes/public/${targetType}/${targetId}/status`)
 }
 
+// ── Permissions ──
+export const permissionAPI = {
+  my: () => api.get('/permissions/my'),
+  grant: (userId, perm) => api.post(`/permissions/${userId}/${perm}`),
+  revoke: (id) => api.delete(`/permissions/${id}`),
+  getList: (userId, perm, page = 1, size = 10) => api.get('/permissions', { params: { userId, perm, page, size } })
+}
+
 // ── Config ──
 export const configAPI = {
   get: () => api.get('/configs/public'),

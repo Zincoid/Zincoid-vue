@@ -1,15 +1,19 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
-import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI } from '@/api'
+import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI, permissionAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
+import { Perm, PERM_KEY } from '@/composables/usePermission'
+import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ScrollArea from '@/components/ScrollArea.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import UserSelect from '@/components/UserSelect.vue'
+import Pagination from '@/components/Pagination.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -146,6 +150,92 @@ function cancelReset() {
   resetOpen.value = false
 }
 
+// ── Permission: grant + manage ──
+const permMessage = ref('')
+const permError = ref('')
+
+const permOptions = computed(() =>
+  Object.entries(PERM_KEY).map(([value, key]) => ({ value: Number(value), label: t(key) }))
+)
+
+function permLabel(p) {
+  return PERM_KEY[p] ? t(PERM_KEY[p]) : t('permission.unknown')
+}
+
+const permGrantOpen = ref(false)
+const permGrantUserId = ref(null)
+const permGrantType = ref(Perm.ARTICLE_OP)
+const permGranting = ref(false)
+
+function openPermGrant() {
+  permGrantOpen.value = true
+  permGrantUserId.value = null
+  permGrantType.value = Perm.ARTICLE_OP
+}
+
+async function handlePermGrant() {
+  if (permGrantUserId.value == null) return
+  if (!await confirm(t('manage.permGrantConfirm'))) return
+  permGranting.value = true
+  try {
+    await permissionAPI.grant(permGrantUserId.value, permGrantType.value)
+    permMessage.value = t('manage.permGrantSuccess')
+    permGrantOpen.value = false
+    setTimeout(() => permMessage.value = '', 2000)
+    fetchPermList(permPage.value)
+  } catch (err) {
+    permError.value = getMessage(err, 'manage.permGrantFailed')
+  } finally {
+    permGranting.value = false
+  }
+}
+
+const permRows = ref([])
+const permPage = ref(1)
+const permPages = ref(1)
+const permTotal = ref(0)
+const permSize = ref(10)
+const permListLoading = ref(false)
+const permListDone = ref(false)
+const permRevoking = ref(null)
+const permFilterUserId = ref(null)
+const permFilterType = ref(null)
+
+async function fetchPermList(p = 1) {
+  permListLoading.value = true
+  try {
+    const res = await permissionAPI.getList(permFilterUserId.value, permFilterType.value, p, permSize.value)
+    const data = res.data?.data || {}
+    permRows.value = data.records || []
+    permPages.value = data.pages || 1
+    permTotal.value = data.total || 0
+    permPage.value = p
+    permError.value = ''
+  } catch (err) {
+    permError.value = getMessage(err, 'manage.permListFailed')
+  } finally {
+    permListLoading.value = false
+    permListDone.value = true
+  }
+}
+
+watch([permFilterUserId, permFilterType], () => fetchPermList(1))
+
+async function handlePermRevoke(row) {
+  if (!await confirm(t('manage.permRevokeConfirm'))) return
+  permRevoking.value = row.id
+  try {
+    await permissionAPI.revoke(row.id)
+    permMessage.value = t('manage.permRevokeSuccess')
+    setTimeout(() => permMessage.value = '', 2000)
+    fetchPermList(permPage.value)
+  } catch (err) {
+    permError.value = getMessage(err, 'manage.permRevokeFailed')
+  } finally {
+    permRevoking.value = null
+  }
+}
+
 onMounted(async () => {
   try {
     const { data } = await configAPI.listAll()
@@ -157,7 +247,9 @@ onMounted(async () => {
   }
   await loadConfig()
   musicSize.value = parseInt(getConfig('page_size', '10'))
+  permSize.value = parseInt(getConfig('page_size', '10'))
   await fetchDisk()
+  fetchPermList()
 })
 
 const diskLoading = ref(false)
@@ -763,6 +855,76 @@ onBeforeUnmount(stopStream)
       </div>
     </section>
 
+    <section class="section">
+      <h3>{{ t('manage.permission') }}</h3>
+      <p v-if="permMessage" class="msg msg--success">{{ permMessage }}</p>
+      <p v-if="permError" class="msg msg--error">{{ permError }}</p>
+
+      <!-- grant — mirrors Capacity Update: click to expand the form -->
+      <div class="tool-item" :class="{ 'tool-item--open': permGrantOpen }">
+        <div class="tool-info">
+          <span class="tool-label">{{ t('manage.permGrant') }}</span>
+          <span class="tool-desc">{{ t('manage.permGrantDesc') }}</span>
+          <div v-if="permGrantOpen" class="config-value-row reset-row">
+            <div class="reset-inputs" style="flex: 1; min-width: 0;">
+              <UserSelect v-model="permGrantUserId" class="perm-user" :placeholder="t('manage.permUserPlaceholder')" />
+              <select v-model="permGrantType" class="field__input capacity-select perm-select">
+                <option v-for="opt in permOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
+            <div class="reset-actions">
+              <button class="btn btn--ghost" @click="permGrantOpen = false">{{ t('common.cancel') }}</button>
+              <button class="btn btn--primary" :disabled="permGranting || permGrantUserId == null" @click="handlePermGrant">
+                <SvgIcon name="check" />
+                {{ permGranting ? t('common.saving') : t('common.confirm') }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <button v-if="!permGrantOpen" class="btn btn--warning" @click="openPermGrant">
+          <SvgIcon name="key" />
+          {{ t('manage.permGrantOpen') }}
+        </button>
+      </div>
+
+      <!-- manage existing grants, with user / permission filters -->
+      <div class="perm-manage">
+        <div class="perm-manage__head">
+          <div class="tool-info">
+            <span class="tool-label">{{ t('manage.permManage') }}</span>
+            <span class="tool-desc">{{ t('manage.permManageDesc') }}</span>
+          </div>
+          <div class="perm-manage__filters">
+            <UserSelect v-model="permFilterUserId" class="perm-user" :placeholder="t('manage.permFilterUser')" />
+            <select v-model="permFilterType" class="field__input capacity-select perm-select">
+              <option :value="null">{{ t('manage.permFilterAll') }}</option>
+              <option v-for="opt in permOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="perm-list">
+          <div v-if="!permListDone" class="perm-list__empty">{{ t('manage.permListLoading') }}</div>
+          <template v-else>
+            <div v-if="!permRows.length" class="perm-list__empty">{{ t('manage.permListEmpty') }}</div>
+            <div v-for="row in permRows" :key="row.id" class="perm-item">
+              <img v-if="row.userAvatar" :src="row.userAvatar" class="perm-item__avatar" />
+              <span v-else class="perm-item__avatar perm-item__avatar--placeholder">{{ (row.username || '?')[0].toUpperCase() }}</span>
+              <span class="perm-item__user">@{{ row.username }}</span>
+              <span class="perm-item__tag">{{ permLabel(row.perm) }}</span>
+              <span class="perm-item__meta">
+                {{ formatDate(row.createdAt) }}<template v-if="row.grantedByUsername"> · {{ t('manage.permGrantedBy', { name: row.grantedByUsername }) }}</template>
+              </span>
+              <button class="btn btn--danger btn--sm perm-item__revoke" :disabled="permRevoking === row.id" @click="handlePermRevoke(row)">
+                <SvgIcon name="revoke" :size="14" />
+                {{ t('manage.permRevoke') }}
+              </button>
+            </div>
+          </template>
+        </div>
+        <Pagination v-if="permTotal" :page="permPage" :pages="permPages" :total="permTotal" :size="permSize" @change="fetchPermList" />
+      </div>
+    </section>
+
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="musicOpen" class="modal-overlay" @mousedown.self="overlayDown = true" @click="overlayDown && (overlayDown = false, closeMusicManage())">
@@ -898,6 +1060,30 @@ h3 { margin-bottom: var(--spacing-lg); }
 }
 .capacity-select:hover { border-color: var(--color-primary); }
 .capacity-select option { font-family: var(--font-mono); }
+
+/* ── Permission grant + manage ── */
+.perm-user { flex: 1; min-width: 140px; }
+.perm-select { width: 150px; }
+.perm-manage {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+}
+.perm-manage__head { display: flex; align-items: center; gap: var(--spacing-lg); flex-wrap: wrap; }
+.perm-manage__filters { display: flex; align-items: center; gap: var(--spacing-sm); flex-shrink: 0; }
+.perm-manage__filters .perm-user { width: 220px; flex: 0 0 auto; }
+.perm-list { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg); }
+.perm-list__empty { padding: var(--spacing-xl) 0; text-align: center; color: var(--color-text-tertiary); font-size: var(--text-sm); }
+.perm-item { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); background: var(--color-bg); border-radius: var(--rounded-md); }
+.perm-item__avatar { width: 32px; height: 32px; border-radius: var(--rounded-full); object-fit: cover; flex-shrink: 0; }
+.perm-item__avatar--placeholder { display: flex; align-items: center; justify-content: center; background: var(--color-primary); color: var(--color-white); font-size: var(--text-xs); font-weight: var(--weight-medium); }
+.perm-item__user { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-heading); flex-shrink: 0; max-width: 12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.perm-item__tag { font-size: var(--text-xs); padding: 2px 10px; border-radius: var(--rounded-full); background: var(--color-primary-bg); color: var(--color-primary); font-weight: var(--weight-medium); flex-shrink: 0; white-space: nowrap; }
+.perm-item__meta { flex: 1; min-width: 0; font-size: var(--text-xs); color: var(--color-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.perm-item__revoke { flex-shrink: 0; margin-left: auto; }
+.perm-manage :deep(.pagination) { margin-top: var(--spacing-md); }
 .tool-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
 .tool-item .btn { margin-left: auto; }
 .tool-label { font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-heading); }
