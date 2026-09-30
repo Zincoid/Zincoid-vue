@@ -114,6 +114,23 @@ function measureHero() {
   const padY = cs ? parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0
   // never let the floor exceed the full height (very short windows)
   heroFinalH = Math.min(heroVh, Math.max(480, (inner ? inner.offsetHeight : 0) + padY))
+  measureHeroBoost(inner)
+}
+
+// Full-screen boost (the scale-up at --hero-p 0) must fit the window: the hero
+// clips overflow, so a fixed 1.22x guillotines the brand/terminal copy at the
+// left and right edges on narrow desktops (before the 857px zoom collapse).
+// Cap it so the whole scaled box fits (b <= (vw - w) / w) — the copy then
+// keeps the same scaled padding margin as on wide screens instead of hugging
+// the edges. Wide screens keep the full 0.22.
+function measureHeroBoost(inner) {
+  const el = heroScrollRef.value
+  if (!el || !inner) return
+  // same layout px space as offsetWidth
+  const vw = document.documentElement.clientWidth
+  const w = inner.offsetWidth
+  const boost = w > 0 ? (vw - w) / w : 0
+  el.style.setProperty('--hero-boost', Math.max(0, Math.min(0.22, boost)).toFixed(4))
 }
 
 function updateHeroProgress() {
@@ -661,6 +678,9 @@ onUnmounted(() => {
   --hero-p: 0;
   --hero-vh: 100vh;
   --hero-final-h: 480px;
+  /* full-screen scale-up; JS caps it so the scaled box always fits the window
+     (the copy keeps its padding margin instead of hugging the edges) */
+  --hero-boost: 0.22;
   position: relative;
   height: var(--hero-vh);
   /* bleed under the fixed navbar for the full-screen feel */
@@ -692,8 +712,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-3xl);
-  /* scale up while full-screen; nudge down while docked so content clears the navbar */
-  transform: scale(calc(1 + 0.22 * (1 - var(--hero-p))))
+  /* scale up while full-screen (boost capped to fit the window); nudge down
+     while docked so content clears the navbar */
+  transform: scale(calc(1 + var(--hero-boost) * (1 - var(--hero-p))))
     translateY(calc(var(--hero-p) * var(--navbar-height) / 2));
   transform-origin: center;
 }
