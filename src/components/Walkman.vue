@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useError } from '@/composables/useError'
 import { useConfig } from '@/composables/useConfig'
@@ -13,7 +13,7 @@ import ScrollArea from '@/components/ScrollArea.vue'
 const { t } = useI18n()
 const { getMessage } = useError()
 const { load: loadConfig, get: getConfig } = useConfig()
-const { external, registerAudio, isPlaying } = useWalkman()
+const { external, registerAudio, unregisterAudio, isPlaying } = useWalkman()
 const auth = useAuthStore()
 
 const tipDismissed = ref(localStorage.getItem('walkmanTipDismissed') === '1')
@@ -452,6 +452,14 @@ onMounted(async () => {
       }
     } catch {}
   }
+})
+
+onUnmounted(() => {
+  // logout tears the player down (v-if) while a track may still be playing —
+  // stop it (a detached <audio> keeps playing otherwise) and clear the shared
+  // refs so DigitalFlow falls back to the static rain immediately
+  audioRef.value?.pause()
+  unregisterAudio()
 })
 
 watch([currentTrack, playMode, volume, musicScope, listPage, playScope, playPage], () => {

@@ -11,5 +11,12 @@ export function useWalkman() {
   function registerAudio(el) {
     audioEl.value = el
   }
-  return { external, playExternal, audioEl, isPlaying, registerAudio }
+  // Walkman unmounts on logout and its audio element dies with it — drop the
+  // shared refs so consumers (DigitalFlow's spectrum) don't keep reading a
+  // detached element or a playing flag that can never turn off again
+  function unregisterAudio() {
+    audioEl.value = null
+    isPlaying.value = false
+  }
+  return { external, playExternal, audioEl, isPlaying, registerAudio, unregisterAudio }
 }

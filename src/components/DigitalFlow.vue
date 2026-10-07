@@ -10,7 +10,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useWalkman } from '@/composables/useWalkman'
 import { configAPI } from '@/api'
 
-const { audioEl, isPlaying } = useWalkman()
+const { audioEl } = useWalkman()
 
 const canvasRef = ref(null)
 let animationId = null
@@ -43,8 +43,15 @@ let lastTime = 0
 
 function ensureAnalyser() {
   const el = audioEl.value
-  if (!el) return
+  // a detached element (walkman unmounted on logout) can't be analyzed —
+  // wiring it would latch spectrum mode onto a dead source
+  if (!el || !el.isConnected) return
   if (analyser && analyserForEl === el) return
+  // the media source node is one-shot per element: only rebuild when the
+  // element itself changed. Leave the analyser null on any failure so tick
+  // falls back to the static rain instead of drawing a blank spectrum.
+  analyser = null
+  freqData = null
   try {
     if (ctx) ctx.close().catch(() => {})
     ctx = new (window.AudioContext || window.webkitAudioContext)()
@@ -56,7 +63,10 @@ function ensureAnalyser() {
     analyser.connect(ctx.destination)
     analyserForEl = el
     freqData = new Uint8Array(analyser.frequencyBinCount)
-  } catch { /* ignore */ }
+  } catch {
+    analyser = null
+    freqData = null
+  }
 }
 
 function buildCells() {
@@ -92,11 +102,17 @@ function tick(now) {
   const w = canvas.width, h = canvas.height
 
   let spectrum = false
-  if (isPlaying.value && audioEl.value) {
+  const el = audioEl.value
+  // ground truth over flags: a paused or detached element (logout tears the
+  // walkman down mid-track) must fall back to the static rain
+  if (el && el.isConnected && !el.paused) {
     ensureAnalyser()
-    if (analyser) {
+    if (analyser && freqData) {
       analyser.getByteFrequencyData(freqData)
-      spectrum = true
+      // a zero signal (muted / dead source) would make every bar length 0 and
+      // the spectrum pass skips every cell — blank canvas. Treat silence as
+      // the static state instead.
+      spectrum = freqData.some((v) => v > 0)
     }
   }
 
@@ -190,14 +206,16 @@ function onMouseMove(e) {
   mouseY = e.clientY - (rect?.top || 0)
 }
 
+function onResize() {
+  clearTimeout(timer)
+  timer = setTimeout(resize, 300)
+}
+
 onMounted(() => {
   resize()
   lastTime = performance.now()
   animationId = requestAnimationFrame(tick)
-  window.addEventListener('resize', () => {
-    clearTimeout(timer)
-    timer = setTimeout(resize, 300)
-  })
+  window.addEventListener('resize', onResize)
   window.addEventListener('mousemove', onMouseMove)
   loadBarRatio()
 })
@@ -205,7 +223,7 @@ onMounted(() => {
 onUnmounted(() => {
   cancelAnimationFrame(animationId)
   clearTimeout(timer)
-  window.removeEventListener('resize', resize)
+  window.removeEventListener('resize', onResize)
   window.removeEventListener('mousemove', onMouseMove)
 })
 </script>
