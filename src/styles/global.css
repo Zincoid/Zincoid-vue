@@ -703,7 +703,6 @@ textarea::-webkit-scrollbar-corner {
 .timeline-list > * + *,
 .moments-grid > * + *,
 .tab-content > * + *,
-.user-grid > * + *,
 .repo-grid > * + * {
   position: relative;
 }
@@ -711,7 +710,6 @@ textarea::-webkit-scrollbar-corner {
 .timeline-list > * + *::before,
 .moments-grid > * + *::before,
 .tab-content > * + *::before,
-.user-grid > * + *::before,
 .repo-grid > * + *::before {
   content: '';
   position: absolute;
@@ -730,25 +728,12 @@ textarea::-webkit-scrollbar-corner {
    right of the first one would draw a stray line at the container's top edge.
    Clipping the container trims those. */
 .moments-grid,
-.user-grid,
 .repo-grid {
   overflow: hidden;
-}
-/* user-grid cards keep the spin-edge hover glow — the 2px padding (cancelled
-   by margin) keeps the clip edge clear of it */
-.user-grid {
-  padding: 2px;
-  margin: -2px;
 }
 .moments-grid > * + *::before {
   top: calc(-0.5 * var(--spacing-md)); /* gap md */
 }
-.user-grid > * + *::before {
-  top: calc(-0.5 * var(--spacing-lg)); /* gap lg */
-}
-/* user page: hovering anything inside the grid (cards or the divider gaps)
-   hides all divider lines */
-.user-grid:hover > *::before { opacity: 0; }
 .repo-grid > * + *::before {
   top: calc(-0.5 * var(--spacing-xl)); /* ReposPage gap xl */
 }
