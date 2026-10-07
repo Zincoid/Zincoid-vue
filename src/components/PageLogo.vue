@@ -7,7 +7,8 @@ import SvgIcon from '@/components/SvgIcon.vue'
 // the settled mark in quietly (no motion storm on top of the page load).
 // Page switches morph: the current icon's glyphs scatter outward in disorder,
 // drift through random symbols, then condense into the next page's icon
-// ("//" for home) and lock into stable glyphs, with a faint idle shimmer
+// ("//" for home) and lock into stable glyphs, with a faint idle shimmer and
+// occasional glitch bursts (torn bands, scrambled cells, chromatic fringe)
 // afterwards. In-flight glyphs stay dim and churn slowly so the transition
 // never out-shouts the content. Scatter points are drawn uniformly across
 // the whole viewport — the disorder cloud spans the screen. Sits just under
@@ -50,6 +51,12 @@ let particles = []
 let gen = 0 // discards stale async mask builds on rapid switches
 let nextFlickerAt = Infinity
 let fadeStart = 0 // load-only: ramp the whole mark up from invisible
+// glitch: short data-corruption bursts over the settled mark
+let glitchUntil = 0
+let nextGlitchAt = Infinity
+let glitchBands = [] // {y0, y1, dx, scramble, chroma} — re-rolled mid-burst
+let nextBandRoll = 0
+let ghostDx = 0 // shared echo offset for the whole mark
 let viewW = 0 // canvas CSS-px size (the area below the navbar)
 let viewH = 0
 
@@ -156,6 +163,9 @@ function spawnParticles(cells) {
     particles = list
     fadeStart = now
     nextFlickerAt = now + 800
+    // no glitch over the quiet load-in — first burst a couple seconds later
+    glitchUntil = 0
+    nextGlitchAt = now + rand(2000, 4500)
     return
   }
 
@@ -193,6 +203,35 @@ function spawnParticles(cells) {
   particles = list
   fadeStart = 0
   nextFlickerAt = now + 1600
+  // the old mark corrupts for a beat before it scatters
+  if (!reduced) startGlitch(now)
+}
+
+// glitch bands: horizontal tears across the mark area, re-rolled a few times
+// per burst so the tear shimmers in place instead of sliding
+function rollGlitchBands() {
+  const oy = (viewH - MARK_PX) / 2
+  glitchBands = []
+  const n = 2 + Math.floor(Math.random() * 3)
+  for (let i = 0; i < n; i++) {
+    const h = CELL * (1 + Math.floor(Math.random() * 3))
+    const y0 = oy + Math.random() * (MARK_PX - h)
+    glitchBands.push({
+      y0,
+      y1: y0 + h,
+      dx: (Math.random() < 0.5 ? -1 : 1) * rand(4, 22),
+      scramble: Math.random() < 0.65,
+      chroma: Math.random() < 0.55
+    })
+  }
+  ghostDx = rand(-5, 5)
+}
+
+function startGlitch(now) {
+  glitchUntil = now + rand(140, 360)
+  rollGlitchBands()
+  nextBandRoll = now + rand(50, 100)
+  nextGlitchAt = glitchUntil + rand(2500, 7500)
 }
 
 function drawFrame(now) {
@@ -207,6 +246,24 @@ function drawFrame(now) {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
   const rgb = isDark ? '75, 85, 99' : '107, 114, 128'
   const fadeAlpha = fadeStart ? Math.min(1, (now - fadeStart) / 500) : 1
+
+  // glitch bursts: schedule, and re-roll the tear bands a few times mid-burst
+  if (!reduced) {
+    if (now < glitchUntil) {
+      if (now >= nextBandRoll) {
+        rollGlitchBands()
+        nextBandRoll = now + rand(50, 110)
+      }
+    } else if (now >= nextGlitchAt) {
+      // hold off while a morph is still flying — the chaos is already there
+      const busy = particles.some(
+        (p) => !p.dissolve && now < p.t0 + p.liftDelay + p.liftDur + p.formDelay + p.formDur
+      )
+      if (busy) nextGlitchAt = now + 300
+      else startGlitch(now)
+    }
+  }
+  const glitching = !reduced && now < glitchUntil
 
   for (const p of particles) {
     const lt = Math.min(1, Math.max(0, (now - p.t0 - p.liftDelay) / p.liftDur))
@@ -252,8 +309,37 @@ function drawFrame(now) {
       }
     }
     // every glyph shares one alpha — only the motion factor varies
-    ctx.fillStyle = `rgba(${rgb},${(GLYPH_ALPHA * alpha * fadeAlpha).toFixed(3)})`
-    ctx.fillText(p.glyph, p.x, p.y)
+    const a = GLYPH_ALPHA * alpha * fadeAlpha
+    let dx = 0
+    let band = null
+    if (glitching && !p.dissolve) {
+      for (const b of glitchBands) {
+        if (p.y >= b.y0 && p.y < b.y1) { band = b; break }
+      }
+      if (band) {
+        dx = band.dx
+        // torn cells churn through noise glyphs while displaced
+        if (band.scramble && now >= p.nextGlyphAt) {
+          p.glyph = pick(CHAOS_CHARS)
+          p.nextGlyphAt = now + rand(40, 90)
+        }
+      }
+    }
+    if (glitching && !p.dissolve) {
+      // whole-mark echo: faint ghost of every glyph at one shared offset
+      ctx.fillStyle = `rgba(${rgb},${(a * 0.4).toFixed(3)})`
+      ctx.fillText(p.glyph, p.x + dx + ghostDx, p.y)
+      if (band && band.chroma) {
+        // chromatic tear on displaced bands — glitch accent colors,
+        // deliberately outside the theme (like digital-flow's spectrum hues)
+        ctx.fillStyle = `rgba(255,70,90,${(a * 0.55).toFixed(3)})`
+        ctx.fillText(p.glyph, p.x + dx - 2.5, p.y)
+        ctx.fillStyle = `rgba(80,220,255,${(a * 0.55).toFixed(3)})`
+        ctx.fillText(p.glyph, p.x + dx + 2.5, p.y)
+      }
+    }
+    ctx.fillStyle = `rgba(${rgb},${a.toFixed(3)})`
+    ctx.fillText(p.glyph, p.x + dx, p.y)
   }
 
   // settled mark keeps a faint life: a few cells shimmer now and then
