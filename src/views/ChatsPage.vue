@@ -304,7 +304,8 @@ function openPreview(src) {
 
 .chat-box {
   flex: 1;
-  background: var(--color-bg);
+  /* transparent: the bubbles carry their own surface — this panel used to
+     paint --color-bg (same as the page) and only hid the page-logo watermark */
   border-radius: var(--rounded-xl);
   overflow-y: auto;
   padding: var(--spacing-lg);

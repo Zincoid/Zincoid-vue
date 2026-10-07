@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import DigitalFlow from '@/components/DigitalFlow.vue'
+import PageLogo from '@/components/PageLogo.vue'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import MessageToast from '@/components/MessageToast.vue'
 import Walkman from '@/components/Walkman.vue'
@@ -21,6 +22,7 @@ const showFlow = computed(() => {
 
 <template>
   <DigitalFlow v-if="showFlow" />
+  <PageLogo />
   <Navbar />
   <main class="page-content">
     <router-view />
