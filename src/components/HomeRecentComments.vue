@@ -9,21 +9,26 @@ const { t } = useI18n()
 // Danmaku (bullet comments): /comments/public/home returns the newest first;
 // spawn order matches — the newest comments fly out first, then on through
 // the history and back around.
-// Bullets spawn round-robin into 3 lanes. The per-lane gap (LANES * SPAWN_MS)
-// is wider than the longest bullet at the near-constant px/s below, so
-// same-lane bullets never overlap (each moves a different distance in the
-// same duration — a long bullet goes slightly faster but starts far enough
-// behind).
+// Organic rhythm: spawn intervals and lane picks are random (a uniform
+// interval + lane rotation reads as a marching queue). Density comes from
+// more lanes and a short refills gap; the gap floor (LANE_GAP_MIN_MS) is set
+// from the worst-case catch-up over a full flight — slow narrow bullet ahead,
+// fast wide one behind, with the mild duration jitter below — so same-lane
+// bullets never overlap. When every lane is still spaced out the tick is
+// skipped.
 const comments = ref([])
 const flying = ref([])
 const ready = ref(false)
 
 const trackEl = ref(null)
-const LANES = 3
-const SPAWN_MS = 2200
+const LANES = 4
+const SPAWN_MIN_MS = 400
+const SPAWN_MAX_MS = 2600
+const LANE_GAP_MIN_MS = 5900
 let spawnTimer = null
 let seq = 0
 let queueIdx = 0
+const laneBusyUntil = new Array(LANES).fill(0)
 
 function targetRoute(c) {
   if (c.targetId == null) return null
@@ -42,12 +47,36 @@ function flightSeconds() {
 function spawn() {
   const list = comments.value
   if (!list.length) return
+  const now = performance.now()
+  const free = []
+  for (let i = 0; i < LANES; i++) {
+    if (now >= laneBusyUntil[i]) free.push(i)
+  }
+  if (!free.length) return // all lanes still spaced out — skip, try next tick
+  const lane = free[(Math.random() * free.length) | 0]
+  laneBusyUntil[lane] = now + LANE_GAP_MIN_MS + Math.random() * 2000
   const c = list[queueIdx % list.length]
   queueIdx++
   flying.value = [
     ...flying.value,
-    { key: ++seq, c, route: targetRoute(c), lane: seq % LANES, dur: flightSeconds() }
+    {
+      key: ++seq,
+      c,
+      route: targetRoute(c),
+      lane,
+      // ±3% of the shared px/s baseline: enough to break lockstep, small
+      // enough that the same-lane gap above still prevents any overlap
+      dur: flightSeconds() * (0.97 + Math.random() * 0.06)
+    }
   ]
+}
+
+function scheduleSpawn() {
+  spawn()
+  spawnTimer = setTimeout(
+    scheduleSpawn,
+    SPAWN_MIN_MS + Math.random() * (SPAWN_MAX_MS - SPAWN_MIN_MS)
+  )
 }
 
 function onFlyEnd(b) {
@@ -73,12 +102,11 @@ onMounted(async () => {
     return
   }
   await nextTick() // track must be laid out for the width-based duration
-  spawn()
-  spawnTimer = setInterval(spawn, SPAWN_MS)
+  scheduleSpawn()
 })
 
 onUnmounted(() => {
-  if (spawnTimer) clearInterval(spawnTimer)
+  if (spawnTimer) clearTimeout(spawnTimer)
 })
 </script>
 
@@ -148,9 +176,10 @@ onUnmounted(() => {
      hover-pause and clicks still work in the faded zones */
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
   mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+  --dm-lanes: 4; /* keep in sync with LANES in the script */
   --dm-lane-h: 32px;
   --dm-lane-gap: 8px;
-  height: calc(3 * var(--dm-lane-h) + 2 * var(--dm-lane-gap));
+  height: calc(var(--dm-lanes) * var(--dm-lane-h) + (var(--dm-lanes) - 1) * var(--dm-lane-gap));
 }
 
 .recent-comments__item {
