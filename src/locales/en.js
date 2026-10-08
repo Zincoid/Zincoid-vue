@@ -539,7 +539,7 @@ export default {
     loginFailed: 'Invalid username or password',
     tokenExpired: 'Token expired, please log in again',
     required: 'Please fill in required fields',
-    usernameLength: 'Username must be 3-50 characters',
+    usernameLength: 'Username must be 2-50 characters',
     passwordLength: 'Password must be 6-100 characters',
     registerFailed: 'Registration failed',
     welcomeBack: 'Welcome back',

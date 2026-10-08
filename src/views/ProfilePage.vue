@@ -103,7 +103,7 @@ async function handleCrop(blob) {
 async function saveProfile() {
   message.value = ''
   error.value = ''
-  if (profile.value.username.length < 3 || profile.value.username.length > 50) {
+  if (profile.value.username.length < 2 || profile.value.username.length > 50) {
     error.value = t('auth.usernameLength')
     return
   }
