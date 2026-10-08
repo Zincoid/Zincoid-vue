@@ -293,6 +293,9 @@ watch(likeLiked, (liked) => {
         <img v-if="moment.userAvatar" :src="moment.userAvatar" class="detail__avatar" />
         <span v-else class="detail__avatar-placeholder">{{ (moment.userNickname || 'U')[0] }}</span>
         <span class="detail__nickname">{{ moment.userNickname }}</span>
+        <!-- plain span inside the author link (nested anchors would be invalid);
+             the link already goes to the author's profile -->
+        <span v-if="moment.username" class="detail__handle">@{{ moment.username }}</span>
       </router-link>
       <div class="detail__meta">
         <span v-if="moment.isPinned" class="detail__pin-badge">{{ t('moment.pinned') }}</span>
@@ -517,6 +520,8 @@ watch(likeLiked, (liked) => {
 .detail__avatar { width: 44px; height: 44px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); }
 .detail__avatar-placeholder { width: 44px; height: 44px; border-radius: var(--rounded-full); background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: var(--weight-medium); }
 .detail__nickname { font-weight: var(--weight-medium); color: var(--color-text-heading); }
+.detail__handle { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.detail__handle:hover { color: var(--color-primary); }
 .detail__meta { display: flex; align-items: center; gap: var(--spacing-md); }
 .detail__time { font-size: var(--text-sm); color: var(--color-text-secondary); font-family: var(--font-mono); }
 .detail__pin-badge { font-size: var(--text-xs); color: var(--color-primary); background: var(--color-primary-light); padding: 1px 8px; border-radius: var(--rounded-full); font-weight: var(--weight-medium); }

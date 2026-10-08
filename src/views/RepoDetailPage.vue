@@ -661,6 +661,9 @@ async function saveEdit() {
               <img v-if="repo.userAvatar" :src="repo.userAvatar" class="author-avatar" alt="" />
               <span v-else class="author-avatar-placeholder">{{ (repo.userNickname || 'U')[0] }}</span>
               <span class="author-nickname">{{ repo.userNickname }}</span>
+              <!-- plain span inside the author link (nested anchors would be invalid);
+                   the link already goes to the author's profile -->
+              <span v-if="repo.username" class="author-handle">@{{ repo.username }}</span>
             </router-link>
             <div class="repo-meta__right">
               <span class="repo-date">{{ formatDate(repo.createdAt) }}<template v-if="relUpdate"> · {{ relUpdate }}</template></span>
@@ -1131,6 +1134,8 @@ async function saveEdit() {
 .author-avatar { width: 44px; height: 44px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); }
 .author-avatar-placeholder { width: 44px; height: 44px; border-radius: var(--rounded-full); background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: var(--weight-medium); }
 .author-nickname { font-weight: var(--weight-medium); color: var(--color-text-heading); }
+.author-handle { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.author-handle:hover { color: var(--color-primary); }
 .repo-date { font-family: var(--font-mono); }
 
 .repo-actions { display: flex; gap: var(--spacing-sm); align-items: center; }

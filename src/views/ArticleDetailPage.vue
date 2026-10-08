@@ -311,6 +311,9 @@ watch(likeLiked, (liked) => {
           <img v-if="article.userAvatar" :src="article.userAvatar" class="author-avatar" alt="" />
           <span v-else class="author-avatar-placeholder">{{ (article.userNickname || 'U')[0] }}</span>
           <span class="author-nickname">{{ article.userNickname }}</span>
+          <!-- plain span inside the author link (nested anchors would be invalid);
+               the link already goes to the author's profile -->
+          <span v-if="article.username" class="author-handle">@{{ article.username }}</span>
         </router-link>
         <div class="article-meta__right">
           <span class="article-date">{{ formatDate(article.createdAt) }}</span>
@@ -413,6 +416,8 @@ watch(likeLiked, (liked) => {
 .author-avatar { width: 44px; height: 44px; border-radius: var(--rounded-full); object-fit: cover; border: 2px solid var(--color-border); }
 .author-avatar-placeholder { width: 44px; height: 44px; border-radius: var(--rounded-full); background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: var(--weight-medium); }
 .author-nickname { font-weight: var(--weight-medium); color: var(--color-text-heading); }
+.author-handle { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-text-secondary); }
+.author-handle:hover { color: var(--color-primary); }
 .article-date { font-family: var(--font-mono); }
 
 .article-cover { margin-bottom: var(--spacing-2xl); border-radius: var(--rounded-lg); overflow: hidden; }
