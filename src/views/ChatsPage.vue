@@ -223,6 +223,13 @@ async function handleDelete(msg) {
   } catch (e) { /* ignore */ }
 }
 
+// the hover @ button: type a complete @mention into the composer and focus it
+// (trailing space keeps the mention dropdown from opening on the finished name)
+function mentionUser(msg) {
+  if (!msg.username) return
+  insertAtCursor(chatTextarea.value, '@' + msg.username + ' ')
+}
+
 function openPreview(src) {
   previewSrc.value = src
   previewOpen.value = true
@@ -249,8 +256,8 @@ function openPreview(src) {
           <div class="chat-msg__body">
             <div class="chat-msg__meta">
               <span class="chat-msg__author">{{ msg.userNickname }}</span>
+              <router-link v-if="msg.username" :to="`/members/@${msg.username}`" class="chat-msg__handle">@{{ msg.username }}</router-link>
               <span class="chat-msg__time">{{ formatDate(msg.createdAt) }}</span>
-              <button v-if="canDelete(msg)" class="chat-msg__delete" @click="handleDelete(msg)" :title="t('common.delete')">&times;</button>
             </div>
             <div v-if="msg.content" class="chat-msg__content">
               <template v-for="(part, i) in msg.parsedContent" :key="i">
@@ -304,6 +311,23 @@ function openPreview(src) {
                 {{ t('common.download') }}
               </a>
             </div>
+            <!-- hover actions: outside the bubble on its outer side, bottom-
+                 anchored — right of the bubble for others' messages (and the @
+                 mention next to delete), left for mine -->
+            <div class="chat-msg__actions">
+              <button
+                v-if="msg.username && auth.user?.id !== msg.userId"
+                class="chat-msg__action chat-msg__action--at"
+                :title="t('chat.mentionTitle')"
+                @click="mentionUser(msg)"
+              ><SvgIcon name="at" :size="14" /></button>
+              <button
+                v-if="canDelete(msg)"
+                class="chat-msg__action chat-msg__action--delete"
+                :title="t('common.delete')"
+                @click="handleDelete(msg)"
+              ><SvgIcon name="trash" :size="14" /></button>
+            </div>
           </div>
         </div>
       </template>
@@ -312,9 +336,6 @@ function openPreview(src) {
     <div class="chat-dock">
       <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
         <div class="chat-input__row">
-          <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </button>
           <div class="chat-input__field">
             <textarea
               ref="chatTextarea"
@@ -353,6 +374,9 @@ function openPreview(src) {
             :pos="mention.mentionPos"
             @select="(username) => mention.insert(chatTextarea, username)"
           />
+          <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
           <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
             <SvgIcon name="send" :size="18" />
           </button>
@@ -481,26 +505,59 @@ function openPreview(src) {
   color: var(--color-primary);
 }
 .chat-msg--mine .chat-msg__author { color: #db2777; }
+.chat-msg__handle {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+}
+.chat-msg__handle:hover {
+  color: var(--color-primary);
+}
 .chat-msg__time {
   font-size: 10px;
   color: var(--color-text-tertiary, #999);
   letter-spacing: .02em;
 }
 
-.chat-msg__delete {
-  margin-left: auto;
-  font-size: 14px;
-  color: var(--color-text-tertiary, #999);
-  padding: 0 4px;
-  line-height: 1;
-  border-radius: var(--rounded-sm);
+/* hover actions: outside the bubble on its outer side, bottom-anchored —
+   right of the bubble for others' messages, left for mine */
+.chat-msg__actions {
+  position: absolute;
+  bottom: 0;
+  left: 100%;
+  margin-left: var(--spacing-xs);
+  display: flex;
+  gap: var(--spacing-xxs);
   opacity: 0;
-  transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
+  transition: opacity var(--transition-fast);
 }
-.chat-msg:hover .chat-msg__delete {
+.chat-msg--mine .chat-msg__actions {
+  left: auto;
+  right: 100%;
+  margin-left: 0;
+  margin-right: var(--spacing-xs);
+}
+.chat-msg:hover .chat-msg__actions {
   opacity: 1;
 }
-.chat-msg__delete:hover {
+.chat-msg__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  min-width: 22px;
+  padding: 0 2px;
+  border-radius: var(--rounded-sm);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-text-tertiary, #999);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.chat-msg__action:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.chat-msg__action--delete:hover {
   color: var(--color-danger);
   background: var(--color-danger-bg);
 }
