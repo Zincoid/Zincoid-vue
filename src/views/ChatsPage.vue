@@ -354,7 +354,7 @@ function openPreview(src) {
             @select="(username) => mention.insert(chatTextarea, username)"
           />
           <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
-            <SvgIcon name="send" :size="16" />
+            <SvgIcon name="send" :size="18" />
           </button>
         </div>
       </div>

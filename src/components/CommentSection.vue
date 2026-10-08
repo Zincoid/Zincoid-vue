@@ -293,7 +293,7 @@ const visibleComments = computed(() => {
             :aria-label="t('comment.send')"
             @click="handleSubmit"
           >
-            <SvgIcon name="send" :size="17" />
+            <SvgIcon name="send" :size="19" />
           </button>
         </div>
       </div>
