@@ -5,7 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
 import { useMention } from '@/composables/useMention'
-import { useToast } from '@/composables/useToast'
+import { useFileDrop } from '@/composables/useFileDrop'
 import { parseMentions } from '@/composables/useMentionLink'
 import { chatAPI, fileAPI, configAPI } from '@/api'
 import { formatDate } from '@/utils/format'
@@ -13,13 +13,13 @@ import MediaViewer from '@/components/MediaViewer.vue'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import FileDropOverlay from '@/components/FileDropOverlay.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
 const auth = useAuthStore()
 const mention = useMention()
 const { confirm } = useConfirm()
-const { toast } = useToast()
 
 const messages = ref([])
 const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedContent: parseMentions(m.content) })))
@@ -94,10 +94,6 @@ onMounted(async () => {
   startPoll()
   window.addEventListener('scroll', onChatScroll, { passive: true })
   window.addEventListener('resize', updateAtBottom)
-  window.addEventListener('dragenter', onDragEnter)
-  window.addEventListener('dragover', onDragOver)
-  window.addEventListener('dragleave', onDragLeave)
-  window.addEventListener('drop', onDrop)
   nextTick(updateAtBottom)
 })
 
@@ -105,10 +101,6 @@ onUnmounted(() => {
   stopPoll()
   window.removeEventListener('scroll', onChatScroll)
   window.removeEventListener('resize', updateAtBottom)
-  window.removeEventListener('dragenter', onDragEnter)
-  window.removeEventListener('dragover', onDragOver)
-  window.removeEventListener('dragleave', onDragLeave)
-  window.removeEventListener('drop', onDrop)
 })
 
 async function fetchMessages() {
@@ -184,41 +176,11 @@ function onFileChange(e) {
   if (f) uploadFile.value = f
 }
 
-// drag & drop attach — listened on window so drops on the page margins (outside
-// the .container) work too; depth counter absorbs enter/leave churn over children
-const dragOver = ref(false)
-let dragDepth = 0
-
-function onDragEnter(e) {
-  if (!auth.isLoggedIn) return
-  if (!e.dataTransfer?.types?.includes?.('Files')) return
-  dragDepth++
-  dragOver.value = true
-}
-
-function onDragLeave() {
-  if (!dragOver.value) return
-  dragDepth = Math.max(0, dragDepth - 1)
-  if (dragDepth === 0) dragOver.value = false
-}
-
-function onDragOver(e) {
-  // cancel the default so the browser doesn't navigate to the dropped file
-  e.preventDefault()
-}
-
-function onDrop(e) {
-  e.preventDefault()
-  dragDepth = 0
-  dragOver.value = false
-  if (!auth.isLoggedIn) return
-  const file = Array.from(e.dataTransfer?.files || []).find((f) => /^(image|video|audio)\//.test(f.type))
-  if (!file) {
-    toast(t('chat.dropUnsupported'), 'error')
-    return
-  }
-  uploadFile.value = file
-}
+// drag & drop attach — one file per message, same as the file picker
+const { dragOver } = useFileDrop({
+  enabled: () => auth.isLoggedIn,
+  onFiles: (files) => { uploadFile.value = files[0] }
+})
 
 function isImage(path) {
   return /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(path)
@@ -395,12 +357,7 @@ function openPreview(src) {
 
     <!-- drag & drop hint (window-level handlers; pointer-events: none so the
          drop still reaches them) -->
-    <div v-if="dragOver" class="chat-drop-overlay" aria-hidden="true">
-      <div class="chat-drop-overlay__hint">
-        <SvgIcon name="attach" :size="18" />
-        {{ t('chat.dropHint') }}
-      </div>
-    </div>
+    <FileDropOverlay :visible="dragOver" />
 
     <MediaViewer :visible="previewOpen" :src="previewSrc" @close="previewOpen = false; previewSrc = null" />
   </div>
@@ -875,33 +832,4 @@ function openPreview(src) {
   text-decoration: underline;
 }
 
-/* ── Drag & drop attach ── */
-.chat-drop-overlay {
-  /* below the navbar and the dock, above page content; pointer-events: none
-     so the drop lands on the window handlers underneath */
-  position: fixed;
-  top: var(--navbar-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
-  border: 2px dashed color-mix(in srgb, var(--color-primary) 45%, transparent);
-}
-.chat-drop-overlay__hint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--rounded-full);
-  /* glass, same material as the dock */
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
-  color: var(--color-text-heading);
-  font-size: var(--text-sm);
-}
 </style>

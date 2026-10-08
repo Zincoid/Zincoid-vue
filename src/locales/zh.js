@@ -681,8 +681,6 @@ export default {
     placeholder: '输入消息，@ 提及用户...',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
-    dropHint: '松开以添加附件',
-    dropUnsupported: '仅支持图片、视频和音频文件',
     fileUnavailable: '资源已失效'
   },
   notification: {
@@ -785,6 +783,8 @@ export default {
     uploading: '上传中...',
     uploadFailed: '上传失败: 文件大小可能超出限制',
     addImage: '添加图片',
+    dropHint: '松开以添加附件',
+    dropUnsupported: '仅支持图片、视频和音频文件',
     mdPlaceholder: '用 Markdown 编写...',
     website: '网站',
     email: '邮箱',

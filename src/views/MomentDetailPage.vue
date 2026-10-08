@@ -8,6 +8,7 @@ import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
 import { useMention } from '@/composables/useMention'
 import { useConfirm } from '@/composables/useConfirm'
+import { useFileDrop } from '@/composables/useFileDrop'
 import { parseMentions } from '@/composables/useMentionLink'
 import { momentAPI, commentAPI, likeAPI, fileAPI } from '@/api'
 import CommentSection from '@/components/CommentSection.vue'
@@ -20,6 +21,7 @@ import MentionDropdown from '@/components/MentionDropdown.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import UploadProgress from '@/components/UploadProgress.vue'
+import FileDropOverlay from '@/components/FileDropOverlay.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
@@ -93,19 +95,33 @@ function cancelEdit() {
   editing.value = false
 }
 
-function handleEditUpload(e) {
-  const file = e.target.files[0]
-  if (!file) return
+function addEditFile(file) {
   if (editKeepImages.value.length + editNewFiles.value.length >= 9) {
     toast(t('moment.maxAttachments'), 'error')
-    e.target.value = ''
-    return
+    return false
   }
   editNewFiles.value.push(file)
   const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'image'
   editNewPreviews.value.push({ url: URL.createObjectURL(file), type })
+  return true
+}
+
+function handleEditUpload(e) {
+  const file = e.target.files[0]
+  if (file) addEditFile(file)
   e.target.value = ''
 }
+
+// drag & drop attach — active while the edit form is open; a drop can carry
+// several files, all of them are appended up to the 9-attachment limit
+const { dragOver } = useFileDrop({
+  enabled: () => editing.value,
+  onFiles: (files) => {
+    for (const f of files) {
+      if (!addEditFile(f)) break
+    }
+  }
+})
 
 function removeKeepImage(i) {
   editKeepImages.value.splice(i, 1)
@@ -474,6 +490,8 @@ watch(likeLiked, (liked) => {
   <p v-if="loadingDone && !moment" class="empty-state">{{ notFoundReason === 'private' ? t('moment.private') : t('moment.notFound') }}</p>
 
   <MediaViewer :src="viewerSrc" :visible="viewerVisible" @close="viewerVisible = false" />
+
+  <FileDropOverlay :visible="dragOver" />
 
   <FabContainer>
     <div v-if="!editing" class="like-fab">

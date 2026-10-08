@@ -681,8 +681,6 @@ export default {
     placeholder: 'Type a message, @ to mention...',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
-    dropHint: 'Drop to attach',
-    dropUnsupported: 'Only image, video and audio files are supported',
     fileUnavailable: 'File no longer available'
   },
   notification: {
@@ -787,6 +785,8 @@ export default {
     uploading: 'Uploading...',
     uploadFailed: 'Upload failed: File may exceed size limit',
     addImage: 'Add Image',
+    dropHint: 'Drop to attach',
+    dropUnsupported: 'Only image, video and audio files are supported',
     mdPlaceholder: 'Write in Markdown...',
     website: 'Website',
     email: 'Email',

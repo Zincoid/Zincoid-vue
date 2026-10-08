@@ -7,6 +7,7 @@ import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
 import { useMention } from '@/composables/useMention'
+import { useFileDrop } from '@/composables/useFileDrop'
 import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -15,6 +16,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import UploadProgress from '@/components/UploadProgress.vue'
 import FabContainer from '@/components/FabContainer.vue'
+import FileDropOverlay from '@/components/FileDropOverlay.vue'
 
 const { t } = useI18n()
 const { getMessage } = useError()
@@ -78,19 +80,33 @@ function onMomentInput(e) {
   mention.onInput(e.target)
 }
 
-function handleUpload(e) {
-  const file = e.target.files[0]
-  if (!file) return
+function addImageFile(file) {
   if (newImageFiles.value.length >= 9) {
     toast(t('moment.maxAttachments'), 'error')
-    e.target.value = ''
-    return
+    return false
   }
   newImageFiles.value.push(file)
   const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : 'image'
   newImagePreviews.value.push({ url: URL.createObjectURL(file), type })
+  return true
+}
+
+function handleUpload(e) {
+  const file = e.target.files[0]
+  if (file) addImageFile(file)
   e.target.value = ''
 }
+
+// drag & drop attach — active while the post form is open; a drop can carry
+// several files, all of them are appended up to the 9-attachment limit
+const { dragOver } = useFileDrop({
+  enabled: () => showEditor.value,
+  onFiles: (files) => {
+    for (const f of files) {
+      if (!addImageFile(f)) break
+    }
+  }
+})
 
 function removeImage(i) {
   newImageFiles.value.splice(i, 1)
@@ -267,6 +283,8 @@ async function submitMoment() {
       <SvgIcon :name="pinnedFirst ? 'pin-off' : 'pin'" :size="20" />
     </button>
   </FabContainer>
+
+  <FileDropOverlay :visible="dragOver" />
 </template>
 
 <style scoped>
