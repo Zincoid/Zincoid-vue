@@ -122,7 +122,9 @@ export default {
     loginHint: '登录后即可评论。',
     replyTo: '回复',
     postFailed: '评论失败',
-    deleteFailed: '删除评论失败'
+    deleteFailed: '删除评论失败',
+    emojiTitle: '插入表情',
+    mentionTitle: '提及用户'
   },
   personal: {
     pageTitle: '个人中心',

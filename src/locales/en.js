@@ -122,7 +122,9 @@ export default {
     loginHint: 'Log in to leave a comment.',
     replyTo: 'Reply to',
     postFailed: 'Failed to comment',
-    deleteFailed: 'Failed to delete comment'
+    deleteFailed: 'Failed to delete comment',
+    emojiTitle: 'Insert emoji',
+    mentionTitle: 'Mention a user'
   },
   personal: {
     pageTitle: 'Personal',

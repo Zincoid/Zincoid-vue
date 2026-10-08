@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useMention } from '@/composables/useMention'
@@ -7,6 +7,7 @@ import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
 import { commentAPI } from '@/api'
 import MentionDropdown from '@/components/MentionDropdown.vue'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -29,6 +30,51 @@ function onCommentInput(e) {
   content.value = e.target.value
   mention.onInput(e.target)
 }
+
+// ── composer tools (emoji picker + @ mention) ──
+const emojiOpen = ref(false)
+const EMOJIS = [
+  '😀', '😄', '😂', '🤣', '😊', '😍', '😘', '😜',
+  '🤔', '😅', '😭', '🥺', '😏', '😉', '😎', '🥳',
+  '🤗', '😴', '👍', '👏', '🙏', '💪', '❤️', '🔥',
+  '✨', '🎉', '💡', '⭐', '🚀', '🌱', '☕', '🎵'
+]
+
+// same write-then-dispatch pattern as useMention's insert
+function insertAtCursor(text) {
+  const ta = commentTextarea.value
+  if (!ta) return
+  const start = ta.selectionStart ?? ta.value.length
+  const end = ta.selectionEnd ?? start
+  ta.value = ta.value.slice(0, start) + text + ta.value.slice(end)
+  const pos = start + text.length
+  ta.setSelectionRange(pos, pos)
+  ta.focus()
+  ta.dispatchEvent(new Event('input', { bubbles: true }))
+}
+
+function insertEmoji(emoji) {
+  emojiOpen.value = false
+  insertAtCursor(emoji)
+}
+
+function insertMentionChar() {
+  insertAtCursor('@')
+  nextTick(() => mention.onInput(commentTextarea.value))
+}
+
+function onEsc() {
+  mention.close()
+  emojiOpen.value = false
+}
+
+function onDocPointerDown(e) {
+  if (!emojiOpen.value) return
+  if (e.target.closest?.('.comments__emoji-panel, .comments__tool--emoji')) return
+  emojiOpen.value = false
+}
+onMounted(() => document.addEventListener('pointerdown', onDocPointerDown))
+onUnmounted(() => document.removeEventListener('pointerdown', onDocPointerDown))
 
 function handleSubmit() {
   if (!content.value.trim()) return
@@ -204,28 +250,65 @@ const visibleComments = computed(() => {
         {{ t('comment.replyingTo') }} <strong>{{ replyTo.userNickname }}</strong>
         <button class="comments__cancel-reply" @click="cancelReply">{{ t('comment.cancel') }}</button>
       </p>
-      <div class="comments__row">
+      <div class="comments__frame">
         <textarea
           ref="commentTextarea"
           :value="content"
           class="comments__input"
           :placeholder="replyTo ? t('comment.replyPlaceholder') : t('comment.placeholder')"
-          rows="3"
+          rows="2"
           @input="onCommentInput"
-          @keydown.esc="mention.close()"
+          @keydown.esc="onEsc"
         ></textarea>
         <MentionDropdown
           :suggestions="mention.suggestions"
           :pos="mention.mentionPos"
           @select="(username) => mention.insert(commentTextarea, username)"
         />
-        <button
-          class="btn btn--primary"
-          :disabled="!content.trim() || submitting"
-          @click="handleSubmit"
-        >
-          {{ t('comment.send') }}
-        </button>
+
+        <!-- small emoji popover above the composer bar -->
+        <div v-if="emojiOpen" class="comments__emoji-panel">
+          <button
+            v-for="emoji in EMOJIS"
+            :key="emoji"
+            type="button"
+            class="comments__emoji-item"
+            @click="insertEmoji(emoji)"
+          >{{ emoji }}</button>
+        </div>
+
+        <!-- tools + send clustered bottom-right -->
+        <div class="comments__bar">
+          <button
+            type="button"
+            class="comments__tool comments__tool--emoji"
+            :class="{ 'comments__tool--active': emojiOpen }"
+            :title="t('comment.emojiTitle')"
+            :aria-label="t('comment.emojiTitle')"
+            @click="emojiOpen = !emojiOpen"
+          >
+            <SvgIcon name="smile" :size="18" />
+          </button>
+          <button
+            type="button"
+            class="comments__tool"
+            :title="t('comment.mentionTitle')"
+            :aria-label="t('comment.mentionTitle')"
+            @click="insertMentionChar"
+          >
+            <SvgIcon name="at" :size="18" />
+          </button>
+          <button
+            type="button"
+            class="comments__send"
+            :disabled="!content.trim() || submitting"
+            :title="t('comment.send')"
+            :aria-label="t('comment.send')"
+            @click="handleSubmit"
+          >
+            <SvgIcon name="send" :size="17" />
+          </button>
+        </div>
       </div>
     </div>
     <p v-else class="comments__login-hint">
@@ -404,32 +487,118 @@ const visibleComments = computed(() => {
   text-decoration: underline;
 }
 
-.comments__row {
-  display: flex;
+/* ── composer: framed textarea with tools + send clustered bottom-right ── */
+.comments__frame {
   position: relative;
-  gap: var(--spacing-sm);
-  align-items: stretch;
-}
-.comments__input {
-  flex: 1;
-  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--rounded-md);
+  border-radius: var(--rounded-lg);
+  background: var(--color-surface);
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+  transition: border-color var(--transition-fast);
+}
+.comments__frame:focus-within {
+  border-color: var(--color-primary);
+}
+
+.comments__input {
+  display: block;
+  width: 100%;
+  min-height: 84px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-  background: var(--color-surface);
-  color: var(--color-text);
   resize: none;
-  height: 72px;
-  transition: border-color var(--transition-fast);
+  scrollbar-width: none; /* firefox */
+  -ms-overflow-style: none;
+}
+.comments__input::-webkit-scrollbar {
+  display: none;
 }
 .comments__input:focus {
   outline: none;
-  border-color: var(--color-primary);
 }
-.comments__row .btn {
-  flex-shrink: 0;
-  align-self: stretch;
+.comments__input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.comments__bar {
+  position: absolute;
+  right: var(--spacing-sm);
+  bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  padding: 2px;
+  /* translucent chip so text scrolled under the cluster fades out softly */
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border-radius: var(--rounded-lg);
+}
+.comments__tool {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-lg);
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.comments__tool:hover,
+.comments__tool--active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.comments__send {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-lg);
+  background: var(--color-primary);
+  color: var(--color-white);
+  margin-left: var(--spacing-xs);
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+.comments__send:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+.comments__send:disabled {
+  background: var(--color-border);
+  color: var(--color-text-tertiary);
+  cursor: default;
+}
+
+.comments__emoji-panel {
+  position: absolute;
+  right: var(--spacing-sm);
+  bottom: 48px;
+  display: grid;
+  grid-template-columns: repeat(8, 30px);
+  gap: 2px;
+  padding: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  z-index: 10;
+}
+.comments__emoji-item {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-sm);
+  font-size: 17px;
+  line-height: 1;
+  transition: background var(--transition-fast);
+}
+.comments__emoji-item:hover {
+  background: var(--color-primary-light);
 }
 
 .comments__login-hint {
