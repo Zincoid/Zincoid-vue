@@ -677,7 +677,7 @@ export default {
   },
   chat: {
     title: '聊天',
-    subtitle: '与用户或AI对话（@ai）',
+    subtitle: '与用户或智能体对话（@ai）',
     placeholder: '输入消息，@ 提及用户...',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',

@@ -677,7 +677,7 @@ export default {
   },
   chat: {
     title: 'Chats',
-    subtitle: 'Chat with users or ai (@ai)',
+    subtitle: 'Chat with users or the agent (@ai)',
     placeholder: 'Type a message, @ to mention...',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
