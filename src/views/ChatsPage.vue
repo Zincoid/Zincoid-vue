@@ -440,9 +440,10 @@ function openPreview(src) {
 /* ── Message bubble ── */
 
 .chat-msg {
+  /* full-width band so hover reaches the whole row — the bubble itself is
+     capped by max-width on .chat-msg__body */
   display: flex;
   gap: var(--spacing-sm);
-  max-width: 75%;
   animation: fadeInUp 0.25s ease;
 }
 
@@ -452,7 +453,6 @@ function openPreview(src) {
 }
 
 .chat-msg--mine {
-  align-self: flex-end;
   flex-direction: row-reverse;
 }
 
@@ -487,6 +487,7 @@ function openPreview(src) {
   border-radius: var(--rounded-lg);
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 0;
+  max-width: 75%;
   position: relative;
 }
 .chat-msg--mine .chat-msg__body {
