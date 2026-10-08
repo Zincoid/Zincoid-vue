@@ -681,6 +681,7 @@ export default {
     title: '聊天',
     subtitle: '与用户或智能体对话（@ai）',
     placeholder: '输入消息，@ 提及用户...',
+    mentionTitle: '提及用户',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
     fileUnavailable: '资源已失效'

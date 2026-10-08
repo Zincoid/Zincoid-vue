@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
 import { useError } from '@/composables/useError'
-import { useMention } from '@/composables/useMention'
+import { useMention, insertAtCursor } from '@/composables/useMention'
 import { useFileDrop } from '@/composables/useFileDrop'
 import { parseMentions } from '@/composables/useMentionLink'
 import { chatAPI, fileAPI, configAPI } from '@/api'
@@ -171,6 +171,12 @@ function onChatInput(e) {
   mention.onInput(e.target)
 }
 
+// the @ tool button: type an @ at the caret so the mention dropdown opens
+function insertMentionChar() {
+  insertAtCursor(chatTextarea.value, '@')
+  nextTick(() => mention.onInput(chatTextarea.value))
+}
+
 function onFileChange(e) {
   const f = e.target.files?.[0]
   if (f) uploadFile.value = f
@@ -309,10 +315,6 @@ function openPreview(src) {
           <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </button>
-          <label class="chat-input__file-btn" :class="{ 'chat-input__file-btn--disabled': uploading }">
-            <SvgIcon name="attach" :size="18" />
-            <input type="file" @change="onFileChange" accept="image/*,video/*,audio/*" />
-          </label>
           <div class="chat-input__field">
             <textarea
               ref="chatTextarea"
@@ -328,6 +330,22 @@ function openPreview(src) {
               <SvgIcon name="attach" :size="12" />
               <span class="chat-input__file-name">{{ uploadFile.name }}</span>
               <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
+            </div>
+            <!-- attach + @ tools: inside the pill on the right (comment composer style) -->
+            <div class="chat-input__tools">
+              <label class="chat-input__tool" :class="{ 'chat-input__tool--disabled': uploading }">
+                <SvgIcon name="attach" :size="18" />
+                <input type="file" @change="onFileChange" accept="image/*,video/*,audio/*" />
+              </label>
+              <button
+                type="button"
+                class="chat-input__tool"
+                :title="t('chat.mentionTitle')"
+                :aria-label="t('chat.mentionTitle')"
+                @click="insertMentionChar"
+              >
+                <SvgIcon name="at" :size="18" />
+              </button>
             </div>
           </div>
           <MentionDropdown
@@ -628,7 +646,7 @@ function openPreview(src) {
   gap: var(--spacing-xs);
   flex-shrink: 1;
   min-width: 0;
-  max-width: 55%;
+  max-width: 45%;
   font-size: var(--text-xs);
   background: var(--color-primary-light);
   color: var(--color-primary);
@@ -687,27 +705,31 @@ function openPreview(src) {
   background: rgba(249, 168, 212, 0.15);
 }
 
-.chat-input__file-btn {
+/* attach + @ tools: flat icon buttons inside the pill on the right —
+   same visual language as the comment composer tools */
+.chat-input__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  flex-shrink: 0;
+}
+.chat-input__tool {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-full);
   color: var(--color-text-secondary);
   cursor: pointer;
-  border-radius: var(--rounded-full);
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border-light);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
-.chat-input__file-btn:hover {
-  color: var(--color-card-hover);
-  border-color: var(--color-card-hover);
-  background: rgba(249, 168, 212, 0.08);
+.chat-input__tool:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
-.chat-input__file-btn--disabled { opacity: 0.4; pointer-events: none; }
-.chat-input__file-btn input { display: none; }
+.chat-input__tool--disabled { opacity: 0.4; pointer-events: none; }
+.chat-input__tool input { display: none; }
 
 /* the pill chrome lives on the field wrapper so the attachment chip can sit
    inside the box, right of the text */

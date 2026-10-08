@@ -108,3 +108,20 @@ export function useMention() {
 
   return reactive({ suggestions, mentionActive, mentionPos, onInput, insert, close })
 }
+
+/**
+ * Insert plain text at the caret of a textarea, keeping the caret after it.
+ * Same write-then-dispatch pattern as useMention().insert so the controlled
+ * `:value` binding picks the change up. Used by the chat / comment tool
+ * buttons (e.g. typing an @ to open the mention dropdown).
+ */
+export function insertAtCursor(textarea, text) {
+  if (!textarea) return
+  const start = textarea.selectionStart ?? textarea.value.length
+  const end = textarea.selectionEnd ?? start
+  textarea.value = textarea.value.slice(0, start) + text + textarea.value.slice(end)
+  const pos = start + text.length
+  textarea.setSelectionRange(pos, pos)
+  textarea.focus()
+  textarea.dispatchEvent(new Event('input', { bubbles: true }))
+}

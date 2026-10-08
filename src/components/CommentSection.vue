@@ -2,7 +2,7 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
-import { useMention } from '@/composables/useMention'
+import { useMention, insertAtCursor } from '@/composables/useMention'
 import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
 import { commentAPI } from '@/api'
@@ -40,26 +40,13 @@ const EMOJIS = [
   '✨', '🎉', '💡', '⭐', '🚀', '🌱', '☕', '🎵'
 ]
 
-// same write-then-dispatch pattern as useMention's insert
-function insertAtCursor(text) {
-  const ta = commentTextarea.value
-  if (!ta) return
-  const start = ta.selectionStart ?? ta.value.length
-  const end = ta.selectionEnd ?? start
-  ta.value = ta.value.slice(0, start) + text + ta.value.slice(end)
-  const pos = start + text.length
-  ta.setSelectionRange(pos, pos)
-  ta.focus()
-  ta.dispatchEvent(new Event('input', { bubbles: true }))
-}
-
 function insertEmoji(emoji) {
   emojiOpen.value = false
-  insertAtCursor(emoji)
+  insertAtCursor(commentTextarea.value, emoji)
 }
 
 function insertMentionChar() {
-  insertAtCursor('@')
+  insertAtCursor(commentTextarea.value, '@')
   nextTick(() => mention.onInput(commentTextarea.value))
 }
 
