@@ -123,8 +123,8 @@ export default {
     replyTo: 'Reply to',
     postFailed: 'Failed to comment',
     deleteFailed: 'Failed to delete comment',
-    emojiTitle: 'Insert emoji',
-    mentionTitle: 'Mention a user'
+    emojiTitle: 'Emoji',
+    mentionTitle: 'Mention'
   },
   personal: {
     pageTitle: 'Personal',
