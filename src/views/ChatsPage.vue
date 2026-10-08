@@ -369,7 +369,7 @@ function openPreview(src) {
 }
 
 .chat-msg__body {
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
   border-radius: var(--rounded-lg);
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 0;
