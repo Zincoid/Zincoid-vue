@@ -134,8 +134,11 @@ onUnmounted(() => {
             <span v-else>{{ (b.c.userNickname || 'U')[0] }}</span>
           </span>
           <span class="recent-comments__nick">{{ b.c.userNickname }}</span>
-          <span v-if="b.c.parentUsername" class="recent-comments__reply">@{{ b.c.parentUsername }}</span>
+          <!-- plain span, not a link: the whole bullet is already a router-link
+               (nested anchors would be invalid) -->
+          <span v-if="b.c.username" class="recent-comments__handle">@{{ b.c.username }}</span>
           <span class="recent-comments__sep">：</span>
+          <span v-if="b.c.parentUsername" class="recent-comments__reply">@{{ b.c.parentUsername }}</span>
           <span class="recent-comments__text">{{ b.c.content }}</span>
         </component>
       </div>
@@ -242,6 +245,12 @@ a.recent-comments__item:hover {
   max-width: 9em;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+.recent-comments__handle {
+  /* same size as the reply-target @text — inherits --text-sm from the item */
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
   flex-shrink: 0;
 }
 .recent-comments__reply {

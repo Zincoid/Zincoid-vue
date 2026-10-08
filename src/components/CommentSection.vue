@@ -199,6 +199,7 @@ const visibleComments = computed(() => {
             <div class="comment__body">
               <div class="comment__header">
                 <span class="comment__author">{{ comment.userNickname }}</span>
+                <router-link v-if="comment.username" :to="`/members/@${comment.username}`" class="comment__handle">@{{ comment.username }}</router-link>
                 <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
               </div>
               <p v-if="comment.parentNickname" class="comment__reply-to">{{ t('comment.replyTo') }} <span class="comment__reply-target">@{{ comment.parentNickname }}</span></p>
@@ -407,6 +408,16 @@ const visibleComments = computed(() => {
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   color: var(--color-text-heading);
+}
+
+.comment__handle {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+.comment__handle:hover {
+  color: var(--color-primary);
 }
 
 .comment__time {
