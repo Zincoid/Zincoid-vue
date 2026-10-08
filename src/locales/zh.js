@@ -682,7 +682,8 @@ export default {
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
     dropHint: '松开以添加附件',
-    dropUnsupported: '仅支持图片、视频和音频文件'
+    dropUnsupported: '仅支持图片、视频和音频文件',
+    fileUnavailable: '资源已失效'
   },
   notification: {
     title: '通知',

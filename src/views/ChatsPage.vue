@@ -232,6 +232,17 @@ function isAudio(path) {
   return /\.(mp3|wav|aac|flac|ogg)(\?|$)/i.test(path)
 }
 
+// Dead media: a message's file can be a shadow reference to a file owned by
+// other content (AI messages), and the original owner deleting/editing that
+// content removes the disk file — the URL then 404s. Keyed by URL so every
+// message sharing the dead file flips together. Replace-on-write for reactivity.
+const mediaBroken = ref(new Set())
+
+function markMediaBroken(url) {
+  if (mediaBroken.value.has(url)) return
+  mediaBroken.value = new Set(mediaBroken.value).add(url)
+}
+
 function canDelete(msg) {
   return auth.isLoggedIn && (auth.user?.id === msg.userId || auth.isAdmin)
 }
@@ -280,11 +291,16 @@ function openPreview(src) {
               </template>
             </div>
             <div v-if="msg.file" class="chat-msg__file">
+              <div v-if="mediaBroken.has(msg.file)" class="chat-msg__file-broken">
+                <SvgIcon name="attach" :size="14" />
+                <span>{{ t('chat.fileUnavailable') }}</span>
+              </div>
               <img
-                v-if="isImage(msg.file)"
+                v-else-if="isImage(msg.file)"
                 :src="msg.file"
                 class="chat-msg__img"
                 @click="openPreview(msg.file)"
+                @error="markMediaBroken(msg.file)"
                 alt=""
               />
               <div
@@ -296,6 +312,7 @@ function openPreview(src) {
                   :src="msg.file"
                   preload="metadata"
                   @loadedmetadata="(e) => e.target.currentTime = 1"
+                  @error="markMediaBroken(msg.file)"
                 ></video>
                 <div class="chat-msg__video-play">
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -306,9 +323,14 @@ function openPreview(src) {
                 class="chat-msg__audio"
                 @click="openPreview(msg.file)"
               >
+                <!-- silent probe: the card shows no player, so this is the only
+                     load attempt that can 404 before the user opens the preview -->
+                <audio :src="msg.file" preload="metadata" hidden @error="markMediaBroken(msg.file)"></audio>
                 <SvgIcon name="audio" :size="32" />
                 <span>Audio</span>
               </div>
+              <!-- plain download link: no load attempt to fail, a dead file can
+                   only surface as the browser's 404 after the click -->
               <a v-else :href="msg.file" target="_blank" class="chat-msg__file-link">
                 <SvgIcon name="file" />
                 {{ t('common.download') }}
@@ -594,6 +616,18 @@ function openPreview(src) {
   transition: background var(--transition-fast);
 }
 .chat-msg__file-link:hover { background: var(--color-border-light); }
+
+/* dead media placeholder (shadow-referenced file was deleted upstream) */
+.chat-msg__file-broken {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--rounded-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
 
 /* ── Input area ── */
 

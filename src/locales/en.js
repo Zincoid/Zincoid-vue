@@ -682,7 +682,8 @@ export default {
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
     dropHint: 'Drop to attach',
-    dropUnsupported: 'Only image, video and audio files are supported'
+    dropUnsupported: 'Only image, video and audio files are supported',
+    fileUnavailable: 'File no longer available'
   },
   notification: {
     title: 'Notifications',
