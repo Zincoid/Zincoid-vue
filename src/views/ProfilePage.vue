@@ -107,6 +107,10 @@ async function saveProfile() {
     error.value = t('auth.usernameLength')
     return
   }
+  if (!/^\w+$/.test(profile.value.username)) {
+    error.value = t('auth.usernameFormat')
+    return
+  }
   if (profile.value.contacts) {
     try {
       const obj = JSON.parse(profile.value.contacts)
