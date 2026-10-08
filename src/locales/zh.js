@@ -680,7 +680,9 @@ export default {
     subtitle: '公共聊天',
     placeholder: '输入消息，@ 提及用户...',
     loginHint: '登录后即可参与聊天。',
-    deleteConfirm: '确定删除这条消息？'
+    deleteConfirm: '确定删除这条消息？',
+    dropHint: '松开以添加附件',
+    dropUnsupported: '仅支持图片、视频和音频文件'
   },
   notification: {
     title: '通知',

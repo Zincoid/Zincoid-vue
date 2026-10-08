@@ -680,7 +680,9 @@ export default {
     subtitle: 'Public chat',
     placeholder: 'Type a message, @ to mention...',
     loginHint: 'Log in to join the chat.',
-    deleteConfirm: 'Delete this message?'
+    deleteConfirm: 'Delete this message?',
+    dropHint: 'Drop to attach',
+    dropUnsupported: 'Only image, video and audio files are supported'
   },
   notification: {
     title: 'Notifications',
