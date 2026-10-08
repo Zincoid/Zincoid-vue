@@ -39,7 +39,8 @@ let pollTimer = null
 const pollSize = ref(50)
 
 const lastScrollTop = ref(0)
-const inputOffset = ref(0)
+const inputAway = ref(false)
+let scrollRunway = 0
 
 function startPoll() {
   stopPoll()
@@ -58,12 +59,19 @@ watch(live, (v) => {
 function onChatScroll() {
   const st = window.scrollY
   const delta = st - lastScrollTop.value
-  if (delta < -1) {
-    inputOffset.value = 200
-  } else if (delta > 1) {
-    inputOffset.value = 0
-  }
   lastScrollTop.value = st
+  // accumulate ~24px of travel before flipping the dock — single-pixel wheel
+  // nudges used to retrigger it mid-scroll, and rapid toggling reads jumpy no
+  // matter how smooth the transition itself is
+  if (Math.sign(delta) !== Math.sign(scrollRunway)) scrollRunway = 0
+  scrollRunway += delta
+  if (scrollRunway <= -24) {
+    inputAway.value = true
+    scrollRunway = 0
+  } else if (scrollRunway >= 24) {
+    inputAway.value = false
+    scrollRunway = 0
+  }
 }
 
 onMounted(async () => {
@@ -247,7 +255,7 @@ function openPreview(src) {
       </template>
     </div>
 
-    <div v-if="auth.isLoggedIn" class="chat-input-area" :style="{ transform: `translate(-50%, ${inputOffset}px)` }">
+    <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
       <div v-if="uploadFile" class="chat-input__file-tag">
         <SvgIcon name="attach" :size="12" />
         {{ uploadFile.name }}
@@ -284,7 +292,7 @@ function openPreview(src) {
         </button>
       </div>
     </div>
-    <p v-else class="chat-login-hint" :style="{ transform: `translate(-50%, ${inputOffset}px)` }">
+    <p v-else class="chat-login-hint" :class="{ 'chat-dock--away': inputAway }">
       {{ t('chat.loginHint') }} <router-link to="/login">{{ t('auth.login') }}</router-link>
     </p>
 
@@ -513,12 +521,11 @@ function openPreview(src) {
   max-width: calc(100% - 2 * var(--spacing-xl));
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
-  border-radius: 28px;
+  border-radius: var(--rounded-full);
   z-index: 50;
   padding: var(--spacing-md);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);
-  transition: transform 0.15s ease-out;
 }
 [data-theme="dark"] .chat-input-area {
   background: rgba(26, 29, 39, 0.7);
@@ -673,11 +680,10 @@ function openPreview(src) {
   padding: var(--spacing-md);
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
-  border-radius: 28px;
+  border-radius: var(--rounded-full);
   z-index: 50;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);
-  transition: transform 0.15s ease-out;
 }
 [data-theme="dark"] .chat-login-hint {
   background: rgba(26, 29, 39, 0.7);
@@ -686,6 +692,20 @@ function openPreview(src) {
 .chat-login-hint a {
   color: var(--color-primary);
   font-weight: var(--weight-medium);
+}
+
+/* ── Dock show/hide (input bar + login hint share one motion) ── */
+/* soft slide + fade: long ease-out curve so the dock settles instead of
+   snapping; opacity keeps the travel from reading as a hard-edged slide */
+.chat-input-area,
+.chat-login-hint {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+.chat-input-area.chat-dock--away,
+.chat-login-hint.chat-dock--away {
+  transform: translateX(-50%) translateY(200px);
+  opacity: 0;
+  pointer-events: none;
 }
 .mention-link {
   color: var(--color-primary);
