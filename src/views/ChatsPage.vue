@@ -42,6 +42,13 @@ const lastScrollTop = ref(0)
 const inputAway = ref(false)
 let scrollRunway = 0
 
+const atBottom = ref(true)
+
+function updateAtBottom() {
+  // 60px threshold — the same one pollNew uses to decide auto-scroll
+  atBottom.value = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
+}
+
 function startPoll() {
   stopPoll()
   pollTimer = setInterval(pollNew, 3000)
@@ -72,6 +79,7 @@ function onChatScroll() {
     inputAway.value = false
     scrollRunway = 0
   }
+  updateAtBottom()
 }
 
 onMounted(async () => {
@@ -83,11 +91,14 @@ onMounted(async () => {
   await fetchMessages()
   startPoll()
   window.addEventListener('scroll', onChatScroll, { passive: true })
+  window.addEventListener('resize', updateAtBottom)
+  nextTick(updateAtBottom)
 })
 
 onUnmounted(() => {
   stopPoll()
   window.removeEventListener('scroll', onChatScroll)
+  window.removeEventListener('resize', updateAtBottom)
 })
 
 async function fetchMessages() {
@@ -100,6 +111,7 @@ async function fetchMessages() {
     // ignore
   } finally {
     loading.value = false
+    nextTick(updateAtBottom)
   }
 }
 
@@ -107,6 +119,11 @@ function scrollBottom() {
   nextTick(() => {
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
   })
+}
+
+function onLoadingDone() {
+  loadingDone.value = true
+  nextTick(updateAtBottom)
 }
 
 async function pollNew() {
@@ -117,8 +134,9 @@ async function pollNew() {
     const newMsgs = list.filter(m => !existingIds.has(m.id))
     if (newMsgs.length > 0) {
       messages.value.push(...newMsgs)
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
-      if (atBottom) scrollBottom()
+      const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
+      if (nearBottom) scrollBottom()
+      nextTick(updateAtBottom)
     }
   } catch (e) { /* ignore */ }
 }
@@ -196,7 +214,7 @@ function openPreview(src) {
     </div>
 
     <div class="chat-box" ref="chatEl">
-      <LoadingSpinner :visible="loading" @done="loadingDone = true" />
+      <LoadingSpinner :visible="loading" @done="onLoadingDone" />
       <template v-if="loadingDone">
         <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
@@ -255,46 +273,55 @@ function openPreview(src) {
       </template>
     </div>
 
-    <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
-      <div v-if="uploadFile" class="chat-input__file-tag">
-        <SvgIcon name="attach" :size="12" />
-        {{ uploadFile.name }}
-        <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
+    <div class="chat-dock">
+      <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
+        <div v-if="uploadFile" class="chat-input__file-tag">
+          <SvgIcon name="attach" :size="12" />
+          {{ uploadFile.name }}
+          <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
+        </div>
+        <div class="chat-input__row">
+          <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </button>
+          <label class="chat-input__file-btn" :class="{ 'chat-input__file-btn--disabled': uploading }">
+            <SvgIcon name="attach" :size="18" />
+            <input type="file" @change="onFileChange" accept="image/*,video/*" />
+          </label>
+          <textarea
+            ref="chatTextarea"
+            :value="content"
+            class="chat-input__textarea"
+            :placeholder="t('chat.placeholder')"
+            rows="2"
+            @input="onChatInput"
+            @keydown.esc="mention.close()"
+            @keydown.enter.exact.prevent="handleSend"
+          ></textarea>
+          <MentionDropdown
+            :suggestions="mention.suggestions"
+            :pos="mention.mentionPos"
+            @select="(username) => mention.insert(chatTextarea, username)"
+          />
+          <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
+            <SvgIcon name="send" :size="16" />
+          </button>
+        </div>
       </div>
-      <div class="chat-input__row">
-        <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </button>
-        <label class="chat-input__file-btn" :class="{ 'chat-input__file-btn--disabled': uploading }">
-          <SvgIcon name="attach" :size="18" />
-          <input type="file" @change="onFileChange" accept="image/*,video/*" />
-        </label>
-        <textarea
-          ref="chatTextarea"
-          :value="content"
-          class="chat-input__textarea"
-          :placeholder="t('chat.placeholder')"
-          rows="2"
-          @input="onChatInput"
-          @keydown.esc="mention.close()"
-          @keydown.enter.exact.prevent="handleSend"
-        ></textarea>
-        <MentionDropdown
-          :suggestions="mention.suggestions"
-          :pos="mention.mentionPos"
-          @select="(username) => mention.insert(chatTextarea, username)"
-        />
-        <button class="chat-scroll-bottom-btn" @click="scrollBottom" title="Scroll to bottom">
-          <SvgIcon name="chevron-down" :size="16" />
-        </button>
-        <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
-          <SvgIcon name="send" :size="16" />
-        </button>
-      </div>
+      <p v-else class="chat-login-hint" :class="{ 'chat-dock--away': inputAway }">
+        {{ t('chat.loginHint') }} <router-link to="/login">{{ t('auth.login') }}</router-link>
+      </p>
+      <!-- kept after the v-if/v-else pair (Vue needs them adjacent); order:-1
+           lifts it above the bar in the dock column -->
+      <button
+        class="chat-scroll-bottom-btn"
+        :class="{ 'chat-scroll-bottom-btn--hidden': atBottom }"
+        @click="scrollBottom"
+        title="Scroll to bottom"
+      >
+        <SvgIcon name="chevron-down" :size="16" />
+      </button>
     </div>
-    <p v-else class="chat-login-hint" :class="{ 'chat-dock--away': inputAway }">
-      {{ t('chat.loginHint') }} <router-link to="/login">{{ t('auth.login') }}</router-link>
-    </p>
 
     <MediaViewer :visible="previewOpen" :src="previewSrc" @close="previewOpen = false; previewSrc = null" />
   </div>
@@ -305,7 +332,8 @@ function openPreview(src) {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - var(--navbar-height) - var(--spacing-4xl));
-  padding-bottom: 200px;
+  /* 240px: clears the dock plus the scroll-to-bottom button stacked on top */
+  padding-bottom: 240px;
 }
 
 /* ── Message area ── */
@@ -512,17 +540,31 @@ function openPreview(src) {
 
 /* ── Input area ── */
 
-.chat-input-area {
+/* fixed dock slot shared by the input bar / login hint and the scroll-to-bottom
+   button: the bar anchors the bottom edge of the slot, the button floats
+   above it (flex column, order -1) */
+.chat-dock {
   position: fixed;
   bottom: 108px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(var(--content-max-width) - 2 * var(--spacing-xl));
   max-width: calc(100% - 2 * var(--spacing-xl));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 50;
+  /* the slot spans button + bar; let clicks fall through the empty space */
+  pointer-events: none;
+}
+.chat-dock > * {
+  pointer-events: auto;
+}
+
+.chat-input-area {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
-  z-index: 50;
   padding: var(--spacing-md);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);
@@ -634,7 +676,9 @@ function openPreview(src) {
 }
 
 .chat-scroll-bottom-btn {
-  flex-shrink: 0;
+  /* lifted above the bar (DOM order keeps Vue's v-if/v-else adjacency) */
+  order: -1;
+  align-self: center;
   width: 42px;
   height: 42px;
   padding: 0;
@@ -642,16 +686,25 @@ function openPreview(src) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg);
+  /* glass, same material as the dock */
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--color-border-light);
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: opacity 0.25s ease, color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
 .chat-scroll-bottom-btn:hover {
-  color: var(--color-card-hover);
-  border-color: var(--color-card-hover);
-  background: rgba(249, 168, 212, 0.08);
+  /* same color, one step deeper — surface darkened 20% at the same 70% glass
+     (surface 56% + black 14% + transparent 30% ⇒ 80/20 color mix, α 0.7) */
+  background: color-mix(in srgb, var(--color-surface) 56%, black 14%, transparent 30%);
+  border-color: var(--color-border);
+  color: var(--color-text-heading);
+}
+/* at the bottom of the page there is nothing to jump to — fade it out in place */
+.chat-scroll-bottom-btn.chat-scroll-bottom-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .chat-send-btn {
@@ -668,12 +721,6 @@ function openPreview(src) {
 /* ── Login hint ── */
 
 .chat-login-hint {
-  position: fixed;
-  bottom: 108px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(var(--content-max-width) - 2 * var(--spacing-xl));
-  max-width: calc(100% - 2 * var(--spacing-xl));
   text-align: center;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
@@ -681,7 +728,6 @@ function openPreview(src) {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
-  z-index: 50;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);
 }
@@ -703,7 +749,7 @@ function openPreview(src) {
 }
 .chat-input-area.chat-dock--away,
 .chat-login-hint.chat-dock--away {
-  transform: translateX(-50%) translateY(200px);
+  transform: translateY(200px);
   opacity: 0;
   pointer-events: none;
 }
