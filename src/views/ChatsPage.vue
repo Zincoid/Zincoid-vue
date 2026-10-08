@@ -321,11 +321,6 @@ function openPreview(src) {
 
     <div class="chat-dock">
       <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
-        <div v-if="uploadFile" class="chat-input__file-tag">
-          <SvgIcon name="attach" :size="12" />
-          {{ uploadFile.name }}
-          <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
-        </div>
         <div class="chat-input__row">
           <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -334,16 +329,23 @@ function openPreview(src) {
             <SvgIcon name="attach" :size="18" />
             <input type="file" @change="onFileChange" accept="image/*,video/*,audio/*" />
           </label>
-          <textarea
-            ref="chatTextarea"
-            :value="content"
-            class="chat-input__textarea"
-            :placeholder="t('chat.placeholder')"
-            rows="2"
-            @input="onChatInput"
-            @keydown.esc="mention.close()"
-            @keydown.enter.exact.prevent="handleSend"
-          ></textarea>
+          <div class="chat-input__field">
+            <textarea
+              ref="chatTextarea"
+              :value="content"
+              class="chat-input__textarea"
+              :placeholder="t('chat.placeholder')"
+              rows="2"
+              @input="onChatInput"
+              @keydown.esc="mention.close()"
+              @keydown.enter.exact.prevent="handleSend"
+            ></textarea>
+            <div v-if="uploadFile" class="chat-input__file-tag" :title="uploadFile.name">
+              <SvgIcon name="attach" :size="12" />
+              <span class="chat-input__file-name">{{ uploadFile.name }}</span>
+              <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
+            </div>
+          </div>
           <MentionDropdown
             :suggestions="mention.suggestions"
             :pos="mention.mentionPos"
@@ -628,17 +630,26 @@ function openPreview(src) {
   background: rgba(26, 29, 39, 0.7);
 }
 
+/* attachment chip: inside the input pill, right of the text (truncates) */
 .chat-input__file-tag {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 55%;
   font-size: var(--text-xs);
   background: var(--color-primary-light);
   color: var(--color-primary);
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: var(--rounded-full);
-  margin-bottom: var(--spacing-sm);
   font-weight: var(--weight-medium);
+}
+.chat-input__file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .chat-file-remove {
   color: var(--color-text-secondary);
@@ -707,27 +718,41 @@ function openPreview(src) {
 .chat-input__file-btn--disabled { opacity: 0.4; pointer-events: none; }
 .chat-input__file-btn input { display: none; }
 
-.chat-input__textarea {
+/* the pill chrome lives on the field wrapper so the attachment chip can sit
+   inside the box, right of the text */
+.chat-input__field {
   flex: 1;
-  padding: 10px var(--spacing-md);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-sm) 0 var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
+  background: var(--color-bg);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.chat-input__field:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.12);
+}
+.chat-input__textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
   font-size: var(--text-sm);
   line-height: 1.4;
-  background: var(--color-bg);
-  color: var(--color-text);
   resize: none;
   height: 42px;
   font-family: inherit;
   overflow-y: auto;
   scrollbar-width: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-.chat-input__textarea::-webkit-scrollbar { display: none; }
 .chat-input__textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.12);
 }
 
 .chat-scroll-bottom-btn {
