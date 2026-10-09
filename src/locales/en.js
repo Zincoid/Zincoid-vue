@@ -685,7 +685,10 @@ export default {
     mentionTitle: 'Mention a user',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
-    fileUnavailable: 'File no longer available'
+    fileUnavailable: 'File no longer available',
+    aiClear: 'Clear',
+    aiExpand: 'Expand',
+    aiCollapse: 'Collapse'
   },
   notification: {
     title: 'Notifications',

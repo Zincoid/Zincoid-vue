@@ -685,7 +685,10 @@ export default {
     mentionTitle: '提及',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
-    fileUnavailable: '资源已失效'
+    fileUnavailable: '资源已失效',
+    aiClear: '清空',
+    aiExpand: '展开',
+    aiCollapse: '收起'
   },
   notification: {
     title: '通知',

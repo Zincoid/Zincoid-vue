@@ -69,8 +69,6 @@ function startStream() {
   es.addEventListener('message', (e) => {
     let msg
     try { msg = JSON.parse(e.data) } catch { return }
-    // the AI's answer lands as a normal message — its tool run is over
-    if (msg.username === 'ai') aiTasks.value = []
     const before = messages.value.length
     appendMsg(msg)
     if (messages.value.length !== before) {
@@ -94,12 +92,26 @@ function stopStream() {
   if (es) { es.close(); es = null }
 }
 
-// ── "AI working" strip: ephemeral tool-call activity from the SSE `tool`
-// events, kept out of the message list (never persisted — a reload starts
-// empty). task must be the lowercase 'chat' ('comment' runs are ignored) and
-// state is "running"/"done"; rows are keyed by tcId so a done updates the
-// running row it belongs to.
+// ── "AI working" strip: tool-call activity from the SSE `tool` events, kept
+// out of the message list (never persisted — a reload starts empty). The
+// strip is a standing panel: rows accumulate and the AI's answer no longer
+// wipes them — the user clears it by hand. task must be the lowercase 'chat'
+// ('comment' runs are ignored) and state is "running"/"done"; rows are keyed
+// by tcId so a done updates the running row it belongs to.
 const aiTasks = ref([])
+const aiExpanded = ref(false)
+
+function aiClear() {
+  aiTasks.value = []
+  aiFadeTop.value = false
+  aiFadeBottom.value = false
+}
+
+function toggleAiExpanded() {
+  aiExpanded.value = !aiExpanded.value
+  // the taller box changes what counts as scrollable — recompute the fades
+  nextTick(aiOnScroll)
+}
 const aiScrollRef = ref(null)
 const aiFadeTop = ref(false)
 const aiFadeBottom = ref(false)
@@ -158,9 +170,9 @@ const aiMaskStyle = computed(() => {
   const bottom = aiFadeBottom.value
   if (!top && !bottom) return null
   let gradient
-  if (top && bottom) gradient = 'linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent)'
-  else if (top) gradient = 'linear-gradient(to bottom, transparent, #000 12px)'
-  else gradient = 'linear-gradient(to bottom, #000 calc(100% - 12px), transparent)'
+  if (top && bottom) gradient = 'linear-gradient(to bottom, transparent, #000 6px, #000 calc(100% - 6px), transparent)'
+  else if (top) gradient = 'linear-gradient(to bottom, transparent, #000 6px)'
+  else gradient = 'linear-gradient(to bottom, #000 calc(100% - 6px), transparent)'
   return { maskImage: gradient, WebkitMaskImage: gradient }
 })
 
@@ -463,10 +475,10 @@ function openPreview(src) {
     </div>
 
     <div class="chat-dock">
-      <!-- "AI working" strip: tool-call rows scroll above the input — plain
-           text, no chrome; ends fade while more content can be scrolled -->
-      <div v-if="aiTasks.length" class="chat-ai" :class="{ 'chat-dock--away': inputAway }">
-        <div ref="aiScrollRef" class="chat-ai__scroll" :style="aiMaskStyle" @scroll.passive="aiOnScroll">
+      <!-- "AI working" strip: standing tool-call panel above the input —
+           plain text, no chrome; ends fade while more can be scrolled -->
+      <div class="chat-ai" :class="{ 'chat-dock--away': inputAway }">
+        <div ref="aiScrollRef" class="chat-ai__scroll" :class="{ 'chat-ai__scroll--expanded': aiExpanded }" :style="aiMaskStyle" @scroll.passive="aiOnScroll">
           <div
             v-for="task in aiTasks"
             :key="task.tcId"
@@ -479,6 +491,14 @@ function openPreview(src) {
               <template v-else>{{ task.name }}<template v-if="task.result"> → {{ task.result }}</template></template>
             </span>
           </div>
+        </div>
+        <div class="chat-ai__tools">
+          <button class="chat-ai__btn" :title="t('chat.aiClear')" @click="aiClear">
+            <SvgIcon name="clean" :size="13" />
+          </button>
+          <button class="chat-ai__btn" :title="aiExpanded ? t('chat.aiCollapse') : t('chat.aiExpand')" @click="toggleAiExpanded">
+            <SvgIcon :name="aiExpanded ? 'chevron-down' : 'chevron-up'" :size="13" />
+          </button>
         </div>
       </div>
       <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
@@ -1064,36 +1084,51 @@ function openPreview(src) {
   font-weight: var(--weight-medium);
 }
 
-/* ── "AI working" strip (ephemeral tool activity above the input) ── */
+/* ── "AI working" strip (standing tool-activity panel above the input) ── */
 /* plain scrolling text: no background/border — the ends fade out through a
    mask while there is more to scroll in that direction */
+.chat-ai {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
 .chat-ai__scroll {
+  flex: 1;
+  min-width: 0;
   max-height: 4.8em; /* ~3 one-line rows */
   overflow-y: auto;
+  overflow-x: hidden; /* long tool text must never scroll sideways */
   scrollbar-width: none;
+}
+.chat-ai__scroll--expanded {
+  max-height: 12em;
 }
 .chat-ai__scroll::-webkit-scrollbar {
   display: none;
 }
 .chat-ai__row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  position: relative;
+  height: 1.6em; /* one line, fixed — long text can never grow the row */
+  padding-left: 18px; /* room for the pinned spinner */
   font-size: var(--text-xs);
   line-height: 1.6em;
   color: var(--color-text-secondary);
   white-space: nowrap;
+  overflow: hidden;
 }
 .chat-ai__row--error {
   color: var(--color-danger);
 }
 .chat-ai__text {
-  min-width: 0;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .chat-ai__spinner {
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -5px;
   width: 10px;
   height: 10px;
   border-radius: var(--rounded-full);
@@ -1103,6 +1138,25 @@ function openPreview(src) {
 }
 @keyframes chat-ai-spin {
   to { transform: rotate(360deg); }
+}
+.chat-ai__tools {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.chat-ai__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+.chat-ai__btn:hover {
+  color: var(--color-text-heading);
+  background: var(--color-bg-alt);
 }
 
 /* ── Dock show/hide (input bar + login hint share one motion) ── */
