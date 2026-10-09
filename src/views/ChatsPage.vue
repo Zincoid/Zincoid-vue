@@ -101,7 +101,14 @@ function stopStream() {
 const aiTasks = ref([])
 const aiExpanded = ref(false)
 
+// a spinner that never gets to spin reads as a glitch — hold each running
+// state at least MIN_SPIN_MS even when the tool (and its done) is instant
+const MIN_SPIN_MS = 250
+const aiPendingDone = new Map() // tcId -> timeout holding back a fast done
+
 function aiClear() {
+  for (const t of aiPendingDone.values()) clearTimeout(t)
+  aiPendingDone.clear()
   aiTasks.value = []
   aiFadeTop.value = false
   aiFadeBottom.value = false
@@ -132,23 +139,50 @@ function onToolEvent(e) {
   const i = aiTasks.value.findIndex(x => x.tcId === d.tcId)
   const prev = i !== -1 ? aiTasks.value[i] : null
   if (d.state === 'running') {
-    const row = { tcId: d.tcId, name: d.name || '', args: d.args || '', state: 'running', result: '' }
+    // a re-run cancels a pending done for the same tcId
+    clearTimeout(aiPendingDone.get(d.tcId))
+    aiPendingDone.delete(d.tcId)
+    const row = { tcId: d.tcId, name: d.name || '', args: d.args || '', state: 'running', result: '', startedAt: Date.now() }
     if (i === -1) aiTasks.value.push(row)
     else aiTasks.value[i] = row
   } else if (d.state === 'done') {
-    const row = {
-      tcId: d.tcId,
-      name: prev?.name || d.name || '',
-      args: prev?.args || d.args || '',
-      state: 'done',
-      result: d.result ?? ''
+    // hold the spinner until it has spun MIN_SPIN_MS — a tool that finishes
+    // instantly would otherwise flip to the result before the first frame
+    const left = prev?.state === 'running' ? MIN_SPIN_MS - (Date.now() - (prev.startedAt || 0)) : 0
+    if (left > 0) {
+      clearTimeout(aiPendingDone.get(d.tcId))
+      aiPendingDone.set(d.tcId, setTimeout(() => {
+        aiPendingDone.delete(d.tcId)
+        applyAiDone(d)
+      }, left))
+      return
     }
-    if (i === -1) aiTasks.value.push(row)
-    else aiTasks.value[i] = row
+    applyAiDone(d)
+    return
   } else return
   nextTick(() => {
     const el2 = aiScrollRef.value
     // follow the newest row unless the user scrolled up to inspect
+    if (el2 && stick) el2.scrollTop = el2.scrollHeight
+    aiOnScroll()
+  })
+}
+
+function applyAiDone(d) {
+  const el = aiScrollRef.value
+  const stick = !el || el.scrollTop + el.clientHeight >= el.scrollHeight - 1
+  const i = aiTasks.value.findIndex(x => x.tcId === d.tcId)
+  if (i === -1) return // cleared while the spinner was held — drop the update
+  const prev = aiTasks.value[i]
+  aiTasks.value[i] = {
+    tcId: d.tcId,
+    name: prev?.name || d.name || '',
+    args: prev?.args || d.args || '',
+    state: 'done',
+    result: d.result ?? ''
+  }
+  nextTick(() => {
+    const el2 = aiScrollRef.value
     if (el2 && stick) el2.scrollTop = el2.scrollHeight
     aiOnScroll()
   })
@@ -486,6 +520,9 @@ function openPreview(src) {
             :class="{ 'chat-ai__row--error': aiIsError(task) }"
           >
             <span v-if="task.state === 'running'" class="chat-ai__spinner"></span>
+            <span v-else class="chat-ai__icon">
+              <SvgIcon :name="aiIsError(task) ? 'close' : 'check'" :size="12" />
+            </span>
             <span class="chat-ai__text">
               <template v-if="task.state === 'running'">{{ task.name }}({{ aiArgsBrief(task.args) }})</template>
               <template v-else>{{ task.name }}<template v-if="task.result"> → {{ task.result }}</template></template>
@@ -493,7 +530,7 @@ function openPreview(src) {
           </div>
         </div>
         <div v-if="aiTasks.length" class="chat-ai__tools">
-          <button class="chat-ai__btn" :title="t('chat.aiClear')" @click="aiClear">
+          <button class="chat-ai__btn chat-ai__btn--danger" :title="t('chat.aiClear')" @click="aiClear">
             <SvgIcon name="clean" :size="13" />
           </button>
           <button class="chat-ai__btn" :title="aiExpanded ? t('chat.aiCollapse') : t('chat.aiExpand')" @click="toggleAiExpanded">
@@ -1095,7 +1132,7 @@ function openPreview(src) {
 .chat-ai__scroll {
   flex: 1;
   min-width: 0;
-  max-height: 4.8em; /* ~3 one-line rows */
+  max-height: 3.2em; /* ~2 one-line rows */
   overflow-y: auto;
   overflow-x: hidden; /* long tool text must never scroll sideways */
   scrollbar-width: none;
@@ -1139,6 +1176,14 @@ function openPreview(src) {
 @keyframes chat-ai-spin {
   to { transform: rotate(360deg); }
 }
+/* done/error icon: same left slot as the spinner, color follows the row */
+.chat-ai__icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -6px;
+  display: inline-flex;
+}
 .chat-ai__tools {
   display: flex;
   gap: 2px;
@@ -1155,8 +1200,12 @@ function openPreview(src) {
   transition: color var(--transition-fast), background var(--transition-fast);
 }
 .chat-ai__btn:hover {
-  color: var(--color-text-heading);
-  background: var(--color-bg-alt);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.chat-ai__btn--danger:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
 
 /* ── Dock show/hide (input bar + login hint share one motion) ── */
