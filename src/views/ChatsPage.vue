@@ -708,6 +708,7 @@ function openPreview(src) {
      paint --color-bg (same as the page) and only hid the page-logo watermark */
   border-radius: var(--rounded-xl);
   overflow-y: auto;
+  overflow-x: hidden; /* a hair of horizontal overflow on mobile must not roll a bar in */
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   display: flex;
