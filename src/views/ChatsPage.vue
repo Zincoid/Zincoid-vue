@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
@@ -36,8 +36,6 @@ const previewSrc = ref(null)
 const previewOpen = ref(false)
 const chatTextarea = ref(null)
 
-const live = ref(true)
-let pollTimer = null
 const pollSize = ref(50)
 
 const lastScrollTop = ref(0)
@@ -47,23 +45,51 @@ let scrollRunway = 0
 const atBottom = ref(true)
 
 function updateAtBottom() {
-  // 60px threshold — the same one pollNew uses to decide auto-scroll
+  // 60px threshold — the same one the SSE handlers use to decide auto-scroll
   atBottom.value = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
 }
 
-function startPoll() {
-  stopPoll()
-  pollTimer = setInterval(pollNew, 3000)
+// ── live updates over SSE (replaces the old 3s polling) ──
+let es = null
+let streamOff = false // set on unmount so a pending restart can't reopen
+
+function appendMsg(msg) {
+  // id-dedupe: the SSE broadcast reaches the sender too, and the POST
+  // response already showed the message — either side may land first
+  if (!msg?.id || messages.value.some(m => m.id === msg.id)) return
+  messages.value.push(msg)
 }
 
-function stopPoll() {
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null }
+function startStream() {
+  stopStream()
+  if (streamOff) return
+  es = new EventSource('/api/chats/public/stream')
+  // 'connected' also fires after a reconnect — pull whatever was missed meanwhile
+  es.addEventListener('connected', () => catchUp())
+  es.addEventListener('message', (e) => {
+    let msg
+    try { msg = JSON.parse(e.data) } catch { return }
+    const before = messages.value.length
+    appendMsg(msg)
+    if (messages.value.length !== before) {
+      const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
+      if (nearBottom) scrollBottom()
+      nextTick(updateAtBottom)
+    }
+  })
+  es.addEventListener('delete', (e) => {
+    const id = Number(e.data)
+    messages.value = messages.value.filter(m => m.id !== id)
+  })
+  es.onerror = () => {
+    // transient drops reconnect on their own; only a fatal close needs a nudge
+    if (es?.readyState === EventSource.CLOSED && !streamOff) setTimeout(startStream, 3000)
+  }
 }
 
-watch(live, (v) => {
-  if (v) startPoll()
-  else stopPoll()
-})
+function stopStream() {
+  if (es) { es.close(); es = null }
+}
 
 function onChatScroll() {
   const st = window.scrollY
@@ -91,14 +117,15 @@ onMounted(async () => {
     if (max > 0) pollSize.value = max
   } catch (e) { /* use default 50 */ }
   await fetchMessages()
-  startPoll()
+  startStream()
   window.addEventListener('scroll', onChatScroll, { passive: true })
   window.addEventListener('resize', updateAtBottom)
   nextTick(updateAtBottom)
 })
 
 onUnmounted(() => {
-  stopPoll()
+  streamOff = true
+  stopStream()
   window.removeEventListener('scroll', onChatScroll)
   window.removeEventListener('resize', updateAtBottom)
 })
@@ -128,7 +155,8 @@ function onLoadingDone() {
   nextTick(updateAtBottom)
 }
 
-async function pollNew() {
+// gap-fill after a (re)connect: merge the newest page into the list by id
+async function catchUp() {
   try {
     const { data } = await chatAPI.getList(1, pollSize.value)
     const list = data.data?.records || []
@@ -156,7 +184,7 @@ async function handleSend() {
       uploading.value = false
     }
     const { data } = await chatAPI.send(content.value.trim() || null, fileUrl)
-    messages.value.push(data.data)
+    appendMsg(data.data) // SSE may have delivered it first — appendMsg dedupes
     content.value = ''
     scrollBottom()
   } catch (e) {
@@ -422,9 +450,6 @@ function openPreview(src) {
             :pos="mention.mentionPos"
             @select="(username) => mention.insert(chatTextarea, username)"
           />
-          <button class="chat-live-toggle" :class="{ 'chat-live-toggle--on': live }" @click="live = !live" :title="live ? 'Live on' : 'Live off'">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </button>
           <button class="btn btn--primary chat-send-btn" :disabled="sending || (!content.trim() && !uploadFile)" @click="handleSend">
             <SvgIcon name="send" :size="18" />
           </button>
@@ -734,7 +759,7 @@ function openPreview(src) {
 }
 
 /* no panel chrome behind the bar — the frosted glass lives on the pieces
-   themselves (.chat-input__field, .chat-live-toggle, .chat-send-btn) */
+   themselves (.chat-input__field, .chat-send-btn) */
 
 /* attachment chip: inside the input pill, right of the text (truncates) */
 .chat-input__file-tag {
@@ -771,37 +796,6 @@ function openPreview(src) {
   position: relative;
   gap: var(--spacing-sm);
   align-items: flex-end;
-}
-
-.chat-live-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  color: var(--color-text-tertiary, #999);
-  cursor: pointer;
-  border-radius: var(--rounded-full);
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-  /* frosted, same material as the scroll button */
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border-light);
-}
-.chat-live-toggle:hover {
-  color: var(--color-text-secondary);
-  border-color: var(--color-text-secondary);
-}
-.chat-live-toggle--on {
-  color: var(--color-card-hover);
-  border-color: var(--color-card-hover);
-  background: rgba(249, 168, 212, 0.08);
-}
-.chat-live-toggle--on:hover {
-  color: #f472b6;
-  border-color: #f472b6;
-  background: rgba(249, 168, 212, 0.15);
 }
 
 /* attach + @ tools: flat icon buttons inside the pill on the right —
