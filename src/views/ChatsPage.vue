@@ -639,6 +639,7 @@ function openPreview(src) {
 .chat-msg__content {
   font-size: var(--text-sm);
   line-height: 1.6;
+  white-space: pre-wrap; /* keep Shift+Enter line breaks */
   word-break: break-word;
   color: var(--color-text);
 }

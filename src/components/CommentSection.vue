@@ -440,6 +440,7 @@ const visibleComments = computed(() => {
 .comment__content {
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
+  white-space: pre-wrap; /* keep Shift+Enter line breaks */
 }
 
 .comment__reply-btn {
