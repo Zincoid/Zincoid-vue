@@ -878,7 +878,8 @@ function openPreview(src) {
 .chat-input__textarea {
   flex: 1;
   min-width: 0;
-  padding: 10px 0;
+  /* center the single line in the 42px box (line-height is 1.4) */
+  padding: calc((42px - 1.4em) / 2) 0;
   border: none;
   background: transparent;
   color: var(--color-text);
