@@ -44,10 +44,19 @@ const lastScrollTop = ref(0)
 const inputAway = ref(false)
 let scrollRunway = 0
 
+// follow intent: glued to the newest message until the user scrolls away
 const atBottom = ref(true)
 
+function pageMaxY() {
+  return document.documentElement.scrollHeight - window.innerHeight
+}
+
+// full position measure — only for non-scroll settle moments (initial load).
+// scroll events use the directional rule in onChatScroll instead: our own
+// follow-jumps fire scroll events too, and a burst can grow the page between a
+// jump and its scroll event — a naive measure then reads "not at bottom" and
+// silently drops the follow mid-burst
 function updateAtBottom() {
-  // 60px threshold — near enough to the bottom counts as pinned to it
   atBottom.value = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
 }
 
@@ -228,7 +237,11 @@ function onChatScroll() {
     inputAway.value = false
     scrollRunway = 0
   }
-  updateAtBottom()
+  // pin directionally: only a real upward scroll (delta < 0) that leaves the
+  // bottom unpins. growth moves the bottom away without moving us, and our own
+  // follow-jumps scroll down — neither may drop the follow
+  if (delta < 0 && st < pageMaxY() - 60) atBottom.value = false
+  else if (st >= pageMaxY() - 60) atBottom.value = true
 }
 
 // sticky follow: while the view is pinned to the bottom, any growth under it
@@ -241,7 +254,7 @@ onMounted(async () => {
   stickRO = new ResizeObserver(() => {
     // the initial delivery on observe() is not a growth event
     if (!stickROSeen) { stickROSeen = true; return }
-    if (atBottom.value) window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+    if (atBottom.value) jumpToBottom()
   })
   if (chatEl.value) stickRO.observe(chatEl.value)
   try {
@@ -252,7 +265,7 @@ onMounted(async () => {
   await fetchMessages()
   startStream()
   window.addEventListener('scroll', onChatScroll, { passive: true })
-  window.addEventListener('resize', updateAtBottom)
+  window.addEventListener('resize', onResize)
   nextTick(updateAtBottom)
 })
 
@@ -261,7 +274,7 @@ onUnmounted(() => {
   stopStream()
   stickRO?.disconnect()
   window.removeEventListener('scroll', onChatScroll)
-  window.removeEventListener('resize', updateAtBottom)
+  window.removeEventListener('resize', onResize)
 })
 
 async function fetchMessages() {
@@ -281,12 +294,20 @@ async function fetchMessages() {
 // jump to the newest message and pin the follow. always instant: a smooth
 // animation counts as "not at the bottom" for its whole duration, so a
 // message arriving mid-animation would drop out of the follow
+function jumpToBottom() {
+  // 'instant' beats the global html { scroll-behavior: smooth }
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+}
+
 function scrollBottom() {
   atBottom.value = true
-  nextTick(() => {
-    // 'instant' beats the global html { scroll-behavior: smooth }
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
-  })
+  nextTick(jumpToBottom)
+}
+
+// resize changes where the bottom is; a pinned view re-anchors, an unpinned
+// one is left alone (no full measure here — see updateAtBottom)
+function onResize() {
+  if (atBottom.value) jumpToBottom()
 }
 
 function onLoadingDone() {
