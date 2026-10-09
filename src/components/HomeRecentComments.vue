@@ -38,6 +38,15 @@ function targetRoute(c) {
   return null
 }
 
+// the bullet grows with its content (names are never cut), so only the comment
+// text is bounded — by characters, not by width. code points, so an emoji
+// sliced in half can't leave a lone surrogate behind
+const TEXT_MAX = 30
+function clipText(s) {
+  const chars = Array.from(String(s ?? ''))
+  return chars.length > TEXT_MAX ? chars.slice(0, TEXT_MAX).join('') + '…' : chars.join('')
+}
+
 // constant px/s across viewports: a wider track → a longer flight
 function flightSeconds() {
   const w = trackEl.value?.clientWidth || 1000
@@ -139,7 +148,7 @@ onUnmounted(() => {
           <span v-if="b.c.username" class="recent-comments__handle">@{{ b.c.username }}</span>
           <span class="recent-comments__sep">：</span>
           <span v-if="b.c.parentUsername" class="recent-comments__reply">@{{ b.c.parentUsername }}</span>
-          <span class="recent-comments__text">{{ b.c.content }}</span>
+          <span class="recent-comments__text">{{ clipText(b.c.content) }}</span>
         </component>
       </div>
     </div>
@@ -193,7 +202,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  max-width: min(320px, 80%);
+  /* fit the content exactly — names are never ellipsized and the comment text
+     is bounded by characters in JS, so the pill just grows wider. max-content
+     is required: an absolutely-positioned auto width would be capped at the
+     track's width instead */
+  width: max-content;
   /* asymmetric: the avatar hugs the left edge a little */
   padding: 0 var(--spacing-md) 0 var(--spacing-sm);
   border-radius: var(--rounded-full);
@@ -242,20 +255,14 @@ a.recent-comments__item:hover {
 .recent-comments__nick {
   color: var(--color-primary);
   font-weight: var(--weight-medium);
-  max-width: 9em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-shrink: 0;
 }
 .recent-comments__handle {
   /* same size as the reply-target @text — inherits --text-sm from the item */
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
-  flex-shrink: 0;
 }
 .recent-comments__reply {
   color: var(--color-text-secondary);
-  flex-shrink: 0;
 }
 .recent-comments__sep {
   color: var(--color-text-tertiary);
@@ -263,19 +270,11 @@ a.recent-comments__item:hover {
 }
 .recent-comments__text {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 @keyframes comment-fly {
   from { transform: translateX(100cqw); }
   to { transform: translateX(-100%); }
-}
-
-@media (max-width: 857px) {
-  .recent-comments__item {
-    max-width: min(220px, 80%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -290,6 +289,7 @@ a.recent-comments__item:hover {
   }
   .recent-comments__item {
     position: static;
+    width: auto;
     max-width: 100%;
     animation: none;
   }
