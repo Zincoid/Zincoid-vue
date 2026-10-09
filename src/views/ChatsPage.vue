@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
+import { useToast } from '@/composables/useToast'
 import { useError } from '@/composables/useError'
 import { useMention, insertAtCursor } from '@/composables/useMention'
 import { useFileDrop } from '@/composables/useFileDrop'
@@ -20,6 +21,7 @@ const { getMessage } = useError()
 const auth = useAuthStore()
 const mention = useMention()
 const { confirm } = useConfirm()
+const { toast } = useToast()
 
 const messages = ref([])
 const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedContent: parseMentions(m.content) })))
@@ -400,6 +402,16 @@ async function handleDelete(msg) {
   } catch (e) { /* ignore */ }
 }
 
+// copy the message text (or file URL) to the clipboard
+async function copyMsg(msg) {
+  try {
+    await navigator.clipboard.writeText(msg.content || msg.file || '')
+    toast(t('chat.copied'), 'success')
+  } catch (e) {
+    toast(t('chat.copyFailed'), 'error')
+  }
+}
+
 // the hover @ button: type a complete @mention into the composer and focus it
 // (trailing space keeps the mention dropdown from opening on the finished name)
 function mentionUser(msg) {
@@ -495,6 +507,12 @@ function openPreview(src) {
                  anchored — right of the bubble for others' messages (and the @
                  mention next to delete), left for mine -->
             <div class="chat-msg__actions">
+              <button
+                v-if="msg.content || msg.file"
+                class="chat-msg__action chat-msg__action--copy"
+                :title="t('chat.copy')"
+                @click="copyMsg(msg)"
+              ><SvgIcon name="copy" :size="14" /></button>
               <button
                 v-if="msg.username && auth.user?.id !== msg.userId"
                 class="chat-msg__action chat-msg__action--at"
@@ -793,6 +811,10 @@ function openPreview(src) {
 .chat-msg__action:hover {
   color: var(--color-primary);
   background: var(--color-primary-light);
+}
+.chat-msg__action--copy:hover {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
 }
 .chat-msg__action--delete:hover {
   color: var(--color-danger);

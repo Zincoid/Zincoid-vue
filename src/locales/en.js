@@ -687,6 +687,9 @@ export default {
     deleteConfirm: 'Delete this message?',
     fileUnavailable: 'File no longer available',
     recalled: 'This message has been recalled.',
+    copy: 'Copy',
+    copied: 'Copied',
+    copyFailed: 'Copy failed',
     aiClear: 'Clear',
     aiExpand: 'Expand',
     aiCollapse: 'Collapse'
