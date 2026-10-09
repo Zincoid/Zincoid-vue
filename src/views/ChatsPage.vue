@@ -733,17 +733,8 @@ function openPreview(src) {
   pointer-events: auto;
 }
 
-.chat-input-area {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-full);
-  padding: var(--spacing-md);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(12px);
-}
-[data-theme="dark"] .chat-input-area {
-  background: rgba(26, 29, 39, 0.7);
-}
+/* no panel chrome behind the bar — the frosted glass lives on the pieces
+   themselves (.chat-input__field, .chat-live-toggle, .chat-send-btn) */
 
 /* attachment chip: inside the input pill, right of the text (truncates) */
 .chat-input__file-tag {
@@ -793,7 +784,9 @@ function openPreview(src) {
   border-radius: var(--rounded-full);
   transition: all var(--transition-fast);
   flex-shrink: 0;
-  background: var(--color-bg);
+  /* frosted, same material as the scroll button */
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--color-border-light);
 }
 .chat-live-toggle:hover {
@@ -880,7 +873,9 @@ function openPreview(src) {
   padding: 0 var(--spacing-sm) 0 var(--spacing-md);
   border: 1px solid var(--color-border);
   border-radius: var(--rounded-full);
-  background: var(--color-bg);
+  /* frosted pill — glass moved here from the old dock panel */
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(12px);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .chat-input__field:focus-within {
@@ -947,6 +942,17 @@ function openPreview(src) {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* frosted version of btn--primary's ink (#111827) */
+  background: color-mix(in srgb, #111827 70%, transparent);
+  border-color: transparent;
+  backdrop-filter: blur(12px);
+}
+.chat-send-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #1f2937 70%, transparent);
+}
+.chat-send-btn:disabled {
+  /* frosted neutral instead of the global solid disabled fill */
+  background: color-mix(in srgb, var(--color-border-light) 70%, transparent);
 }
 
 /* ── Login hint ── */
