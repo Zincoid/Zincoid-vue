@@ -686,6 +686,7 @@ export default {
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
     fileUnavailable: '资源已失效',
+    recalled: '该消息已被撤回。',
     aiClear: '清空',
     aiExpand: '展开',
     aiCollapse: '收起'

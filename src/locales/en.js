@@ -686,6 +686,7 @@ export default {
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
     fileUnavailable: 'File no longer available',
+    recalled: 'This message has been recalled.',
     aiClear: 'Clear',
     aiExpand: 'Expand',
     aiCollapse: 'Collapse'

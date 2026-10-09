@@ -79,7 +79,9 @@ function startStream() {
   })
   es.addEventListener('delete', (e) => {
     const id = Number(e.data)
-    messages.value = messages.value.filter(m => m.id !== id)
+    // recall: the content is gone but the slot stays — a centered notice keeps
+    // the conversation flow instead of the list jumping
+    messages.value = messages.value.map(m => m.id === id ? { ...m, recalled: true } : m)
   })
   es.addEventListener('tool', onToolEvent)
   es.onerror = () => {
@@ -394,7 +396,7 @@ async function handleDelete(msg) {
   if (!await confirm(t('chat.deleteConfirm'))) return
   try {
     await chatAPI.delete(msg.id)
-    messages.value = messages.value.filter(m => m.id !== msg.id)
+    messages.value = messages.value.map(m => m.id === msg.id ? { ...m, recalled: true } : m)
   } catch (e) { /* ignore */ }
 }
 
@@ -423,7 +425,10 @@ function openPreview(src) {
     <div class="chat-box" ref="chatEl">
       <LoadingSpinner :visible="loading" @done="onLoadingDone" />
       <template v-if="loadingDone">
-        <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId }">
+        <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId, 'chat-msg--recalled': msg.recalled }">
+          <!-- recalled: content gone, the slot keeps a centered notice -->
+          <div v-if="msg.recalled" class="chat-msg__recalled">{{ t('chat.recalled') }}</div>
+          <template v-else>
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
             <img v-if="msg.userAvatar" :src="msg.userAvatar" alt="" />
             <span v-else>{{ (msg.userNickname || '?')[0] }}</span>
@@ -504,6 +509,7 @@ function openPreview(src) {
               ><SvgIcon name="trash" :size="14" /></button>
             </div>
           </div>
+          </template>
         </div>
       </template>
     </div>
@@ -675,6 +681,15 @@ function openPreview(src) {
 
 .chat-msg--mine {
   flex-direction: row-reverse;
+}
+
+/* recalled: a centered notice in place of the removed bubble */
+.chat-msg--recalled {
+  justify-content: center;
+}
+.chat-msg__recalled {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
 .chat-msg__avatar {
