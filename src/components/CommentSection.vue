@@ -247,6 +247,7 @@ const visibleComments = computed(() => {
           rows="2"
           @input="onCommentInput"
           @keydown.esc="onEsc"
+          @keydown.enter.exact.prevent="handleSubmit"
         ></textarea>
         <MentionDropdown
           :suggestions="mention.suggestions"
