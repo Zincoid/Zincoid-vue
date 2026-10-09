@@ -246,20 +246,22 @@ function typeLabel(type) {
       </div>
     </div>
 
+    <!-- loading row lives outside the .tab-content divider containers (same as
+         the list pages): an in-container loader would count as a sibling and
+         push a stray hairline onto the first real item -->
+    <LoadingSpinner :visible="tabLoading" />
+
     <div class="tab-content" v-show="tab === 'moments'">
-      <LoadingSpinner :visible="tabLoading" />
       <MomentCard v-for="m in moments" :key="m.id" :moment="m" />
       <p v-if="!tabLoading && !moments.length" class="empty-state">{{ t('user.momentsEmpty') }}</p>
       <Pagination :page="mPage" :pages="mPages" :total="mTotal" :size="pageSize" @change="onMPage" />
     </div>
     <div class="tab-content" v-show="tab === 'articles'">
-      <LoadingSpinner :visible="tabLoading" />
       <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
       <p v-if="!tabLoading && !articles.length" class="empty-state">{{ t('user.articlesEmpty') }}</p>
       <Pagination :page="aPage" :pages="aPages" :total="aTotal" :size="pageSize" @change="onAPage" />
     </div>
     <div class="tab-content" v-show="tab === 'repos'">
-      <LoadingSpinner :visible="tabLoading" />
       <div v-if="repos.length" class="repo-grid">
         <div v-for="repo in repos" :key="repo.id" @click="router.push(`/repos/${repo.id}`)">
           <RepoCard :repo="repo" :show-user="false" :sort-updated="repoUpdated" />
