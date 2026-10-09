@@ -551,6 +551,11 @@ const visibleComments = computed(() => {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+.comments__tool--emoji:hover,
+.comments__tool--emoji.comments__tool--active {
+  background: var(--color-pink-bg);
+  color: var(--color-pink);
+}
 
 .comments__send {
   width: 36px;

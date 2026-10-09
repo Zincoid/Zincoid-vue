@@ -582,7 +582,7 @@ function openPreview(src) {
             </div>
             <!-- attach + emoji + @ tools: inside the pill on the right (comment composer style) -->
             <div class="chat-input__tools">
-              <label class="chat-input__tool" :class="{ 'chat-input__tool--disabled': uploading }">
+              <label class="chat-input__tool chat-input__tool--attach" :class="{ 'chat-input__tool--disabled': uploading }">
                 <SvgIcon name="attach" :size="18" />
                 <input type="file" @change="onFileChange" accept="image/*,video/*,audio/*" />
               </label>
@@ -1007,6 +1007,15 @@ function openPreview(src) {
 .chat-input__tool--active {
   background: var(--color-primary-light);
   color: var(--color-primary);
+}
+.chat-input__tool--attach:hover {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+.chat-input__tool--emoji:hover,
+.chat-input__tool--emoji.chat-input__tool--active {
+  background: var(--color-pink-bg);
+  color: var(--color-pink);
 }
 .chat-input__tool--disabled { opacity: 0.4; pointer-events: none; }
 .chat-input__tool input { display: none; }
