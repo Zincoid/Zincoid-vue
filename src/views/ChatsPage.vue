@@ -107,8 +107,8 @@ function stopStream() {
 // out of the message list (never persisted — a reload starts empty). The
 // strip is a standing panel: rows accumulate and the AI's answer no longer
 // wipes them — the user clears it by hand. task must be the lowercase 'chat'
-// ('comment' runs are ignored) and state is "running"/"done"; rows are keyed
-// by tcId so a done updates the running row it belongs to.
+// ('comment' runs are ignored) and state is "running"/"done"/"error"; rows are
+// keyed by tcId so a done/error updates the running row it belongs to.
 const aiTasks = ref([])
 const aiExpanded = ref(false)
 
@@ -156,7 +156,7 @@ function onToolEvent(e) {
     const row = { tcId: d.tcId, name: d.name || '', args: d.args || '', state: 'running', result: '', startedAt: Date.now() }
     if (i === -1) aiTasks.value.push(row)
     else aiTasks.value[i] = row
-  } else if (d.state === 'done') {
+  } else if (d.state === 'done' || d.state === 'error') {
     // hold the spinner until it has spun MIN_SPIN_MS — a tool that finishes
     // instantly would otherwise flip to the result before the first frame
     const left = prev?.state === 'running' ? MIN_SPIN_MS - (Date.now() - (prev.startedAt || 0)) : 0
@@ -189,7 +189,7 @@ function applyAiDone(d) {
     tcId: d.tcId,
     name: prev?.name || d.name || '',
     args: prev?.args || d.args || '',
-    state: 'done',
+    state: d.state === 'error' ? 'error' : 'done',
     result: d.result ?? ''
   }
   nextTick(() => {
@@ -205,8 +205,11 @@ function aiArgsBrief(args) {
   return s.length > 40 ? s.slice(0, 40) + '…' : s
 }
 
+// failed tools come as state 'error'; older payloads folded the failure into a
+// done whose result starts with "Error:" — keep that readable too
 function aiIsError(task) {
-  return task.state === 'done' && String(task.result ?? '').startsWith('Error:')
+  return task.state === 'error'
+    || (task.state === 'done' && String(task.result ?? '').startsWith('Error:'))
 }
 
 // edge fades only where there is actually more to scroll
