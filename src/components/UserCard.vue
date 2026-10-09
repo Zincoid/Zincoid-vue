@@ -52,14 +52,12 @@ watch(() => localeStore.locale, () => nextTick(checkActiveOverflow))
 // The display walks nameN from 0 to max(handle, nickname) length in flow:
 // the typed handle prefix, the hero's space + caret at the typing head, and
 // the not-yet-covered nickname tail — the tail is typed over until it's gone
-// (no leftover). The name box keeps its pre-hover width as a floor (no
-// instant reservation of the handle's width); once the tail is covered the
-// growing handle widens the box and pushes the tags after it. Leaving the
-// card types back to the nickname, faster, matching the hero terminal's
-// delete cadence.
-const nameTextRef = ref(null)
+// (no leftover). The hero's blank before the caret stays in the finished run;
+// nothing else is held behind the caret, so the tags after the name settle
+// right against the typed run instead of being kept out by a leftover blank.
+// Leaving the card types back to the nickname, faster, matching the hero
+// terminal's delete cadence.
 const nameN = ref(0)
-const nameMinWidth = ref(null)
 let nameTimer = null
 const TYPE_MS = 100 // hero typing cadence
 const ERASE_MS = 40 // hero terminal deleting cadence
@@ -71,25 +69,16 @@ const nameEnd = computed(() => Math.max(nameHandle.value.length, (props.user.nic
 
 function animateName(target) {
   clearInterval(nameTimer)
-  if (nameN.value === target) {
-    if (!target) nameMinWidth.value = null
-    return
-  }
+  if (nameN.value === target) return
   const step = target > nameN.value ? 1 : -1
   nameTimer = setInterval(() => {
     nameN.value += step
-    if (nameN.value === target) {
-      clearInterval(nameTimer)
-      if (!target) nameMinWidth.value = null
-    }
+    if (nameN.value === target) clearInterval(nameTimer)
   }, step > 0 ? TYPE_MS : ERASE_MS)
 }
 
 function onCardEnter() {
   if (!nameHandle.value) return
-  if (!nameN.value && nameTextRef.value) {
-    nameMinWidth.value = nameTextRef.value.getBoundingClientRect().width
-  }
   animateName(nameEnd.value)
 }
 
@@ -137,7 +126,7 @@ async function handleDelete() {
     </span>
     <div class="user-card__info">
       <h4 class="user-card__name">
-        <span ref="nameTextRef" class="user-card__name-text" :style="nameMinWidth ? { minWidth: nameMinWidth + 'px' } : null">{{ nameTyped }}{{ nameN ? ' ' : '' }}<span v-if="nameN" class="cursor">▌</span>{{ nameTail }}</span>
+        <span class="user-card__name-text">{{ nameTyped }}{{ nameN ? ' ' : '' }}<span v-if="nameN" class="cursor">▌</span>{{ nameTail }}</span>
         <span v-if="user.gender !== null && user.gender !== undefined" class="user-card__pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         <span v-if="user.status === 0" class="user-card__disabled-tag">{{ t('user.disabled') }}</span>
       </h4>
