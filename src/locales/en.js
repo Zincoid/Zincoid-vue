@@ -681,6 +681,7 @@ export default {
     title: 'Chats',
     subtitle: 'Chat with users or the agent (@ai)',
     placeholder: 'Type a message, @ to mention...',
+    emojiTitle: 'Emoji',
     mentionTitle: 'Mention a user',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',

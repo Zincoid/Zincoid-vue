@@ -177,6 +177,34 @@ function insertMentionChar() {
   nextTick(() => mention.onInput(chatTextarea.value))
 }
 
+// emoji picker (comment composer style): popover grid above the input pill
+const emojiOpen = ref(false)
+const EMOJIS = [
+  '😀', '😄', '😂', '🤣', '😊', '😍', '😘', '😜',
+  '🤔', '😅', '😭', '🥺', '😏', '😉', '😎', '🥳',
+  '🤗', '😴', '👍', '👏', '🙏', '💪', '❤️', '🔥',
+  '✨', '🎉', '💡', '⭐', '🚀', '🌱', '☕', '🎵'
+]
+
+function insertEmoji(emoji) {
+  emojiOpen.value = false
+  insertAtCursor(chatTextarea.value, emoji)
+}
+
+function onEsc() {
+  mention.close()
+  emojiOpen.value = false
+}
+
+// clicking outside closes the emoji popover
+function onDocPointerDown(e) {
+  if (!emojiOpen.value) return
+  if (e.target.closest?.('.chat-input__emoji-panel, .chat-input__tool--emoji')) return
+  emojiOpen.value = false
+}
+onMounted(() => document.addEventListener('pointerdown', onDocPointerDown))
+onUnmounted(() => document.removeEventListener('pointerdown', onDocPointerDown))
+
 function onFileChange(e) {
   const f = e.target.files?.[0]
   if (f) uploadFile.value = f
@@ -344,7 +372,7 @@ function openPreview(src) {
               :placeholder="t('chat.placeholder')"
               rows="2"
               @input="onChatInput"
-              @keydown.esc="mention.close()"
+              @keydown.esc="onEsc"
               @keydown.enter.exact.prevent="handleSend"
             ></textarea>
             <div v-if="uploadFile" class="chat-input__file-tag" :title="uploadFile.name">
@@ -352,12 +380,22 @@ function openPreview(src) {
               <span class="chat-input__file-name">{{ uploadFile.name }}</span>
               <button class="chat-file-remove" @click="uploadFile = null">&times;</button>
             </div>
-            <!-- attach + @ tools: inside the pill on the right (comment composer style) -->
+            <!-- attach + emoji + @ tools: inside the pill on the right (comment composer style) -->
             <div class="chat-input__tools">
               <label class="chat-input__tool" :class="{ 'chat-input__tool--disabled': uploading }">
                 <SvgIcon name="attach" :size="18" />
                 <input type="file" @change="onFileChange" accept="image/*,video/*,audio/*" />
               </label>
+              <button
+                type="button"
+                class="chat-input__tool chat-input__tool--emoji"
+                :class="{ 'chat-input__tool--active': emojiOpen }"
+                :title="t('chat.emojiTitle')"
+                :aria-label="t('chat.emojiTitle')"
+                @click="emojiOpen = !emojiOpen"
+              >
+                <SvgIcon name="smile" :size="18" />
+              </button>
               <button
                 type="button"
                 class="chat-input__tool"
@@ -367,6 +405,16 @@ function openPreview(src) {
               >
                 <SvgIcon name="at" :size="18" />
               </button>
+            </div>
+            <!-- small emoji popover above the pill -->
+            <div v-if="emojiOpen" class="chat-input__emoji-panel">
+              <button
+                v-for="emoji in EMOJIS"
+                :key="emoji"
+                type="button"
+                class="chat-input__emoji-item"
+                @click="insertEmoji(emoji)"
+              >{{ emoji }}</button>
             </div>
           </div>
           <MentionDropdown
@@ -782,16 +830,48 @@ function openPreview(src) {
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-.chat-input__tool:hover {
+.chat-input__tool:hover,
+.chat-input__tool--active {
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
 .chat-input__tool--disabled { opacity: 0.4; pointer-events: none; }
 .chat-input__tool input { display: none; }
 
+/* emoji popover: floats above the pill, same grid language as the comment
+   composer panel (no shadow) */
+.chat-input__emoji-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--spacing-xs));
+  display: grid;
+  grid-template-columns: repeat(8, 30px);
+  gap: 2px;
+  padding: var(--spacing-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  z-index: 10;
+}
+.chat-input__emoji-item {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-sm);
+  font-size: 17px;
+  line-height: 1;
+  transition: background var(--transition-fast);
+}
+.chat-input__emoji-item:hover {
+  background: var(--color-primary-light);
+}
+
 /* the pill chrome lives on the field wrapper so the attachment chip can sit
    inside the box, right of the text */
 .chat-input__field {
+  position: relative; /* anchor for the emoji popover */
   flex: 1;
   min-width: 0;
   display: flex;
