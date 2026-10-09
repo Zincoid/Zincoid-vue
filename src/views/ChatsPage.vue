@@ -47,7 +47,7 @@ let scrollRunway = 0
 const atBottom = ref(true)
 
 function updateAtBottom() {
-  // 60px threshold — the same one the SSE handlers use to decide auto-scroll
+  // 60px threshold — near enough to the bottom counts as pinned to it
   atBottom.value = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
 }
 
@@ -73,11 +73,9 @@ function startStream() {
     try { msg = JSON.parse(e.data) } catch { return }
     const before = messages.value.length
     appendMsg(msg)
-    if (messages.value.length !== before) {
-      const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
-      if (nearBottom) scrollBottom()
-      nextTick(updateAtBottom)
-    }
+    // follow by flag, not by a fresh position measure: a burst grows the page
+    // faster than a measure-then-scroll pair can agree on, and the follow drops
+    if (messages.value.length !== before && atBottom.value) scrollBottom()
   })
   es.addEventListener('delete', (e) => {
     const id = Number(e.data)
@@ -233,7 +231,19 @@ function onChatScroll() {
   updateAtBottom()
 }
 
+// sticky follow: while the view is pinned to the bottom, any growth under it
+// (a burst of messages, an image finishing its load) re-anchors instantly —
+// per-message scroll calls can't keep up when several land in the same frame
+let stickRO = null
+let stickROSeen = false
+
 onMounted(async () => {
+  stickRO = new ResizeObserver(() => {
+    // the initial delivery on observe() is not a growth event
+    if (!stickROSeen) { stickROSeen = true; return }
+    if (atBottom.value) window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
+  })
+  if (chatEl.value) stickRO.observe(chatEl.value)
   try {
     const { data } = await configAPI.get()
     const max = parseInt(data.data?.message_max_count)
@@ -249,6 +259,7 @@ onMounted(async () => {
 onUnmounted(() => {
   streamOff = true
   stopStream()
+  stickRO?.disconnect()
   window.removeEventListener('scroll', onChatScroll)
   window.removeEventListener('resize', updateAtBottom)
 })
@@ -267,9 +278,14 @@ async function fetchMessages() {
   }
 }
 
+// jump to the newest message and pin the follow. always instant: a smooth
+// animation counts as "not at the bottom" for its whole duration, so a
+// message arriving mid-animation would drop out of the follow
 function scrollBottom() {
+  atBottom.value = true
   nextTick(() => {
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
+    // 'instant' beats the global html { scroll-behavior: smooth }
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' })
   })
 }
 
@@ -287,9 +303,7 @@ async function catchUp() {
     const newMsgs = list.filter(m => !existingIds.has(m.id))
     if (newMsgs.length > 0) {
       messages.value.push(...newMsgs)
-      const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
-      if (nearBottom) scrollBottom()
-      nextTick(updateAtBottom)
+      if (atBottom.value) scrollBottom()
     }
   } catch (e) { /* ignore */ }
 }
