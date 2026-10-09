@@ -928,8 +928,9 @@ function openPreview(src) {
 
 .chat-send-btn {
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
+  /* same outer height as the input pill (42px textarea + 2×1px border) */
+  width: 44px;
+  height: 44px;
   padding: 0;
   border-radius: var(--rounded-full);
   display: flex;
@@ -937,7 +938,7 @@ function openPreview(src) {
   justify-content: center;
   /* frosted version of btn--primary's ink (#111827) */
   background: color-mix(in srgb, #111827 70%, transparent);
-  border-color: transparent;
+  border: 1px solid var(--color-border); /* same plain edge as the input pill */
   backdrop-filter: blur(12px);
 }
 .chat-send-btn:hover:not(:disabled) {
