@@ -69,6 +69,8 @@ function startStream() {
   es.addEventListener('message', (e) => {
     let msg
     try { msg = JSON.parse(e.data) } catch { return }
+    // the AI's answer lands as a normal message — its tool run is over
+    if (msg.username === 'ai') aiTasks.value = []
     const before = messages.value.length
     appendMsg(msg)
     if (messages.value.length !== before) {
@@ -81,6 +83,7 @@ function startStream() {
     const id = Number(e.data)
     messages.value = messages.value.filter(m => m.id !== id)
   })
+  es.addEventListener('tool', onToolEvent)
   es.onerror = () => {
     // transient drops reconnect on their own; only a fatal close needs a nudge
     if (es?.readyState === EventSource.CLOSED && !streamOff) setTimeout(startStream, 3000)
@@ -90,6 +93,76 @@ function startStream() {
 function stopStream() {
   if (es) { es.close(); es = null }
 }
+
+// ── "AI working" strip: ephemeral tool-call activity from the SSE `tool`
+// events, kept out of the message list (never persisted — a reload starts
+// empty). task must be the lowercase 'chat' ('comment' runs are ignored) and
+// state is "running"/"done"; rows are keyed by tcId so a done updates the
+// running row it belongs to.
+const aiTasks = ref([])
+const aiScrollRef = ref(null)
+const aiFadeTop = ref(false)
+const aiFadeBottom = ref(false)
+
+function aiOnScroll() {
+  const el = aiScrollRef.value
+  if (!el) return
+  aiFadeTop.value = el.scrollTop > 0
+  aiFadeBottom.value = el.scrollTop + el.clientHeight < el.scrollHeight - 1
+}
+
+function onToolEvent(e) {
+  let d
+  try { d = JSON.parse(e.data) } catch { return }
+  if (d.task !== 'chat' || !d.tcId) return
+  const el = aiScrollRef.value
+  const stick = !el || el.scrollTop + el.clientHeight >= el.scrollHeight - 1
+  const i = aiTasks.value.findIndex(x => x.tcId === d.tcId)
+  const prev = i !== -1 ? aiTasks.value[i] : null
+  if (d.state === 'running') {
+    const row = { tcId: d.tcId, name: d.name || '', args: d.args || '', state: 'running', result: '' }
+    if (i === -1) aiTasks.value.push(row)
+    else aiTasks.value[i] = row
+  } else if (d.state === 'done') {
+    const row = {
+      tcId: d.tcId,
+      name: prev?.name || d.name || '',
+      args: prev?.args || d.args || '',
+      state: 'done',
+      result: d.result ?? ''
+    }
+    if (i === -1) aiTasks.value.push(row)
+    else aiTasks.value[i] = row
+  } else return
+  nextTick(() => {
+    const el2 = aiScrollRef.value
+    // follow the newest row unless the user scrolled up to inspect
+    if (el2 && stick) el2.scrollTop = el2.scrollHeight
+    aiOnScroll()
+  })
+}
+
+// args arrives as a JSON string — show it on the row as a short one-liner
+function aiArgsBrief(args) {
+  const s = String(args ?? '')
+  return s.length > 40 ? s.slice(0, 40) + '…' : s
+}
+
+function aiIsError(task) {
+  return task.state === 'done' && String(task.result ?? '').startsWith('Error:')
+}
+
+// edge fades only where there is actually more to scroll
+const aiMaskStyle = computed(() => {
+  const top = aiFadeTop.value
+  const bottom = aiFadeBottom.value
+  if (!top && !bottom) return null
+  let gradient
+  if (top && bottom) gradient = 'linear-gradient(to bottom, transparent, #000 12px, #000 calc(100% - 12px), transparent)'
+  else if (top) gradient = 'linear-gradient(to bottom, transparent, #000 12px)'
+  else gradient = 'linear-gradient(to bottom, #000 calc(100% - 12px), transparent)'
+  return { maskImage: gradient, WebkitMaskImage: gradient }
+})
 
 function onChatScroll() {
   const st = window.scrollY
@@ -390,6 +463,24 @@ function openPreview(src) {
     </div>
 
     <div class="chat-dock">
+      <!-- "AI working" strip: tool-call rows scroll above the input — plain
+           text, no chrome; ends fade while more content can be scrolled -->
+      <div v-if="aiTasks.length" class="chat-ai" :class="{ 'chat-dock--away': inputAway }">
+        <div ref="aiScrollRef" class="chat-ai__scroll" :style="aiMaskStyle" @scroll.passive="aiOnScroll">
+          <div
+            v-for="task in aiTasks"
+            :key="task.tcId"
+            class="chat-ai__row"
+            :class="{ 'chat-ai__row--error': aiIsError(task) }"
+          >
+            <span v-if="task.state === 'running'" class="chat-ai__spinner"></span>
+            <span class="chat-ai__text">
+              <template v-if="task.state === 'running'">{{ task.name }}({{ aiArgsBrief(task.args) }})</template>
+              <template v-else>{{ task.name }}<template v-if="task.result"> → {{ task.result }}</template></template>
+            </span>
+          </div>
+        </div>
+      </div>
       <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
         <div class="chat-input__row">
           <div class="chat-input__field">
@@ -973,15 +1064,58 @@ function openPreview(src) {
   font-weight: var(--weight-medium);
 }
 
+/* ── "AI working" strip (ephemeral tool activity above the input) ── */
+/* plain scrolling text: no background/border — the ends fade out through a
+   mask while there is more to scroll in that direction */
+.chat-ai__scroll {
+  max-height: 4.8em; /* ~3 one-line rows */
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.chat-ai__scroll::-webkit-scrollbar {
+  display: none;
+}
+.chat-ai__row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--text-xs);
+  line-height: 1.6em;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+.chat-ai__row--error {
+  color: var(--color-danger);
+}
+.chat-ai__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-ai__spinner {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--rounded-full);
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  animation: chat-ai-spin 0.8s linear infinite;
+}
+@keyframes chat-ai-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Dock show/hide (input bar + login hint share one motion) ── */
 /* soft slide + fade: long ease-out curve so the dock settles instead of
    snapping; opacity keeps the travel from reading as a hard-edged slide */
 .chat-input-area,
-.chat-login-hint {
+.chat-login-hint,
+.chat-ai {
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 }
 .chat-input-area.chat-dock--away,
-.chat-login-hint.chat-dock--away {
+.chat-login-hint.chat-dock--away,
+.chat-ai.chat-dock--away {
   transform: translateY(200px);
   opacity: 0;
   pointer-events: none;
