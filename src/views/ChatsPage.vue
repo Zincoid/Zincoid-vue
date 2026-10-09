@@ -492,7 +492,7 @@ function openPreview(src) {
             </span>
           </div>
         </div>
-        <div class="chat-ai__tools">
+        <div v-if="aiTasks.length" class="chat-ai__tools">
           <button class="chat-ai__btn" :title="t('chat.aiClear')" @click="aiClear">
             <SvgIcon name="clean" :size="13" />
           </button>
