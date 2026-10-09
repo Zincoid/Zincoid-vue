@@ -1125,7 +1125,11 @@ function openPreview(src) {
   height: 42px;
   font-family: inherit;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: none; /* firefox */
+  -ms-overflow-style: none;
+}
+.chat-input__textarea::-webkit-scrollbar {
+  display: none; /* chromium / safari */
 }
 .chat-input__textarea:focus {
   outline: none;
