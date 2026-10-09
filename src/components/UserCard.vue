@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
@@ -48,6 +48,57 @@ onMounted(() => nextTick(checkActiveOverflow))
 watch(() => props.user, () => nextTick(checkActiveOverflow))
 watch(() => localeStore.locale, () => nextTick(checkActiveOverflow))
 
+// ── hover: type @username over the nickname (overwrite, hero-style typing) ──
+// The display walks nameN from 0 to max(handle, nickname) length in flow:
+// the typed handle prefix, the hero's space + caret at the typing head, and
+// the not-yet-covered nickname tail — the tail is typed over until it's gone
+// (no leftover). The name box keeps its pre-hover width as a floor (no
+// instant reservation of the handle's width); once the tail is covered the
+// growing handle widens the box and pushes the tags after it. Leaving the
+// card types back to the nickname, faster, matching the hero terminal's
+// delete cadence.
+const nameTextRef = ref(null)
+const nameN = ref(0)
+const nameMinWidth = ref(null)
+let nameTimer = null
+const TYPE_MS = 100 // hero typing cadence
+const ERASE_MS = 40 // hero terminal deleting cadence
+
+const nameHandle = computed(() => (props.user.username ? '@' + props.user.username : ''))
+const nameTyped = computed(() => nameHandle.value.slice(0, nameN.value))
+const nameTail = computed(() => (props.user.nickname || '').slice(nameN.value))
+const nameEnd = computed(() => Math.max(nameHandle.value.length, (props.user.nickname || '').length))
+
+function animateName(target) {
+  clearInterval(nameTimer)
+  if (nameN.value === target) {
+    if (!target) nameMinWidth.value = null
+    return
+  }
+  const step = target > nameN.value ? 1 : -1
+  nameTimer = setInterval(() => {
+    nameN.value += step
+    if (nameN.value === target) {
+      clearInterval(nameTimer)
+      if (!target) nameMinWidth.value = null
+    }
+  }, step > 0 ? TYPE_MS : ERASE_MS)
+}
+
+function onCardEnter() {
+  if (!nameHandle.value) return
+  if (!nameN.value && nameTextRef.value) {
+    nameMinWidth.value = nameTextRef.value.getBoundingClientRect().width
+  }
+  animateName(nameEnd.value)
+}
+
+function onCardLeave() {
+  animateName(0)
+}
+
+onBeforeUnmount(() => clearInterval(nameTimer))
+
 function goDetail() {
   router.push(`/members/${props.user.id}`)
 }
@@ -74,7 +125,7 @@ async function handleDelete() {
 </script>
 
 <template>
-  <div class="user-card spin-edge" @click="goDetail">
+  <div class="user-card spin-edge" @click="goDetail" @mouseenter="onCardEnter" @mouseleave="onCardLeave">
     <img
       v-if="user.avatar"
       :src="user.avatar"
@@ -86,7 +137,7 @@ async function handleDelete() {
     </span>
     <div class="user-card__info">
       <h4 class="user-card__name">
-        <span class="user-card__name-text">{{ user.nickname }}</span>
+        <span ref="nameTextRef" class="user-card__name-text" :style="nameMinWidth ? { minWidth: nameMinWidth + 'px' } : null">{{ nameTyped }}{{ nameN ? ' ' : '' }}<span v-if="nameN" class="cursor">▌</span>{{ nameTail }}</span>
         <span v-if="user.gender !== null && user.gender !== undefined" class="user-card__pronouns">{{ user.gender === 0 ? t('user.heHim') : t('user.sheHer') }}</span>
         <span v-if="user.status === 0" class="user-card__disabled-tag">{{ t('user.disabled') }}</span>
       </h4>
