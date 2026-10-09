@@ -870,11 +870,10 @@ function openPreview(src) {
   /* frosted pill — glass moved here from the old dock panel */
   background: color-mix(in srgb, var(--color-surface) 70%, transparent);
   backdrop-filter: blur(12px);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 .chat-input__field:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(249, 168, 212, 0.12);
 }
 .chat-input__textarea {
   flex: 1;
