@@ -416,6 +416,9 @@ async function copyMsg(msg) {
 // (trailing space keeps the mention dropdown from opening on the finished name)
 function mentionUser(msg) {
   if (!msg.username) return
+  // the dock slides away while browsing history — pop it back up first so the
+  // mention doesn't land in a hidden composer
+  inputAway.value = false
   insertAtCursor(chatTextarea.value, '@' + msg.username + ' ')
 }
 
