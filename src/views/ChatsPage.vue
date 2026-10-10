@@ -976,9 +976,13 @@ function openPreview(src) {
 /* ── Attachments ── */
 
 .chat-msg__file {
-  margin-top: var(--spacing-xs);
   overflow: hidden;
   border-radius: var(--rounded-md);
+}
+/* gap between text and attachment — only when text exists above it; on an
+   attachment-only message it would push the image off-center in the bubble */
+.chat-msg__content + .chat-msg__file {
+  margin-top: var(--spacing-xs);
 }
 
 .chat-msg__img {
