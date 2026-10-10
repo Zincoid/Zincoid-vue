@@ -121,6 +121,7 @@ function removeImage(i) {
 
 async function submitMoment() {
   if (!newContent.value.trim() && !newImageFiles.value.length) return
+  mention.close()
   posting.value = true
   const totalFiles = newImageFiles.value.length
   uploadState.value = { total: totalFiles, uploaded: 0, currentFile: 0, currentProgress: 0 }

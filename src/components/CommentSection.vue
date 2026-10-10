@@ -65,6 +65,7 @@ onUnmounted(() => document.removeEventListener('pointerdown', onDocPointerDown))
 
 function handleSubmit() {
   if (!content.value.trim()) return
+  mention.close()
   submitting.value = true
   emit('submit', {
     content: content.value.trim(),

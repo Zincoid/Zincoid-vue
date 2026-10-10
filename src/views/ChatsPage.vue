@@ -334,6 +334,9 @@ async function catchUp() {
 
 async function handleSend() {
   if (!content.value.trim() && !uploadFile.value) return
+  // sending without a trailing space leaves the mention query open — the
+  // dropdown must not outlive the composer content
+  mention.close()
   sending.value = true
   try {
     let fileUrl = null
