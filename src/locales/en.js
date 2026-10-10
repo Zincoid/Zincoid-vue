@@ -36,7 +36,7 @@ export default {
     delete: 'Delete',
     postFailed: 'Failed to post',
     deleteError: 'Failed to delete',
-    placeholder: "What's on your mind? @ to mention...",
+    placeholder: "What's on your mind?",
     updateFailed: 'Failed to update',
     private: 'Moment is private.',
     maxAttachments: 'Up to 9 attachments allowed'
@@ -117,8 +117,8 @@ export default {
     showReplies: 'Show {count} replies',
     delete: 'Delete',
     deleteConfirm: 'Delete this comment?',
-    placeholder: 'Write a comment, @ to mention...',
-    replyPlaceholder: 'Write your reply, @ to mention...',
+    placeholder: 'Write a comment...',
+    replyPlaceholder: 'Write a reply...',
     loginHint: 'Log in to leave a comment.',
     replyTo: 'Reply to',
     postFailed: 'Failed to comment',
@@ -680,7 +680,7 @@ export default {
   chat: {
     title: 'Chats',
     subtitle: 'Chat with users or the agent (@ai)',
-    placeholder: 'Type a message, @ to mention...',
+    placeholder: 'Type a message...',
     emojiTitle: 'Emoji',
     mentionTitle: 'Mention a user',
     loginHint: 'Log in to join the chat.',

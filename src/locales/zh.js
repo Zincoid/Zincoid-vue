@@ -36,7 +36,7 @@ export default {
     delete: '删除',
     postFailed: '发布失败',
     deleteError: '删除失败',
-    placeholder: '在想什么？@ 提及用户...',
+    placeholder: '在想什么？',
     updateFailed: '更新失败',
     private: '动态为私有。',
     maxAttachments: '最多上传 9 个附件'
@@ -117,8 +117,8 @@ export default {
     showReplies: '查看 {count} 条回复',
     delete: '删除',
     deleteConfirm: '确定删除这条评论？',
-    placeholder: '写评论，@ 提及用户...',
-    replyPlaceholder: '写回复，@ 提及用户...',
+    placeholder: '写评论...',
+    replyPlaceholder: '写回复...',
     loginHint: '登录后即可评论。',
     replyTo: '回复',
     postFailed: '评论失败',
@@ -680,7 +680,7 @@ export default {
   chat: {
     title: '聊天',
     subtitle: '与用户或智能体对话（@ai）',
-    placeholder: '输入消息，@ 提及用户...',
+    placeholder: '说点什么...',
     emojiTitle: '表情',
     mentionTitle: '提及',
     loginHint: '登录后即可参与聊天。',
