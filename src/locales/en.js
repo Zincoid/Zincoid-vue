@@ -33,6 +33,7 @@ export default {
     new: 'New',
     post: 'Post',
     attach: 'Attach',
+    mentionTitle: 'Mention',
     delete: 'Delete',
     postFailed: 'Failed to post',
     deleteError: 'Failed to delete',

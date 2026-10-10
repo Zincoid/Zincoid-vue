@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import DotBanner from '@/components/DotBanner.vue'
 import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { useConfig } from '@/composables/useConfig'
-import { useMention } from '@/composables/useMention'
+import { useMention, insertAtCursor } from '@/composables/useMention'
 import { useFileDrop } from '@/composables/useFileDrop'
 import { momentAPI, fileAPI } from '@/api'
 import MomentCard from '@/components/MomentCard.vue'
@@ -78,6 +78,11 @@ function onPageChange(p) {
 function onMomentInput(e) {
   newContent.value = e.target.value
   mention.onInput(e.target)
+}
+
+function insertMentionChar() {
+  insertAtCursor(momentTextarea.value, '@')
+  nextTick(() => mention.onInput(momentTextarea.value))
 }
 
 function addImageFile(file) {
@@ -222,6 +227,26 @@ async function submitMoment() {
           :uploaded="uploadState.uploaded"
           :current-progress="uploadState.currentProgress"
         />
+        <!-- icon tools on the right of the visibility row; hidden while posting
+             so the progress lands in their place -->
+        <div v-if="!posting && !uploadState.total" class="editor__tools">
+          <label class="editor__tool editor__tool--attach" :title="t('moment.attach')">
+            <SvgIcon name="attach" :size="18" />
+            <input type="file" accept="image/*,video/*,audio/*" class="hidden-input" @change="handleUpload" />
+          </label>
+          <button type="button" class="editor__tool" :title="t('moment.mentionTitle')" @click="insertMentionChar">
+            <SvgIcon name="at" :size="18" />
+          </button>
+          <button
+            type="button"
+            class="editor__send"
+            :disabled="!newContent.trim() && !newImageFiles.length"
+            :title="t('moment.post')"
+            @click="submitMoment"
+          >
+            <SvgIcon name="send" :size="19" />
+          </button>
+        </div>
       </div>
 
       <div v-if="newImagePreviews.length" class="editor__images">
@@ -242,22 +267,6 @@ async function submitMoment() {
             <SvgIcon name="close" :size="10" />
           </button>
         </div>
-      </div>
-
-      <div class="editor__actions">
-        <label class="btn btn--outline btn--sm">
-          <SvgIcon name="attach" />
-          {{ t('moment.attach') }}
-          <input type="file" accept="image/*,video/*,audio/*" class="hidden-input" @change="handleUpload" />
-        </label>
-        <button
-          class="btn btn--primary btn--sm"
-          :disabled="(!newContent.trim() && !newImageFiles.length) || posting"
-          @click="submitMoment"
-        >
-          <SvgIcon name="send" />
-          {{ posting ? t('common.posting') : t('moment.post') }}
-        </button>
       </div>
     </div>
 
@@ -300,8 +309,15 @@ async function submitMoment() {
 .editor__image-wrap { position: relative; width: 80px; height: 80px; }
 .editor__image-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--rounded-md); }
 .editor__remove { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: var(--rounded-full); background: var(--color-danger); color: white; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.editor__actions { display: flex; gap: var(--spacing-sm); align-items: center; justify-content: flex-end; }
-.editor__actions .btn { flex: 1; }
+/* icon tools on the right of the visibility row — same language as the
+   comment composer's tool bar */
+.editor__tools { display: flex; align-items: center; gap: var(--spacing-xxs); margin-left: auto; }
+.editor__tool { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--rounded-lg); color: var(--color-text-secondary); cursor: pointer; transition: background var(--transition-fast), color var(--transition-fast); }
+.editor__tool:hover { background: var(--color-primary-light); color: var(--color-primary); }
+.editor__tool--attach:hover { background: var(--color-success-bg); color: var(--color-success); }
+.editor__send { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--rounded-lg); background: var(--color-primary); color: var(--color-white); margin-left: var(--spacing-xs); transition: background var(--transition-fast), opacity var(--transition-fast); }
+.editor__send:hover:not(:disabled) { background: var(--color-primary-hover); }
+.editor__send:disabled { background: var(--color-border); color: var(--color-text-tertiary); cursor: default; }
 .editor__video-preview { position: relative; width: 100%; height: 100%; background: #000; border-radius: var(--rounded-md); overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .editor__video-preview video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
 .editor__play-icon { position: relative; width: 28px; height: 28px; border-radius: var(--rounded-full); background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; color: white; }

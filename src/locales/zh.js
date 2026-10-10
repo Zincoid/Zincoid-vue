@@ -33,6 +33,7 @@ export default {
     new: '新建',
     post: '发布',
     attach: '附件',
+    mentionTitle: '提及',
     delete: '删除',
     postFailed: '发布失败',
     deleteError: '删除失败',
