@@ -86,6 +86,7 @@ let heroRaf = 0
 let heroVh = 0        // full hero height, layout px
 let heroFinalH = 480  // compact hero height, layout px (floor; measured on mobile)
 let lastVw = 0
+let lastVh = 0
 let dropColorGreen = '#3fb950'
 let dropColorBlue = '#58a6ff'
 
@@ -151,11 +152,17 @@ function onHeroScroll() {
 }
 
 function onHeroResize() {
-  // Width-only: height changes are the mobile URL bar collapsing — chasing
-  // them makes the hero breathe while scrolling.
+  // Width changes always re-measure. Height changes only on desktop: a height
+  // change mid-scroll on a touch device is the mobile URL bar collapsing, and
+  // chasing it makes the hero (and the page under it) breathe. But ignoring
+  // height resizes on desktop leaves heroVh stale — the hero then comes back
+  // from its compact state at the old height and no longer covers the screen.
   const vw = document.documentElement.clientWidth
-  if (vw !== lastVw) {
+  const vh = window.innerHeight
+  const realHeightChange = !window.matchMedia('(pointer: coarse)').matches && vh !== lastVh
+  if (vw !== lastVw || realHeightChange) {
     lastVw = vw
+    lastVh = vh
     measureHero()
     updateHeroProgress()
   }
@@ -164,6 +171,7 @@ function onHeroResize() {
 function startHeroScroll() {
   if (!heroScrollRef.value) return
   lastVw = document.documentElement.clientWidth
+  lastVh = window.innerHeight
   measureHero()
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reduceMotion) {
