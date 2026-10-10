@@ -501,12 +501,14 @@ function openPreview(src) {
             <img v-if="msg.userAvatar" :src="msg.userAvatar" alt="" />
             <span v-else>{{ (msg.userNickname || '?')[0] }}</span>
           </router-link>
-          <div class="chat-msg__body">
+          <div class="chat-msg__stack">
+            <!-- meta sits above the bubble, never inside it -->
             <div class="chat-msg__meta">
               <span class="chat-msg__author">{{ msg.userNickname }}</span>
               <router-link v-if="msg.username" :to="`/members/@${msg.username}`" class="chat-msg__handle">@{{ msg.username }}</router-link>
               <span class="chat-msg__time">{{ formatDate(msg.createdAt) }}</span>
             </div>
+            <div class="chat-msg__body">
             <div v-if="msg.content" class="chat-msg__content">
               <template v-for="(part, i) in msg.parsedContent" :key="i">
                 <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
@@ -581,6 +583,7 @@ function openPreview(src) {
                 :title="t('common.delete')"
                 @click="handleDelete(msg)"
               ><SvgIcon name="trash" :size="14" /></button>
+            </div>
             </div>
           </div>
           </template>
@@ -742,8 +745,8 @@ function openPreview(src) {
 /* ── Message bubble ── */
 
 .chat-msg {
-  /* full-width band so hover reaches the whole row — the bubble itself is
-     capped by max-width on .chat-msg__body */
+  /* full-width band so hover reaches the whole row — meta + bubble stack is
+     capped by max-width on .chat-msg__stack */
   display: flex;
   gap: var(--spacing-sm);
   animation: fadeInUp 0.25s ease;
@@ -793,12 +796,25 @@ function openPreview(src) {
   background: transparent;
 }
 
+/* meta + bubble column: the meta line lives outside (above) the bubble */
+.chat-msg__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+  max-width: 75%;
+}
+.chat-msg--mine .chat-msg__stack {
+  align-items: flex-end;
+}
+
 .chat-msg__body {
   background: color-mix(in srgb, var(--color-surface) 60%, transparent);
   border-radius: var(--rounded-lg);
   padding: var(--spacing-sm) var(--spacing-md);
   min-width: 0;
-  max-width: 75%;
+  max-width: 100%;
   position: relative;
 }
 .chat-msg--mine .chat-msg__body {
@@ -809,7 +825,6 @@ function openPreview(src) {
   display: flex;
   gap: var(--spacing-sm);
   align-items: baseline;
-  margin-bottom: 3px;
 }
 .chat-msg__author {
   font-size: var(--text-xs);
@@ -907,7 +922,11 @@ function openPreview(src) {
 
 .chat-msg__video-card {
   position: relative;
-  max-width: 280px;
+  /* explicit width: the card's children are all absolutely positioned, so a
+     video-only bubble has no content width to stretch to (the meta line used
+     to supply one before it moved out of the bubble) and the card collapsed */
+  width: 280px;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
   background: var(--color-bg);
   border-radius: var(--rounded-md);
@@ -941,6 +960,11 @@ function openPreview(src) {
 .chat-msg__audio {
   display: flex;
   align-items: center;
+  /* fixed width so the icon + label can't shrink the bubble to a stub now
+     that the meta line no longer supplies width — kept tighter than the
+     video card, there is only a label to show */
+  width: 180px;
+  max-width: 100%;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--color-bg);
