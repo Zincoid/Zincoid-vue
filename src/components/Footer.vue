@@ -95,4 +95,12 @@ const { t } = useI18n()
     margin-left: 0;
   }
 }
+
+/* mobile: the nav tags (moments/articles/repos/chats/members) are redundant
+   with the navbar — drop the direct-child links (the filing links stay) */
+@media (max-width: 857px) {
+  .footer__inner > a {
+    display: none;
+  }
+}
 </style>
