@@ -431,6 +431,18 @@ function markMediaBroken(url) {
   mediaBroken.value = new Set(mediaBroken.value).add(url)
 }
 
+// the list preview prefers msg.thumb (a lightweight thumbnail the backend now
+// serves for image files) — a dead thumb must fall back to the full file before
+// the message counts as broken
+function onImgError(msg, e) {
+  const el = e.target
+  if (msg.thumb && el.getAttribute('src') !== msg.file) {
+    el.src = msg.file
+    return
+  }
+  markMediaBroken(msg.file)
+}
+
 function canDelete(msg) {
   return auth.isLoggedIn && (auth.user?.id === msg.userId || auth.isAdmin)
 }
@@ -508,10 +520,10 @@ function openPreview(src) {
               </div>
               <img
                 v-else-if="isImage(msg.file)"
-                :src="msg.file"
+                :src="msg.thumb || msg.file"
                 class="chat-msg__img"
                 @click="openPreview(msg.file)"
-                @error="markMediaBroken(msg.file)"
+                @error="onImgError(msg, $event)"
                 alt=""
               />
               <div
