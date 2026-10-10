@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useConfirm } from '@/composables/useConfirm'
@@ -25,6 +25,41 @@ const { toast } = useToast()
 
 const messages = ref([])
 const parsedMessages = computed(() => messages.value.map(m => ({ ...m, parsedContent: parseMentions(m.content) })))
+
+// calendar-day key for the date bands in the timeline (createdAt is ISO)
+function dayKey(s) {
+  return String(s || '').slice(0, 10)
+}
+
+// ── hover: type the timestamp in and erase it out, char by char — same
+// cadence as UserCard's @handle typing (100ms in, 40ms out). progress lives
+// per message id so a fast mouse sweep over the list runs each row's own
+// animation independently.
+const TYPE_MS = 30
+const ERASE_MS = 15
+const timeN = reactive({}) // msgId -> chars of the timestamp currently shown
+const timeTimers = new Map() // msgId -> interval
+
+function animateTime(id, target) {
+  clearInterval(timeTimers.get(id))
+  const cur = timeN[id] || 0
+  if (cur === target) return
+  const step = target > cur ? 1 : -1
+  timeTimers.set(id, setInterval(() => {
+    timeN[id] = (timeN[id] || 0) + step
+    if (timeN[id] === target) {
+      clearInterval(timeTimers.get(id))
+      timeTimers.delete(id)
+    }
+  }, step > 0 ? TYPE_MS : ERASE_MS))
+}
+
+function onMsgEnter(msg) {
+  animateTime(msg.id, formatDate(msg.createdAt).length)
+}
+function onMsgLeave(msg) {
+  animateTime(msg.id, 0)
+}
 const content = ref('')
 const sending = ref(false)
 const loading = ref(true)
@@ -276,6 +311,8 @@ onUnmounted(() => {
   streamOff = true
   stopStream()
   stickRO?.disconnect()
+  for (const t of timeTimers.values()) clearInterval(t)
+  timeTimers.clear()
   window.removeEventListener('scroll', onChatScroll)
   window.removeEventListener('resize', onResize)
 })
@@ -493,7 +530,17 @@ function openPreview(src) {
     <div class="chat-box" ref="chatEl">
       <LoadingSpinner :visible="loading" @done="onLoadingDone" />
       <template v-if="loadingDone">
-        <div v-for="msg in parsedMessages" :key="msg.id" class="chat-msg" :class="{ 'chat-msg--mine': auth.user?.id === msg.userId, 'chat-msg--recalled': msg.recalled }">
+        <template v-for="(msg, i) in parsedMessages" :key="msg.id">
+          <!-- date band before the first message of each day, centered like the recalled notice -->
+          <div v-if="i === 0 || dayKey(msg.createdAt) !== dayKey(parsedMessages[i - 1].createdAt)" class="chat-day">
+            <span>{{ dayKey(msg.createdAt) }}</span>
+          </div>
+          <div
+            class="chat-msg"
+            :class="{ 'chat-msg--mine': auth.user?.id === msg.userId, 'chat-msg--recalled': msg.recalled }"
+            @mouseenter="onMsgEnter(msg)"
+            @mouseleave="onMsgLeave(msg)"
+          >
           <!-- recalled: content gone, the slot keeps a centered notice -->
           <div v-if="msg.recalled" class="chat-msg__recalled">{{ t('chat.recalled') }}</div>
           <template v-else>
@@ -506,7 +553,7 @@ function openPreview(src) {
             <div class="chat-msg__meta">
               <span class="chat-msg__author">{{ msg.userNickname }}</span>
               <router-link v-if="msg.username" :to="`/members/@${msg.username}`" class="chat-msg__handle">@{{ msg.username }}</router-link>
-              <span class="chat-msg__time">{{ formatDate(msg.createdAt) }}</span>
+              <span class="chat-msg__time"><template v-if="timeN[msg.id]">{{ formatDate(msg.createdAt).slice(0, timeN[msg.id]) }} <span class="cursor">▌</span></template></span>
             </div>
             <div class="chat-msg__body">
             <div v-if="msg.content" class="chat-msg__content">
@@ -588,6 +635,7 @@ function openPreview(src) {
           </div>
           </template>
         </div>
+        </template>
       </template>
     </div>
 
@@ -770,6 +818,25 @@ function openPreview(src) {
   color: var(--color-text-secondary);
 }
 
+/* date band — centered gray label flanked by hairline rules before each day's
+   block; extra vertical margin so the day boundary breathes more than the
+   message-to-message gap */
+.chat-day {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+.chat-day::before,
+.chat-day::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
 .chat-msg__avatar {
   width: 36px;
   height: 36px;
@@ -844,6 +911,11 @@ function openPreview(src) {
   font-size: 10px;
   color: var(--color-text-tertiary, #999);
   letter-spacing: .02em;
+  /* visibility is the typing animation (see animateTime) — nothing to fade */
+}
+/* own messages: the timestamp leads the meta line (left of the name) */
+.chat-msg--mine .chat-msg__time {
+  order: -1;
 }
 
 /* hover actions: outside the bubble on its outer side, bottom-anchored —
