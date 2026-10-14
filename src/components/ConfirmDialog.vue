@@ -108,7 +108,7 @@ onBeforeUnmount(() => stopTimer())
   align-items: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--rounded-full);
+  border-radius: var(--rounded-md);
   font-size: var(--text-xs);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -118,11 +118,11 @@ onBeforeUnmount(() => stopTimer())
 .confirm-dialog__btn--cancel {
   background: transparent;
   color: var(--color-text-secondary);
-  border-color: var(--color-border);
+  /* no border at all — kept transparent so the box matches the confirm button */
+  border-color: transparent;
 }
 .confirm-dialog__btn--cancel:hover {
   color: var(--color-text-heading);
-  border-color: var(--color-text-secondary);
   background: var(--color-bg-alt);
 }
 .confirm-dialog__btn--confirm {
