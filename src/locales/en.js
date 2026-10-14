@@ -23,7 +23,7 @@ export default {
   moment: {
     title: 'Moments',
     titleSingle: 'Moment',
-    subtitle: 'Latest community updates',
+    subtitle: 'Fresh thoughts, updates and shares from everyone',
     empty: 'No moments yet.',
     notFound: 'Moment not found.',
     pinned: 'Pinned',
@@ -56,7 +56,7 @@ export default {
   article: {
     title: 'Articles',
     titleSingle: 'Article',
-    subtitle: 'Long-form thoughts and tutorials',
+    subtitle: 'In-depth essays, guides and technical notes',
     empty: 'No articles yet.',
     notFound: 'Article not found.',
     pinned: 'Pinned',
@@ -92,7 +92,7 @@ export default {
     musicRequestSuccess: 'Music request sent',
     musicRequestFailed: 'Failed to send music request',
     moreComing: 'More features coming soon...',
-    subtitle: 'All members',
+    subtitle: 'Meet every member of the community',
     empty: 'No members found.',
     searchPlaceholder: 'Search username or nickname...',
     moments: 'Moments',
@@ -195,7 +195,7 @@ export default {
   repo: {
     pageTitle: 'Repos',
     pageTitleSingle: 'Repo',
-    placeholder: 'Code repos, media & file collections',
+    placeholder: 'Code repos, media works and file collections',
     all: 'All',
     code: 'Code',
     media: 'Media',

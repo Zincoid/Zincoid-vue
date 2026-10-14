@@ -23,7 +23,7 @@ export default {
   moment: {
     title: '动态',
     titleSingle: '动态',
-    subtitle: '社区最新动态',
+    subtitle: '大家的最新想法、近况与分享',
     empty: '暂无动态。',
     notFound: '动态不存在。',
     pinned: '置顶',
@@ -56,7 +56,7 @@ export default {
   article: {
     title: '文章',
     titleSingle: '文章',
-    subtitle: '长文和教程',
+    subtitle: '深度长文、教程与技术沉淀',
     empty: '暂无文章。',
     notFound: '文章不存在。',
     pinned: '置顶',
@@ -92,7 +92,7 @@ export default {
     musicRequestSuccess: '音乐请求已发送',
     musicRequestFailed: '音乐请求发送失败',
     moreComing: '更多功能敬请期待...',
-    subtitle: '所有成员',
+    subtitle: '认识社区里的每一位成员',
     empty: '暂无成员。',
     searchPlaceholder: '搜索用户名或昵称...',
     moments: '动态',
@@ -234,7 +234,7 @@ export default {
   repo: {
     pageTitle: '仓库',
     pageTitleSingle: '仓库',
-    placeholder: '代码仓库、媒体集与文件集',
+    placeholder: '代码仓库、媒体作品与文件合集',
     all: '全部',
     code: '代码',
     media: '媒体',
