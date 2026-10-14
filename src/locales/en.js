@@ -311,7 +311,7 @@ export default {
     noAuthorizations: 'No authorizations.'
   },
   request: {
-    desc: 'Manage all types of request operations (only retain data from the past 7 days)',
+    desc: 'Manage request operations (only retain data from the past 7 days)',
     received: 'Received',
     sent: 'Sent',
     pending: 'Pending',

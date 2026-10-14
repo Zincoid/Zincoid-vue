@@ -291,7 +291,7 @@ export default {
     views: '次浏览',
   },
   access: {
-    desc: '管理仓库访问授权',
+    desc: '管理仓库授权',
     received: '接收',
     sent: '发送',
     pending: '待处理',
@@ -311,7 +311,7 @@ export default {
     noAuthorizations: '暂无授权。'
   },
   request: {
-    desc: '管理各类请求操作（仅保留近7日数据）',
+    desc: '管理请求操作（仅保留近7日数据）',
     received: '接收',
     sent: '发送',
     pending: '待处理',
