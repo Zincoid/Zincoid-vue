@@ -459,7 +459,7 @@ async function changeEmail() {
             </div>
             <div class="card__actions" style="display:flex;gap:var(--spacing-sm)">
               <button class="btn btn--outline btn--full" @click="showDeleteForm = false; deleteConfirmInput = ''">{{ t('common.cancel') }}</button>
-              <button class="btn btn--primary btn--full delete-btn" :disabled="deleteConfirmInput !== auth.user?.username" @click="deleteAccount">
+              <button class="btn btn--danger btn--full" :disabled="deleteConfirmInput !== auth.user?.username" @click="deleteAccount">
                 <SvgIcon name="trash" :size="16" />
                 {{ t('common.confirm') }}
               </button>
@@ -469,7 +469,7 @@ async function changeEmail() {
           <template v-else>
             <p class="card__desc">{{ t('profile.deleteAccountDesc') }}</p>
             <div class="card__actions">
-              <button class="btn btn--primary btn--full delete-btn" @click="showDeleteForm = true">
+              <button class="btn btn--danger btn--full" @click="showDeleteForm = true">
                 <SvgIcon name="trash" :size="16" />
                 {{ t('profile.deleteAccount') }}
               </button>
@@ -666,24 +666,30 @@ async function changeEmail() {
   color: var(--color-danger);
 }
 
-/* destructive CTA — same filled style as the save button (global .btn--primary),
-   only the ink is swapped to danger red (and its darker night tones) */
-.delete-btn {
+/* filled danger variant — layout comes from global .btn/.btn--danger,
+   only the fills are overridden here */
+.btn--danger {
   background: var(--color-danger);
-  border-color: var(--color-danger);
+  color: white;
 }
-.delete-btn:hover {
+.btn--danger:hover {
   background: var(--color-danger);
-  border-color: var(--color-danger);
+  color: white;
   opacity: 0.85;
 }
-[data-theme="dark"] .delete-btn {
+.btn--danger:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+[data-theme="dark"] .btn--danger {
   background: #5f1414;
   border-color: #7f1d1d;
+  color: var(--color-text);
 }
-[data-theme="dark"] .delete-btn:hover {
+[data-theme="dark"] .btn--danger:hover {
   background: #7f1d1d;
   border-color: #991b1b;
+  color: white;
   opacity: 1;
 }
 
