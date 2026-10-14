@@ -173,11 +173,14 @@ th {
 .btn--primary:active {
   transform: scale(0.98);
 }
+/* night mode drops the pure-white label to the muted text tone */
 [data-theme="dark"] .btn--primary {
   border-color: #374151;
+  color: var(--color-text);
 }
 [data-theme="dark"] .btn--primary:hover {
   border-color: #4b5563;
+  color: var(--color-text);
 }
 /* list-page create buttons (light: white fill, dark-mode button's border treatment) */
 .btn--white {
@@ -192,11 +195,11 @@ th {
 }
 [data-theme="dark"] .btn--white {
   background: #111827;
-  color: #fff;
+  color: var(--color-text);
 }
 [data-theme="dark"] .btn--white:hover {
   background: #1f2937;
-  color: #fff;
+  color: var(--color-text);
 }
 .btn--outline {
   border-color: var(--color-border);
