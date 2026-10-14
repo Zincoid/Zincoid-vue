@@ -242,6 +242,8 @@ export default {
     empty: '暂无仓库。',
     emptyItems: '暂无内容。',
     itemsRemaining: '（剩余 {count}）',
+    sortDefault: '默认',
+    sortLatest: '最近',
     deleteConfirm: '确定删除这个仓库？',
     new: '新建',
     name: '名称',

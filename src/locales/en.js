@@ -203,6 +203,8 @@ export default {
     empty: 'No repos yet.',
     emptyItems: 'No items yet.',
     itemsRemaining: '({count} left)',
+    sortDefault: 'Default',
+    sortLatest: 'Recent',
     deleteConfirm: 'Delete this repo?',
     new: 'New',
     name: 'Name',

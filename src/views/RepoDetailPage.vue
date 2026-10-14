@@ -179,10 +179,24 @@ const itemsTotal = ref(0)
 const itemsRemaining = computed(() => Math.max(0, itemsTotal.value - (repo.value?.items?.length || 0)))
 const itemsLoadingMore = ref(false)
 let itemsSize = 10
+// 'default' = manual sort order, 'latest' = newest first (backend `latest` flag)
+const itemsSort = ref('default')
+const sortOptions = computed(() => [
+  { value: 'default', label: t('repo.sortDefault') },
+  { value: 'latest', label: t('repo.sortLatest') }
+])
+
+async function setItemsSort(mode) {
+  if (itemsSort.value === mode) return
+  itemsSort.value = mode
+  try {
+    await fetchItems(1)
+  } catch { /* ignore */ }
+}
 
 async function fetchItems(page) {
   const version = ++itemsVersion
-  const res = await repoAPI.getItems(route.params.id, page, itemsSize)
+  const res = await repoAPI.getItems(route.params.id, page, itemsSize, itemsSort.value === 'latest')
   if (version !== itemsVersion) return
   const data = res.data.data
   if (page === 1) {
@@ -216,7 +230,7 @@ async function fetchRepo() {
     likeCount.value = repo.value.likeCount || 0
     const [cRes, iRes] = await Promise.all([
       commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value),
-      !repo.value.restricted && repo.value.type !== 0 ? repoAPI.getItems(route.params.id, 1, itemsSize) : Promise.resolve(null)
+      !repo.value.restricted && repo.value.type !== 0 ? repoAPI.getItems(route.params.id, 1, itemsSize, itemsSort.value === 'latest') : Promise.resolve(null)
     ])
     if (iRes) {
       const data = iRes.data.data
@@ -394,6 +408,9 @@ const uploadState = ref({
 async function handleItemFiles(e) {
   const files = e.target.files
   if (!files.length) return
+  // tail-append bookkeeping assumes default (manual) order — jump back to it
+  // first when sorted by latest, so new items land where the list expects them
+  if (itemsSort.value !== 'default') await setItemsSort('default')
   uploading.value = true
   uploadState.value = { total: files.length, uploaded: 0, currentProgress: 0 }
   try {
@@ -441,7 +458,7 @@ async function alignItemsTail() {
   const page = Math.min(itemsPage.value, Math.max(itemsPages.value, 1))
   if (page <= 0) return
   const version = ++itemsVersion
-  const res = await repoAPI.getItems(route.params.id, page, itemsSize)
+  const res = await repoAPI.getItems(route.params.id, page, itemsSize, itemsSort.value === 'latest')
   if (version !== itemsVersion) return
   const data = res.data.data
   itemsPage.value = data.page || page
@@ -698,8 +715,18 @@ async function saveEdit() {
         </div>
         <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
 
-        <div v-if="!repo.restricted && repo.tags?.length" class="repo-tags">
-          <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
+        <div v-if="!repo.restricted" class="repo-tags">
+          <div class="repo-tags__list">
+            <span v-for="tag in repo.tags" :key="tag" class="repo-tag">{{ tag }}</span>
+            <span v-if="!repo.tags?.length" class="repo-tag--empty">{{ t('repo.noTags') }}</span>
+          </div>
+          <div v-if="repo.type !== 0" class="items-sort">
+            <SliderSelect
+              :model-value="itemsSort"
+              :options="sortOptions"
+              @update:model-value="setItemsSort"
+            />
+          </div>
         </div>
 
         <!-- CODE type → external link + GitHub info -->
@@ -754,12 +781,12 @@ async function saveEdit() {
                 </button>
                 <div v-else class="item-card"
                      :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
-                     :draggable="canEdit()"
-                     @dragstart="canEdit() && onDragStart(item.id, $event)"
-                     @dragover="canEdit() && onDragOver(item.id, $event)"
-                     @drop="canEdit() && onDrop(item.id, $event)">
+                     :draggable="canEdit() && itemsSort === 'default'"
+                     @dragstart="canEdit() && itemsSort === 'default' && onDragStart(item.id, $event)"
+                     @dragover="canEdit() && itemsSort === 'default' && onDragOver(item.id, $event)"
+                     @drop="canEdit() && itemsSort === 'default' && onDrop(item.id, $event)">
                   <div class="item-card__handle">
-                    <SvgIcon v-if="canEdit()" name="drag" />
+                    <SvgIcon v-if="canEdit() && itemsSort === 'default'" name="drag" />
                     <SvgIcon v-else name="chevron-right" />
                   </div>
                   <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
@@ -788,12 +815,12 @@ async function saveEdit() {
           <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
           <div v-else class="items-list">
             <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
-                 :draggable="canEdit()"
-                 @dragstart="canEdit() && onDragStart(item.id, $event)"
-                 @dragover="canEdit() && onDragOver(item.id, $event)"
-                 @drop="canEdit() && onDrop(item.id, $event)">
+                 :draggable="canEdit() && itemsSort === 'default'"
+                 @dragstart="canEdit() && itemsSort === 'default' && onDragStart(item.id, $event)"
+                 @dragover="canEdit() && itemsSort === 'default' && onDragOver(item.id, $event)"
+                 @drop="canEdit() && itemsSort === 'default' && onDrop(item.id, $event)">
               <div class="item-row__handle">
-                <SvgIcon v-if="canEdit()" name="drag" />
+                <SvgIcon v-if="canEdit() && itemsSort === 'default'" name="drag" />
                 <SvgIcon v-else name="chevron-right" />
               </div>
               <div class="item-row__icon">
@@ -1255,8 +1282,12 @@ async function saveEdit() {
   object-fit: unset;
 }
 
-.repo-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--spacing-xl); }
+.repo-tags { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.repo-tags__list { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
+.repo-tag--empty { font-size: var(--text-xs); color: var(--color-text-tertiary); }
+/* item sort switch — default (manual order) vs latest (newest first) */
+.items-sort { flex-shrink: 0; margin-left: auto; }
 
 .repo-url { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); }
 .repo-url:hover { border-color: var(--color-primary); }

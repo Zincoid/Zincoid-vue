@@ -196,7 +196,7 @@ export const repoAPI = {
   getRandom: () => api.get('/repos/public/random'),
   getHomeFeed: (size = 10) => api.get('/repos/public/home', { params: { size } }),
   getDetail: (id) => api.get(`/repos/public/${id}`),
-  getItems: (id, page = 1, size = 10) => api.get(`/repos/public/${id}/items`, { params: { page, size } }),
+  getItems: (id, page = 1, size = 10, latest = false) => api.get(`/repos/public/${id}/items`, { params: { page, size, latest } }),
   addItem: (repoId, fileId) => api.post(`/repos/${repoId}/items`, null, { params: { fileId } }),
   deleteItem: (repoId, itemId) => api.delete(`/repos/${repoId}/items/${itemId}`),
   swapItems: (repoId, from, to) => api.put(`/repos/${repoId}/items/sort`, null, { params: { from, to } }),
