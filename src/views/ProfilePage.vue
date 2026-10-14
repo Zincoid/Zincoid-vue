@@ -666,21 +666,15 @@ async function changeEmail() {
   color: var(--color-danger);
 }
 
+/* filled danger variant — layout comes from global .btn/.btn--danger,
+   only the fills are overridden here */
 .btn--danger {
   background: var(--color-danger);
   color: white;
-  border: 1px solid var(--color-danger);
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--rounded-md);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  transition: opacity var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
 }
 .btn--danger:hover {
+  background: var(--color-danger);
+  color: white;
   opacity: 0.85;
 }
 .btn--danger:disabled {
@@ -695,6 +689,7 @@ async function changeEmail() {
 [data-theme="dark"] .btn--danger:hover {
   background: #7f1d1d;
   border-color: #991b1b;
+  color: var(--color-text);
   opacity: 1;
 }
 
