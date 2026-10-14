@@ -180,7 +180,7 @@ th {
 }
 [data-theme="dark"] .btn--primary:hover {
   border-color: #4b5563;
-  color: var(--color-text);
+  color: white;
 }
 /* list-page create buttons (light: white fill, dark-mode button's border treatment) */
 .btn--white {
@@ -199,7 +199,7 @@ th {
 }
 [data-theme="dark"] .btn--white:hover {
   background: #1f2937;
-  color: var(--color-text);
+  color: #fff;
 }
 .btn--outline {
   border-color: var(--color-border);

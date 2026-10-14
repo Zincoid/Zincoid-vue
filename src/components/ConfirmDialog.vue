@@ -140,7 +140,7 @@ onBeforeUnmount(() => stopTimer())
 }
 [data-theme="dark"] .confirm-dialog__btn--confirm:hover {
   border-color: #4b5563;
-  color: var(--color-text);
+  color: white;
 }
 
 .confirm-fade-enter-active,

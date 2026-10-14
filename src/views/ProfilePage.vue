@@ -689,7 +689,7 @@ async function changeEmail() {
 [data-theme="dark"] .btn--danger:hover {
   background: #7f1d1d;
   border-color: #991b1b;
-  color: var(--color-text);
+  color: white;
   opacity: 1;
 }
 
