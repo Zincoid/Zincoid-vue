@@ -129,7 +129,7 @@ export default {
   },
   personal: {
     pageTitle: 'Personal',
-    subtitle: 'Manage your profile, data and account settings',
+    subtitle: 'All your account management in one place',
     profileTab: 'Profile',
     dataTab: 'Data',
     accessTab: 'Access',
@@ -140,7 +140,7 @@ export default {
   },
   profile: {
     pageTitle: 'Profile',
-    subtitle: 'Manage your personal information and account settings',
+    subtitle: 'Manage your information and account settings',
     information: 'Information',
     loadFailed: 'Failed to load profile',
     avatarUpdated: 'Avatar updated!',

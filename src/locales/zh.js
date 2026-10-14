@@ -129,7 +129,7 @@ export default {
   },
   personal: {
     pageTitle: '个人中心',
-    subtitle: '管理基本信息、数据和账户设置',
+    subtitle: '一站式管理你的账号',
     profileTab: '基本',
     dataTab: '数据',
     accessTab: '授权',
@@ -140,7 +140,7 @@ export default {
   },
   profile: {
     pageTitle: '基本',
-    subtitle: '管理个人信息和账户设置',
+    subtitle: '管理信息和账户设置',
     information: '个人信息',
     loadFailed: '加载个人信息失败',
     avatarUpdated: '头像已更新',
