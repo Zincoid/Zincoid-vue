@@ -717,7 +717,7 @@ async function saveEdit() {
               <SvgIcon name="key" :size="12" /> {{ t('repo.requestAccess') }}
             </button>
             <button v-if="auth.isLoggedIn" class="repo-access__refresh" :title="t('repo.refresh')" @click="fetchRepo">
-              <SvgIcon name="refresh" :size="16" />
+              <SvgIcon name="refresh" :size="12" />
             </button>
           </div>
         </div>
@@ -1194,9 +1194,9 @@ async function saveEdit() {
 .repo-access__icon { display: flex; align-items: center; justify-content: center; color: var(--color-danger); }
 .repo-access__msg { font-size: var(--text-sm); color: var(--color-text-secondary); }
 .repo-access__actions { display: flex; align-items: center; gap: var(--spacing-sm); }
-/* bare icon button — no border, no accent color; box matches the auth pill beside it */
-.repo-access__refresh { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; flex-shrink: 0; border: none; background: transparent; color: var(--color-text-secondary); border-radius: var(--rounded-full); cursor: pointer; transition: color var(--transition-fast), background var(--transition-fast); }
-.repo-access__refresh:hover { color: var(--color-text); background: var(--color-bg-alt); }
+/* icon-only outline pill — same treatment as the auth pill, in the brighter accent blue */
+.repo-access__refresh { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; flex-shrink: 0; border: 1px solid var(--terminal-accent); background: transparent; color: var(--terminal-accent); border-radius: var(--rounded-full); cursor: pointer; transition: color var(--transition-fast), background var(--transition-fast); }
+.repo-access__refresh:hover { color: var(--color-white); background: var(--terminal-accent); }
 .btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: normal; color: var(--color-warning); background: transparent; border: 1px solid var(--color-warning); border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
 .btn--restricted:hover { color: var(--color-white); background: var(--color-warning); }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); white-space: pre-line; }
