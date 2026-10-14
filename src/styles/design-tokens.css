@@ -38,6 +38,14 @@
   --color-text-tertiary: #b0b7c3;
   --color-text-inverse: #ffffff;
 
+  /* Noise banner band colors — five posterization steps fed to the WebGL
+     noise shader (see NoiseBanner.vue); cream → tan → pink → orange → ink */
+  --noise-0: #f2ecdd;
+  --noise-1: #e4d8bb;
+  --noise-2: #ffb3d9;
+  --noise-3: #ff5a36;
+  --noise-4: #15131d;
+
   /* ── Typography ── */
   --font-body: 'JetBrains Mono', 'Zen Kaku Gothic New', sans-serif;
   --font-mono: 'JetBrains Mono', 'Consolas', sans-serif, monospace;
@@ -133,6 +141,13 @@
   --color-text-inverse: #111827;
 
   --color-card-hover: #be185d;
+
+  /* Noise banner band colors (dark) — indigo → purple → pink → acid */
+  --noise-0: #0c0b12;
+  --noise-1: #1d1840;
+  --noise-2: #3a2a8c;
+  --noise-3: #ff4fb4;
+  --noise-4: #c8ff3d;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);

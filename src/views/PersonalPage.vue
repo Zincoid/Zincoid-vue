@@ -4,6 +4,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useAuthStore } from '@/stores/auth'
 import { useLocaleStore } from '@/stores/locale'
 import SvgIcon from '@/components/SvgIcon.vue'
+import NoiseBanner from '@/components/NoiseBanner.vue'
 
 const { t } = useI18n()
 const auth = useAuthStore()
@@ -50,6 +51,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <NoiseBanner />
   <div class="personal container">
     <div class="header">
       <div class="page-header">
