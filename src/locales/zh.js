@@ -244,6 +244,8 @@ export default {
     itemsRemaining: '（剩余 {count}）',
     sortDefault: '默认',
     sortLatest: '最近',
+    dragSortOn: '开启拖动排序',
+    dragSortOff: '关闭拖动排序',
     deleteConfirm: '确定删除这个仓库？',
     new: '新建',
     name: '名称',

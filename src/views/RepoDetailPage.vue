@@ -185,6 +185,8 @@ const sortOptions = computed(() => [
   { value: 'default', label: t('repo.sortDefault') },
   { value: 'latest', label: t('repo.sortLatest') }
 ])
+// drag reordering is opt-in — off by default so casual browsing never picks up cards
+const dragSort = ref(false)
 
 async function setItemsSort(mode) {
   if (itemsSort.value === mode) return
@@ -721,11 +723,22 @@ async function saveEdit() {
             <span v-if="!repo.tags?.length" class="repo-tag--empty">{{ t('repo.noTags') }}</span>
           </div>
           <div v-if="repo.type !== 0" class="items-sort">
-            <SliderSelect
-              :model-value="itemsSort"
-              :options="sortOptions"
-              @update:model-value="setItemsSort"
-            />
+            <button
+              v-if="canEdit() && itemsSort === 'default'"
+              class="items-sort__drag"
+              :class="{ 'items-sort__drag--on': dragSort }"
+              :title="dragSort ? t('repo.dragSortOff') : t('repo.dragSortOn')"
+              @click="dragSort = !dragSort"
+            >
+              <SvgIcon name="drag" :size="14" />
+            </button>
+            <div class="items-sort__slider" :class="{ 'items-sort__slider--locked': dragSort }">
+              <SliderSelect
+                :model-value="itemsSort"
+                :options="sortOptions"
+                @update:model-value="setItemsSort"
+              />
+            </div>
           </div>
         </div>
 
@@ -781,13 +794,13 @@ async function saveEdit() {
                 </button>
                 <div v-else class="item-card"
                      :class="{ 'item-card--pending': mediaType(item.url) === 'image' && !mediaLoaded[item.id] }"
-                     :draggable="canEdit() && itemsSort === 'default'"
-                     @dragstart="canEdit() && itemsSort === 'default' && onDragStart(item.id, $event)"
-                     @dragover="canEdit() && itemsSort === 'default' && onDragOver(item.id, $event)"
-                     @drop="canEdit() && itemsSort === 'default' && onDrop(item.id, $event)">
+                     :draggable="canEdit() && dragSort && itemsSort === 'default'"
+                     @dragstart="canEdit() && dragSort && itemsSort === 'default' && onDragStart(item.id, $event)"
+                     @dragover="canEdit() && dragSort && itemsSort === 'default' && onDragOver(item.id, $event)"
+                     @drop="canEdit() && dragSort && itemsSort === 'default' && onDrop(item.id, $event)">
                   <div class="item-card__handle">
-                    <SvgIcon v-if="canEdit() && itemsSort === 'default'" name="drag" />
-                    <SvgIcon v-else name="chevron-right" />
+                    <SvgIcon v-if="canEdit() && dragSort && itemsSort === 'default'" name="drag" :size="10" />
+                    <SvgIcon v-else name="chevron-right" :size="10" />
                   </div>
                   <img v-if="mediaType(item.url) === 'image'" :src="item.thumb" class="item-card__thumb" loading="lazy"
                        @load="onMediaLoad(item.id, $event)" @error="onMediaLoad(item.id, $event)" @click="previewItem(item.url)" />
@@ -815,12 +828,12 @@ async function saveEdit() {
           <p v-if="!repo.items?.length" class="empty-state">{{ t('repo.emptyItems') }}</p>
           <div v-else class="items-list">
             <div v-for="(item, index) in repo.items" :key="item.id" class="item-row"
-                 :draggable="canEdit() && itemsSort === 'default'"
-                 @dragstart="canEdit() && itemsSort === 'default' && onDragStart(item.id, $event)"
-                 @dragover="canEdit() && itemsSort === 'default' && onDragOver(item.id, $event)"
-                 @drop="canEdit() && itemsSort === 'default' && onDrop(item.id, $event)">
+                 :draggable="canEdit() && dragSort && itemsSort === 'default'"
+                 @dragstart="canEdit() && dragSort && itemsSort === 'default' && onDragStart(item.id, $event)"
+                 @dragover="canEdit() && dragSort && itemsSort === 'default' && onDragOver(item.id, $event)"
+                 @drop="canEdit() && dragSort && itemsSort === 'default' && onDrop(item.id, $event)">
               <div class="item-row__handle">
-                <SvgIcon v-if="canEdit() && itemsSort === 'default'" name="drag" />
+                <SvgIcon v-if="canEdit() && dragSort && itemsSort === 'default'" name="drag" />
                 <SvgIcon v-else name="chevron-right" />
               </div>
               <div class="item-row__icon">
@@ -1287,7 +1300,14 @@ async function saveEdit() {
 .repo-tag { padding: 1px var(--spacing-sm); font-size: var(--text-xs); color: var(--color-text-secondary); background: var(--color-bg-alt); border-radius: var(--rounded-full); }
 .repo-tag--empty { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 /* item sort switch — default (manual order) vs latest (newest first) */
-.items-sort { flex-shrink: 0; margin-left: auto; }
+.items-sort { display: flex; align-items: center; gap: var(--spacing-sm); flex-shrink: 0; margin-left: auto; }
+/* drag-sort master switch — pure icon toggle left of the sort selector */
+.items-sort__drag { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: none; border-radius: var(--rounded-full); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: color var(--transition-fast), background var(--transition-fast); }
+.items-sort__drag:hover { color: var(--color-text); background: var(--color-bg-alt); }
+.items-sort__drag--on { color: var(--color-primary); background: var(--color-primary-light); }
+.items-sort__drag--on:hover { color: var(--color-primary); background: var(--color-primary-light); }
+/* sort switching is locked while drag reordering is enabled */
+.items-sort__slider--locked { opacity: 0.5; pointer-events: none; }
 
 .repo-url { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: var(--spacing-md) var(--spacing-lg); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--rounded-md); font-size: var(--text-sm); }
 .repo-url:hover { border-color: var(--color-primary); }
@@ -1369,7 +1389,7 @@ async function saveEdit() {
 .item-card[draggable="true"] { cursor: grab; }
 .item-card[draggable="true"]:active { cursor: grabbing; }
 .item-card:hover .item-card__handle, .item-card:hover .item-card__delete { opacity: 1; }
-.item-card__handle { position: absolute; top: 6px; left: 6px; z-index: 2; color: #fff; display: flex; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.item-card__handle { position: absolute; top: 6px; left: 6px; width: 20px; height: 20px; z-index: 2; color: #fff; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast); text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
 .item-card__thumb { width: 100%; height: auto; display: block; }
 .item-card--pending { background: var(--color-bg-alt); min-height: 200px; }

@@ -205,6 +205,8 @@ export default {
     itemsRemaining: '({count} left)',
     sortDefault: 'Default',
     sortLatest: 'Recent',
+    dragSortOn: 'Enable drag sort',
+    dragSortOff: 'Disable drag sort',
     deleteConfirm: 'Delete this repo?',
     new: 'New',
     name: 'Name',
