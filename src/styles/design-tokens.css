@@ -20,6 +20,7 @@
   --color-success-bg: rgba(22, 163, 74, 0.08);
   --color-pink: #be185d;
   --color-pink-bg: rgba(190, 24, 93, 0.08);
+  --color-blue: #0969da;
 
   --color-white: #ffffff;
   --color-red: #e74c3c;
@@ -141,6 +142,8 @@
   --color-text-inverse: #111827;
 
   --color-card-hover: #be185d;
+
+  --color-blue: #58a6ff;
 
   /* Noise banner band colors (dark) — indigo → purple → pink → acid */
   --noise-0: #0c0b12;
