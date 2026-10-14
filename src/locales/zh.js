@@ -284,7 +284,7 @@ export default {
     contributing: '贡献中',
     contribHint: '贡献者：可在仓库设置内加入和退出',
     leaveContributorConfirm: '确定要退出该仓库的贡献？',
-    restrictedHint: '查看此仓库需要授权',
+    restrictedHint: '需要访问授权。',
     noDesc: '暂无简介',
     noTags: '暂无标签',
     pinned: '置顶',
