@@ -360,7 +360,7 @@ export default {
     deleteFailed: '删除失败'
   },
   manage: {
-    subtitle: '站点信息、配置与工具',
+    subtitle: '站点信息、配置与运维工具',
     config: '配置',
     storage: '存储',
     storageTotal: '总空间',

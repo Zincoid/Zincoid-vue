@@ -360,7 +360,7 @@ export default {
     deleteFailed: 'Delete failed'
   },
   manage: {
-    subtitle: 'Site information, configuration & tools',
+    subtitle: 'Site information, configuration & ops tools',
     config: 'Configuration',
     storage: 'Storage',
     storageTotal: 'Total',
