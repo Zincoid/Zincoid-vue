@@ -223,6 +223,7 @@ export default {
     byUpdated: 'By Updated',
     updated: 'Updated',
     requestAccess: 'Auth',
+    refresh: 'Refresh',
     requestAccessConfirm: 'Request access to this repo?',
     requestAccessSent: 'Request sent',
     transfer: 'Transfer',

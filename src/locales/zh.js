@@ -262,6 +262,7 @@ export default {
     byUpdated: '按更新时间',
     updated: '更新于',
     requestAccess: '授权',
+    refresh: '刷新',
     requestAccessConfirm: '确定要申请访问此仓库？',
     requestAccessSent: '申请已发送',
     transfer: '转让',
