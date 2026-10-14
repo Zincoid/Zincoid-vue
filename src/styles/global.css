@@ -406,6 +406,12 @@ th {
   font-size: var(--text-base);
   margin-top: var(--spacing-sm);
 }
+/* terminal-style prompt before every page subtitle */
+.page-header__subtitle::before {
+  content: '>>';
+  color: var(--terminal-accent);
+  margin-right: 0.5em;
+}
 
 [data-theme="dark"] .page-header__title {
   color: #d1d5db;
