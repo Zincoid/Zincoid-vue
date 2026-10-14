@@ -713,7 +713,7 @@ async function saveEdit() {
           </div>
           <p class="repo-access__msg">{{ t('repo.restrictedHint') }}</p>
           <button v-if="auth.isLoggedIn && !isOwner()" class="btn btn--restricted" @click="requestAccess">
-            <SvgIcon name="key" :size="16" /> {{ t('repo.requestAccess') }}
+            <SvgIcon name="key" :size="12" /> {{ t('repo.requestAccess') }}
           </button>
         </div>
         <div v-if="!repo.restricted && repo.description" class="repo-desc">{{ repo.description }}</div>
@@ -1186,9 +1186,9 @@ async function saveEdit() {
 
 /* restricted prompt — no chrome: a big warning lock, hint and CTA stacked below */
 .repo-access { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); padding: var(--spacing-2xl) 0 var(--spacing-xl); text-align: center; }
-.repo-access__icon { display: flex; align-items: center; justify-content: center; color: var(--color-warning); }
+.repo-access__icon { display: flex; align-items: center; justify-content: center; color: var(--color-danger); }
 .repo-access__msg { font-size: var(--text-sm); color: var(--color-text-secondary); }
-.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-xs) var(--spacing-lg); font-size: var(--text-sm); font-weight: normal; color: var(--color-warning); background: transparent; border: 1px solid var(--color-warning); border-radius: var(--rounded-md); cursor: pointer; transition: all var(--transition-fast); }
+.btn--restricted { display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-xs) var(--spacing-md); font-size: var(--text-xs); font-weight: normal; color: var(--color-warning); background: transparent; border: 1px solid var(--color-warning); border-radius: var(--rounded-full); cursor: pointer; transition: all var(--transition-fast); }
 .btn--restricted:hover { color: var(--color-white); background: var(--color-warning); }
 .repo-desc { font-size: var(--text-base); color: var(--color-text); margin-bottom: var(--spacing-xl); line-height: var(--leading-relaxed); white-space: pre-line; }
 
