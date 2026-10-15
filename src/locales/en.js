@@ -125,7 +125,8 @@ export default {
     postFailed: 'Failed to comment',
     deleteFailed: 'Failed to delete comment',
     emojiTitle: 'Emoji',
-    mentionTitle: 'Mention'
+    mentionTitle: 'Mention',
+    refresh: 'Refresh'
   },
   personal: {
     pageTitle: 'Personal',

@@ -125,7 +125,8 @@ export default {
     postFailed: '评论失败',
     deleteFailed: '删除评论失败',
     emojiTitle: '表情',
-    mentionTitle: '提及'
+    mentionTitle: '提及',
+    refresh: '刷新'
   },
   personal: {
     pageTitle: '个人中心',

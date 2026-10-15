@@ -17,7 +17,7 @@ const props = defineProps({
   total: { type: Number, default: 0 }
 })
 
-const emit = defineEmits(['submit', 'delete'])
+const emit = defineEmits(['submit', 'delete', 'refresh'])
 
 const auth = useAuthStore()
 const mention = useMention()
@@ -177,7 +177,17 @@ const visibleComments = computed(() => {
 
 <template>
   <div class="comments">
-    <h4 class="comments__title">{{ t('comment.title', { count: total }) }}</h4>
+    <div class="comments__header">
+      <h4 class="comments__title">{{ t('comment.title', { count: total }) }}</h4>
+      <button
+        class="comments__refresh"
+        :title="t('comment.refresh')"
+        :aria-label="t('comment.refresh')"
+        @click="emit('refresh')"
+      >
+        <SvgIcon name="refresh" :size="14" />
+      </button>
+    </div>
 
     <div class="comments__list" v-if="flatComments.length">
       <template v-for="comment in visibleComments" :key="comment.id">
@@ -312,10 +322,34 @@ const visibleComments = computed(() => {
   margin-top: var(--spacing-3xl);
 }
 
+.comments__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
 .comments__title {
   font-size: var(--text-lg);
-  margin-bottom: var(--spacing-xl);
   color: var(--color-text-heading);
+}
+
+/* icon-only refresh — no border, no fill, ink follows the text buttons */
+.comments__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.comments__refresh:hover {
+  color: var(--color-primary);
 }
 
 .comments__list {

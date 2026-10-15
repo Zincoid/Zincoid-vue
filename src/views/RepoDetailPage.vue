@@ -933,6 +933,7 @@ async function saveEdit() {
             :total="commentTotal"
             @submit="handleComment"
             @delete="handleDeleteComment"
+            @refresh="fetchComments"
         />
         <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
       </template>
