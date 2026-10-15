@@ -154,7 +154,7 @@ const flatComments = computed(() => {
   }
   return list.map(c => ({
     ...c,
-    parentNickname: c.parentId ? map.get(c.parentId)?.userNickname : null,
+    parentUsername: c.parentId ? map.get(c.parentId)?.username : null,
     parsedContent: parseMentions(c.content)
   }))
 })
@@ -203,7 +203,7 @@ const visibleComments = computed(() => {
                 <router-link v-if="comment.username" :to="`/members/@${comment.username}`" class="comment__handle">@{{ comment.username }}</router-link>
                 <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
               </div>
-              <p v-if="comment.parentNickname" class="comment__reply-to">{{ t('comment.replyTo') }} <span class="comment__reply-target">@{{ comment.parentNickname }}</span></p>
+              <p v-if="comment.parentUsername" class="comment__reply-to">{{ t('comment.replyTo') }} <span class="comment__reply-target">@{{ comment.parentUsername }}</span></p>
               <p class="comment__content">
                 <template v-for="(part, i) in comment.parsedContent" :key="i">
                   <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
