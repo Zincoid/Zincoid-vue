@@ -47,10 +47,10 @@ function onDeleteClick(id) {
 }
 
 // sort mode: false = latest, true = hot — parents own the fetch
-const hot = ref(false)
+const hot = ref(true)
 const sortOptions = computed(() => [
-  { value: false, label: t('comment.sortLatest') },
-  { value: true, label: t('comment.sortHot') }
+  { value: true, label: t('comment.sortHot') },
+  { value: false, label: t('comment.sortLatest') }
 ])
 
 function onSortToggle(v) {

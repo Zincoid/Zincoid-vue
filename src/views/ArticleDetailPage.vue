@@ -98,7 +98,7 @@ const commentPage = ref(1)
 const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
-const commentHot = ref(false)
+const commentHot = ref(true)
 const loading = ref(true)
 const loadingDone = ref(false)
 const likeLiked = ref(false)
@@ -168,7 +168,7 @@ async function fetchDetail() {
   try {
     const [aRes, cRes, lRes] = await Promise.all([
       articleAPI.getDetail(id),
-      commentAPI.getArticle(id, 1, commentSize.value),
+      commentAPI.getArticle(id, 1, commentSize.value, commentHot.value),
       likeAPI.getStatus(1, id)
     ])
     article.value = aRes.data.data

@@ -45,7 +45,7 @@ const commentPage = ref(1)
 const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
-const commentHot = ref(false)
+const commentHot = ref(true)
 const loading = ref(true)
 const loadingDone = ref(false)
 const viewerSrc = ref('')
@@ -185,7 +185,7 @@ async function fetchDetail() {
   try {
     const [mRes, cRes, lRes] = await Promise.all([
       momentAPI.getDetail(id),
-      commentAPI.getMoment(id, 1, commentSize.value),
+      commentAPI.getMoment(id, 1, commentSize.value, commentHot.value),
       likeAPI.getStatus(0, id)
     ])
     moment.value = mRes.data.data

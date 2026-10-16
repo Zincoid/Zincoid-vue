@@ -56,7 +56,7 @@ const commentPage = ref(1)
 const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
-const commentHot = ref(false)
+const commentHot = ref(true)
 
 // ── Transfer modal ──
 const settingsOpen = ref(false)
@@ -232,7 +232,7 @@ async function fetchRepo() {
     likeLiked.value = repo.value.isLiked || false
     likeCount.value = repo.value.likeCount || 0
     const [cRes, iRes] = await Promise.all([
-      commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value),
+      commentAPI.getRepo(route.params.id, commentPage.value, commentSize.value, commentHot.value),
       !repo.value.restricted && repo.value.type !== 0 ? repoAPI.getItems(route.params.id, 1, itemsSize, itemsSort.value === 'latest') : Promise.resolve(null)
     ])
     if (iRes) {
