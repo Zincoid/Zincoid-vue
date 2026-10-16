@@ -129,7 +129,8 @@ export default {
     refresh: '刷新',
     more: '更多',
     sortLatest: '最新',
-    sortHot: '最热'
+    sortHot: '最热',
+    empty: '暂无评论。'
   },
   personal: {
     pageTitle: '个人中心',

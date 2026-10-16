@@ -336,6 +336,7 @@ const visibleComments = computed(() => {
         </div>
       </template>
     </div>
+    <p v-else class="comments__empty">{{ t('comment.empty') }}</p>
 
     <div v-if="auth.isLoggedIn" class="comments__form">
       <p v-if="replyTo" class="comments__reply-notice">
@@ -794,6 +795,12 @@ const visibleComments = computed(() => {
 .comments__login-hint {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+}
+
+.comments__empty {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-2xl);
 }
 .mention-link {
   color: var(--color-primary);

@@ -129,7 +129,8 @@ export default {
     refresh: 'Refresh',
     more: 'More',
     sortLatest: 'Latest',
-    sortHot: 'Hot'
+    sortHot: 'Hot',
+    empty: 'No comments yet.'
   },
   personal: {
     pageTitle: 'Personal',
