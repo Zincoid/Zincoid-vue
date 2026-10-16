@@ -15,7 +15,8 @@ const { t } = useI18n()
 const props = defineProps({
   comments: { type: Array, default: () => [] },
   targetId: { type: [Number, String], required: true },
-  targetType: { type: String, required: true }, // 'moment' | 'article'
+  targetType: { type: String, required: true }, // 'moment' | 'article' | 'repo'
+  ownerId: { type: [Number, String], default: null }, // target author may delete comments too
   total: { type: Number, default: 0 }
 })
 
@@ -33,7 +34,7 @@ const submitting = ref(false)
 const openMenuId = ref(null)
 
 function canDelete(comment) {
-  return auth.user?.id === comment.userId || auth.isAdmin
+  return auth.user?.id === comment.userId || auth.user?.id === props.ownerId || auth.isAdmin
 }
 
 function toggleMenu(id) {
