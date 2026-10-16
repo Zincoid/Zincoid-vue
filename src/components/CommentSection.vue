@@ -648,11 +648,12 @@ const visibleComments = computed(() => {
 }
 .comment__pin-tag {
   font-size: var(--text-xs);
-  color: var(--color-primary);
-  background: var(--color-primary-light);
+  color: var(--color-pink);
+  background: var(--color-pink-bg);
   padding: 1px 8px;
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);
+  margin-right: var(--spacing-sm);
 }
 /* overflow menu — three dots pinned to the header's right edge */
 .comment__menu {
