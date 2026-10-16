@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/format'
 import { commentAPI, likeAPI } from '@/api'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -18,7 +19,7 @@ const props = defineProps({
   total: { type: Number, default: 0 }
 })
 
-const emit = defineEmits(['submit', 'delete', 'refresh'])
+const emit = defineEmits(['submit', 'delete', 'refresh', 'sort'])
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -42,6 +43,14 @@ function toggleMenu(id) {
 function onDeleteClick(id) {
   openMenuId.value = null
   emit('delete', id)
+}
+
+// sort mode: false = latest, true = hot — parents own the fetch
+const hot = ref(false)
+
+function onSortToggle(v) {
+  hot.value = v
+  emit('sort', v)
 }
 
 function onCommentInput(e) {
@@ -231,6 +240,12 @@ const visibleComments = computed(() => {
       >
         <SvgIcon name="refresh" :size="14" />
       </button>
+      <ToggleSwitch
+        class="comments__sort"
+        :model-value="hot"
+        :label="hot ? t('comment.sortHot') : t('comment.sortLatest')"
+        @update:model-value="onSortToggle"
+      />
     </div>
 
     <div class="comments__list" v-if="flatComments.length">
@@ -410,6 +425,11 @@ const visibleComments = computed(() => {
 }
 .comments__refresh:hover {
   color: var(--color-primary);
+}
+
+/* latest/hot switcher pinned to the right end of the title row */
+.comments__sort {
+  margin-left: auto;
 }
 
 .comments__list {

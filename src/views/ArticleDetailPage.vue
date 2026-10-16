@@ -98,6 +98,7 @@ const commentPage = ref(1)
 const commentPages = ref(1)
 const commentTotal = ref(0)
 const commentSize = ref(10)
+const commentHot = ref(false)
 const loading = ref(true)
 const loadingDone = ref(false)
 const likeLiked = ref(false)
@@ -233,7 +234,7 @@ async function handleDeleteComment(commentId) {
 }
 
 async function fetchComments() {
-  const { data } = await commentAPI.getArticle(route.params.id, commentPage.value, commentSize.value)
+  const { data } = await commentAPI.getArticle(route.params.id, commentPage.value, commentSize.value, commentHot.value)
   comments.value = data.data.records || []
   commentPages.value = data.data.pages || 1
   commentTotal.value = data.data.total || 0
@@ -241,6 +242,12 @@ async function fetchComments() {
 
 function onCommentPageChange(p) {
   commentPage.value = p
+  fetchComments()
+}
+
+function onCommentSort(hot) {
+  commentHot.value = hot
+  commentPage.value = 1
   fetchComments()
 }
 
@@ -381,6 +388,7 @@ watch(likeLiked, (liked) => {
       @submit="handleComment"
       @delete="handleDeleteComment"
       @refresh="fetchComments"
+      @sort="onCommentSort"
     />
     <Pagination :page="commentPage" :pages="commentPages" :total="commentTotal" :size="commentSize" @change="onCommentPageChange" />
   </div>

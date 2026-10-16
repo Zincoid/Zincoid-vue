@@ -127,7 +127,9 @@ export default {
     emojiTitle: 'Emoji',
     mentionTitle: 'Mention',
     refresh: 'Refresh',
-    more: 'More'
+    more: 'More',
+    sortLatest: 'Latest',
+    sortHot: 'Hot'
   },
   personal: {
     pageTitle: 'Personal',

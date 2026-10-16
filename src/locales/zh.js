@@ -127,7 +127,9 @@ export default {
     emojiTitle: '表情',
     mentionTitle: '提及',
     refresh: '刷新',
-    more: '更多'
+    more: '更多',
+    sortLatest: '最新',
+    sortHot: '最热'
   },
   personal: {
     pageTitle: '个人中心',
