@@ -195,7 +195,7 @@ async function fetchDetail() {
     likeLiked.value = lRes.data.data.liked
     likeCount.value = lRes.data.data.count
   } catch (e) {
-    notFoundReason.value = e?.response?.data?.message === 'Moment is private'
+    notFoundReason.value = e?.response?.data?.error === 'MOMENT_IS_PRIVATE'
       ? 'private'
       : 'notFound'
     console.error(e)

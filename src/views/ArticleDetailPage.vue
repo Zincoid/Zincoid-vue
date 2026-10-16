@@ -180,7 +180,7 @@ async function fetchDetail() {
 
     buildToc()
   } catch (e) {
-    notFoundReason.value = e?.response?.data?.message === 'Article is private'
+    notFoundReason.value = e?.response?.data?.error === 'ARTICLE_IS_PRIVATE'
       ? 'private'
       : 'notFound'
     console.error(e)

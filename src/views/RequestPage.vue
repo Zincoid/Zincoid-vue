@@ -7,6 +7,7 @@ import { useConfirm } from '@/composables/useConfirm'
 import { useToast } from '@/composables/useToast'
 import { requestAPI } from '@/api'
 import { useWalkman } from '@/composables/useWalkman'
+import { useError } from '@/composables/useError'
 import Pagination from '@/components/Pagination.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
@@ -14,6 +15,7 @@ import SvgIcon from '@/components/SvgIcon.vue'
 import { formatDate } from '@/utils/format'
 
 const { t } = useI18n()
+const { getMessage } = useError()
 const { confirm } = useConfirm()
 const { toast } = useToast()
 const router = useRouter()
@@ -115,7 +117,7 @@ async function handleRevoke(r) {
     await requestAPI.remove(r.id)
     detail.value = null
   } catch (err) {
-    toast(err?.response?.data?.message || t('request.deleteFailed'), 'error')
+    toast(getMessage(err, 'request.deleteFailed'), 'error')
   } finally {
     handlingId.value = null
     fetchRP(); fetchRR(); fetchSP(); fetchSR()

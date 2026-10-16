@@ -4,12 +4,13 @@ export function useError() {
   const { t } = useI18n()
 
   function getMessage(err, fallbackKey) {
-    const msg = err?.response?.data?.message
-    if (msg) {
-      const key = `errors.${msg}`
-      const translated = t(key)
-      if (translated !== key) return translated
-      return msg
+    const data = err?.response?.data
+    const key = data?.error || data?.message
+    if (key) {
+      const i18nKey = `errors.${key}`
+      const translated = t(i18nKey)
+      if (translated !== i18nKey) return translated
+      return data?.message || key
     }
     if (fallbackKey) return t(fallbackKey)
     return t('common.failed')
