@@ -130,7 +130,8 @@ export default {
     more: 'More',
     sortLatest: 'Latest',
     sortHot: 'Hot',
-    empty: 'No comments yet.'
+    empty: 'No comments yet.',
+    pinned: 'Pinned'
   },
   personal: {
     pageTitle: 'Personal',
@@ -609,6 +610,9 @@ export default {
     'Only founder can unpin moments': 'Only admin can unpin moments',
     'Only founder can pin articles': 'Only admin can pin articles',
     'Only founder can unpin articles': 'Only admin can unpin articles',
+    'Only top-level comments can be pinned': 'Only top-level comments can be pinned',
+    'No permission to pin this comment': 'No permission to pin this comment',
+    'No permission to unpin this comment': 'No permission to unpin this comment',
     'Admin permission required': 'Admin permission required',
     'Internal server error': 'Internal server error',
     'Invalid or expired verification code': 'Invalid or expired verification code',

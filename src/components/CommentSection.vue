@@ -3,6 +3,8 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
+import { useToast } from '@/composables/useToast'
+import { useError } from '@/composables/useError'
 import { useMention, insertAtCursor } from '@/composables/useMention'
 import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
@@ -12,11 +14,13 @@ import SvgIcon from '@/components/SvgIcon.vue'
 import SliderSelect from '@/components/SliderSelect.vue'
 
 const { t } = useI18n()
+const { toast } = useToast()
+const { getMessage } = useError()
 const props = defineProps({
   comments: { type: Array, default: () => [] },
   targetId: { type: [Number, String], required: true },
   targetType: { type: String, required: true }, // 'moment' | 'article' | 'repo'
-  ownerId: { type: [Number, String], default: null } // target author may delete comments too
+  ownerId: { type: [Number, String], default: null } // target author may delete comments and pin root ones
 })
 
 const emit = defineEmits(['submit', 'delete', 'refresh', 'sort'])
@@ -43,6 +47,25 @@ function toggleMenu(id) {
 function onDeleteClick(id) {
   openMenuId.value = null
   emit('delete', id)
+}
+
+// pinning is reserved for the target author and root comments only
+function canPin(comment) {
+  return auth.user?.id === props.ownerId && !comment.parentId
+}
+
+function hasMenu(comment) {
+  return canDelete(comment) || canPin(comment)
+}
+
+async function onPinClick(comment) {
+  openMenuId.value = null
+  try {
+    await (comment.isPinned ? commentAPI.unpin : commentAPI.pin)(comment.id)
+    emit('refresh')
+  } catch (err) {
+    if (err?.response?.status !== 401) toast(getMessage(err, 'common.failed'), 'error')
+  }
 }
 
 // sort mode: false = latest, true = hot — parents own the fetch
@@ -289,18 +312,22 @@ const visibleComments = computed(() => {
                 <span class="comment__author">{{ comment.userNickname }}</span>
                 <router-link v-if="comment.username" :to="`/members/@${comment.username}`" class="comment__handle">@{{ comment.username }}</router-link>
                 <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
-                <div v-if="canDelete(comment)" class="comment__menu">
-                  <button
-                    class="comment__more-btn"
-                    :class="{ 'comment__more-btn--open': openMenuId === comment.id }"
-                    :title="t('comment.more')"
-                    :aria-label="t('comment.more')"
-                    @click="toggleMenu(comment.id)"
-                  >
-                    <SvgIcon name="more" :size="14" />
-                  </button>
-                  <div v-if="openMenuId === comment.id" class="comment__menu-panel">
-                    <button class="comment__menu-item" @click="onDeleteClick(comment.id)">{{ t('comment.delete') }}</button>
+                <div class="comment__header-right">
+                  <span v-if="comment.isPinned" class="comment__pin-tag">{{ t('comment.pinned') }}</span>
+                  <div v-if="hasMenu(comment)" class="comment__menu">
+                    <button
+                      class="comment__more-btn"
+                      :class="{ 'comment__more-btn--open': openMenuId === comment.id }"
+                      :title="t('comment.more')"
+                      :aria-label="t('comment.more')"
+                      @click="toggleMenu(comment.id)"
+                    >
+                      <SvgIcon name="more" :size="14" />
+                    </button>
+                    <div v-if="openMenuId === comment.id" class="comment__menu-panel">
+                      <button v-if="canPin(comment)" class="comment__menu-item" @click="onPinClick(comment)">{{ comment.isPinned ? t('common.unpin') : t('common.pin') }}</button>
+                      <button v-if="canDelete(comment)" class="comment__menu-item comment__menu-item--danger" @click="onDeleteClick(comment.id)">{{ t('comment.delete') }}</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -612,10 +639,24 @@ const visibleComments = computed(() => {
 .comment__toggle-btn:hover {
   text-decoration: underline;
 }
+/* right side of the header — pin tag + overflow menu */
+.comment__header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.comment__pin-tag {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 1px 8px;
+  border-radius: var(--rounded-full);
+  font-weight: var(--weight-medium);
+}
 /* overflow menu — three dots pinned to the header's right edge */
 .comment__menu {
   position: relative;
-  margin-left: auto;
 }
 .comment__more-btn {
   display: inline-flex;
@@ -652,11 +693,17 @@ const visibleComments = computed(() => {
   text-align: left;
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--text-xs);
-  color: var(--color-danger);
+  color: var(--color-text);
   border-radius: var(--rounded-sm);
   transition: background var(--transition-fast);
 }
 .comment__menu-item:hover {
+  background: var(--color-bg-alt);
+}
+.comment__menu-item--danger {
+  color: var(--color-danger);
+}
+.comment__menu-item--danger:hover {
   background: var(--color-danger-bg);
 }
 

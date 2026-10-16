@@ -130,7 +130,8 @@ export default {
     more: '更多',
     sortLatest: '最新',
     sortHot: '最热',
-    empty: '暂无评论。'
+    empty: '暂无评论。',
+    pinned: '置顶'
   },
   personal: {
     pageTitle: '个人中心',
@@ -609,6 +610,9 @@ export default {
     'Only founder can unpin moments': '仅管理员可取消置顶动态',
     'Only founder can pin articles': '仅管理员可置顶文章',
     'Only founder can unpin articles': '仅管理员可取消置顶文章',
+    'Only top-level comments can be pinned': '仅根评论可置顶',
+    'No permission to pin this comment': '无权置顶此评论',
+    'No permission to unpin this comment': '无权取消置顶此评论',
     'Admin permission required': '需要管理员权限',
     'Internal server error': '服务器内部错误',
     'Invalid or expired verification code': '验证码错误或已过期',

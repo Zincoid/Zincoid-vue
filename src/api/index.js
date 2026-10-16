@@ -108,7 +108,9 @@ export const commentAPI = {
     getDetail: (commentId) => api.get(`/comments/public/${commentId}`),
     getCount: (targetType, targetId) => api.get(`/comments/public/count/${RELATED_TYPE[targetType]}/${targetId}`),
     getHomeFeed: (size = 15) => api.get('/comments/public/home', { params: { size } }),
-  delete: (commentId) => api.delete(`/comments/${commentId}`)
+  delete: (commentId) => api.delete(`/comments/${commentId}`),
+  pin: (commentId) => api.put(`/comments/${commentId}/pin`),
+  unpin: (commentId) => api.put(`/comments/${commentId}/unpin`)
 }
 
 // ── Files ──
