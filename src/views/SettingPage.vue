@@ -23,12 +23,10 @@ const autoPlayMusic = ref(true)
 onMounted(async () => {
   try {
     const { data } = await userAPI.getUserConfig()
-    if (data.code === 200) {
-      receiveEmail.value = data.data.receiveEmail
-      receiveEmailSys.value = data.data.receiveEmailSys
-      receiveEmailRepoAccess.value = data.data.receiveEmailRepoAccess
-      autoPlayMusic.value = data.data.autoPlayMusic !== false
-    }
+    receiveEmail.value = data.data.receiveEmail
+    receiveEmailSys.value = data.data.receiveEmailSys
+    receiveEmailRepoAccess.value = data.data.receiveEmailRepoAccess
+    autoPlayMusic.value = data.data.autoPlayMusic !== false
   } catch (e) {
     handle(e, 'setting.loadFailed')
   } finally {

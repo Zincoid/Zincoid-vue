@@ -447,7 +447,7 @@ onMounted(async () => {
   if (auth.isLoggedIn) {
     try {
       const { data } = await userAPI.getUserConfig()
-      if (data.code === 200 && data.data.autoPlayMusic !== false && currentTrack.value && playSource.value !== 'external') {
+      if (data.data.autoPlayMusic !== false && currentTrack.value && playSource.value !== 'external') {
         nextTick(() => audioRef.value.play()).catch(() => {})
       }
     } catch {}

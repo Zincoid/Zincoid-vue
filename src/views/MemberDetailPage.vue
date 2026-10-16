@@ -119,9 +119,9 @@ onMounted(async () => {
     userId.value = uRes.data.data.id
     await Promise.all([fetchMoments(), fetchArticles(), fetchRepos()])
   } catch (e) {
-    const code = e.response?.data?.code
-    notFound.value = code === 404
-    banned.value = code === 403
+    const error = e.response?.data?.error
+    notFound.value = error === 'USER_NOT_FOUND'
+    banned.value = error === 'USER_DISABLED'
   } finally {
     loading.value = false
   }
