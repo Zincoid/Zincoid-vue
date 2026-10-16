@@ -269,14 +269,15 @@ const visibleComments = computed(() => {
 })
 
 // index of the pinned thread's last visible item — the divider goes after it,
-// so expanded replies stay above the line (pinned is always first in the list)
+// so expanded replies stay above the line (pinned is always first in the list).
+// No divider when the pinned thread is the only root in the list.
 const pinDividerAfter = computed(() => {
   const list = visibleComments.value
   if (!list[0]?.isPinned) return -1
   for (let i = 1; i < list.length; i++) {
     if (list[i].depth === 0) return i - 1
   }
-  return list.length - 1
+  return -1
 })
 </script>
 
@@ -372,7 +373,7 @@ const pinDividerAfter = computed(() => {
             </div>
           </div>
         </div>
-        <div v-if="idx === pinDividerAfter" class="comment__pin-divider"></div>
+        <div v-if="idx === pinDividerAfter" class="comment__pin-divider"># ──────────────────────────── #</div>
       </template>
     </div>
     <p v-else class="comments__empty">{{ t('comment.empty') }}</p>
@@ -667,10 +668,13 @@ const pinDividerAfter = computed(() => {
   font-weight: var(--weight-medium);
   margin-right: var(--spacing-xs);
 }
-/* separator under a pinned comment */
+/* separator under a pinned comment — ascii rule aligned under the comment body */
 .comment__pin-divider {
-  border-top: 1px solid var(--color-border);
-  margin: var(--spacing-xs) 0 var(--spacing-sm);
+  margin: var(--spacing-xs) 0 var(--spacing-sm) 40px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  white-space: pre;
 }
 /* overflow menu — three dots pinned to the header's right edge */
 .comment__menu {
