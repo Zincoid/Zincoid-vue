@@ -385,7 +385,6 @@ watch(likeLiked, (liked) => {
       :target-id="route.params.id"
       target-type="article"
       :owner-id="article.userId"
-      :total="commentTotal"
       @submit="handleComment"
       @delete="handleDeleteComment"
       @refresh="fetchComments"

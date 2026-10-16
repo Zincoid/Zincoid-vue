@@ -16,8 +16,7 @@ const props = defineProps({
   comments: { type: Array, default: () => [] },
   targetId: { type: [Number, String], required: true },
   targetType: { type: String, required: true }, // 'moment' | 'article' | 'repo'
-  ownerId: { type: [Number, String], default: null }, // target author may delete comments too
-  total: { type: Number, default: 0 }
+  ownerId: { type: [Number, String], default: null } // target author may delete comments too
 })
 
 const emit = defineEmits(['submit', 'delete', 'refresh', 'sort'])
@@ -95,8 +94,21 @@ function onDocPointerDown(e) {
     openMenuId.value = null
   }
 }
-onMounted(() => document.addEventListener('pointerdown', onDocPointerDown))
+onMounted(() => {
+  document.addEventListener('pointerdown', onDocPointerDown)
+  fetchTotal()
+})
 onUnmounted(() => document.removeEventListener('pointerdown', onDocPointerDown))
+
+// total comment count including replies — fetched here so the title
+// stays independent from the paged (roots-only) list total
+const total = ref(0)
+
+function fetchTotal() {
+  commentAPI.getCount(props.targetType, props.targetId)
+    .then(({ data }) => { total.value = data.data || 0 })
+    .catch(() => { /* ignore */ })
+}
 
 function handleSubmit() {
   if (!content.value.trim()) return
@@ -188,6 +200,7 @@ watch(() => props.comments, () => {
   expandedParents.value = new Set()
   likeState.value = new Map()
   openMenuId.value = null
+  fetchTotal()
 })
 
 function countReplies(comments) {

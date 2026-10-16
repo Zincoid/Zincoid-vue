@@ -94,6 +94,9 @@ export const articleAPI = {
 }
 
 // ── Comments ──
+// RelatedType values expected by the backend path converter
+const RELATED_TYPE = { moment: 0, article: 1, repo: 4 }
+
 export const commentAPI = {
   addMoment: (momentId, data) => api.post(`/comments/moment/${momentId}`, data),
     addArticle: (articleId, data) => api.post(`/comments/article/${articleId}`, data),
@@ -103,6 +106,7 @@ export const commentAPI = {
     getRepo: (repoId, page = 1, size = 10, hot = true) => api.get(`/comments/public/repo/${repoId}`, { params: { page, size, hot } }),
     getReplies: (parentId) => api.get(`/comments/public/replies/${parentId}`),
     getDetail: (commentId) => api.get(`/comments/public/${commentId}`),
+    getCount: (targetType, targetId) => api.get(`/comments/public/count/${RELATED_TYPE[targetType]}/${targetId}`),
     getHomeFeed: (size = 15) => api.get('/comments/public/home', { params: { size } }),
   delete: (commentId) => api.delete(`/comments/${commentId}`)
 }

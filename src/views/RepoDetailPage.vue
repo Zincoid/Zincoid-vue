@@ -938,7 +938,6 @@ async function saveEdit() {
             :target-id="route.params.id"
             target-type="repo"
             :owner-id="repo.userId"
-            :total="commentTotal"
             @submit="handleComment"
             @delete="handleDeleteComment"
             @refresh="fetchComments"
