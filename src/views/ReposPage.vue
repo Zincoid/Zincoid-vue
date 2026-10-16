@@ -289,6 +289,7 @@ async function createRepo() {
                   <label class="field__label">{{ t('article.visibility') }}</label>
                   <SliderSelect
                     fill
+                    even
                     :model-value="createForm.visibility"
                     :options="visibilityOptions"
                     @update:model-value="v => createForm.visibility = v"

@@ -991,6 +991,7 @@ async function saveEdit() {
                     <label class="field__label">{{ t('article.visibility') }}</label>
                     <SliderSelect
                       fill
+                      even
                       :model-value="editForm.visibility"
                       :options="visibilityOptions"
                       @update:model-value="v => editForm.visibility = v"
