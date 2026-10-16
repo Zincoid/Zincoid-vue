@@ -267,6 +267,17 @@ const visibleComments = computed(() => {
     return true
   })
 })
+
+// index of the pinned thread's last visible item — the divider goes after it,
+// so expanded replies stay above the line (pinned is always first in the list)
+const pinDividerAfter = computed(() => {
+  const list = visibleComments.value
+  if (!list[0]?.isPinned) return -1
+  for (let i = 1; i < list.length; i++) {
+    if (list[i].depth === 0) return i - 1
+  }
+  return list.length - 1
+})
 </script>
 
 <template>
@@ -290,7 +301,7 @@ const visibleComments = computed(() => {
     </div>
 
     <div class="comments__list" v-if="flatComments.length">
-      <template v-for="comment in visibleComments" :key="comment.id">
+      <template v-for="(comment, idx) in visibleComments" :key="comment.id">
         <div
           class="comment"
           :class="`comment--depth-${Math.min(comment.depth, 2)}`"
@@ -311,9 +322,9 @@ const visibleComments = computed(() => {
               <div class="comment__header">
                 <span class="comment__author">{{ comment.userNickname }}</span>
                 <router-link v-if="comment.username" :to="`/members/@${comment.username}`" class="comment__handle">@{{ comment.username }}</router-link>
-                <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
                 <div class="comment__header-right">
                   <span v-if="comment.isPinned" class="comment__pin-tag">{{ t('comment.pinned') }}</span>
+                  <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
                   <div v-if="hasMenu(comment)" class="comment__menu">
                     <button
                       class="comment__more-btn"
@@ -361,6 +372,7 @@ const visibleComments = computed(() => {
             </div>
           </div>
         </div>
+        <div v-if="idx === pinDividerAfter" class="comment__pin-divider"></div>
       </template>
     </div>
     <p v-else class="comments__empty">{{ t('comment.empty') }}</p>
@@ -639,12 +651,12 @@ const visibleComments = computed(() => {
 .comment__toggle-btn:hover {
   text-decoration: underline;
 }
-/* right side of the header — pin tag + overflow menu */
+/* right side of the header — pin tag, time, overflow menu */
 .comment__header-right {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 .comment__pin-tag {
   font-size: var(--text-xs);
@@ -653,7 +665,12 @@ const visibleComments = computed(() => {
   padding: 1px 8px;
   border-radius: var(--rounded-full);
   font-weight: var(--weight-medium);
-  margin-right: var(--spacing-sm);
+  margin-right: var(--spacing-xs);
+}
+/* separator under a pinned comment */
+.comment__pin-divider {
+  border-top: 1px solid var(--color-border);
+  margin: var(--spacing-xs) 0 var(--spacing-sm);
 }
 /* overflow menu — three dots pinned to the header's right edge */
 .comment__menu {
