@@ -581,7 +581,7 @@ function onListLeave() {
   min-width: 0;
   display: flex;
   gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md);
 }
 
 .comment__avatar {
