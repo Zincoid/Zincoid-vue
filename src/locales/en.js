@@ -126,7 +126,8 @@ export default {
     deleteFailed: 'Failed to delete comment',
     emojiTitle: 'Emoji',
     mentionTitle: 'Mention',
-    refresh: 'Refresh'
+    refresh: 'Refresh',
+    more: 'More'
   },
   personal: {
     pageTitle: 'Personal',
@@ -718,6 +719,7 @@ export default {
     likedMoment: 'liked your moment',
     likedArticle: 'liked your article',
     likedRepo: 'liked your repo',
+    likedComment: 'liked your comment',
     registered: 'registered a new account',
     viewerRequest: 'requested to view your repo',
     viewerGranted: 'approved your repo view access',

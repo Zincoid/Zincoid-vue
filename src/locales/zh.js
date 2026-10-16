@@ -126,7 +126,8 @@ export default {
     deleteFailed: '删除评论失败',
     emojiTitle: '表情',
     mentionTitle: '提及',
-    refresh: '刷新'
+    refresh: '刷新',
+    more: '更多'
   },
   personal: {
     pageTitle: '个人中心',
@@ -718,6 +719,7 @@ export default {
     likedMoment: '点赞了你的动态',
     likedArticle: '点赞了你的文章',
     likedRepo: '点赞了你的仓库',
+    likedComment: '点赞了你的评论',
     registered: '注册了新账号',
     viewerRequest: '申请查看你的仓库',
     viewerGranted: '同意了你的仓库查看授权',

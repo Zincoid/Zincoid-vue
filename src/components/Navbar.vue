@@ -7,7 +7,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useI18n } from '@/composables/useI18n'
 import { useConfig, siteBrand } from '@/composables/useConfig'
 import { useConfirm } from '@/composables/useConfirm'
-import { notificationAPI } from '@/api'
+import { notificationAPI, commentAPI } from '@/api'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ScrollArea from '@/components/ScrollArea.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
@@ -131,6 +131,16 @@ function goNotification(n) {
   if (n.relatedType === 11) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'request'; return }
   if (n.targetType === 3) {
     router.push('/chats')
+    return
+  }
+  if (n.targetType === 6) {
+    // like on a comment — resolve the comment's target page first
+    commentAPI.getDetail(n.targetId).then(({ data }) => {
+      const c = data.data
+      if (!c?.targetId) return
+      const name = c.targetType === 4 ? 'RepoDetail' : c.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
+      router.push({ name, params: { id: c.targetId } })
+    }).catch(() => {})
     return
   }
   const name = n.targetType === 4 ? 'RepoDetail' : n.targetType === 0 ? 'MomentDetail' : 'ArticleDetail'
@@ -357,7 +367,7 @@ function closeMenu() {
                               : n.relatedType === 11
                                 ? t('notification.request')
                                 : n.relatedType === 6
-                                  ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : t('notification.likedArticle'))
+                                  ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : n.targetType === 6 ? t('notification.likedComment') : t('notification.likedArticle'))
                     : n.relatedType === 2
                       ? t('notification.mentionedMoment')
                       : n.relatedType === 3

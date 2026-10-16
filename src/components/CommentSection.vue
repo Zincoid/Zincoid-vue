@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from '@/composables/useI18n'
 import { useMention, insertAtCursor } from '@/composables/useMention'
 import { parseMentions } from '@/composables/useMentionLink'
 import { formatDate } from '@/utils/format'
-import { commentAPI } from '@/api'
+import { commentAPI, likeAPI } from '@/api'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
@@ -20,11 +21,28 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'delete', 'refresh'])
 
 const auth = useAuthStore()
+const router = useRouter()
 const mention = useMention()
 const content = ref('')
 const replyTo = ref(null)
 const commentTextarea = ref(null)
 const submitting = ref(false)
+
+// per-comment overflow menu (delete lives in here)
+const openMenuId = ref(null)
+
+function canDelete(comment) {
+  return auth.user?.id === comment.userId || auth.isAdmin
+}
+
+function toggleMenu(id) {
+  openMenuId.value = openMenuId.value === id ? null : id
+}
+
+function onDeleteClick(id) {
+  openMenuId.value = null
+  emit('delete', id)
+}
 
 function onCommentInput(e) {
   content.value = e.target.value
@@ -56,9 +74,12 @@ function onEsc() {
 }
 
 function onDocPointerDown(e) {
-  if (!emojiOpen.value) return
-  if (e.target.closest?.('.comments__emoji-panel, .comments__tool--emoji')) return
-  emojiOpen.value = false
+  if (emojiOpen.value && !e.target.closest?.('.comments__emoji-panel, .comments__tool--emoji')) {
+    emojiOpen.value = false
+  }
+  if (openMenuId.value != null && !e.target.closest?.('.comment__menu')) {
+    openMenuId.value = null
+  }
 }
 onMounted(() => document.addEventListener('pointerdown', onDocPointerDown))
 onUnmounted(() => document.removeEventListener('pointerdown', onDocPointerDown))
@@ -90,6 +111,22 @@ function cancelReply() {
 
 const loadedReplies = ref(new Map())
 const loadingReply = ref(null)
+
+// like overrides keyed by comment id — keeps toggles local until a refresh
+const likeState = ref(new Map())
+
+async function toggleLike(comment) {
+  if (!auth.isLoggedIn) {
+    router.push('/login')
+    return
+  }
+  try {
+    const { data } = await likeAPI.toggle(6, comment.id) // 6 = RelatedType.COMMENT
+    const m = new Map(likeState.value)
+    m.set(comment.id, { liked: data.data.liked, count: data.data.count })
+    likeState.value = m
+  } catch { /* ignore */ }
+}
 
 const allComments = computed(() => {
   return props.comments.map(c => ({
@@ -135,6 +172,8 @@ async function toggleExpand(parentId) {
 watch(() => props.comments, () => {
   loadedReplies.value = new Map()
   expandedParents.value = new Set()
+  likeState.value = new Map()
+  openMenuId.value = null
 })
 
 function countReplies(comments) {
@@ -152,11 +191,16 @@ const flatComments = computed(() => {
   for (const c of list) {
     map.set(c.id, c)
   }
-  return list.map(c => ({
-    ...c,
-    parentUsername: c.parentId ? map.get(c.parentId)?.username : null,
-    parsedContent: parseMentions(c.content)
-  }))
+  return list.map(c => {
+    const like = likeState.value.get(c.id)
+    return {
+      ...c,
+      parentUsername: c.parentId ? map.get(c.parentId)?.username : null,
+      parsedContent: parseMentions(c.content),
+      likeCount: like ? like.count : (c.likeCount ?? 0),
+      isLiked: like ? like.liked : !!c.isLiked
+    }
+  })
 })
 
 const visibleComments = computed(() => {
@@ -212,6 +256,20 @@ const visibleComments = computed(() => {
                 <span class="comment__author">{{ comment.userNickname }}</span>
                 <router-link v-if="comment.username" :to="`/members/@${comment.username}`" class="comment__handle">@{{ comment.username }}</router-link>
                 <span class="comment__time">{{ formatDate(comment.createdAt) }}</span>
+                <div v-if="canDelete(comment)" class="comment__menu">
+                  <button
+                    class="comment__more-btn"
+                    :class="{ 'comment__more-btn--open': openMenuId === comment.id }"
+                    :title="t('comment.more')"
+                    :aria-label="t('comment.more')"
+                    @click="toggleMenu(comment.id)"
+                  >
+                    <SvgIcon name="more" :size="14" />
+                  </button>
+                  <div v-if="openMenuId === comment.id" class="comment__menu-panel">
+                    <button class="comment__menu-item" @click="onDeleteClick(comment.id)">{{ t('comment.delete') }}</button>
+                  </div>
+                </div>
               </div>
               <p v-if="comment.parentUsername" class="comment__reply-to">{{ t('comment.replyTo') }} <span class="comment__reply-target">@{{ comment.parentUsername }}</span></p>
               <p class="comment__content">
@@ -221,14 +279,16 @@ const visibleComments = computed(() => {
                 </template>
               </p>
               <div class="comment__actions">
-                <button class="comment__reply-btn" @click="startReply(comment)">{{ t('comment.reply') }}</button>
                 <button
-                  v-if="auth.user?.id === comment.userId || auth.isAdmin"
-                  class="comment__delete-btn"
-                  @click="emit('delete', comment.id)"
+                  class="comment__like-btn"
+                  :class="{ 'comment__like-btn--active': comment.isLiked }"
+                  :title="comment.isLiked ? t('common.unlike') : t('common.like')"
+                  @click="toggleLike(comment)"
                 >
-                  {{ t('comment.delete') }}
+                  <SvgIcon :name="comment.isLiked ? 'heart-filled' : 'heart'" :size="12" />
+                  <span v-if="comment.likeCount > 0">{{ comment.likeCount }}</span>
                 </button>
+                <button class="comment__reply-btn" @click="startReply(comment)">{{ t('comment.reply') }}</button>
                 <button
                   v-if="comment.depth === 0 && comment.replyCount > 0"
                   class="comment__toggle-btn"
@@ -486,6 +546,19 @@ const visibleComments = computed(() => {
 .comment__reply-btn:hover {
   color: var(--color-primary);
 }
+.comment__like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  padding: 0;
+  margin-right: var(--spacing-sm);
+}
+.comment__like-btn:hover,
+.comment__like-btn--active {
+  color: var(--color-danger);
+}
 .comment__actions {
   display: flex;
   gap: var(--spacing-md);
@@ -500,13 +573,52 @@ const visibleComments = computed(() => {
 .comment__toggle-btn:hover {
   text-decoration: underline;
 }
-.comment__delete-btn {
+/* overflow menu — three dots pinned to the header's right edge */
+.comment__menu {
+  position: relative;
+  margin-left: auto;
+}
+.comment__more-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.comment__more-btn:hover,
+.comment__more-btn--open {
+  color: var(--color-primary);
+}
+.comment__menu-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-xxs);
+  min-width: 96px;
+  padding: var(--spacing-xxs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  z-index: 10;
+}
+.comment__menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--text-xs);
   color: var(--color-danger);
-  padding: 0;
+  border-radius: var(--rounded-sm);
+  transition: background var(--transition-fast);
 }
-.comment__delete-btn:hover {
-  opacity: 0.7;
+.comment__menu-item:hover {
+  background: var(--color-danger-bg);
 }
 
 .comments__reply-notice {
