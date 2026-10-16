@@ -279,6 +279,30 @@ const pinDividerAfter = computed(() => {
   }
   return -1
 })
+
+// sliding hover highlight — one overlay that glides between comment blocks
+const listEl = ref(null)
+const hoverStyle = ref({ top: '0px', left: '0px', width: '0px', height: '0px' })
+const hoverVisible = ref(false)
+
+function onCommentHover(e) {
+  const list = listEl.value
+  const wrap = e.currentTarget
+  if (!list || !wrap) return
+  const lr = list.getBoundingClientRect()
+  const wr = wrap.getBoundingClientRect()
+  hoverStyle.value = {
+    top: `${wr.top - lr.top}px`,
+    left: `${wr.left - lr.left}px`,
+    width: `${wr.width}px`,
+    height: `${wr.height}px`
+  }
+  hoverVisible.value = true
+}
+
+function onListLeave() {
+  hoverVisible.value = false
+}
 </script>
 
 <template>
@@ -301,16 +325,17 @@ const pinDividerAfter = computed(() => {
       />
     </div>
 
-    <div class="comments__list" v-if="flatComments.length">
+    <div class="comments__list" v-if="flatComments.length" ref="listEl" @mouseleave="onListLeave">
+      <div class="comments__hover-bg" :class="{ 'comments__hover-bg--on': hoverVisible }" :style="hoverStyle"></div>
       <template v-for="(comment, idx) in visibleComments" :key="comment.id">
         <div
           class="comment"
-          :class="`comment--depth-${Math.min(comment.depth, 2)}`"
+          :class="[`comment--depth-${Math.min(comment.depth, 2)}`, { 'comment--menu-open': openMenuId === comment.id }]"
         >
           <div class="comment__indent">
             <div class="comment__thread-line"></div>
           </div>
-          <div class="comment__content-wrap">
+          <div class="comment__content-wrap" @mouseenter="onCommentHover">
             <div class="comment__avatar">
               <router-link v-if="comment.userAvatar" :to="`/members/${comment.userId}`">
                 <img :src="comment.userAvatar" alt="" />
@@ -492,15 +517,39 @@ const pinDividerAfter = computed(() => {
 }
 
 .comments__list {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
   margin-bottom: var(--spacing-2xl);
 }
 
+/* sliding hover highlight — glides between comment blocks; darkens,
+   never brightens (white overlays read as glare in dark mode) */
+.comments__hover-bg {
+  position: absolute;
+  z-index: 0;
+  border-radius: var(--rounded-xl);
+  background: rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease, opacity var(--transition-fast);
+}
+[data-theme='dark'] .comments__hover-bg {
+  background: rgba(0, 0, 0, 0.2);
+}
+.comments__hover-bg--on {
+  opacity: 1;
+}
+
 .comment {
+  position: relative;
+  z-index: 1;
   display: flex;
   gap: 0;
+}
+.comment--menu-open {
+  z-index: 5;
 }
 
 .comment__indent {
@@ -533,7 +582,6 @@ const pinDividerAfter = computed(() => {
   display: flex;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
-  border-radius: var(--rounded-md);
 }
 
 .comment__avatar {
