@@ -99,11 +99,13 @@ function statusLabel(s) {
         :model-value="activeTab"
         :options="tabOptions"
         fill
+        even
         @update:model-value="activeTab = $event"
       />
       <SliderSelect
         :model-value="roleFilter"
         :options="roleOptions"
+        even
         @update:model-value="roleFilter = $event"
       />
     </div>

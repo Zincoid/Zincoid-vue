@@ -1,31 +1,65 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 
 const props = defineProps({
   modelValue: { required: true },
   options: { type: Array, required: true },
-  fill: { type: Boolean, default: false }
+  fill: { type: Boolean, default: false },
+  even: { type: Boolean, default: false } // equal-width segments instead of content-sized
 })
 defineEmits(['update:modelValue'])
 
-const count = computed(() => props.options.length)
-
-const indicatorStyle = computed(() => {
-  const i = Math.max(0, props.options.findIndex(o => o.value === props.modelValue))
-  return {
-    left: `calc(${(i * 100) / count.value}% + 3px)`,
-    width: `calc(${100 / count.value}% - 6px)`
-  }
-})
+const root = ref(null)
+const indicatorStyle = ref({ left: '3px', width: '0px' })
 
 function isActive(opt) {
   return props.modelValue === opt.value
 }
+
+// Size each button to its own label, then hand out leftover space
+// proportionally so long labels never spill outside their hover box.
+// With `even`, segments stay equal-width instead. The sliding indicator
+// tracks the active button's real geometry in both modes.
+function layout() {
+  const el = root.value
+  if (!el) return
+  const btns = [...el.querySelectorAll('.slider-select__btn')]
+  if (!btns.length) return
+  if (props.even) {
+    btns.forEach(b => { b.style.flexGrow = '' })
+  } else {
+    btns.forEach(b => { b.style.flexGrow = '0' })
+    const natural = btns.map(b => b.offsetWidth)
+    btns.forEach((b, i) => { b.style.flexGrow = String(natural[i] || 1) })
+  }
+  const i = Math.max(0, props.options.findIndex(o => o.value === props.modelValue))
+  const active = btns[i]
+  if (!active) return
+  indicatorStyle.value = {
+    left: `${active.offsetLeft + 3}px`,
+    width: `${Math.max(0, active.offsetWidth - 6)}px`
+  }
+}
+
+let resizeObserver
+onMounted(() => {
+  nextTick(layout)
+  window.addEventListener('resize', layout)
+  resizeObserver = new ResizeObserver(() => layout())
+  if (root.value) resizeObserver.observe(root.value)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', layout)
+  resizeObserver?.disconnect()
+})
+
+watch(() => props.modelValue, () => nextTick(layout))
+watch(() => props.options, () => nextTick(layout), { deep: true })
 </script>
 
 <template>
-  <div class="slider-select" :class="{ 'slider-select--fill': fill }">
+  <div ref="root" class="slider-select" :class="{ 'slider-select--fill': fill, 'slider-select--even': even }">
     <div class="slider-select__indicator" :style="indicatorStyle"></div>
     <button
       v-for="opt in options"
@@ -57,14 +91,17 @@ function isActive(opt) {
   min-width: 0;
 }
 
+.slider-select--even .slider-select__btn {
+  flex: 1 1 0;
+}
+
 .slider-select__indicator {
   position: absolute;
   top: 3px;
-  left: 3px;
   height: calc(100% - 6px);
   background: var(--color-primary-light);
   border-radius: calc(var(--rounded-md) - 1px);
-  transition: left 0.2s ease;
+  transition: left 0.2s ease, width 0.2s ease;
 }
 
 .slider-select__btn {
@@ -83,7 +120,7 @@ function isActive(opt) {
   white-space: nowrap;
   position: relative;
   z-index: 1;
-  flex: 1 1 0;
+  flex: 0 1 auto;
 }
 
 .slider-select__btn:hover { color: var(--color-text-heading); }

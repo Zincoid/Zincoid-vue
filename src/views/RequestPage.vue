@@ -251,6 +251,7 @@ function formatSize(bytes) {
       class="request-tabs"
       :model-value="activeTab"
       :options="tabOptions"
+      even
       @update:model-value="activeTab = $event"
     />
 
