@@ -9,7 +9,7 @@ import { formatDate } from '@/utils/format'
 import { commentAPI, likeAPI } from '@/api'
 import MentionDropdown from '@/components/MentionDropdown.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
-import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import SliderSelect from '@/components/SliderSelect.vue'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -47,6 +47,10 @@ function onDeleteClick(id) {
 
 // sort mode: false = latest, true = hot — parents own the fetch
 const hot = ref(false)
+const sortOptions = computed(() => [
+  { value: false, label: t('comment.sortLatest') },
+  { value: true, label: t('comment.sortHot') }
+])
 
 function onSortToggle(v) {
   hot.value = v
@@ -240,10 +244,10 @@ const visibleComments = computed(() => {
       >
         <SvgIcon name="refresh" :size="14" />
       </button>
-      <ToggleSwitch
+      <SliderSelect
         class="comments__sort"
         :model-value="hot"
-        :label="hot ? t('comment.sortHot') : t('comment.sortLatest')"
+        :options="sortOptions"
         @update:model-value="onSortToggle"
       />
     </div>
