@@ -808,7 +808,7 @@ export default {
     'NO_PERMISSION_ADD_ITEM': 'No permission to add item',
     'NO_PERMISSION_DELETE_ITEM': 'No permission to delete item',
     'NO_PERMISSION_SWAP_ITEM': 'No permission to swap item',
-    'INVALID_ITEM_SORT': 'Invalid Item Sort',
+    'INVALID_ITEM_SORT': 'Invalid item sort',
     'ACCESS_ALREADY_REQUESTED': 'Access already requested',
     'ACCESS_ALREADY_APPROVED': 'Access already approved',
     'ACCESS_ALREADY_REJECTED': 'Access already rejected',
