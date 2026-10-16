@@ -862,7 +862,6 @@ export default {
     'EMAIL_NEW_CODE_REQUIRED': 'Email and newCode are required',
     'INVALID_DAYS_RANGE': 'days must be between 1 and 365',
     'INVALID_TOP_RANGE': 'top must be between 0 and 500',
-    'INVALID_PARAMETER': 'Invalid parameter',
     // ── AI ────────────────────────────────────────────────
     'AI_USER_NOT_INITIALIZED': 'AI user not initialized',
     'AI_PROVIDER_NOT_CONFIGURED': 'AI provider not configured (ai.openai.providers)',

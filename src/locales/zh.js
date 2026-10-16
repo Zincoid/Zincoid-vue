@@ -862,7 +862,6 @@ export default {
     'EMAIL_NEW_CODE_REQUIRED': '邮箱和新验证码不能为空',
     'INVALID_DAYS_RANGE': '天数必须在 1 到 365 之间',
     'INVALID_TOP_RANGE': 'top 必须在 0 到 500 之间',
-    'INVALID_PARAMETER': '参数无效',
     // ── AI ────────────────────────────────────────────────
     'AI_USER_NOT_INITIALIZED': 'AI 用户未初始化',
     'AI_PROVIDER_NOT_CONFIGURED': 'AI 服务未配置（ai.openai.providers）',
