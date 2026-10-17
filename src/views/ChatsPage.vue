@@ -525,6 +525,12 @@ function openPreview(src) {
   previewSrc.value = src
   previewOpen.value = true
 }
+
+// collapsed dock: pop the composer back up and drop the cursor into it
+function openComposer() {
+  inputAway.value = false
+  nextTick(() => chatTextarea.value?.focus())
+}
 </script>
 
 <template>
@@ -747,15 +753,27 @@ function openPreview(src) {
         {{ t('chat.loginHint') }} <router-link to="/login">{{ t('auth.login') }}</router-link>
       </p>
       <!-- kept after the v-if/v-else pair (Vue needs them adjacent); order:-1
-           lifts it above the bar in the dock column -->
-      <button
-        class="chat-scroll-bottom-btn"
-        :class="{ 'chat-scroll-bottom-btn--hidden': atBottom }"
-        @click="scrollBottom"
-        title="Scroll to bottom"
-      >
-        <SvgIcon name="chevron-down" :size="16" />
-      </button>
+           lifts it above the bar in the dock column. the compose button sits
+           beside the scroll button while the dock is collapsed -->
+      <div class="chat-dock-float">
+        <button
+          class="chat-scroll-bottom-btn"
+          :class="{ 'chat-scroll-bottom-btn--hidden': atBottom }"
+          @click="scrollBottom"
+          title="Scroll to bottom"
+        >
+          <SvgIcon name="chevron-down" :size="18" />
+        </button>
+        <button
+          v-if="auth.isLoggedIn && inputAway"
+          class="chat-compose-btn"
+          :title="t('chat.composeTitle')"
+          :aria-label="t('chat.composeTitle')"
+          @click="openComposer"
+        >
+          <SvgIcon name="input-box" :size="18" />
+        </button>
+      </div>
     </div>
 
     <!-- drag & drop hint (window-level handlers; pointer-events: none so the
@@ -1260,10 +1278,16 @@ function openPreview(src) {
   outline: none;
 }
 
-.chat-scroll-bottom-btn {
-  /* lifted above the bar (DOM order keeps Vue's v-if/v-else adjacency) */
+/* floating pill pair above the bar — lifted above the bar (DOM order keeps
+   Vue's v-if/v-else adjacency), centered as a row */
+.chat-dock-float {
   order: -1;
   align-self: center;
+  display: flex;
+  gap: var(--spacing-sm);
+}
+.chat-scroll-bottom-btn,
+.chat-compose-btn {
   width: 42px;
   height: 42px;
   padding: 0;
@@ -1279,7 +1303,8 @@ function openPreview(src) {
   cursor: pointer;
   transition: opacity 0.25s ease, color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
-.chat-scroll-bottom-btn:hover {
+.chat-scroll-bottom-btn:hover,
+.chat-compose-btn:hover {
   /* same color, one step deeper — surface darkened 20% at the same 70% glass
      (surface 56% + black 14% + transparent 30% ⇒ 80/20 color mix, α 0.7) */
   background: color-mix(in srgb, var(--color-surface) 56%, black 14%, transparent 30%);

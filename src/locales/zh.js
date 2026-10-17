@@ -609,6 +609,7 @@ export default {
     placeholder: '说点什么...',
     emojiTitle: '表情',
     mentionTitle: '提及',
+    composeTitle: '写消息',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
     fileUnavailable: '资源已失效',

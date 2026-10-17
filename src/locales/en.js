@@ -609,6 +609,7 @@ export default {
     placeholder: 'Type a message...',
     emojiTitle: 'Emoji',
     mentionTitle: 'Mention a user',
+    composeTitle: 'Compose a message',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
     fileUnavailable: 'File no longer available',
