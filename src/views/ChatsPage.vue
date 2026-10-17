@@ -68,6 +68,7 @@ const page = ref(1)
 const hasMore = ref(true)
 const chatEl = ref(null)
 const uploadFile = ref(null)
+const replyTo = ref(null) // message being replied to (quoted only, no notification)
 const uploading = ref(false)
 const previewSrc = ref(null)
 const previewOpen = ref(false)
@@ -131,6 +132,12 @@ function startStream() {
     // recall: the content is gone but the slot stays — a centered notice keeps
     // the conversation flow instead of the list jumping
     messages.value = messages.value.map(m => m.id === id ? { ...m, recalled: true } : m)
+  })
+  es.addEventListener('trim', (e) => {
+    const id = Number(e.data)
+    // over-limit cleanup: same slot-keeping notice as recall, different wording
+    // — nobody recalled anything, the chat just hit message_max_count
+    messages.value = messages.value.map(m => m.id === id ? { ...m, trimmed: true } : m)
   })
   es.addEventListener('tool', onToolEvent)
   es.onerror = () => {
@@ -407,9 +414,10 @@ async function handleSend() {
       uploadFile.value = null
       uploading.value = false
     }
-    const { data } = await chatAPI.send(content.value.trim() || null, fileUrl)
+    const { data } = await chatAPI.send(content.value.trim() || null, fileUrl, replyTo.value?.id || null)
     appendMsg(data.data) // SSE may have delivered it first — appendMsg dedupes
     content.value = ''
+    replyTo.value = null
     scrollBottom()
   } catch (e) {
     // ignore
@@ -446,6 +454,7 @@ function insertEmoji(emoji) {
 function onEsc() {
   mention.close()
   emojiOpen.value = false
+  replyTo.value = null
 }
 
 // clicking outside closes the emoji popover
@@ -525,6 +534,22 @@ async function copyMsg(msg) {
   }
 }
 
+// reply: quote the message above the composer — purely visual, no notification
+function replyMsg(msg) {
+  replyTo.value = msg
+  nextTick(() => chatTextarea.value?.focus())
+}
+
+// click a quote to jump to the original — no-op when it isn't loaded
+function jumpToReply(id) {
+  const el = document.getElementById('msg-' + id)
+  if (!el) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.classList.remove('chat-msg--flash')
+  void el.offsetWidth // restart the flash on repeated clicks
+  el.classList.add('chat-msg--flash')
+}
+
 // the hover @ button: type a complete @mention into the composer and focus it
 // (trailing space keeps the mention dropdown from opening on the finished name)
 function mentionUser(msg) {
@@ -565,13 +590,14 @@ function openComposer() {
             <span>{{ dayKey(msg.createdAt) }}</span>
           </div>
           <div
+            :id="'msg-' + msg.id"
             class="chat-msg"
-            :class="{ 'chat-msg--mine': auth.user?.id === msg.userId, 'chat-msg--recalled': msg.recalled }"
+            :class="{ 'chat-msg--mine': auth.user?.id === msg.userId, 'chat-msg--recalled': msg.recalled || msg.trimmed }"
             @mouseenter="onMsgEnter(msg)"
             @mouseleave="onMsgLeave(msg)"
           >
-          <!-- recalled: content gone, the slot keeps a centered notice -->
-          <div v-if="msg.recalled" class="chat-msg__recalled">{{ t('chat.recalled') }}</div>
+          <!-- recalled/trimmed: content gone, the slot keeps a centered notice -->
+          <div v-if="msg.recalled || msg.trimmed" class="chat-msg__recalled">{{ msg.trimmed ? t('chat.trimmed') : t('chat.recalled') }}</div>
           <template v-else>
           <router-link :to="`/members/${msg.userId}`" class="chat-msg__avatar">
             <img v-if="msg.userAvatar" :src="msg.userAvatar" alt="" />
@@ -585,6 +611,25 @@ function openComposer() {
               <span class="chat-msg__time"><template v-if="timeN[msg.id]">{{ formatDate(msg.createdAt).slice(0, timeN[msg.id]) }} <span class="cursor">▌</span></template></span>
             </div>
             <div class="chat-msg__body">
+            <!-- reply quote: muted strip atop the bubble; target gone → placeholder -->
+            <div
+              v-if="msg.replyId"
+              class="chat-msg__reply"
+              :class="{ 'chat-msg__reply--dead': !msg.reply }"
+              @click="msg.reply && jumpToReply(msg.reply.id)"
+            >
+              <template v-if="msg.reply">
+                <img v-if="msg.reply.thumb" :src="msg.reply.thumb" class="chat-msg__reply-thumb" alt="" />
+                <div class="chat-msg__reply-info">
+                  <div class="chat-msg__reply-head">
+                    <span class="chat-msg__reply-name">{{ msg.reply.userNickname }}</span>
+                    <span class="chat-msg__reply-time">{{ formatDate(msg.reply.createdAt) }}</span>
+                  </div>
+                  <div class="chat-msg__reply-preview">{{ msg.reply.content || (!msg.reply.thumb ? t('chat.replyFile') : '') }}</div>
+                </div>
+              </template>
+              <span v-else class="chat-msg__reply-dead">{{ t('chat.replyDeleted') }}</span>
+            </div>
             <div v-if="msg.content" class="chat-msg__content">
               <template v-for="(part, i) in msg.parsedContent" :key="i">
                 <router-link v-if="part.link" :to="`/members/@${part.username}`" class="mention-link">{{ part.text }}</router-link>
@@ -641,6 +686,11 @@ function openComposer() {
                  anchored — right of the bubble for others' messages (and the @
                  mention next to delete), left for mine -->
             <div class="chat-msg__actions">
+              <button
+                class="chat-msg__action chat-msg__action--reply"
+                :title="t('chat.replyTitle')"
+                @click="replyMsg(msg)"
+              ><SvgIcon name="reply" :size="14" /></button>
               <button
                 v-if="msg.content || msg.file"
                 class="chat-msg__action chat-msg__action--copy"
@@ -701,6 +751,13 @@ function openComposer() {
       <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }" @focusin="inputFocused = true; inputAway = false" @focusout="onComposerFocusOut">
         <div class="chat-input__row">
           <div class="chat-input__field">
+            <!-- reply chip: quoted message preview above the textarea -->
+            <div v-if="replyTo" class="chat-input__reply">
+              <SvgIcon name="reply" :size="12" />
+              <span class="chat-input__reply-name">{{ replyTo.userNickname }}</span>
+              <span class="chat-input__reply-text">{{ replyTo.content || (!replyTo.thumb ? t('chat.replyFile') : '') }}</span>
+              <button class="chat-file-remove" @click="replyTo = null">&times;</button>
+            </div>
             <textarea
               ref="chatTextarea"
               :value="content"
@@ -1016,6 +1073,71 @@ function openComposer() {
   color: var(--color-text);
 }
 
+/* ── Reply quote ── */
+
+/* muted strip at the top of the bubble — click jumps to the original */
+.chat-msg__reply {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  padding: 4px 8px;
+  border-radius: var(--rounded-md);
+  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  cursor: pointer;
+  min-width: 0;
+  transition: background var(--transition-fast);
+}
+.chat-msg__reply:hover { background: var(--color-bg); }
+.chat-msg__reply--dead,
+.chat-msg__reply--dead:hover {
+  cursor: default;
+  background: transparent;
+}
+.chat-msg__reply-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.chat-msg__reply-info { min-width: 0; }
+.chat-msg__reply-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.chat-msg__reply-name {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+.chat-msg__reply-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+.chat-msg__reply-preview {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-msg__reply-dead {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* brief band flash when a quote jumps to its original */
+.chat-msg--flash { animation: chat-flash 1.2s ease; }
+@keyframes chat-flash {
+  0%, 100% { background: transparent; }
+  30% { background: var(--color-primary-light); }
+}
+
 /* ── Attachments ── */
 
 .chat-msg__file {
@@ -1176,6 +1298,29 @@ function openComposer() {
   transition: color var(--transition-fast);
 }
 .chat-file-remove:hover { color: var(--color-danger); }
+
+/* reply chip: quoted message preview strip above the textarea */
+.chat-input__reply {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  padding: 2px 4px 6px;
+}
+.chat-input__reply-name {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chat-input__reply-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
 
 .chat-input__row {
   display: flex;
