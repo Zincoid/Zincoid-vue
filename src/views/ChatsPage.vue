@@ -1347,6 +1347,17 @@ function openComposer() {
   white-space: nowrap;
   min-width: 0;
 }
+/* mobile: the pill keeps only the icon — the name would squeeze the composer */
+@media (max-width: 857px) {
+  .chat-input__file-name {
+    display: none;
+  }
+  /* same for the reply chip: drop the quoted text and thumbnail */
+  .chat-input__reply-text,
+  .chat-input__reply-thumb {
+    display: none;
+  }
+}
 .chat-file-remove {
   color: var(--color-text-secondary);
   font-size: 16px;
@@ -1387,7 +1398,7 @@ function openComposer() {
   white-space: nowrap;
   min-width: 0;
   /* cap the preview so long quotes ellipsize instead of hogging the input */
-  max-width: 240px;
+  max-width: 75px;
 }
 
 .chat-input__row {
