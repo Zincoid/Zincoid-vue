@@ -765,8 +765,9 @@ function openComposer() {
           <SvgIcon name="chevron-down" :size="18" />
         </button>
         <button
-          v-if="auth.isLoggedIn && inputAway"
+          v-if="auth.isLoggedIn"
           class="chat-compose-btn"
+          :class="{ 'chat-compose-btn--collapsed': !inputAway }"
           :title="t('chat.composeTitle')"
           :aria-label="t('chat.composeTitle')"
           @click="openComposer"
@@ -1284,7 +1285,6 @@ function openComposer() {
   order: -1;
   align-self: center;
   display: flex;
-  gap: var(--spacing-sm);
 }
 .chat-scroll-bottom-btn,
 .chat-compose-btn {
@@ -1302,6 +1302,25 @@ function openComposer() {
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: opacity 0.25s ease, color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+/* keeps its slot centered in the row and layers over the sliding compose pill */
+.chat-scroll-bottom-btn {
+  position: relative;
+  z-index: 1;
+}
+/* the compose button keeps its 42px pill at all times — animating width would
+   squash the circle. it tucks away behind the scroll button via negative
+   margin + fade, which still glides the row to its new center */
+.chat-compose-btn {
+  flex-shrink: 0;
+  margin-left: var(--spacing-sm);
+  z-index: 0; /* slide behind the scroll button while collapsing */
+  transition: margin 0.25s ease, opacity 0.25s ease, color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+.chat-compose-btn.chat-compose-btn--collapsed {
+  margin-left: -42px;
+  opacity: 0;
+  pointer-events: none;
 }
 .chat-scroll-bottom-btn:hover,
 .chat-compose-btn:hover {
