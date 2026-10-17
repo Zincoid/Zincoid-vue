@@ -144,7 +144,7 @@ defineExpose({ resolveImages, pendingFiles })
     <div v-if="!previewMode && pendingPreviews.length" class="md-editor__thumbs">
       <div v-for="(preview, i) in pendingPreviews" :key="i" class="md-editor__thumb-item">
         <img :src="preview" alt="" />
-        <button class="md-editor__thumb-remove" @click="removePending(i)" title="Remove">
+        <button class="md-editor__thumb-remove" @click="removePending(i)">
           <SvgIcon name="close" :size="10" />
         </button>
       </div>

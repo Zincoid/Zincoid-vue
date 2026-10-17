@@ -760,7 +760,8 @@ function openComposer() {
           class="chat-scroll-bottom-btn"
           :class="{ 'chat-scroll-bottom-btn--hidden': atBottom }"
           @click="scrollBottom"
-          title="Scroll to bottom"
+          :title="t('chat.scrollBottomTitle')"
+          :aria-label="t('chat.scrollBottomTitle')"
         >
           <SvgIcon name="chevron-down" :size="18" />
         </button>

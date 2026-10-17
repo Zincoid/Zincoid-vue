@@ -382,7 +382,7 @@ watch(likeLiked, (liked) => {
             <div v-else class="edit-audio-thumb">
               <SvgIcon name="audio" :size="18" />
             </div>
-            <button class="edit-media-remove" @click="removeKeepImage(i)" title="Remove">
+            <button class="edit-media-remove" @click="removeKeepImage(i)">
             <SvgIcon name="close" :size="10" />
           </button>
           </div>
@@ -395,7 +395,7 @@ watch(likeLiked, (liked) => {
             <div v-else class="edit-audio-thumb">
               <SvgIcon name="audio" :size="18" />
             </div>
-            <button class="edit-media-remove" @click="removeNewImage(i)" title="Remove">
+            <button class="edit-media-remove" @click="removeNewImage(i)">
             <SvgIcon name="close" :size="10" />
           </button>
           </div>

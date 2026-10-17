@@ -172,7 +172,7 @@ async function save() {
         </div>
         <div v-if="coverPreview || form.coverImage" class="cover-preview-wrap">
           <img :src="coverPreview || form.coverImage" class="cover-preview" />
-          <button class="cover-preview-remove" @click="removeCover" title="Remove cover">&times;</button>
+          <button class="cover-preview-remove" @click="removeCover">&times;</button>
         </div>
       </div>
 

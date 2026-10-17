@@ -104,6 +104,9 @@ export default {
     admin: 'Admin',
     members: 'User',
     disabled: 'Disabled',
+    disableTitle: 'Disable',
+    enableTitle: 'Enable',
+    deleteTitle: 'Delete',
     lastActive: 'Last active',
     bannedMessage: 'Account disabled.',
     notFound: 'User not found.'
@@ -610,6 +613,7 @@ export default {
     emojiTitle: 'Emoji',
     mentionTitle: 'Mention a user',
     composeTitle: 'Compose a message',
+    scrollBottomTitle: 'Scroll to bottom',
     loginHint: 'Log in to join the chat.',
     deleteConfirm: 'Delete this message?',
     fileUnavailable: 'File no longer available',

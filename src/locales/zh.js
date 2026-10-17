@@ -104,6 +104,9 @@ export default {
     admin: '管理',
     members: '用户',
     disabled: '已禁用',
+    disableTitle: '禁用',
+    enableTitle: '启用',
+    deleteTitle: '删除',
     lastActive: '上次活跃',
     bannedMessage: '用户已停用。',
     notFound: '用户不存在。'
@@ -610,6 +613,7 @@ export default {
     emojiTitle: '表情',
     mentionTitle: '提及',
     composeTitle: '写消息',
+    scrollBottomTitle: '滚动到底部',
     loginHint: '登录后即可参与聊天。',
     deleteConfirm: '确定删除这条消息？',
     fileUnavailable: '资源已失效',
