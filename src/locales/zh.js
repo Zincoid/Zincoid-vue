@@ -875,6 +875,7 @@ export default {
     'AI_NO_MESSAGE': 'AI 响应中没有可用消息',
     'AI_REASONING_TRUNCATED': '请求过于复杂，推理被中断',
     // ── System ────────────────────────────────────────────
+    'RESOURCE_NOT_FOUND': '资源不存在',
     'INTERNAL_SERVER_ERROR': '服务器内部错误',
     'SERVER_UNDER_MAINTENANCE': '服务器维护中（计划：UTC+8 00:00-00:10）',
     // ── Maintenance fallback (maintenance.js query.reason) ──

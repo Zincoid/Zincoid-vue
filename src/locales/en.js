@@ -875,6 +875,7 @@ export default {
     'AI_NO_MESSAGE': 'No available message in AI response',
     'AI_REASONING_TRUNCATED': 'Request too complex, reasoning was interrupted',
     // ── System ────────────────────────────────────────────
+    'RESOURCE_NOT_FOUND': 'Resource not found',
     'INTERNAL_SERVER_ERROR': 'Internal server error',
     'SERVER_UNDER_MAINTENANCE': 'Server is under maintenance (scheduled: UTC+8 00:00-00:10)',
     // ── Maintenance fallback (maintenance.js query.reason) ──
