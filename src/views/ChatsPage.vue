@@ -77,6 +77,8 @@ const pollSize = ref(50)
 
 const lastScrollTop = ref(0)
 const inputAway = ref(false)
+// composer focus: a focused input must never slide away mid-typing
+const inputFocused = ref(false)
 let scrollRunway = 0
 
 // follow intent: glued to the newest message until the user scrolls away
@@ -259,6 +261,12 @@ const aiMaskStyle = computed(() => {
   return { maskImage: gradient, WebkitMaskImage: gradient }
 })
 
+// composer engagement: focus anywhere in the input area (textarea or its
+// tool buttons) counts as "in use" and blocks the dock auto-hide
+function onComposerFocusOut(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) inputFocused.value = false
+}
+
 function onChatScroll() {
   const st = window.scrollY
   const delta = st - lastScrollTop.value
@@ -269,7 +277,8 @@ function onChatScroll() {
   if (Math.sign(delta) !== Math.sign(scrollRunway)) scrollRunway = 0
   scrollRunway += delta
   if (scrollRunway <= -24) {
-    inputAway.value = true
+    // never slide away a focused composer mid-typing
+    if (!inputFocused.value) inputAway.value = true
     scrollRunway = 0
   } else if (scrollRunway >= 24) {
     inputAway.value = false
@@ -669,7 +678,7 @@ function openPreview(src) {
           </button>
         </div>
       </div>
-      <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }">
+      <div v-if="auth.isLoggedIn" class="chat-input-area" :class="{ 'chat-dock--away': inputAway }" @focusin="inputFocused = true; inputAway = false" @focusout="onComposerFocusOut">
         <div class="chat-input__row">
           <div class="chat-input__field">
             <textarea
