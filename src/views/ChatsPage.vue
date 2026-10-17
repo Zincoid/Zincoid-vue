@@ -80,6 +80,9 @@ const inputAway = ref(false)
 // composer focus: a focused input must never slide away mid-typing
 const inputFocused = ref(false)
 let scrollRunway = 0
+// content height at the last scroll event — a change between two events means
+// the page moved because the layout moved, not because the user scrolled
+let lastScrollHeight = 0
 
 // follow intent: glued to the newest message until the user scrolls away
 const atBottom = ref(true)
@@ -271,18 +274,28 @@ function onChatScroll() {
   const st = window.scrollY
   const delta = st - lastScrollTop.value
   lastScrollTop.value = st
-  // accumulate ~24px of travel before flipping the dock — single-pixel wheel
-  // nudges used to retrigger it mid-scroll, and rapid toggling reads jumpy no
-  // matter how smooth the transition itself is
-  if (Math.sign(delta) !== Math.sign(scrollRunway)) scrollRunway = 0
-  scrollRunway += delta
-  if (scrollRunway <= -24) {
-    // never slide away a focused composer mid-typing
-    if (!inputFocused.value) inputAway.value = true
-    scrollRunway = 0
-  } else if (scrollRunway >= 24) {
-    inputAway.value = false
-    scrollRunway = 0
+  // a recall shrinking a bubble (or any other reflow — image landing, burst
+  // growing the list) drags scrollY along with it: the browser clamps toward
+  // the new bottom or scroll-anchoring slides the view. that still fires real
+  // scroll events, but it always lands together with a content height change,
+  // so it must not count as a user gesture for the dock
+  const sh = document.documentElement.scrollHeight
+  const layoutMoved = sh !== lastScrollHeight
+  lastScrollHeight = sh
+  if (!layoutMoved) {
+    // accumulate ~24px of travel before flipping the dock — single-pixel wheel
+    // nudges used to retrigger it mid-scroll, and rapid toggling reads jumpy no
+    // matter how smooth the transition itself is
+    if (Math.sign(delta) !== Math.sign(scrollRunway)) scrollRunway = 0
+    scrollRunway += delta
+    if (scrollRunway <= -24) {
+      // never slide away a focused composer mid-typing
+      if (!inputFocused.value) inputAway.value = true
+      scrollRunway = 0
+    } else if (scrollRunway >= 24) {
+      inputAway.value = false
+      scrollRunway = 0
+    }
   }
   // pin directionally: only a real upward scroll (delta < 0) that leaves the
   // bottom unpins. growth moves the bottom away without moving us, and our own
@@ -312,6 +325,7 @@ onMounted(async () => {
   await fetchMessages()
   startStream()
   window.addEventListener('scroll', onChatScroll, { passive: true })
+  lastScrollHeight = document.documentElement.scrollHeight
   window.addEventListener('resize', onResize)
   nextTick(updateAtBottom)
 })
