@@ -605,7 +605,7 @@ onBeforeUnmount(stopStream)
             <div v-for="(entry, i) in logEntries" :key="i" class="log-line" :class="'log-line--' + entry.level.toLowerCase()">
               <span class="log-line__time">{{ entry.timestamp }}</span>
               <span class="log-line__level">{{ entry.level }}</span>
-              <span class="log-line__logger">{{ entry.logger }}:</span>
+              <span class="log-line__logger">{{ entry.ip || '/' }} {{ entry.user || '/' }} {{ entry.logger }}:</span>
               <span class="log-line__msg">{{ entry.message }}</span>
               <pre v-if="entry.stackTrace" class="log-line__stack">{{ entry.stackTrace }}</pre>
             </div>
