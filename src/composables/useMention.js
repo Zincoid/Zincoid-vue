@@ -67,43 +67,59 @@ export function useMention() {
     suggestions.value = []
   }
 
+  // style.top/left on a position:fixed element and getBoundingClientRect() can
+  // live in different scales — CSS zoom (html { zoom: 0.75 } on the mobile
+  // breakpoint) multiplies one and not the other, which floated the dropdown
+  // far above the caret on phones. A throwaway fixed probe measures the map
+  // between the two spaces so placement is right under either convention.
+  function fixedSpace() {
+    const probe = document.createElement('div')
+    probe.style.cssText = 'position:fixed;top:0;left:0;width:1000px;height:1000px;visibility:hidden;pointer-events:none'
+    document.body.appendChild(probe)
+    const r = probe.getBoundingClientRect()
+    document.body.removeChild(probe)
+    return { ox: r.left, oy: r.top, sx: r.width / 1000 || 1, sy: r.height / 1000 || 1 }
+  }
+
   function getCaretPixelPos(textarea, charIdx) {
-    const container = textarea.offsetParent
+    const map = fixedSpace()
     const style = window.getComputedStyle(textarea)
+    const taRect = textarea.getBoundingClientRect()
+
+    // overlay a styled mirror on the textarea and measure the caret inside it
     const mirror = document.createElement('div')
-    mirror.style.position = 'absolute'
-    mirror.style.top = textarea.offsetTop + 'px'
-    mirror.style.left = textarea.offsetLeft + 'px'
+    mirror.style.position = 'fixed'
+    mirror.style.top = (taRect.top - map.oy) / map.sy + 'px'
+    mirror.style.left = (taRect.left - map.ox) / map.sx + 'px'
     mirror.style.visibility = 'hidden'
     mirror.style.whiteSpace = 'pre-wrap'
     mirror.style.wordWrap = 'break-word'
     mirror.style.overflowWrap = 'break-word'
-    mirror.style.width = textarea.clientWidth + 'px'
-    mirror.style.height = textarea.clientHeight + 'px'
+    mirror.style.boxSizing = 'border-box'
+    mirror.style.width = taRect.width / map.sx + 'px'
+    mirror.style.height = taRect.height / map.sy + 'px'
     mirror.style.font = style.font
     mirror.style.fontSize = style.fontSize
     mirror.style.fontFamily = style.fontFamily
     mirror.style.lineHeight = style.lineHeight
     mirror.style.padding = style.padding
     mirror.style.border = style.border
-    mirror.style.boxSizing = style.boxSizing
     mirror.style.letterSpacing = style.letterSpacing
     mirror.style.overflowY = 'auto'
     mirror.textContent = textarea.value.substring(0, charIdx) + '​'
-    container.appendChild(mirror)
+    document.body.appendChild(mirror)
     mirror.scrollTop = textarea.scrollTop
 
     const span = document.createElement('span')
     span.textContent = '​'
     mirror.appendChild(span)
 
-    const rect = mirror.getBoundingClientRect()
-    const result = {
-      top: rect.top + span.offsetTop - 8,
-      left: rect.left + span.offsetLeft + 8
+    const caret = span.getBoundingClientRect()
+    document.body.removeChild(mirror)
+    return {
+      top: (caret.top - 8 - map.oy) / map.sy,
+      left: (caret.left + 8 - map.ox) / map.sx
     }
-    container.removeChild(mirror)
-    return result
   }
 
   return reactive({ suggestions, mentionActive, mentionPos, onInput, insert, close })
