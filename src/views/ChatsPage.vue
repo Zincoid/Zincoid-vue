@@ -1286,7 +1286,8 @@ function openComposer() {
 /* no panel chrome behind the bar — the frosted glass lives on the pieces
    themselves (.chat-input__field, .chat-send-btn) */
 
-/* attachment chip: inside the input pill, right of the text (truncates) */
+/* attachment chip: inside the input pill, right of the text (truncates) —
+   same muted pill language as the reply chip */
 .chat-input__file-tag {
   display: inline-flex;
   align-items: center;
@@ -1295,11 +1296,10 @@ function openComposer() {
   min-width: 0;
   max-width: 45%;
   font-size: var(--text-xs);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  padding: 4px 10px;
+  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
+  color: var(--color-text-secondary);
+  padding: 3px 10px;
   border-radius: var(--rounded-full);
-  font-weight: var(--weight-medium);
 }
 .chat-input__file-name {
   overflow: hidden;
@@ -1325,7 +1325,6 @@ function openComposer() {
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
   padding: 3px 10px;
-  margin-bottom: var(--spacing-xxs);
   border-radius: var(--rounded-full);
   background: color-mix(in srgb, var(--color-bg) 65%, transparent);
 }
@@ -1347,6 +1346,8 @@ function openComposer() {
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+  /* cap the preview so long quotes ellipsize instead of hogging the input */
+  max-width: 240px;
 }
 
 .chat-input__row {
