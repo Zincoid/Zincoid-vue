@@ -544,10 +544,32 @@ function replyMsg(msg) {
 function jumpToReply(id) {
   const el = document.getElementById('msg-' + id)
   if (!el) return
+  const box = chatEl.value
+  const flash = () => {
+    el.classList.remove('chat-msg--flash')
+    void el.offsetWidth // restart the flash on repeated clicks
+    el.classList.add('chat-msg--flash')
+  }
+  // how far the box still has to travel to center the target
+  const boxRect = box?.getBoundingClientRect()
+  const rect = el.getBoundingClientRect()
+  const delta = boxRect ? Math.abs(rect.top - (boxRect.top + (boxRect.height - rect.height) / 2)) : 0
   el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  el.classList.remove('chat-msg--flash')
-  void el.offsetWidth // restart the flash on repeated clicks
-  el.classList.add('chat-msg--flash')
+  if (delta < 8) {
+    flash()
+    return
+  }
+  // a far jump outlasts the flash if it starts now — fire when the scroll lands
+  let done = false
+  const onEnd = () => {
+    if (done) return
+    done = true
+    box?.removeEventListener('scrollend', onEnd)
+    clearTimeout(timer)
+    flash()
+  }
+  const timer = setTimeout(onEnd, 700) // fallback when scrollend never fires
+  box?.addEventListener('scrollend', onEnd)
 }
 
 // the hover @ button: type a complete @mention into the composer and focus it
@@ -1148,11 +1170,29 @@ function openComposer() {
   font-style: italic;
 }
 
-/* brief band flash when a quote jumps to its original */
-.chat-msg--flash { animation: chat-flash 1.2s ease; }
+/* lock-on corner brackets when a quote jumps to its original — four right
+   angles offset from the body instead of a box hugging it — 3px thick, 12px
+   arms */
+.chat-msg--flash { position: relative; }
+.chat-msg--flash::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--spacing-sm) * -1);
+  pointer-events: none;
+  background:
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 0 / 12px 3px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 0 / 3px 12px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 100% 0 / 12px 3px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 100% 0 / 3px 12px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 100% / 12px 3px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 100% / 3px 12px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 100% 100% / 12px 3px no-repeat,
+    linear-gradient(var(--color-primary), var(--color-primary)) 100% 100% / 3px 12px no-repeat;
+  animation: chat-flash 1s ease 2 forwards; /* 3 blinks, 1.2s each */
+}
 @keyframes chat-flash {
-  0%, 100% { background: transparent; }
-  30% { background: var(--color-primary-light); }
+  0%, 100% { opacity: 0; }
+  30% { opacity: 1; }
 }
 
 /* ── Attachments ── */
