@@ -1086,12 +1086,12 @@ function openComposer() {
 .chat-msg__reply {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 6px;
   /* extra air above the strip (bubble padding alone reads tight next to the
      content's line-height leading below) */
   margin-top: var(--spacing-xs);
   margin-bottom: var(--spacing-sm);
-  padding: 3px 8px;
+  padding: var(--spacing-xs) var(--spacing-sm);
   border-left: 2px solid color-mix(in srgb, var(--color-primary) 50%, transparent);
   border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0;
   background: color-mix(in srgb, var(--color-bg) 65%, transparent);
@@ -1110,8 +1110,8 @@ function openComposer() {
   border-left-color: var(--color-border);
 }
 .chat-msg__reply-thumb {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
