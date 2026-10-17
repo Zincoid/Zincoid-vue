@@ -142,17 +142,18 @@ function onClose() {
   height: 40px;
   border-radius: var(--rounded-full);
   background: rgba(255, 255, 255, 0.15);
-  color: white;
+  color: rgba(255, 255, 255, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
   border: none;
   text-decoration: none;
 }
 .viewer-btn:hover {
   background: rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 .viewer-content {
