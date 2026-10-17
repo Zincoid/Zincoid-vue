@@ -19,7 +19,7 @@ defineProps({
   <!-- copy -->
   <svg v-else-if="name === 'copy'" :width="size" :height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
   <!-- reply -->
-  <svg v-else-if="name === 'reply'" :width="size" :height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+  <svg v-else-if="name === 'reply'" :width="size" :height="size" viewBox="0 0 1024 1024" fill="currentColor"><path d="M384 128c-81.292 0-144.966 22.458-189.254 66.746C150.458 239.034 128 302.708 128 384l0 512 320 0L448 384l-192 0c0-46.112 9.844-79.332 29.254-98.746C304.668 265.844 337.888 256 384 256"/><path d="M832 128c-81.292 0-144.966 22.458-189.254 66.746C598.458 239.034 576 302.708 576 384l0 512 320 0L896 384l-192 0c0-46.112 9.844-79.332 29.254-98.746C752.668 265.844 785.888 256 832 256"/></svg>
   <!-- plus -->
   <svg v-else-if="name === 'plus'" :width="size" :height="size" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   <!-- close -->

@@ -620,12 +620,11 @@ function openComposer() {
             >
               <template v-if="msg.reply">
                 <img v-if="msg.reply.thumb" :src="msg.reply.thumb" class="chat-msg__reply-thumb" alt="" />
+                <!-- single row: name, time, then the quoted text truncated to one line -->
                 <div class="chat-msg__reply-info">
-                  <div class="chat-msg__reply-head">
-                    <span class="chat-msg__reply-name">{{ msg.reply.userNickname }}</span>
-                    <span class="chat-msg__reply-time">{{ formatDate(msg.reply.createdAt) }}</span>
-                  </div>
-                  <div class="chat-msg__reply-preview">{{ msg.reply.content || (!msg.reply.thumb ? t('chat.replyFile') : '') }}</div>
+                  <span class="chat-msg__reply-name">{{ msg.reply.userNickname }}</span>
+                  <span class="chat-msg__reply-time">{{ formatDate(msg.reply.createdAt) }}</span>
+                  <span class="chat-msg__reply-preview">{{ msg.reply.content || (!msg.reply.thumb ? t('chat.replyFile') : '') }}</span>
                 </div>
               </template>
               <span v-else class="chat-msg__reply-dead">{{ t('chat.replyDeleted') }}</span>
@@ -687,16 +686,16 @@ function openComposer() {
                  mention next to delete), left for mine -->
             <div class="chat-msg__actions">
               <button
-                class="chat-msg__action chat-msg__action--reply"
-                :title="t('chat.replyTitle')"
-                @click="replyMsg(msg)"
-              ><SvgIcon name="reply" :size="14" /></button>
-              <button
                 v-if="msg.content || msg.file"
                 class="chat-msg__action chat-msg__action--copy"
                 :title="t('chat.copy')"
                 @click="copyMsg(msg)"
               ><SvgIcon name="copy" :size="14" /></button>
+              <button
+                class="chat-msg__action chat-msg__action--reply"
+                :title="t('chat.replyTitle')"
+                @click="replyMsg(msg)"
+              ><SvgIcon name="reply" :size="14" /></button>
               <button
                 v-if="msg.username && auth.user?.id !== msg.userId"
                 class="chat-msg__action chat-msg__action--at"
@@ -756,6 +755,7 @@ function openComposer() {
               <SvgIcon name="reply" :size="12" />
               <span class="chat-input__reply-name">{{ replyTo.userNickname }}</span>
               <span class="chat-input__reply-text">{{ replyTo.content || (!replyTo.thumb ? t('chat.replyFile') : '') }}</span>
+              <img v-if="replyTo.thumb" :src="replyTo.thumb" class="chat-input__reply-thumb" alt="" />
               <button class="chat-file-remove" @click="replyTo = null">&times;</button>
             </div>
             <textarea
@@ -1056,6 +1056,10 @@ function openComposer() {
   color: var(--color-primary);
   background: var(--color-primary-light);
 }
+.chat-msg__action--reply:hover {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
 .chat-msg__action--copy:hover {
   color: var(--color-warning);
   background: var(--color-warning-bg);
@@ -1075,48 +1079,59 @@ function openComposer() {
 
 /* ── Reply quote ── */
 
-/* muted strip at the top of the bubble — click jumps to the original */
+/* quote strip at the top of the bubble — accent bar on the left + muted
+   panel; click jumps to the original */
 .chat-msg__reply {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
-  padding: 4px 8px;
-  border-radius: var(--rounded-md);
-  background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+  /* extra air above the strip (bubble padding alone reads tight next to the
+     content's line-height leading below) */
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  padding: 3px 8px;
+  border-left: 2px solid color-mix(in srgb, var(--color-primary) 50%, transparent);
+  border-radius: 0 var(--rounded-sm) var(--rounded-sm) 0;
+  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
   cursor: pointer;
   min-width: 0;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
-.chat-msg__reply:hover { background: var(--color-bg); }
+.chat-msg__reply:hover {
+  background: var(--color-bg);
+  border-left-color: var(--color-primary);
+}
 .chat-msg__reply--dead,
 .chat-msg__reply--dead:hover {
   cursor: default;
   background: transparent;
+  border-left-color: var(--color-border);
 }
 .chat-msg__reply-thumb {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
 }
-.chat-msg__reply-info { min-width: 0; }
-.chat-msg__reply-head {
+.chat-msg__reply-info {
   display: flex;
   align-items: baseline;
   gap: 6px;
+  min-width: 0;
 }
 .chat-msg__reply-name {
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .chat-msg__reply-time {
-  font-size: var(--text-xs);
+  font-size: 10px;
   color: var(--color-text-tertiary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .chat-msg__reply-preview {
   font-size: var(--text-xs);
@@ -1124,6 +1139,8 @@ function openComposer() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 .chat-msg__reply-dead {
   font-size: var(--text-xs);
@@ -1299,7 +1316,7 @@ function openComposer() {
 }
 .chat-file-remove:hover { color: var(--color-danger); }
 
-/* reply chip: quoted message preview strip above the textarea */
+/* reply chip: quoted message preview pill above the textarea */
 .chat-input__reply {
   display: flex;
   align-items: center;
@@ -1307,11 +1324,21 @@ function openComposer() {
   min-width: 0;
   font-size: var(--text-xs);
   color: var(--color-text-secondary);
-  padding: 2px 4px 6px;
+  padding: 3px 10px;
+  margin-bottom: var(--spacing-xxs);
+  border-radius: var(--rounded-full);
+  background: color-mix(in srgb, var(--color-bg) 65%, transparent);
+}
+.chat-input__reply-thumb {
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 .chat-input__reply-name {
   font-weight: var(--weight-semibold);
-  color: var(--color-text);
+  color: var(--color-primary);
   white-space: nowrap;
   flex-shrink: 0;
 }
