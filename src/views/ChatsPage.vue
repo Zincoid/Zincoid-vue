@@ -534,9 +534,12 @@ async function copyMsg(msg) {
   }
 }
 
-// reply: quote the message above the composer — purely visual, no notification
+// reply: quote the message above the composer — purely visual, no notification;
+// auto-drop "@username " into the input so the reply is addressed (not on your
+// own messages)
 function replyMsg(msg) {
   replyTo.value = msg
+  if (msg.username && auth.user?.id !== msg.userId) insertAtCursor(chatTextarea.value, '@' + msg.username + ' ')
   nextTick(() => chatTextarea.value?.focus())
 }
 
