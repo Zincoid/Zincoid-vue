@@ -620,11 +620,13 @@ function openComposer() {
             >
               <template v-if="msg.reply">
                 <img v-if="msg.reply.thumb" :src="msg.reply.thumb" class="chat-msg__reply-thumb" alt="" />
-                <!-- single row: name, time, then the quoted text truncated to one line -->
                 <div class="chat-msg__reply-info">
-                  <span class="chat-msg__reply-name">{{ msg.reply.userNickname }}</span>
-                  <span class="chat-msg__reply-time">{{ formatDate(msg.reply.createdAt) }}</span>
-                  <span class="chat-msg__reply-preview">{{ msg.reply.content || (!msg.reply.thumb ? t('chat.replyFile') : '') }}</span>
+                  <div class="chat-msg__reply-head">
+                    <span class="chat-msg__reply-name">{{ msg.reply.userNickname }}</span>
+                    <span class="chat-msg__reply-time">{{ formatDate(msg.reply.createdAt) }}</span>
+                  </div>
+                  <!-- quoted text stays under the name row, cut to one line -->
+                  <div class="chat-msg__reply-preview">{{ msg.reply.content || (!msg.reply.thumb ? t('chat.replyFile') : '') }}</div>
                 </div>
               </template>
               <span v-else class="chat-msg__reply-dead">{{ t('chat.replyDeleted') }}</span>
@@ -1114,11 +1116,11 @@ function openComposer() {
   border-radius: 4px;
   flex-shrink: 0;
 }
-.chat-msg__reply-info {
+.chat-msg__reply-info { min-width: 0; }
+.chat-msg__reply-head {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  min-width: 0;
 }
 .chat-msg__reply-name {
   font-size: var(--text-xs);
@@ -1139,8 +1141,6 @@ function openComposer() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
-  min-width: 0;
 }
 .chat-msg__reply-dead {
   font-size: var(--text-xs);
