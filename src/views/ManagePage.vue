@@ -873,7 +873,7 @@ onBeforeUnmount(stopStream)
         <div class="tool-info">
           <span class="tool-label">{{ t('manage.permGrant') }}</span>
           <span class="tool-desc">{{ t('manage.permGrantDesc') }}</span>
-          <div v-if="permGrantOpen" class="config-value-row reset-row">
+          <div v-if="permGrantOpen" class="config-value-row reset-row perm-row">
             <div class="reset-inputs" style="flex: 1; min-width: 0;">
               <UserSelect v-model="permGrantUserId" class="perm-user" :placeholder="t('manage.permUserPlaceholder')" />
               <select v-model="permGrantType" class="field__input capacity-select perm-select">
@@ -1080,13 +1080,16 @@ h3 { margin-bottom: var(--spacing-lg); }
 /* ── Permission grant + manage ── */
 .perm-user { flex: 1; min-width: 140px; }
 .perm-select { width: 150px; }
+/* the chosen-user chip is taller than a bare input — stretch these rows so the
+   type select and action buttons grow with the card instead of staying short */
+.perm-row { align-items: stretch; }
 /* expanded manage panel lives inside .tool-info of the toggle tool-item */
 /* the manage tool-item wraps: the cancel/filters bar shares the label row
    (right side, where the side button sits when closed) and the list drops
    onto a full-width second line of the same tool-item */
 .perm-manage-item { flex-wrap: wrap; }
-.perm-manage__bar { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; margin-left: auto; flex-shrink: 0; }
-.perm-manage__filters { display: flex; align-items: center; gap: var(--spacing-sm); flex-wrap: wrap; }
+.perm-manage__bar { display: flex; align-items: stretch; gap: var(--spacing-sm); flex-wrap: wrap; margin-left: auto; flex-shrink: 0; }
+.perm-manage__filters { display: flex; align-items: stretch; gap: var(--spacing-sm); flex-wrap: wrap; }
 .perm-manage__filters .perm-user { width: 220px; flex: 0 0 auto; }
 .perm-manage { flex: 0 0 100%; width: 100%; }
 .perm-list { display: flex; flex-direction: column; gap: var(--spacing-sm); }
