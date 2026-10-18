@@ -170,7 +170,7 @@ async function toggleLike(comment) {
     return
   }
   try {
-    const { data } = await likeAPI.toggle(6, comment.id) // 6 = RelatedType.COMMENT
+    const { data } = await likeAPI.toggle(6, comment.id) // 6 = BizType.COMMENT
     const m = new Map(likeState.value)
     m.set(comment.id, { liked: data.data.liked, count: data.data.count })
     likeState.value = m

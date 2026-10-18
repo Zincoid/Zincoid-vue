@@ -94,7 +94,7 @@ export const articleAPI = {
 }
 
 // ── Comments ──
-// RelatedType values expected by the backend path converter
+// BizType values expected by the backend path converter
 const RELATED_TYPE = { moment: 0, article: 1, repo: 4 }
 
 export const commentAPI = {
