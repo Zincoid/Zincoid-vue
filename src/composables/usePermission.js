@@ -1,14 +1,14 @@
 import { ref } from 'vue'
 import { permissionAPI } from '@/api'
 
-// Permission codes mirror the backend Permission enum (serialized as integers).
-export const Permission = {
+// Permission codes mirror the backend PermissionType enum (serialized as integers).
+export const PermissionType = {
   ARTICLE_OP: 0
 }
 
 // Locale key for each known permission — extend when the backend adds more.
 export const PERMISSION_KEY = {
-  [Permission.ARTICLE_OP]: 'permission.articleOp'
+  [PermissionType.ARTICLE_OP]: 'permission.articleOp'
 }
 
 // Module-level cache (like useConfig): fetched once per login and shared by

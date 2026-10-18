@@ -135,9 +135,9 @@ export const likeAPI = {
 // ── Permissions ──
 export const permissionAPI = {
   my: () => api.get('/permissions/my'),
-  grant: (userId, permission) => api.post(`/permissions/${userId}/${permission}`),
+  grant: (userId, type) => api.post(`/permissions/${userId}/${type}`),
   revoke: (id) => api.delete(`/permissions/${id}`),
-  getList: (userId, permission, page = 1, size = 10) => api.get('/permissions', { params: { userId, permission, page, size } })
+  getList: (userId, type, page = 1, size = 10) => api.get(`/permissions`, { params: { userId, type, page, size } })
 }
 
 // ── Config ──

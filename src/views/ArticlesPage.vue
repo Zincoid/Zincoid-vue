@@ -5,7 +5,7 @@ import { useI18n } from '@/composables/useI18n'
 import { useToast } from '@/composables/useToast'
 import DotBanner from '@/components/DotBanner.vue'
 import { useConfig } from '@/composables/useConfig'
-import { usePermission, Permission } from '@/composables/usePermission'
+import { usePermission, PermissionType } from '@/composables/usePermission'
 import { articleAPI } from '@/api'
 import ArticleCard from '@/components/ArticleCard.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -28,7 +28,7 @@ const loading = ref(true)
 const loadingDone = ref(false)
 
 // ARTICLE_OP gates article creation server-side; admins pass unconditionally
-const canArticleOp = computed(() => auth.isAdmin || has(Permission.ARTICLE_OP))
+const canArticleOp = computed(() => auth.isAdmin || has(PermissionType.ARTICLE_OP))
 const authDialogOpen = ref(false)
 const refreshingPerm = ref(false)
 
