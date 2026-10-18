@@ -233,7 +233,7 @@ export const requestAPI = {
   create: (receiverId, type, meta) => api.post(`/requests/${receiverId}`, null, { params: { type, meta } }),
   sent: (page = 1, size = 10) => api.get('/requests/sent', { params: { page, size } }),
   received: (page = 1, size = 10) => api.get('/requests/received', { params: { page, size } }),
-  handle: (requestId, access) => api.put(`/requests/${requestId}`, null, { params: { access } }),
+  handle: (requestId, approval) => api.put(`/requests/${requestId}`, null, { params: { approval } }),
   remove: (requestId) => api.delete(`/requests/${requestId}`)
 }
 

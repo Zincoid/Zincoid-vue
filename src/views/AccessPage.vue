@@ -132,7 +132,7 @@ function statusLabel(s) {
                   </div>
                 </div>
                 <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
-                <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
+                <span class="access-card__status pending">{{ statusLabel(a.approval) }}</span>
                 <div class="access-card__actions" @click.stop>
                   <button class="access-card__btn access-card__btn--reject" :title="t('access.reject')" @click="rejectAccess(a.id)"><SvgIcon name="close" :size="14" /></button>
                   <button class="access-card__btn access-card__btn--allow" :title="t('access.approve')" @click="approve(a.id)"><SvgIcon name="check" :size="14" /></button>
@@ -154,7 +154,7 @@ function statusLabel(s) {
                   </div>
                 </div>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
-                <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
+                <span class="access-card__status" :class="{ approved: a.approval === 1, rejected: a.approval === 2 }">{{ statusLabel(a.approval) }}</span>
                 <button class="access-card__btn access-card__btn--del" :title="t('access.revoke')" @click.stop="revoke(a.id)"><SvgIcon name="revoke" :size="14" /></button>
               </div>
             </div>
@@ -175,7 +175,7 @@ function statusLabel(s) {
               <div v-for="a in spData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
-                <span class="access-card__status pending">{{ statusLabel(a.access) }}</span>
+                <span class="access-card__status pending">{{ statusLabel(a.approval) }}</span>
               </div>
             </div>
             <Pagination :page="spData.pages > 0 ? (spData.page || 1) : 1" :pages="spData.pages" :total="spData.total" :size="pageSize" @change="p => fetchSP(p)" />
@@ -186,7 +186,7 @@ function statusLabel(s) {
               <div v-for="a in srData.records" :key="a.id" class="access-card" @click="router.push(`/repos/${a.repoId}`)">
                 <span class="access-card__repo access-card__repo--fill">{{ repoNameOf(a) }}</span>
                 <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
-                <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ statusLabel(a.access) }}</span>
+                <span class="access-card__status" :class="{ approved: a.approval === 1, rejected: a.approval === 2 }">{{ statusLabel(a.approval) }}</span>
               </div>
             </div>
             <Pagination :page="srData.pages > 0 ? (srData.page || 1) : 1" :pages="srData.pages" :total="srData.total" :size="pageSize" @change="p => fetchSR(p)" />

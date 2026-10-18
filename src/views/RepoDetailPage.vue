@@ -1131,7 +1131,7 @@ async function saveEdit() {
                     </div>
                   </div>
                   <div class="access-card__time">{{ formatDate(a.createdAt) }}</div>
-                  <span class="access-card__status pending">{{ accessStatus(a.access) }}</span>
+                  <span class="access-card__status pending">{{ accessStatus(a.approval) }}</span>
                   <div class="access-card__actions" @click.stop>
                     <button class="access-card__btn access-card__btn--reject" :title="t('access.reject')" @click="accessReject(a.id)"><SvgIcon name="close" :size="14" /></button>
                     <button class="access-card__btn access-card__btn--allow" :title="t('access.approve')" @click="accessApprove(a.id)"><SvgIcon name="check" :size="14" /></button>
@@ -1154,7 +1154,7 @@ async function saveEdit() {
                     </div>
                   </div>
                   <div class="access-card__time">{{ formatDate(a.updatedAt) }}</div>
-                  <span class="access-card__status" :class="{ approved: a.access === 1, rejected: a.access === 2 }">{{ accessStatus(a.access) }}</span>
+                  <span class="access-card__status" :class="{ approved: a.approval === 1, rejected: a.approval === 2 }">{{ accessStatus(a.approval) }}</span>
                   <button class="access-card__btn access-card__btn--del access-card__btn--icon" :title="t('access.revoke')" @click="accessRevoke(a.id)"><SvgIcon name="revoke" :size="14" /></button>
                 </div>
                 </ScrollArea>

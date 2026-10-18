@@ -70,22 +70,22 @@ async function fetchAll() {
 async function fetchRP(p = 1) {
   const { data } = await requestAPI.received(p, pageSize)
   const d = data.data
-  rpData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
+  rpData.value = { ...d, records: (d.records || []).filter(r => r.approval === 0) }
 }
 async function fetchRR(p = 1) {
   const { data } = await requestAPI.received(p, pageSize)
   const d = data.data
-  rrData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
+  rrData.value = { ...d, records: (d.records || []).filter(r => r.approval !== 0) }
 }
 async function fetchSP(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
   const d = data.data
-  spData.value = { ...d, records: (d.records || []).filter(r => r.access === 0) }
+  spData.value = { ...d, records: (d.records || []).filter(r => r.approval === 0) }
 }
 async function fetchSR(p = 1) {
   const { data } = await requestAPI.sent(p, pageSize)
   const d = data.data
-  srData.value = { ...d, records: (d.records || []).filter(r => r.access !== 0) }
+  srData.value = { ...d, records: (d.records || []).filter(r => r.approval !== 0) }
 }
 
 function openDetail(r, received) {
@@ -93,12 +93,12 @@ function openDetail(r, received) {
   detailReceived.value = received
 }
 
-async function handleRequest(r, access) {
+async function handleRequest(r, approval) {
   if (handlingId.value) return
-  if (!await confirm(access === 1 ? t('request.approveConfirm') : t('request.rejectConfirm'))) return
+  if (!await confirm(approval === 1 ? t('request.approveConfirm') : t('request.rejectConfirm'))) return
   handlingId.value = r.id
   try {
-    await requestAPI.handle(r.id, access === 1 ? 'APPROVED' : 'REJECTED')
+    await requestAPI.handle(r.id, approval === 1 ? 'APPROVED' : 'REJECTED')
     detail.value = null
     fetchRP(); fetchRR(); fetchSP(); fetchSR()
   } catch { /* ignore */ } finally {
@@ -284,7 +284,7 @@ function formatSize(bytes) {
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
-                <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
+                <span class="request-card__status pending">{{ statusLabel(r.approval) }}</span>
                 <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--reject"
@@ -327,7 +327,7 @@ function formatSize(bytes) {
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
-                <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
+                <span class="request-card__status" :class="{ approved: r.approval === 1, rejected: r.approval === 2 }">{{ statusLabel(r.approval) }}</span>
                 <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
@@ -367,7 +367,7 @@ function formatSize(bytes) {
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.createdAt) }}</div>
-                <span class="request-card__status pending">{{ statusLabel(r.access) }}</span>
+                <span class="request-card__status pending">{{ statusLabel(r.approval) }}</span>
                 <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
@@ -398,7 +398,7 @@ function formatSize(bytes) {
                   </div>
                 </div>
                 <div class="request-card__time">{{ formatDate(r.handledAt || r.createdAt) }}</div>
-                <span class="request-card__status" :class="{ approved: r.access === 1, rejected: r.access === 2 }">{{ statusLabel(r.access) }}</span>
+                <span class="request-card__status" :class="{ approved: r.approval === 1, rejected: r.approval === 2 }">{{ statusLabel(r.approval) }}</span>
                 <div class="request-card__actions" @click.stop>
                   <button
                     class="request-card__btn request-card__btn--del"
@@ -466,7 +466,7 @@ function formatSize(bytes) {
               </div>
               <div v-else class="detail-row">
                 <span class="detail-label">{{ t('request.musicLabel') }}</span>
-                <span class="detail-value">{{ detail.access === 1 ? t('request.musicNone') : t('request.musicPending') }}</span>
+                <span class="detail-value">{{ detail.approval === 1 ? t('request.musicNone') : t('request.musicPending') }}</span>
               </div>
               <div v-if="musicUrl(detail)" class="detail-row detail-row--center">
                 <span class="detail-label">{{ t('request.operationLabel') }}</span>
@@ -494,7 +494,7 @@ function formatSize(bytes) {
             <div class="detail-row">
               <span class="detail-label">{{ t('request.statusLabel') }}</span>
               <span class="detail-value">
-                <span class="request-card__status" :class="{ pending: detail.access === 0, approved: detail.access === 1, rejected: detail.access === 2 }">{{ statusLabel(detail.access) }}</span>
+                <span class="request-card__status" :class="{ pending: detail.approval === 0, approved: detail.approval === 1, rejected: detail.approval === 2 }">{{ statusLabel(detail.approval) }}</span>
               </span>
             </div>
             <div class="detail-row">
@@ -521,7 +521,7 @@ function formatSize(bytes) {
                 <SvgIcon name="trash" :size="14" />
                 {{ t('request.remove') }}
               </button>
-              <template v-if="detailReceived && detail.access === 0">
+              <template v-if="detailReceived && detail.approval === 0">
                 <button
                   class="btn btn--danger"
                   :disabled="handlingId !== null"
