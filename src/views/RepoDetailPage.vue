@@ -1112,6 +1112,7 @@ async function saveEdit() {
             <SliderSelect
               :model-value="accessType"
               :options="[{ value: 'viewer', label: t('access.viewer') }, { value: 'contributor', label: t('access.contributor') }]"
+              even
               @update:model-value="accessType = $event"
             />
           </div>
