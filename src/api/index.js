@@ -210,7 +210,7 @@ export const repoAPI = {
   requestAccess: (repoId) => api.post(`/repos/access/${repoId}/viewers`),
   applyContributor: (repoId) => api.post(`/repos/access/${repoId}/contributors`),
   leaveContributor: (repoId) => api.delete(`/repos/access/${repoId}/contributors`),
-  getAccessList: (path, page = 1, size = 10, role, repoId) => api.get(`/repos/access${path}`, { params: { page, size, role, repoId } }),
+  getAccessList: (path, page = 1, size = 10, type, repoId) => api.get(`/repos/access${path}`, { params: { page, size, type, repoId } }),
   _get: (path) => api.get(`/repos/access${path}`),
   _put: (path) => api.put(`/repos/access${path}`),
   _delete: (path) => api.delete(`/repos/access${path}`)

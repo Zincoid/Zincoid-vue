@@ -65,17 +65,17 @@ const transferOverlayDown = ref(false)
 // ── Access management modal ──
 const accessOpen = ref(false)
 const accessLoading = ref(false)
-const accessRole = ref('viewer')
+const accessType = ref('viewer')
 let accessPageSize = 10
 const apData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const arData = ref({ records: [], pages: 1, total: 0, page: 1 })
 
 async function fetchAccessPending(p = 1) {
-  const { data } = await repoAPI.getAccessList('/received/pending', p, accessPageSize, accessRole.value === 'contributor' ? 1 : 0, Number(route.params.id))
+  const { data } = await repoAPI.getAccessList('/received/pending', p, accessPageSize, accessType.value === 'contributor' ? 1 : 0, Number(route.params.id))
   apData.value = data.data
 }
 async function fetchAccessResolved(p = 1) {
-  const { data } = await repoAPI.getAccessList('/received/resolved', p, accessPageSize, accessRole.value === 'contributor' ? 1 : 0, Number(route.params.id))
+  const { data } = await repoAPI.getAccessList('/received/resolved', p, accessPageSize, accessType.value === 'contributor' ? 1 : 0, Number(route.params.id))
   arData.value = data.data
 }
 async function openAccess() {
@@ -83,7 +83,7 @@ async function openAccess() {
   accessLoading.value = true
   try { await Promise.all([fetchAccessPending(1), fetchAccessResolved(1)]) } catch { /* ignore */ } finally { accessLoading.value = false }
 }
-watch(accessRole, () => {
+watch(accessType, () => {
   accessLoading.value = true
   Promise.all([fetchAccessPending(1), fetchAccessResolved(1)]).catch(() => {}).finally(() => { accessLoading.value = false })
 })
@@ -1110,9 +1110,9 @@ async function saveEdit() {
           </h3>
           <div class="modal--access__filters">
             <SliderSelect
-              :model-value="accessRole"
+              :model-value="accessType"
               :options="[{ value: 'viewer', label: t('access.viewer') }, { value: 'contributor', label: t('access.contributor') }]"
-              @update:model-value="accessRole = $event"
+              @update:model-value="accessType = $event"
             />
           </div>
           <div class="modal--access__body">

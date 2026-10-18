@@ -25,12 +25,12 @@ const tabOptions = computed(() => [
   { value: 'sent', label: t('access.sent'), icon: 'send' }
 ])
 
-const roleFilter = ref('viewer')
-const roleOptions = computed(() => [
+const typeFilter = ref('viewer')
+const typeOptions = computed(() => [
   { value: 'viewer', label: t('access.viewer') },
   { value: 'contributor', label: t('access.contributor') }
 ])
-const roleValue = computed(() => roleFilter.value === 'contributor' ? 1 : 0)
+const typeValue = computed(() => typeFilter.value === 'contributor' ? 1 : 0)
 
 const spData = ref({ records: [], pages: 1, total: 0, page: 1 })
 const srData = ref({ records: [], pages: 1, total: 0, page: 1 })
@@ -53,12 +53,12 @@ async function fetchAll() {
   }
 }
 
-async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/sent/pending', p, pageSize, roleValue.value); spData.value = data.data }
-async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/sent/resolved', p, pageSize, roleValue.value); srData.value = data.data }
-async function fetchRP(p = 1) { const { data } = await repoAPI.getAccessList('/received/pending', p, pageSize, roleValue.value); rpData.value = data.data }
-async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/received/resolved', p, pageSize, roleValue.value); rrData.value = data.data }
+async function fetchSP(p = 1) { const { data } = await repoAPI.getAccessList('/sent/pending', p, pageSize, typeValue.value); spData.value = data.data }
+async function fetchSR(p = 1) { const { data } = await repoAPI.getAccessList('/sent/resolved', p, pageSize, typeValue.value); srData.value = data.data }
+async function fetchRP(p = 1) { const { data } = await repoAPI.getAccessList('/received/pending', p, pageSize, typeValue.value); rpData.value = data.data }
+async function fetchRR(p = 1) { const { data } = await repoAPI.getAccessList('/received/resolved', p, pageSize, typeValue.value); rrData.value = data.data }
 
-watch(roleFilter, () => { fetchAll() })
+watch(typeFilter, () => { fetchAll() })
 
 function repoNameOf(a) { return a.repoName || `#${a.repoId}` }
 function userNameOf(a) { return a.userNickname || `User#${a.userId}` }
@@ -103,10 +103,10 @@ function statusLabel(s) {
         @update:model-value="activeTab = $event"
       />
       <SliderSelect
-        :model-value="roleFilter"
-        :options="roleOptions"
+        :model-value="typeFilter"
+        :options="typeOptions"
         even
-        @update:model-value="roleFilter = $event"
+        @update:model-value="typeFilter = $event"
       />
     </div>
 
