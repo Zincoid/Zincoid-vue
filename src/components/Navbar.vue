@@ -124,11 +124,11 @@ function goNotification(n) {
       unreadCount.value = Math.max(0, unreadCount.value - 1)
     }).catch(() => {})
   }
-  if (n.relatedType === 5) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'system'; return }
-  if (n.relatedType === 7) { router.push(`/members/${n.relatedId}`); return }
-  if (n.relatedType === 8 || n.relatedType === 12) { router.push('/personal/access'); return }
-  if (n.relatedType === 9 || n.relatedType === 10 || n.relatedType === 13 || n.relatedType === 14) { router.push(`/repos/${n.relatedId}`); return }
-  if (n.relatedType === 11) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'request'; return }
+  if (n.type === 5) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'system'; return }
+  if (n.type === 7) { router.push(`/members/${n.relatedId}`); return }
+  if (n.type === 8 || n.type === 12) { router.push('/personal/access'); return }
+  if (n.type === 9 || n.type === 10 || n.type === 13 || n.type === 14) { router.push(`/repos/${n.relatedId}`); return }
+  if (n.type === 11) { detailMessage.value = n.snippet; detailSender.value = n.senderNickname; detailKind.value = 'request'; return }
   if (n.targetType === 3) {
     router.push('/chats')
     return
@@ -348,33 +348,33 @@ function closeMenu() {
             <div class="navbar__notif-item-body">
               <div class="navbar__notif-item-text">
                 <strong>{{ n.senderNickname }}</strong>
-                {{ n.relatedType === 5
+                {{ n.type === 5
                   ? t('notification.system')
-                  : n.relatedType === 7
+                  : n.type === 7
                     ? t('notification.registered')
-                    : n.relatedType === 8
+                    : n.type === 8
                       ? t('notification.viewerRequest')
-                    : n.relatedType === 9
+                    : n.type === 9
                       ? t('notification.viewerGranted')
-                      : n.relatedType === 10
+                      : n.type === 10
                         ? t('notification.viewerRejected')
-                        : n.relatedType === 12
+                        : n.type === 12
                           ? t('notification.contributorRequest')
-                          : n.relatedType === 13
+                          : n.type === 13
                             ? t('notification.contributorGranted')
-                            : n.relatedType === 14
+                            : n.type === 14
                               ? t('notification.contributorRejected')
-                              : n.relatedType === 11
+                              : n.type === 11
                                 ? t('notification.request')
-                                : n.relatedType === 6
+                                : n.type === 6
                                   ? (n.targetType === 0 ? t('notification.likedMoment') : n.targetType === 4 ? t('notification.likedRepo') : n.targetType === 6 ? t('notification.likedComment') : t('notification.likedArticle'))
-                    : n.relatedType === 2
+                    : n.type === 2
                       ? t('notification.mentionedMoment')
-                      : n.relatedType === 3
+                      : n.type === 3
                         ? (n.targetType === 0 ? t('notification.mentionedCommentMoment') : n.targetType === 4 ? t('notification.mentionedCommentRepo') : t('notification.mentionedCommentArticle'))
-                        : n.relatedType === 4
+                        : n.type === 4
                           ? t('notification.mentionedChat')
-                          : n.relatedType === 1
+                          : n.type === 1
                             ? (n.targetType === 0 ? t('notification.repliedMoment') : n.targetType === 4 ? t('notification.repliedRepo') : t('notification.repliedArticle'))
                             : (n.targetType === 0 ? t('notification.commentedMoment') : n.targetType === 4 ? t('notification.commentedRepo') : t('notification.commentedArticle')) }}
               </div>
