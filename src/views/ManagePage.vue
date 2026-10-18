@@ -6,7 +6,7 @@ import { useError } from '@/composables/useError'
 import { useToast } from '@/composables/useToast'
 import { configAPI, userAPI, storageAPI, notificationAPI, logAPI, musicAPI, permissionAPI } from '@/api'
 import { useConfig } from '@/composables/useConfig'
-import { Perm, PERM_KEY } from '@/composables/usePermission'
+import { Permission, PERMISSION_KEY } from '@/composables/usePermission'
 import { formatDate } from '@/utils/format'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ScrollArea from '@/components/ScrollArea.vue'
@@ -155,22 +155,22 @@ const permMessage = ref('')
 const permError = ref('')
 
 const permOptions = computed(() =>
-  Object.entries(PERM_KEY).map(([value, key]) => ({ value: Number(value), label: t(key) }))
+  Object.entries(PERMISSION_KEY).map(([value, key]) => ({ value: Number(value), label: t(key) }))
 )
 
 function permLabel(p) {
-  return PERM_KEY[p] ? t(PERM_KEY[p]) : t('permission.unknown')
+  return PERMISSION_KEY[p] ? t(PERMISSION_KEY[p]) : t('permission.unknown')
 }
 
 const permGrantOpen = ref(false)
 const permGrantUserId = ref(null)
-const permGrantType = ref(Perm.ARTICLE_OP)
+const permGrantType = ref(Permission.ARTICLE_OP)
 const permGranting = ref(false)
 
 function openPermGrant() {
   permGrantOpen.value = true
   permGrantUserId.value = null
-  permGrantType.value = Perm.ARTICLE_OP
+  permGrantType.value = Permission.ARTICLE_OP
 }
 
 async function handlePermGrant() {
@@ -928,7 +928,7 @@ onBeforeUnmount(stopStream)
                 <img v-if="row.userAvatar" :src="row.userAvatar" class="perm-item__avatar" />
                 <span v-else class="perm-item__avatar perm-item__avatar--placeholder">{{ (row.username || '?')[0].toUpperCase() }}</span>
                 <span class="perm-item__user">@{{ row.username }}</span>
-                <span class="perm-item__tag">{{ permLabel(row.perm) }}</span>
+                <span class="perm-item__tag">{{ permLabel(row.permission) }}</span>
                 <span class="perm-item__meta">
                   {{ formatDate(row.createdAt) }}<template v-if="row.grantedByUsername"> · {{ t('manage.permGrantedBy', { name: row.grantedByUsername }) }}</template>
                 </span>
